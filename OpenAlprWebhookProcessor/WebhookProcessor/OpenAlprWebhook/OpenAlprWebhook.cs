@@ -78,7 +78,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public string BestRegion { get; set; }
 
         [JsonPropertyName("best_region_confidence")]
-        public int BestRegionConfidence { get; set; }
+        public double BestRegionConfidence { get; set; }
 
         [JsonPropertyName("matches_template")]
         public bool MatchesTemplate { get; set; }
