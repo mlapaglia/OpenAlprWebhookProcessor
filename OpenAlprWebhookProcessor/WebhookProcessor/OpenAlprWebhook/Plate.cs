@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public string Region { get; set; }
 
         [JsonPropertyName("region_confidence")]
-        public int RegionConfience { get; set; }
+        public double RegionConfidence { get; set; }
 
         [JsonPropertyName("processing_time_ms")]
         public double ProcessingTimeMs { get; set; }
