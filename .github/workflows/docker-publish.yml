@@ -45,7 +45,6 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
-          registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
@@ -54,4 +53,4 @@ jobs:
         with:
           file: ./OpenAlprWebhookProcessor/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/openalprwebhookprocessor:latest
+          tags: mlapaglia/openalprwebhookprocessor:latest
