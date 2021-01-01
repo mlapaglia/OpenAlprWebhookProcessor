@@ -2,9 +2,11 @@
 
 namespace OpenAlprWebhookProcessor.Cameras.Configuration
 {
-    public class HikvisionCameraConfiguration
+    public class Camera
     {
-        public Uri UpdateTextUrl { get; set; }
+        public CameraManufacturer Manufacturer { get; set; }
+
+        public Uri UpdateOverlayTextUrl { get; set; }
 
         public string Username { get; set; }
 
