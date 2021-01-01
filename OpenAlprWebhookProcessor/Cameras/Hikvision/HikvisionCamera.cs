@@ -5,38 +5,19 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using System.IO;
-using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Collections.Generic;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
-using System.Linq;
+using System.Net;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
-    public class HikvisionCamera : ICamera
+    public static class HikvisionCamera
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-
-        private readonly ILogger _logger;
-
-        private readonly CameraConfiguration _configuration;
-
-        public HikvisionCamera(
-            IHttpClientFactory httpClientFactory,
-            ILogger<HikvisionCamera> logger,
-            CameraConfiguration configuration)
-        {
-            _httpClientFactory = httpClientFactory;
-            _logger = logger;
-            _configuration = configuration;
-        }
-
-        public async Task ClearCameraTextAsync(
-            int openAlprCameraId,
+        public static async Task ClearCameraTextAsync(
+            Camera cameraToUpdate,
             CancellationToken cancellationToken)
         {
-            var cameraToUpdate = _configuration.HikvisionCameras.First(x => x.OpenAlprCameraId == openAlprCameraId);
-
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
 
             videoOverlayRequest.TextOverlayList.TextOverlay.Add(
@@ -47,20 +28,26 @@ namespace OpenAlprWebhookProcessor.Cameras
                     DisplayText = string.Empty,
                 });
 
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "2",
+                    Enabled = "false",
+                    DisplayText = string.Empty,
+                });
+
             await PushCameraTextAsync(
                 cameraToUpdate,
                 videoOverlayRequest,
                 cancellationToken);
         }
 
-        public async Task SetCameraTextAsync(
-            int openAlprCameraId,
+        public static async Task SetCameraTextAsync(
+            Camera cameraToUpdate,
             string plateNumber,
             string vehicleDescription,
             CancellationToken cancellationToken)
         {
-            var cameraToUpdate = _configuration.HikvisionCameras.First(x => x.OpenAlprCameraId == openAlprCameraId);
-
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
 
             videoOverlayRequest.TextOverlayList.TextOverlay.Add(
@@ -85,11 +72,19 @@ namespace OpenAlprWebhookProcessor.Cameras
                 cancellationToken);
         }
 
-        private async Task PushCameraTextAsync(
-            HikvisionCameraConfiguration cameraToUpdate,
+        private static async Task PushCameraTextAsync(
+            Camera cameraToUpdate,
             VideoOverlay videoOverlay,
             CancellationToken cancellationToken)
         {
+            var client = new HttpClient(new HttpClientHandler()
+            {
+                UseDefaultCredentials = true,
+                Credentials = new NetworkCredential(
+                    cameraToUpdate.Username,
+                    cameraToUpdate.Password),
+            });
+
             using (var stringWriter = new StringWriter())
             {
                 using (XmlWriter writer = XmlWriter.Create(stringWriter))
@@ -99,14 +94,9 @@ namespace OpenAlprWebhookProcessor.Cameras
                         writer,
                         videoOverlay);
 
-                    var content = new StringContent(stringWriter.ToString());
-                    _logger.LogInformation(stringWriter.ToString());
-
-                    var client = _httpClientFactory.CreateClient(nameof(HikvisionCamera));
-
                     var response = await client.PutAsync(
-                        cameraToUpdate.UpdateTextUrl,
-                        content,
+                        cameraToUpdate.UpdateOverlayTextUrl,
+                        new StringContent(stringWriter.ToString()),
                         cancellationToken);
 
                     if (!response.IsSuccessStatusCode)

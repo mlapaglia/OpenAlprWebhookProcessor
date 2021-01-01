@@ -28,18 +28,6 @@ namespace OpenAlprWebhookProcessor
             var cameraConfiguration = new CameraConfiguration();
             Configuration.GetSection("Cameras").Bind(cameraConfiguration);
 
-            services.AddHttpClient(nameof(HikvisionCamera))
-                .ConfigurePrimaryHttpMessageHandler(() =>
-                {
-                    return new HttpClientHandler()
-                    {
-                        UseDefaultCredentials = true,
-                        Credentials = new NetworkCredential(
-                            cameraConfiguration.HikvisionCameras[0].Username,
-                            cameraConfiguration.HikvisionCameras[0].Password),
-                    };
-                });
-
             services.AddLogging(config =>
             {
                 config.AddDebug();
@@ -49,7 +37,6 @@ namespace OpenAlprWebhookProcessor
             services.AddSingleton(cameraConfiguration);
 
             services.AddSingleton<WebhookHandler>();
-            services.AddSingleton<ICamera, HikvisionCamera>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

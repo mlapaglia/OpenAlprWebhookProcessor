@@ -1,20 +1,21 @@
-﻿using System;
+﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
-    public class DahuaCamera : ICamera
+    public static class DahuaCamera
     {
-        public Task ClearCameraTextAsync(
-            int openAlprCameraId,
+        public static async Task ClearCameraTextAsync(
+            Camera cameraToUpdate,
             CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task SetCameraTextAsync(
-            int openAlprCameraId,
+        public static async Task SetCameraTextAsync(
+            Camera cameraToUpdate,
             string plateNumber,
             string vehicleDescription,
             CancellationToken cancellationToken)
