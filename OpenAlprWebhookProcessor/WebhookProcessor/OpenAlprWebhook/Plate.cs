@@ -9,7 +9,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public string PlateNumber { get; set; }
 
         [JsonPropertyName("confidence")]
-        public double Confience { get; set; }
+        public double Confidence { get; set; }
 
         [JsonPropertyName("matches_template")]
         public int MatchesTemplate { get; set; }

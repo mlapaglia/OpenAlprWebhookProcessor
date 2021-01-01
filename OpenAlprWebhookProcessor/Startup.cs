@@ -4,11 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.WebhookProcessor;
-using System.Net;
-using System.Net.Http;
+using Serilog;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -52,6 +50,8 @@ namespace OpenAlprWebhookProcessor
             }
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
