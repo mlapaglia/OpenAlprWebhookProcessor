@@ -1,4 +1,5 @@
 ﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,8 +17,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public static async Task SetCameraTextAsync(
             Camera cameraToUpdate,
-            string plateNumber,
-            string vehicleDescription,
+            CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

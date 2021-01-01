@@ -9,6 +9,7 @@ using System.Threading;
 using System.Collections.Generic;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
 using System.Net;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
@@ -36,6 +37,30 @@ namespace OpenAlprWebhookProcessor.Cameras
                     DisplayText = string.Empty,
                 });
 
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "3",
+                    Enabled = "false",
+                    DisplayText = string.Empty,
+                });
+
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "4",
+                    Enabled = "false",
+                    DisplayText = string.Empty,
+                });
+
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "2",
+                    Enabled = "false",
+                    DisplayText = string.Empty,
+                });
+
             await PushCameraTextAsync(
                 cameraToUpdate,
                 videoOverlayRequest,
@@ -44,8 +69,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public static async Task SetCameraTextAsync(
             Camera cameraToUpdate,
-            string plateNumber,
-            string vehicleDescription,
+            CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
@@ -55,7 +79,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                 {
                     Id = "1",
                     Enabled = "true",
-                    DisplayText = plateNumber,
+                    DisplayText = updateRequest.LicensePlate,
                 });
 
             videoOverlayRequest.TextOverlayList.TextOverlay.Add(
@@ -63,7 +87,23 @@ namespace OpenAlprWebhookProcessor.Cameras
                 {
                     Id = "2",
                     Enabled = "true",
-                    DisplayText = vehicleDescription,
+                    DisplayText = updateRequest.VehicleDescription,
+                });
+
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "3",
+                    Enabled = "true",
+                    DisplayText = $"Processing Time: {updateRequest.OpenAlprProcessingTimeMs}ms",
+                });
+
+            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
+                new TextOverlay()
+                {
+                    Id = "4",
+                    Enabled = "true",
+                    DisplayText = $"Confidence: {updateRequest.ProcessedPlateConfidence}%",
                 });
 
             await PushCameraTextAsync(

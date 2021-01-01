@@ -71,15 +71,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         case CameraManufacturer.Dahua:
                             await DahuaCamera.SetCameraTextAsync(
                                 cameraToUpdate,
-                                job.LicensePlate,
-                                job.VehicleDescription,
+                                job,
                                 _cancellationTokenSource.Token);
                             break;
                         case CameraManufacturer.Hikvision:
                             await HikvisionCamera.SetCameraTextAsync(
                                 cameraToUpdate,
-                                job.LicensePlate,
-                                job.VehicleDescription,
+                                job,
                                 _cancellationTokenSource.Token);
                             break;
                         default:
@@ -106,7 +104,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 {
                     var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == openAlprId.Key);
 
-                    
+                    _logger.LogInformation("here");
                     if ((DateTime.UtcNow - openAlprId.Value) > TimeSpan.FromSeconds(5))
                     {
                         _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -23,6 +24,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             {
                 LicensePlate = webhook.BestPlateNumber,
                 OpenAlprCameraId = webhook.CameraId,
+                OpenAlprProcessingTimeMs = Math.Round(webhook.BestPlate.ProcessingTimeMs, 2),
+                ProcessedPlateConfidence = Math.Round(webhook.BestPlate.Confidence, 2),
                 VehicleDescription = $"{webhook.Vehicle.Year[0]?.Name} {webhook.Vehicle.MakeModel[0]?.Name}",
             };
 
