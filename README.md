@@ -11,7 +11,7 @@ The container needs 1 port for incoming connections, and an appsettings.json vol
     docker run -d \
     --name=openalprwebhookprocessor \
     --net=bridge \
-    -v /app/appsettings.json:/appsettings.json\
+    -v /app/appsettings.json:/app/appsettings.json\
     -p 3859:80 \
     mlapaglia/openalprwebhookprocessor
     
