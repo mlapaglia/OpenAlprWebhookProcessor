@@ -42,7 +42,7 @@ jobs:
           release_name="OpenAlprWebHookProcessor-1.2.0-windows64"
           dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
           dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
