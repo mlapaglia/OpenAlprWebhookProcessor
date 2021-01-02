@@ -13,6 +13,7 @@ namespace OpenAlprWebhookProcessor
                 .WriteTo.File(
                     "log-.txt",
                     rollingInterval: RollingInterval.Day)
+                .WriteTo.Console()
                 .CreateLogger();
 
             CreateHostBuilder(args).Build().Run();

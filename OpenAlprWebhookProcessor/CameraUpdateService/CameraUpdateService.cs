@@ -104,7 +104,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 {
                     var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == openAlprId.Key);
 
-                    _logger.LogInformation("here");
                     if ((DateTime.UtcNow - openAlprId.Value) > TimeSpan.FromSeconds(5))
                     {
                         _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);
