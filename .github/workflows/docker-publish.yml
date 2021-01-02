@@ -69,11 +69,15 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+      - name: Get git tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
           file: ./OpenAlprWebhookProcessor/Dockerfile
           push: true
           tags: |
-            mlapaglia/openalprwebhookprocessor:${{ GITHUB_REF##*/ }}
+            mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
             mlapaglia/openalprwebhookprocessor:latest
