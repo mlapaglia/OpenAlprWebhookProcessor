@@ -16,10 +16,8 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
@@ -28,13 +26,46 @@ jobs:
           else
             docker build . --file OpenAlprWebhookProcessor/Dockerfile
           fi
-
-  push:
-    needs: test
-
+  
+  create-github-release:
+    name: Create Github Release
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    # if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
 
+  github-build-release:
+    name: Build Github Release
+    # if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
+      - run: |
+        dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
+        dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+        dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+
+  docker-build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
