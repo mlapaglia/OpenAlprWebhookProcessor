@@ -51,6 +51,7 @@ jobs:
 
   github-build-release:
     name: Build Github Release
+    runs-on: ubuntu-latest
     # if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@main
