@@ -53,14 +53,6 @@ namespace OpenAlprWebhookProcessor.Cameras
                     DisplayText = string.Empty,
                 });
 
-            videoOverlayRequest.TextOverlayList.TextOverlay.Add(
-                new TextOverlay()
-                {
-                    Id = "2",
-                    Enabled = "false",
-                    DisplayText = string.Empty,
-                });
-
             await PushCameraTextAsync(
                 cameraToUpdate,
                 videoOverlayRequest,

@@ -10,7 +10,10 @@ namespace OpenAlprWebhookProcessor
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.RollingFile("log-{Date}.txt")
+                .WriteTo.File(
+                    "log-.txt",
+                    rollingInterval: RollingInterval.Day)
+                .WriteTo.Console()
                 .CreateLogger();
 
             CreateHostBuilder(args).Build().Run();
