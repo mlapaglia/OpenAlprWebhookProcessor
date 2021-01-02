@@ -57,10 +57,9 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
-      - run: |
-        dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
-        dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-        dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+      - run: dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
+      - run: dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+      - run: dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
 
   docker-build-push:
     needs: test
