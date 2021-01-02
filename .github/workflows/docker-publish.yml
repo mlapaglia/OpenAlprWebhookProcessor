@@ -18,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Builds dockerfile
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
             docker-compose --file docker-compose.test.yml build
@@ -29,7 +29,7 @@ jobs:
           fi
 
   build-github-release:
-    needs: create-github-release
+    needs: test
     name: Build Github Release
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
