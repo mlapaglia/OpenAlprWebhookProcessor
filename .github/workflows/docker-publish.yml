@@ -14,42 +14,16 @@ env:
   IMAGE_NAME: OpenAlprWebhookProcessor
 
 jobs:
-  test:
+  docker-build:
+    name: Docker Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run tests
-        run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file OpenAlprWebhookProcessor/Dockerfile
-          fi
-  
-  create-github-release:
-    name: Create Github Release
-    runs-on: ubuntu-latest
-    # if: github.event_name == 'push'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false
+      - name: Builds dockerfile
+        run: docker build . --file OpenAlprWebhookProcessor/Dockerfile
 
-  github-build-release:
+  build-github-release:
+    needs: create-github-release
     name: Build Github Release
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
@@ -58,11 +32,21 @@ jobs:
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '3.1.x'
-      - run: dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
-      - run: dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-      - run: dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+        run: |
+          tag=$(git describe --tags --abbrev=0)
+          release_name="OpenAlprWebHookProcessor-$tag-windows64"
+          dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
+          dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+          tar czvf "${release_name}.tar.gz" "$release_name"
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: "OpenAlprWebHookProcessor*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker-build-push:
+    name: Docker Publish
     needs: test
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
