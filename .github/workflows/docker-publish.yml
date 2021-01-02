@@ -15,7 +15,6 @@ env:
 
 jobs:
   docker-build:
-    name: Docker Build
     runs-on: ubuntu-latest
     steps:
       - name: Builds dockerfile
@@ -46,7 +45,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker-build-push:
-    name: Docker Publish
     needs: test
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
