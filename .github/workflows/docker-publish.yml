@@ -74,4 +74,6 @@ jobs:
         with:
           file: ./OpenAlprWebhookProcessor/Dockerfile
           push: true
-          tags: mlapaglia/openalprwebhookprocessor:latest
+          tags: |
+            mlapaglia/openalprwebhookprocessor:${GITHUB_REF##*/}
+            mlapaglia/openalprwebhookprocessor:latest
