@@ -14,12 +14,19 @@ env:
   IMAGE_NAME: OpenAlprWebhookProcessor
 
 jobs:
-  docker-build:
+  test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Builds dockerfile
         uses: actions/checkout@v2
-        run: docker build . --file OpenAlprWebhookProcessor/Dockerfile
+        run: |
+          if [ -f docker-compose.test.yml ]; then
+            docker-compose --file docker-compose.test.yml build
+            docker-compose --file docker-compose.test.yml run sut
+          else
+            docker build . --file OpenAlprWebhookProcessor/Dockerfile
+          fi
 
   build-github-release:
     needs: create-github-release
@@ -38,6 +45,8 @@ jobs:
           dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
           dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
           tar czvf "${release_name}.tar.gz" "$release_name"
+
+      - name: Publish
       - uses: softprops/action-gh-release@v1
         with:
           files: "OpenAlprWebHookProcessor*"
