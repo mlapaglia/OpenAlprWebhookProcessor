@@ -11,5 +11,7 @@
         public double OpenAlprProcessingTimeMs { get; set; }
 
         public double ProcessedPlateConfidence { get; set; }
+
+        public byte[] LicensePlateJpeg { get; set; }
     }
 }
