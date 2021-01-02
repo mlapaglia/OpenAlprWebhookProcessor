@@ -64,7 +64,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 try
                 {
-                    var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == job.OpenAlprCameraId);
+                    var cameraToUpdate = _cameraConfiguration.Cameras.FirstOrDefault(x => x.OpenAlprCameraId == job.OpenAlprCameraId);
+
+                    if (cameraToUpdate == null)
+                    {
+                        _logger.LogError($"Unable to find camera with OpenAlprId: {job.OpenAlprCameraId}, check your configuration.");
+                        continue;
+                    }
 
                     switch (cameraToUpdate.Manufacturer)
                     {
