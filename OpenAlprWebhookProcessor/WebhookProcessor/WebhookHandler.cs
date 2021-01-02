@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 OpenAlprCameraId = webhook.CameraId,
                 OpenAlprProcessingTimeMs = Math.Round(webhook.BestPlate.ProcessingTimeMs, 2),
                 ProcessedPlateConfidence = Math.Round(webhook.BestPlate.Confidence, 2),
-                VehicleDescription = $"{webhook.Vehicle.Year[0]?.Name} {FormatVehicleDescription(webhook.Vehicle.MakeModel[0]?.Name)}",
+                VehicleDescription = $"{webhook.Vehicle.Year?[0].Name} {FormatVehicleDescription(webhook.Vehicle.MakeModel?[0].Name)}",
             };
 
             _cameraUpdateService.AddJob(updateRequest);
