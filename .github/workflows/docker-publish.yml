@@ -19,6 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
@@ -28,16 +29,18 @@ jobs:
             docker build . --file OpenAlprWebhookProcessor/Dockerfile
           fi
 
-  build-github-release:
+  create-artifact:
     needs: test
-    name: Build Github Release
+
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
     steps:
-      - uses: actions/checkout@main
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
+      - name: Check out the repo
+        uses: actions/checkout@main
+
+      - name: Setup Buildx
+        uses: actions/setup-dotnet@v1
+
       - name: Build Artifact
         run: |
           tag=$(git describe --tags --abbrev=0)
