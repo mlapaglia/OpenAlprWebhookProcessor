@@ -43,6 +43,7 @@ jobs:
 
       - name: Build Artifact
         run: |
+          git fetch --tags
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-$tag-windows64"
           dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
