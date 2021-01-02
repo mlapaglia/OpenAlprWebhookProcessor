@@ -4,22 +4,18 @@ on:
   push:
     branches:
       - master
-
     tags:
       - v*
-
   pull_request:
 
 env:
   IMAGE_NAME: OpenAlprWebhookProcessor
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
@@ -29,9 +25,8 @@ jobs:
             docker build . --file OpenAlprWebhookProcessor/Dockerfile
           fi
 
-  create-artifact:
+  windows-build-push:
     needs: test
-
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
     steps:
@@ -43,7 +38,6 @@ jobs:
 
       - name: Build Artifact
         run: |
-          git fetch --tags
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-$tag-windows64"
           dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
