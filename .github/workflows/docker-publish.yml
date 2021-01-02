@@ -51,7 +51,7 @@ jobs:
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
-      - uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v1
         with:
           files: "OpenAlprWebHookProcessor*"
         env:
