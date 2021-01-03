@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 ProcessedPlateConfidence = Math.Round(webhook.BestPlate.Confidence, 2),
             };
 
-            if (webhook.Vehicle.MakeModel.Count > 0)
+            if (webhook.Vehicle.MakeModel != null && webhook.Vehicle.MakeModel.Count > 0)
             {
                 updateRequest.VehicleDescription = $"{webhook.Vehicle.Year[0].Name} {FormatVehicleDescription(webhook.Vehicle.MakeModel[0].Name)}";
             } 
