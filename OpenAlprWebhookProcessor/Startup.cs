@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
+using OpenAlprWebhookProcessor.Middleware;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
+using System;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -25,6 +27,11 @@ namespace OpenAlprWebhookProcessor
 
             var cameraConfiguration = new CameraConfiguration();
             Configuration.GetSection("Cameras").Bind(cameraConfiguration);
+
+            if (cameraConfiguration.Cameras == null || cameraConfiguration.Cameras.Count == 0)
+            {
+                throw new ArgumentException("no cameras found in appsettings, check your configuration");
+            }
 
             services.AddLogging(config =>
             {
@@ -47,6 +54,11 @@ namespace OpenAlprWebhookProcessor
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            if (Configuration.GetValue("WebRequestLoggingEnabled", false))
+            {
+                app.UseMiddleware<RequestResponseLoggingMiddleware>();
             }
 
             app.UseHttpsRedirection();
