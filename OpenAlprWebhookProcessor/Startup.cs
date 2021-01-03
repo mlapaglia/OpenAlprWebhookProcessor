@@ -61,8 +61,6 @@ namespace OpenAlprWebhookProcessor
                 app.UseMiddleware<RequestResponseLoggingMiddleware>();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseSerilogRequestLogging();
 
             app.UseRouting();

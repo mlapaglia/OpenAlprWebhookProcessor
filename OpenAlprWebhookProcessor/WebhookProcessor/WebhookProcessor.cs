@@ -25,5 +25,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
             _webhookHandler.Handle(webhookEvent);
         }
+
+        [HttpGet]
+        public ActionResult Get()
+        {
+            _logger.LogInformation("test succedded from: " + Request.HttpContext.Connection.RemoteIpAddress);
+            return Ok("Webhook Processor");
+        }
     }
 }
