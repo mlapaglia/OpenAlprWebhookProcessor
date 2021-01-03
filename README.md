@@ -5,6 +5,13 @@ This service accepts license plate webhooks from the OpenALPR web server. The we
 ## Quick Start
 The container needs 1 port for incoming connections, and an appsettings.json volume to configure the cameras to update. Check the `ConfigurationExamples` folder for guidance.
 
+## Windows Configuration
+Fill out the `appsettings.json` file with camera details then start the application.
+
+**command line**
+
+    dotnet ./OpenAlprWebhookProcessor.dll
+
 ## Docker Configuration
 **docker cli**
 
