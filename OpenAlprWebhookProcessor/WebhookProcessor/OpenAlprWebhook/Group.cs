@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class OpenAlprWebhook
+    public class Group
     {
         [JsonPropertyName("data_type")]
         public string DataType { get; set; }
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public string AgentVersion { get; set; }
 
         [JsonPropertyName("agent_type")]
-        public string AgenType { get; set; }
+        public string AgentType { get; set; }
 
         [JsonPropertyName("camera_id")]
         public int CameraId { get; set; }
