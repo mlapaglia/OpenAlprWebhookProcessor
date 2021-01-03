@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
-using OpenAlprWebhookProcessor.Middleware;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
@@ -54,11 +53,6 @@ namespace OpenAlprWebhookProcessor
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-
-            if (Configuration.GetValue("WebRequestLoggingEnabled", false))
-            {
-                app.UseMiddleware<RequestResponseLoggingMiddleware>();
             }
 
             app.UseSerilogRequestLogging();

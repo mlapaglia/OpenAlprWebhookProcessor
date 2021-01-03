@@ -13,5 +13,9 @@
         public double ProcessedPlateConfidence { get; set; }
 
         public byte[] LicensePlateJpeg { get; set; }
+
+        public bool IsAlert { get; set; }
+
+        public string AlertDescription { get; set; }
     }
 }

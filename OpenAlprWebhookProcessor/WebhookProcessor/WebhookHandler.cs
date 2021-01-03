@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
@@ -16,20 +17,22 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public void Handle(OpenAlprWebhook webhook)
+        public void HandleWebhook(Webhook webhook)
         {
             var updateRequest = new CameraUpdateRequest()
             {
-                LicensePlate = webhook.BestPlateNumber,
-                LicensePlateJpeg = Convert.FromBase64String(webhook.BestPlate.PlateCropJpeg),
-                OpenAlprCameraId = webhook.CameraId,
-                OpenAlprProcessingTimeMs = Math.Round(webhook.BestPlate.ProcessingTimeMs, 2),
-                ProcessedPlateConfidence = Math.Round(webhook.BestPlate.Confidence, 2),
+                LicensePlate = webhook.Group.BestPlateNumber,
+                LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
+                OpenAlprCameraId = webhook.Group.CameraId,
+                OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
+                ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                IsAlert = webhook.DataType == "alpr_alert",
+                AlertDescription = webhook.Description,
             };
 
-            if (webhook.Vehicle.MakeModel != null && webhook.Vehicle.MakeModel.Count > 0)
+            if (webhook.Group.Vehicle.MakeModel != null && webhook.Group.Vehicle.MakeModel.Count > 0)
             {
-                updateRequest.VehicleDescription = $"{webhook.Vehicle.Year[0].Name} {FormatVehicleDescription(webhook.Vehicle.MakeModel[0].Name)}";
+                updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             } 
 
             _cameraUpdateService.AddJob(updateRequest);
