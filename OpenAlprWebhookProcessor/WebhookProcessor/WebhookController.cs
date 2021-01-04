@@ -60,7 +60,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
 
                 _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
-                _webhookHandler.HandleWebhook(webhook);
+                await _webhookHandler.HandleWebhookAsync(webhook);
             }
 
             return Ok();
