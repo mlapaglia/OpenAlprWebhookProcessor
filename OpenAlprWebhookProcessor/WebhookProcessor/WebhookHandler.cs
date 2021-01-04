@@ -30,7 +30,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 AlertDescription = webhook.Description,
             };
 
-            if (webhook.Group.Vehicle.MakeModel != null && webhook.Group.Vehicle.MakeModel.Count > 0)
+            if (webhook.Group.Vehicle != null)
             {
                 updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             } 
