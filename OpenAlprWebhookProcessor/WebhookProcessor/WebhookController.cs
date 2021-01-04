@@ -30,7 +30,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         [HttpPost]
-        public async Task Post()
+        public async Task<ActionResult> Post()
         {
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
@@ -47,6 +47,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     webhook = JsonSerializer.Deserialize<Webhook>(jsonString);
                 }
+                else if (jsonString.Contains("openalpr_webhook\": \"test"))
+                {
+                    return Ok("Test successful");
+                }
                 else
                 {
                     webhook = new Webhook
@@ -58,12 +62,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
                 _webhookHandler.HandleWebhook(webhook);
             }
+
+            return Ok();
         }
 
         [HttpGet]
         public ActionResult Get()
         {
-            _logger.LogInformation("test succedded from: " + Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("test succeeded from: " + Request.HttpContext.Connection.RemoteIpAddress);
             return Ok("Webhook Processor");
         }
     }
