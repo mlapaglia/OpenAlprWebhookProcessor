@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -11,13 +13,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
+        private readonly ProcessorContext _processorContext;
+
         public WebhookHandler(
-            CameraUpdateService.CameraUpdateService cameraUpdateService)
+            CameraUpdateService.CameraUpdateService cameraUpdateService,
+            ProcessorContext processorContext)
         {
             _cameraUpdateService = cameraUpdateService;
+            _processorContext = processorContext;
         }
 
-        public void HandleWebhook(Webhook webhook)
+        public async Task HandleWebhookAsync(Webhook webhook)
         {
             var updateRequest = new CameraUpdateRequest()
             {
@@ -36,6 +42,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             } 
 
             _cameraUpdateService.AddJob(updateRequest);
+            _processorContext.PlateGroups.Add(new PlateGroup()
+            {
+                PlateNumber = webhook.Group.BestPlateNumber,
+                PlateJpeg = webhook.Group.BestPlate.PlateCropJpeg,
+                OpenAlprCameraId = webhook.Group.CameraId,
+                OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
+                PlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                IsAlert = webhook.DataType == "alpr_alert",
+                AlertDescription = webhook.Description,
+            });
+
+            await _processorContext.SaveChangesAsync();
         }
 
         private string FormatVehicleDescription(string vehicleMakeModel)

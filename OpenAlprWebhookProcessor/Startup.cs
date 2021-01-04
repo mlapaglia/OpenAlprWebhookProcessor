@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
+using System.Linq;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -38,9 +41,13 @@ namespace OpenAlprWebhookProcessor
                 config.AddConsole();
             });
 
+            services
+                .AddEntityFrameworkSqlite()
+                .AddDbContext<ProcessorContext>(options => options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
+
             services.AddSingleton(cameraConfiguration);
 
-            services.AddSingleton<WebhookHandler>();
+            services.AddScoped<WebhookHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -57,6 +64,8 @@ namespace OpenAlprWebhookProcessor
 
             app.UseSerilogRequestLogging();
 
+            MigrateDb(app);
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -65,6 +74,19 @@ namespace OpenAlprWebhookProcessor
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private static void MigrateDb(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                if (processorContext.Database.GetPendingMigrations().Any())
+                {
+                    processorContext.Database.Migrate();
+                }
+            }
         }
     }
 }
