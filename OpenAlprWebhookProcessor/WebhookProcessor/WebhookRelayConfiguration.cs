@@ -7,6 +7,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         public bool IgnoreSslErrors { get; set; }
 
-        public List<Uri> RelayUrls { get; set; }
+        public List<Uri> RelayUrls = new List<Uri>();
     }
 }
