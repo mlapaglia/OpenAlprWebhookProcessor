@@ -50,7 +50,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
                 PlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                 IsAlert = webhook.DataType == "alpr_alert",
-                AlertDescription = webhook.Description,
+                AlertDescription = webhook.Description
             });
 
             await _processorContext.SaveChangesAsync();
