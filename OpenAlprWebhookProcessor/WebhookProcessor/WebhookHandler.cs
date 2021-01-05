@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Net.Http;
 using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
@@ -15,16 +16,24 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly ProcessorContext _processorContext;
 
+        private readonly WebhookRelayConfiguration _webhookRelayConfiguration;
+
         public WebhookHandler(
             CameraUpdateService.CameraUpdateService cameraUpdateService,
-            ProcessorContext processorContext)
+            ProcessorContext processorContext,
+            WebhookRelayConfiguration webhookRelayConfiguration)
         {
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
+            _webhookRelayConfiguration = webhookRelayConfiguration;
         }
 
-        public async Task HandleWebhookAsync(Webhook webhook)
+        public async Task HandleWebhookAsync(
+            string rawWebhook,
+            Webhook webhook)
         {
+            await RelayWebhookToSubscribersAsync(rawWebhook);
+
             var updateRequest = new CameraUpdateRequest()
             {
                 LicensePlate = webhook.Group.BestPlateNumber,
@@ -60,6 +69,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             return _textInfo
                 .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
+        }
+
+        private async Task RelayWebhookToSubscribersAsync(string rawWebhook)
+        {
+            var httpClient = new HttpClient();
+            var postContent = new StringContent(rawWebhook);
+
+            foreach (var webhookUrl in _webhookRelayConfiguration.RelayUrls)
+            {
+                await httpClient.PostAsync(
+                    webhookUrl,
+                    postContent);
+            }
         }
     }
 }
