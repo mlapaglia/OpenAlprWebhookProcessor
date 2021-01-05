@@ -18,8 +18,7 @@ Fill out the `appsettings.json` file with camera details then start the applicat
     docker run -d \
     --name=openalprwebhookprocessor \
     --net=bridge \
-    -v /app/appsettings.json:/app/appsettings.json \
-	-v /app/processor.db:/app/processor.db \
+    -v /app/config/:/app/config/ \
     -p 3859:80 \
     mlapaglia/openalprwebhookprocessor
     
