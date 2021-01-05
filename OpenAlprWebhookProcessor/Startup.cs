@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
@@ -48,9 +49,12 @@ namespace OpenAlprWebhookProcessor
             services.AddSingleton(cameraConfiguration);
 
             services.AddScoped<WebhookHandler>();
+            services.AddScoped<GetLicensePlateHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
+
+            services.AddSwaggerGen();
         }
 
         public void Configure(
@@ -65,6 +69,14 @@ namespace OpenAlprWebhookProcessor
             app.UseSerilogRequestLogging();
 
             MigrateDb(app);
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenALPR Webhook Processor");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseRouting();
 
