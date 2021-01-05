@@ -34,20 +34,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
-                var jsonString = await reader.ReadToEndAsync();
+                var rawWebhook = await reader.ReadToEndAsync();
 
                 if (_webRequestLoggingEnabled)
                 {
-                    _logger.LogInformation("request received {0}", jsonString);
+                    _logger.LogInformation("request received {0}", rawWebhook);
                 }
 
                 Webhook webhook;
 
-                if (jsonString.Contains("alpr_alert"))
+                if (rawWebhook.Contains("alpr_alert"))
                 {
-                    webhook = JsonSerializer.Deserialize<Webhook>(jsonString);
+                    webhook = JsonSerializer.Deserialize<Webhook>(rawWebhook);
                 }
-                else if (jsonString.Contains("openalpr_webhook\": \"test"))
+                else if (rawWebhook.Contains("openalpr_webhook\": \"test"))
                 {
                     return Ok("Test successful");
                 }
@@ -55,12 +55,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     webhook = new Webhook
                     {
-                        Group = JsonSerializer.Deserialize<Group>(jsonString)
+                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
                     };
                 }
 
                 _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
-                await _webhookHandler.HandleWebhookAsync(webhook);
+
+                await _webhookHandler.HandleWebhookAsync(
+                    rawWebhook,
+                    webhook);
             }
 
             return Ok();

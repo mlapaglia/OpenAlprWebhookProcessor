@@ -31,6 +31,10 @@ namespace OpenAlprWebhookProcessor
             var cameraConfiguration = new CameraConfiguration();
             Configuration.GetSection("Cameras").Bind(cameraConfiguration);
 
+            var webhookRelayConfiguration = new WebhookRelayConfiguration();
+            Configuration.GetSection("WebhookRelays").Bind(webhookRelayConfiguration);
+            services.AddSingleton(webhookRelayConfiguration);
+
             if (cameraConfiguration.Cameras == null || cameraConfiguration.Cameras.Count == 0)
             {
                 throw new ArgumentException("no cameras found in appsettings, check your configuration");
