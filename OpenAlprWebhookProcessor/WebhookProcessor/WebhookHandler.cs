@@ -73,7 +73,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private async Task RelayWebhookToSubscribersAsync(string rawWebhook)
         {
-            var httpClient = new HttpClient();
+            var clientHandler = new HttpClientHandler();
+
+            if (_webhookRelayConfiguration.IgnoreSslErrors)
+            {
+                clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            }
+
+            var httpClient = new HttpClient(clientHandler);
             var postContent = new StringContent(rawWebhook);
 
             foreach (var webhookUrl in _webhookRelayConfiguration.RelayUrls)
