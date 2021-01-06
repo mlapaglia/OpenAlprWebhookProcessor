@@ -34,6 +34,11 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
                 $"{serverUrl}api/accountinfo",
                 formContent);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+            }
+
             var responseString = await response.Content.ReadAsStringAsync();
 
             var agentRegistrationResponse = JsonSerializer.Deserialize<RegistrationResponse>(responseString);
