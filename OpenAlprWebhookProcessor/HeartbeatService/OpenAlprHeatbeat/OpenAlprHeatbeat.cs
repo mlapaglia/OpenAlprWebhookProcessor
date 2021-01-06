@@ -101,6 +101,4 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
         [JsonPropertyName("video_streams")]
         public List<VideoStream> VideoStreams { get; set; }
     }
-
-
 }
