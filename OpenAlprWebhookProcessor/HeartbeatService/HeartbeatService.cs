@@ -164,7 +164,8 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
                 {
                     company = new Data.Company()
                     {
-                        CompanyId = companyId
+                        CompanyId = companyId,
+                        Username = _agentConfiguration.OpenAlprWebServer.Username,
                     };
 
                     processorContext.Companies.Add(company);
