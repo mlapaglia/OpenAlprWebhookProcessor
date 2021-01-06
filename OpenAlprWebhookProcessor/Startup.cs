@@ -28,16 +28,17 @@ namespace OpenAlprWebhookProcessor
         {
             services.AddControllers();
 
-            var cameraConfiguration = new CameraConfiguration();
-            Configuration.GetSection("Cameras").Bind(cameraConfiguration);
+            var agentConfiguration = new AgentConfiguration();
+            Configuration.GetSection("OpenAlprAgent").Bind(agentConfiguration);
 
-            var webhookRelayConfiguration = new WebhookRelayConfiguration();
-            Configuration.GetSection("WebhookRelays").Bind(webhookRelayConfiguration);
-            services.AddSingleton(webhookRelayConfiguration);
-
-            if (cameraConfiguration.Cameras == null || cameraConfiguration.Cameras.Count == 0)
+            if (agentConfiguration.Cameras == null || agentConfiguration.Cameras.Count == 0)
             {
                 throw new ArgumentException("no cameras found in appsettings, check your configuration");
+            }
+
+            if (agentConfiguration.OpenAlprWebServer.Endpoint != null)
+            {
+                services.AddHostedService<HeartbeatService.HeartbeatService>();
             }
 
             services.AddLogging(config =>
@@ -50,7 +51,7 @@ namespace OpenAlprWebhookProcessor
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<ProcessorContext>(options => options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
 
-            services.AddSingleton(cameraConfiguration);
+            services.AddSingleton(agentConfiguration);
 
             services.AddScoped<WebhookHandler>();
             services.AddScoped<GetLicensePlateHandler>();

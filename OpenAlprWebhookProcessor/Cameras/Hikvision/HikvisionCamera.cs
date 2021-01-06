@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Cameras
     public static class HikvisionCamera
     {
         public static async Task ClearCameraTextAsync(
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             CancellationToken cancellationToken)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
@@ -60,7 +60,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         public static async Task SetCameraTextAsync(
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
@@ -105,7 +105,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         private static async Task PushCameraTextAsync(
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             VideoOverlay videoOverlay,
             CancellationToken cancellationToken)
         {
