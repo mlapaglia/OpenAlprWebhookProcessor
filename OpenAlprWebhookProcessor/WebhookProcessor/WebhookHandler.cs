@@ -33,7 +33,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             string rawWebhook,
             Webhook webhook)
         {
-            if (_agentConfiguration.OpenAlprWebServer.Endpoint != null)
+            if (_agentConfiguration.OpenAlprWebServer != null
+                && _agentConfiguration.OpenAlprWebServer.Endpoint != null)
             {
                 await RelayWebhookAsync(rawWebhook);
             }
