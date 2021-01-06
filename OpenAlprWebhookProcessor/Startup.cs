@@ -36,7 +36,8 @@ namespace OpenAlprWebhookProcessor
                 throw new ArgumentException("no cameras found in appsettings, check your configuration");
             }
 
-            if (agentConfiguration.OpenAlprWebServer.Endpoint != null)
+            if (agentConfiguration.OpenAlprWebServer != null
+                && agentConfiguration.OpenAlprWebServer.Endpoint != null)
             {
                 services.AddHostedService<HeartbeatService.HeartbeatService>();
             }
