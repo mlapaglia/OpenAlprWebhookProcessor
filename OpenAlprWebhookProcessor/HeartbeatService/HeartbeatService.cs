@@ -40,11 +40,11 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            _companyId = await RegisterAgentAsync();
-
             Task.Run(async () => await SendHeartbeatsAsync());
+
+            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -56,6 +56,8 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
 
         private async Task SendHeartbeatsAsync()
         {
+            _companyId = await RegisterAgentAsync();
+
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
                 var clientHandler = new HttpClientHandler();

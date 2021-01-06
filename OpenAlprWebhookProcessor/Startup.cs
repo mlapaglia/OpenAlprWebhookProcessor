@@ -67,14 +67,14 @@ namespace OpenAlprWebhookProcessor
             IApplicationBuilder app,
             IWebHostEnvironment env)
         {
+            MigrateDb(app);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseSerilogRequestLogging();
-
-            MigrateDb(app);
 
             app.UseSwagger();
 

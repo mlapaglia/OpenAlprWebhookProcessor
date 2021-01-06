@@ -36,7 +36,8 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException(await response.Content.ReadAsStringAsync());
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(error);
             }
 
             var responseString = await response.Content.ReadAsStringAsync();
