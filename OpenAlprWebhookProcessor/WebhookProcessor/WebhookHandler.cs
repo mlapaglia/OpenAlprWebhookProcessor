@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
+using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
@@ -16,23 +17,27 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly ProcessorContext _processorContext;
 
-        private readonly WebhookRelayConfiguration _webhookRelayConfiguration;
+        private readonly AgentConfiguration _agentConfiguration;
 
         public WebhookHandler(
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
-            WebhookRelayConfiguration webhookRelayConfiguration)
+            AgentConfiguration agentConfiguration)
         {
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
-            _webhookRelayConfiguration = webhookRelayConfiguration;
+            _agentConfiguration = agentConfiguration;
         }
 
         public async Task HandleWebhookAsync(
             string rawWebhook,
             Webhook webhook)
         {
-            await RelayWebhookToSubscribersAsync(rawWebhook);
+            if (_agentConfiguration.OpenAlprWebServer != null
+                && _agentConfiguration.OpenAlprWebServer.Endpoint != null)
+            {
+                await RelayWebhookAsync(rawWebhook);
+            }
 
             var updateRequest = new CameraUpdateRequest()
             {
@@ -71,11 +76,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
         }
 
-        private async Task RelayWebhookToSubscribersAsync(string rawWebhook)
+        private async Task RelayWebhookAsync(string rawWebhook)
         {
             var clientHandler = new HttpClientHandler();
 
-            if (_webhookRelayConfiguration.IgnoreSslErrors)
+            if (_agentConfiguration.OpenAlprWebServer.IgnoreSslErrors)
             {
                 clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
             }
@@ -83,12 +88,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             var httpClient = new HttpClient(clientHandler);
             var postContent = new StringContent(rawWebhook);
 
-            foreach (var webhookUrl in _webhookRelayConfiguration.RelayUrls)
-            {
-                await httpClient.PostAsync(
-                    webhookUrl,
-                    postContent);
-            }
+            await httpClient.PostAsync(
+                _agentConfiguration.OpenAlprWebServer.Endpoint,
+                postContent);
         }
     }
 }

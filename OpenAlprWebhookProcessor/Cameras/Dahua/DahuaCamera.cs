@@ -11,7 +11,7 @@ namespace OpenAlprWebhookProcessor.Cameras
     public static class DahuaCamera
     {
         public static async Task ClearCameraTextAsync(
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             CancellationToken cancellationToken)
         {
             var client = new HttpClient(new HttpClientHandler()
@@ -31,7 +31,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         public static async Task SetCameraTextAsync(
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
@@ -53,7 +53,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private static async Task SendUpdateCommandAsync(
             HttpClient client,
-            Camera cameraToUpdate,
+            CameraConfiguration cameraToUpdate,
             int textFieldId,
             string textToSet,
             CancellationToken cancellationToken)

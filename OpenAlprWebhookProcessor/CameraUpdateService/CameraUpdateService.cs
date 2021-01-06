@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly CameraConfiguration _cameraConfiguration;
+        private readonly AgentConfiguration _cameraConfiguration;
 
         private readonly ConcurrentDictionary<int, DateTime> _camerasWithActiveOverlays;
 
@@ -24,7 +24,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public CameraUpdateService(
             ILogger<CameraUpdateService> logger,
-            CameraConfiguration cameraConfiguration)
+            AgentConfiguration cameraConfiguration)
         {
             _logger = logger;
             _cameraConfiguration = cameraConfiguration;
