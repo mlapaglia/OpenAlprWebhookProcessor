@@ -71,7 +71,7 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
 
                 var serializedHeartbeat = JsonSerializer.Serialize(heartbeat);
 
-                if(_webRequestLoggingEnabled)
+                if (_webRequestLoggingEnabled)
                 {
                     _logger.LogInformation("hearbeat sent: {0}", serializedHeartbeat);
                 }
@@ -148,34 +148,42 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
 
         private async Task<string> RegisterAgentAsync()
         {
-            var companyId = await AgentRegistration.RegisterAgentAsync(
-                _agentConfiguration.OpenAlprWebServer.Endpoint,
-                _agentConfiguration.OpenAlprWebServer.Username,
-                _agentConfiguration.OpenAlprWebServer.Password,
-                _agentConfiguration.OpenAlprWebServer.IgnoreSslErrors);
-
-            using(var scope = _scopeFactory.CreateScope())
+            try
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var companyId = await AgentRegistration.RegisterAgentAsync(
+                    _agentConfiguration.OpenAlprWebServer.Endpoint,
+                    _agentConfiguration.OpenAlprWebServer.Username,
+                    _agentConfiguration.OpenAlprWebServer.Password,
+                    _agentConfiguration.OpenAlprWebServer.IgnoreSslErrors);
 
-                var company = await processorContext.Companies.FirstOrDefaultAsync(x => x.CompanyId == companyId);
-
-                if (company == null)
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    company = new Data.Company()
+                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                    var company = await processorContext.Companies.FirstOrDefaultAsync(x => x.CompanyId == companyId);
+
+                    if (company == null)
                     {
-                        CompanyId = companyId,
-                        Username = _agentConfiguration.OpenAlprWebServer.Username,
-                    };
+                        company = new Data.Company()
+                        {
+                            CompanyId = companyId,
+                            Username = _agentConfiguration.OpenAlprWebServer.Username,
+                        };
 
-                    processorContext.Companies.Add(company);
+                        processorContext.Companies.Add(company);
 
-                    await processorContext.SaveChangesAsync();
+                        await processorContext.SaveChangesAsync();
+                    }
+
+                    _logger.LogInformation("Agent registered with server successfully");
+
+                    return company.CompanyId;
                 }
-
-                _logger.LogInformation("Agent registered with server successfully");
-
-                return company.CompanyId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "failed to register Agent");
+                throw;
             }
         }
     }
