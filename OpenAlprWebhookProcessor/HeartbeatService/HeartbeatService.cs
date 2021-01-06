@@ -31,7 +31,7 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
         {
             _cancellationTokenSource.Cancel();
 
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         private async Task SendHeartbeatsAsync()
