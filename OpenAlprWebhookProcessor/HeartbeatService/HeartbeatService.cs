@@ -173,6 +173,8 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
                     await processorContext.SaveChangesAsync();
                 }
 
+                _logger.LogInformation("Agent registered with server successfully");
+
                 return company.CompanyId;
             }
         }
