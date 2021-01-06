@@ -6,8 +6,6 @@ namespace OpenAlprWebhookProcessor.Cameras.Configuration
     {
         public List<CameraConfiguration> Cameras { get; set; }
 
-        public string CompanyId { get; set; }
-
         public string Hostname { get; set; }
 
         public OpenAlprServerConfiguration OpenAlprWebServer { get; set; }

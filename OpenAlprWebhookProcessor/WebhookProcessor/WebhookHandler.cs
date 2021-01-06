@@ -89,7 +89,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             var postContent = new StringContent(rawWebhook);
 
             await httpClient.PostAsync(
-                _agentConfiguration.OpenAlprWebServer.Endpoint,
+                $"{_agentConfiguration.OpenAlprWebServer.Endpoint}push",
                 postContent);
         }
     }
