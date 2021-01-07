@@ -104,11 +104,16 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 await OverrideOnPremisesValuesAsync(webhook);
 
                 var httpClient = new HttpClient(clientHandler);
-                var postContent = new StringContent(JsonSerializer.Serialize(webhook));
+                var postContent = new StringContent(JsonSerializer.Serialize(webhook.Group));
 
-                await httpClient.PostAsync(
+                var response = await httpClient.PostAsync(
                     Url.Combine(_agentConfiguration.OpenAlprWebServer.Endpoint.ToString(), "push"),
                     postContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ArgumentException($"Failed to relay webhook successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}, {{0}}", await response.Content.ReadAsStringAsync());
+                }
 
                 _logger.LogInformation($"Webhook relayed successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}");
             }
