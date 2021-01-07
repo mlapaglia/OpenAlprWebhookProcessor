@@ -24,7 +24,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public int FrameEnd { get; set; }
 
         [JsonPropertyName("company_id")]
-        public string CompanId { get; set; }
+        public string CompanyId { get; set; }
 
         [JsonPropertyName("agent_uid")]
         public string AgentUid { get; set; }
