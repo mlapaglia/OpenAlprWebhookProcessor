@@ -1,4 +1,5 @@
-﻿using OpenAlprWebhookProcessor.HeartbeatService.Registration;
+﻿using Flurl;
+using OpenAlprWebhookProcessor.HeartbeatService.Registration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -31,7 +32,7 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
             });
 
             var response = await httpClient.PostAsync(
-                $"{serverUrl}api/accountinfo",
+                Url.Combine(serverUrl.ToString(), "api/accountinfo"),
                 formContent);
 
             if (!response.IsSuccessStatusCode)
