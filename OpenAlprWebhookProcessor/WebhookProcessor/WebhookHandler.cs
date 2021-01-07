@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Flurl;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -106,7 +107,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 var postContent = new StringContent(JsonSerializer.Serialize(webhook));
 
                 await httpClient.PostAsync(
-                    $"{_agentConfiguration.OpenAlprWebServer.Endpoint}push",
+                    Url.Combine(_agentConfiguration.OpenAlprWebServer.Endpoint.ToString(), "push"),
                     postContent);
 
                 _logger.LogInformation($"Webhook relayed successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}");

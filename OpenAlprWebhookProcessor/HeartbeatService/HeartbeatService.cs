@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Flurl;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -79,7 +80,7 @@ namespace OpenAlprWebhookProcessor.HeartbeatService
                 }
 
                 await httpClient.PostAsync(
-                    $"{_agentConfiguration.OpenAlprWebServer.Endpoint}push",
+                    Url.Combine(_agentConfiguration.OpenAlprWebServer.Endpoint.ToString(), "push"),
                     new StringContent(serializedHeartbeat),
                     _cancellationTokenSource.Token);
 
