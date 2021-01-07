@@ -89,6 +89,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private async Task RelayWebhookAsync(Webhook webhook)
         {
+            _logger.LogInformation("Attempting to relay webhook");
+
             var clientHandler = new HttpClientHandler();
 
             if (_agentConfiguration.OpenAlprWebServer.IgnoreSslErrors)
@@ -106,6 +108,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 await httpClient.PostAsync(
                     $"{_agentConfiguration.OpenAlprWebServer.Endpoint}push",
                     postContent);
+
+                _logger.LogInformation($"Webhook relayed successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}");
             }
             catch (Exception ex)
             {

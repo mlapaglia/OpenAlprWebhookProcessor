@@ -48,9 +48,7 @@ namespace OpenAlprWebhookProcessor
                 config.AddConsole();
             });
 
-            services
-                .AddEntityFrameworkSqlite()
-                .AddDbContext<ProcessorContext>(options => options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
+            services.AddDbContext<ProcessorContext>(options => options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
 
             services.AddSingleton(agentConfiguration);
 
