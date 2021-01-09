@@ -23,9 +23,9 @@ namespace OpenAlprWebhookProcessor
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostContext, config) =>
-                    {
-                        config.AddJsonFile("config/appsettings.json");
-                    })
+                {
+                    config.AddJsonFile("config/appsettings.json");
+                })
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
-    [ApiController]
     [Route("licensePlates")]
     public class LicensePlatesController : ControllerBase
     {
