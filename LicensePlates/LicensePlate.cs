@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -22,5 +19,13 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         public bool IsAlert { get; set; }
 
         public string AlertDescription { get; set; }
+
+        public DateTimeOffset ReceivedOn { get; set; }
+
+        public double Direction { get; set; }
+
+        public Uri ImageUrl { get; set; }
+
+        public Uri CropImageUrl { get; set; }
     }
 }

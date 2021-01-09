@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Data
 {
     public class PlateGroup
     {
         public Guid Id { get; set; }
+
+        public string OpenAlprUuid { get; set; }
 
         public int OpenAlprCameraId { get; set; }
 
@@ -17,12 +16,16 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string AlertDescription { get; set; }
 
-        public DateTimeOffset ReceivedOn { get; set; }
+        public long ReceivedOnEpoch { get; set; }
 
-        public string PlateNumber { get; set; }
+        public string Number { get; set; }
 
-        public string PlateJpeg { get; set; }
+        public string Jpeg { get; set; }
 
-        public double PlateConfidence { get; set; }
+        public double Confidence { get; set; }
+
+        public string VehicleDescription { get; set; }
+
+        public double Direction { get; set; }
     }
 }

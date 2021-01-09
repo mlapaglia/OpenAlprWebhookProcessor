@@ -27,8 +27,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             _getLicensePlateHandler = getLicensePlateHandler;
         }
 
-        [HttpPost]
-        [Route("{licensePlate}")]
+        [HttpGet("{licensePlate}")]
         public async Task<List<LicensePlate>> Get(
             string licensePlate,
             CancellationToken cancellationToken)
@@ -40,6 +39,21 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
             return await _getLicensePlateHandler.GetLicensePlatesAsync(
                 licensePlate,
+                cancellationToken);
+        }
+
+        [HttpGet("recent")]
+        public async Task<List<LicensePlate>> GetRecent(
+            CancellationToken cancellationToken,
+            int numberOfPlates = 10)
+        {
+            if (_webRequestLoggingEnabled)
+            {
+                _logger.LogInformation("recent plates request received {0}", numberOfPlates);
+            }
+
+            return await _getLicensePlateHandler.GetRecentPlatesAsync(
+                numberOfPlates,
                 cancellationToken);
         }
     }

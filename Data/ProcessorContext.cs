@@ -10,7 +10,5 @@ namespace OpenAlprWebhookProcessor.Data
         }
 
         public DbSet<PlateGroup> PlateGroups { get; set; }
-
-        public DbSet<Company> Companies { get; set; }
     }
 }

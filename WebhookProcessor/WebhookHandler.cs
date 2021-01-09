@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Flurl;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
@@ -19,28 +12,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         private readonly ILogger _logger;
 
-        private readonly IServiceScopeFactory _scopeFactory;
-
         private readonly TextInfo _textInfo = CultureInfo.CurrentCulture.TextInfo;
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
         private readonly ProcessorContext _processorContext;
 
-        private readonly AgentConfiguration _agentConfiguration;
-
         public WebhookHandler(
             ILogger<WebhookHandler> logger,
-            IServiceScopeFactory scopeFactory,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
-            ProcessorContext processorContext,
-            AgentConfiguration agentConfiguration)
+            ProcessorContext processorContext)
         {
             _logger = logger;
-            _scopeFactory = scopeFactory;
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
-            _agentConfiguration = agentConfiguration;
         }
 
         public async Task HandleWebhookAsync(Webhook webhook)
@@ -62,86 +47,31 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             }
 
             _cameraUpdateService.AddJob(updateRequest);
+
             _processorContext.PlateGroups.Add(new PlateGroup()
             {
-                PlateNumber = webhook.Group.BestPlateNumber,
-                PlateJpeg = webhook.Group.BestPlate.PlateCropJpeg,
+                AlertDescription = webhook.Description,
+                Direction = webhook.Group.TravelDirection,
+                IsAlert = webhook.DataType == "alpr_alert",
                 OpenAlprCameraId = webhook.Group.CameraId,
                 OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
-                PlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
-                IsAlert = webhook.DataType == "alpr_alert",
-                AlertDescription = webhook.Description
+                OpenAlprUuid = webhook.Group.BestUuid,
+                Number = webhook.Group.BestPlateNumber,
+                Jpeg = webhook.Group.BestPlate.PlateCropJpeg,
+                Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                VehicleDescription = updateRequest.VehicleDescription,
             });
 
             await _processorContext.SaveChangesAsync();
 
-            if (_agentConfiguration.OpenAlprWebServer != null
-                && _agentConfiguration.OpenAlprWebServer.Endpoint != null)
-            {
-                await RelayWebhookAsync(webhook);
-            }
+            _logger.LogInformation("plate saved successfully");
         }
 
         private string FormatVehicleDescription(string vehicleMakeModel)
         {
             return _textInfo
                 .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
-        }
-
-        private async Task RelayWebhookAsync(Webhook webhook)
-        {
-            _logger.LogInformation("Attempting to relay webhook");
-
-            var clientHandler = new HttpClientHandler();
-
-            if (_agentConfiguration.OpenAlprWebServer.IgnoreSslErrors)
-            {
-                clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-            }
-
-            try
-            {
-                await OverrideOnPremisesValuesAsync(webhook);
-
-                var httpClient = new HttpClient(clientHandler);
-                var postContent = new StringContent(JsonSerializer.Serialize(webhook.Group));
-
-                var response = await httpClient.PostAsync(
-                    Url.Combine(_agentConfiguration.OpenAlprWebServer.Endpoint.ToString(), "push"),
-                    postContent);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new ArgumentException($"Failed to relay webhook successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}, {{0}}", await response.Content.ReadAsStringAsync());
-                }
-
-                _logger.LogInformation($"Webhook relayed successfully to {_agentConfiguration.OpenAlprWebServer.Endpoint}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Unable to relay webhook");
-            }
-        }
-
-        private async Task OverrideOnPremisesValuesAsync(Webhook webhook)
-        {
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                var onPremCompany = await processorContext.Companies
-                    .Where(x => x.Username == _agentConfiguration.OpenAlprWebServer.Username)
-                    .FirstOrDefaultAsync();
-
-                if (onPremCompany == null)
-                {
-                    throw new ArgumentException($"could not find company id: { webhook.Group.CompanyId } and username: { _agentConfiguration.OpenAlprWebServer.Username}");
-                }
-
-                webhook.Group.CompanyId = onPremCompany.CompanyId;
-            }
         }
     }
 }

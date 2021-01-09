@@ -1,0 +1,31 @@
+.example-h2 {
+    margin: 0 8px 16px;
+  }
+  
+  .example-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 60px;
+  }
+  
+  .example-margin {
+    margin: 8px;
+  }
+  
+  .mat-slider-horizontal {
+    width: 300px;
+  }
+  
+  .mat-slider-vertical {
+    height: 300px;
+  }
+  
+  .mat-card + .mat-card {
+    margin-top: 8px;
+  }
+  
+  .example-result-card h2 {
+    margin: 0 8px;
+  }
+  

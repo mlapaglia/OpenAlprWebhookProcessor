@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Cameras.Configuration
 {
@@ -8,7 +9,9 @@ namespace OpenAlprWebhookProcessor.Cameras.Configuration
 
         public string Hostname { get; set; }
 
-        public OpenAlprServerConfiguration OpenAlprWebServer { get; set; }
+        public bool IgnoreSslErrors { get; set; }
+
+        public Uri Endpoint { get; set; }
 
         public string Uid { get; set; }
 
