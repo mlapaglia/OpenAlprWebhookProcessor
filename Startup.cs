@@ -87,7 +87,7 @@ namespace OpenAlprWebhookProcessor
                 c.RoutePrefix = "/swagger";
             });
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {

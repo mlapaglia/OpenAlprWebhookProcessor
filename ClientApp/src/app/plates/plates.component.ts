@@ -2,6 +2,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Lightbox } from 'ngx-lightbox';
 import { Plate } from './plate';
 import { PlateService } from './plate.service';
 
@@ -44,7 +45,9 @@ export class PlatesComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
-  constructor(private plateService: PlateService) { }
+  constructor(
+    private plateService: PlateService,
+    private lightbox: Lightbox) { }
 
   ngOnInit(): void {
     this.plateService.getRecentPlates()
@@ -56,5 +59,15 @@ export class PlatesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     
+  }
+
+  public openLightbox(url: string) {
+    var albums =[ {
+      src: url,
+      caption: "test",
+      thumb: url
+    }];
+    
+    this.lightbox.open(albums, 0);
   }
 }

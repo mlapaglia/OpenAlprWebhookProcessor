@@ -66,8 +66,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
             {
                 AlertDescription = plate.AlertDescription,
                 Direction = plate.Direction,
-                ImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), "/img/", plate.OpenAlprUuid, ".jpg")),
-                CropImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), "/crop/", plate.OpenAlprUuid, ".jpg")),
+                ImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), "/img/", $"{plate.OpenAlprUuid}.jpg")),
+                CropImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), "/crop/", $"{plate.OpenAlprUuid}.jpg")),
                 IsAlert = plate.IsAlert,
                 LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,
