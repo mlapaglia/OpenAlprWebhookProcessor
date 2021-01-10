@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - develop
     tags:
       - v*
   pull_request:
@@ -22,7 +23,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build . --file OpenAlprWebhookProcessor/Dockerfile
+            docker build . --file Dockerfile
           fi
 
   windows-build-push:
@@ -40,9 +41,9 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
-          dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
-          dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
+          dotnet restore "OpenAlprWebhookProcessor.csproj"
+          dotnet build "OpenAlprWebhookProcessor.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
@@ -55,7 +56,9 @@ jobs:
   docker-build-push:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    if: |
+      (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
+      || github.ref == 'refs/heads/develop'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -75,9 +78,18 @@ jobs:
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
+        if: github.ref == 'refs/heads/master'
         with:
-          file: ./OpenAlprWebhookProcessor/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
             mlapaglia/openalprwebhookprocessor:latest
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        if: github.ref == 'refs/heads/develop'
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}-alpha
