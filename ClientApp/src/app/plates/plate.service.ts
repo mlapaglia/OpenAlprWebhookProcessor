@@ -12,6 +12,6 @@ export class PlateService {
         private http: HttpClient) { }
         
     getRecentPlates(): Observable<Plate[]> {
-        return this.http.get<Plate[]>(`${environment.apiUrl}/${this.recentPlatesUrl}`);
+        return this.http.get<Plate[]>(`/${this.recentPlatesUrl}`);
     }
 }
