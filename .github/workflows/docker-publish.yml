@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - develop
     tags:
       - v*
   pull_request:
@@ -75,9 +76,18 @@ jobs:
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
+        if: github.ref == 'refs/heads/master'
         with:
           file: ./Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
             mlapaglia/openalprwebhookprocessor:latest
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        if: github.ref == 'refs/heads/develop'
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}-alpha
