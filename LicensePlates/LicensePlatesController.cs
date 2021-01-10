@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
     [Authorize]
+    [ApiController]
     [Route("licensePlates")]
     public class LicensePlatesController : ControllerBase
     {
