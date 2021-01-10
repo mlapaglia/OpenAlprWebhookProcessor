@@ -56,7 +56,9 @@ jobs:
   docker-build-push:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    if: |
+      (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
+      || github.ref == 'refs/heads/develop'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
