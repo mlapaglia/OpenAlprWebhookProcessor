@@ -98,5 +98,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}.alpha
+            mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
             mlapaglia/openalprwebhookprocessor:latest
