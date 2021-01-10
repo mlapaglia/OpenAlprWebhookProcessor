@@ -15,7 +15,7 @@
       <div class="example-element-detail"
            [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
         <div class="example-element-description">
-          <img style="cursor: pointer;" [src]="element.imageUrl" (click)="openLightbox(element.imageUrl)" width="300"/>
+          <img style="cursor: pointer;" [src]="element.imageUrl" (click)="openLightbox(element.imageUrl, element.plateNumber)" width="300"/>
         </div>
         <div class="example-element-description">
           <img src="{{element.cropImageUrl}}" />

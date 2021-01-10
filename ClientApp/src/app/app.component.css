@@ -1,31 +1,35 @@
-.example-h2 {
-    margin: 0 8px 16px;
-  }
-  
-  .example-section {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    height: 60px;
-  }
-  
-  .example-margin {
-    margin: 8px;
-  }
-  
-  .mat-slider-horizontal {
-    width: 300px;
-  }
-  
-  .mat-slider-vertical {
-    height: 300px;
-  }
-  
-  .mat-card + .mat-card {
-    margin-top: 8px;
-  }
-  
-  .example-result-card h2 {
-    margin: 0 8px;
-  }
-  
+section {
+  display: table;
+}
+
+.example-label {
+  display: table-cell;
+  font-size: 14px;
+  margin-left: 8px;
+  min-width: 120px;
+}
+
+.example-button-row {
+  display: table-cell;
+  width: 490px;
+}
+
+.example-button-row .mat-button-base {
+  margin: 8px 8px 8px 0;
+}
+
+.example-flex-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.example-button-container {
+  display: flex;
+  justify-content: center;
+  width: 120px;
+}
+
+.material-icons {
+  vertical-align: middle;
+}

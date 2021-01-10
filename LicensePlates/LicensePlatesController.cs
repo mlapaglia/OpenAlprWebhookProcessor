@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
@@ -8,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
+    [Authorize]
     [Route("licensePlates")]
     public class LicensePlatesController : ControllerBase
     {

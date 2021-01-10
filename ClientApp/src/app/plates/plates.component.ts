@@ -1,5 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Lightbox } from 'ngx-lightbox';
@@ -18,31 +19,13 @@ import { PlateService } from './plate.service';
     ])],
 })
 export class PlatesComponent implements OnInit, AfterViewInit {
-
-  openAlprCameraId: number;
-
-  vehicleDescription: string;
-
-  plateNumber: string;
-
-  openAlprProcessingTimeMs: number;
-
-  processedPlateConfidence: number;
-
-  licensePlateJpegBase64: number;
-
-  isAlert: boolean;
-
-  alertDescription: string;
-
-  receivedOn: Date;
-
-  direction: number;
-
   columnsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'processedPlateConfidence', 'receivedOn'];
   rowsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'direction', 'processedPlateConfidence', 'receivedOn'];
   plates: MatTableDataSource<Plate>;
 
+  myControl = new FormControl();
+  options: string[] = ['One', 'Two', 'Three'];
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
@@ -61,13 +44,13 @@ export class PlatesComponent implements OnInit, AfterViewInit {
     
   }
 
-  public openLightbox(url: string) {
+  public openLightbox(url: string, plateNumber: string) {
     var albums =[ {
       src: url,
-      caption: "test",
+      caption: plateNumber,
       thumb: url
     }];
-    
+
     this.lightbox.open(albums, 0);
   }
 }
