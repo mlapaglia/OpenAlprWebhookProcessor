@@ -353,4 +353,4 @@ MigrationBackup/
 
 dist/
 
-log.*
+**/log*.txt
