@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Utilities;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -12,8 +13,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     public class WebhookHandler
     {
         private readonly ILogger _logger;
-
-        private readonly TextInfo _textInfo = CultureInfo.CurrentCulture.TextInfo;
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
@@ -44,7 +43,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (webhook.Group.Vehicle != null)
             {
-                updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
+                updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             }
 
             _cameraUpdateService.AddJob(updateRequest);
@@ -70,15 +69,23 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _logger.LogInformation("plate saved successfully");
         }
 
-        private string FormatVehicleDescription(string vehicleMakeModel)
+        public static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
         {
-            return _textInfo
-                .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
-        }
-
-        private static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
-        {
-            return $"x1={coordinates[3].X}&y1={coordinates[3].Y}&x2={coordinates[1].X}&y2={coordinates[1].Y}";
+            return VehicleUtilities.FormatLicensePlateImageCoordinates(
+                new List<int>()
+                {
+                    coordinates[0].X,
+                    coordinates[1].X,
+                    coordinates[2].X,
+                    coordinates[3].X,
+                },
+                new List<int>()
+                {
+                    coordinates[0].Y,
+                    coordinates[1].Y,
+                    coordinates[2].Y,
+                    coordinates[3].Y,
+                });
         }
     }
 }
