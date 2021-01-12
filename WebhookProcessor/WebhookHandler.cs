@@ -78,7 +78,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
         {
-            return $"x1={coordinates[0].X}&y1={coordinates[0].Y}&x2={coordinates[1].X}y2={coordinates[1].Y}";
+            return $"x1={coordinates[3].X}&y1={coordinates[3].Y}&x2={coordinates[1].X}&y2={coordinates[1].Y}";
         }
     }
 }
