@@ -18,7 +18,7 @@ import { PlateService } from './plate.service';
     ])],
 })
 export class PlatesComponent implements OnInit {
-  columnsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'processedPlateConfidence', 'receivedOn'];
+  columnsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'processedPlateConfidence'];
   rowsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'direction', 'processedPlateConfidence', 'receivedOn'];
   plates: MatTableDataSource<Plate>;
   
