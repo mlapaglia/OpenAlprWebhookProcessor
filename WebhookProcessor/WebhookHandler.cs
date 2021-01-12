@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _processorContext.PlateGroups.Add(new PlateGroup()
             {
                 AlertDescription = webhook.Description,
+                PlateCoordinates = FormatLicensePlateXyCoordinates(webhook.Group.BestPlate.Coordinates),
                 Direction = webhook.Group.TravelDirection,
                 IsAlert = webhook.DataType == "alpr_alert",
                 OpenAlprCameraId = webhook.Group.CameraId,
@@ -72,6 +74,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             return _textInfo
                 .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
+        }
+
+        private static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
+        {
+            return $"x1={coordinates[0].X}&y1={coordinates[0].Y}&x2={coordinates[1].X}y2={coordinates[1].Y}";
         }
     }
 }
