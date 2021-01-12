@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Cameras.Configuration
 
         public string Version { get; set; }
 
-        public string OpenAlprWebServerUrl { get; set; }
+        public Uri OpenAlprWebServerUrl { get; set; }
 
         public string OpenAlprWebServerApiKey { get; set; }
     }

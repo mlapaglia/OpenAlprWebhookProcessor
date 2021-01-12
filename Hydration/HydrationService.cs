@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             _logger = logger;
             _openAlprServerUrl = new Uri(
                 Flurl.Url.Combine(
-                    agentConfiguration.OpenAlprWebServerUrl,
+                    agentConfiguration.OpenAlprWebServerUrl.ToString(),
                     "/api/search/plate",
                     $"?api_key={agentConfiguration.OpenAlprWebServerApiKey}"));
         }
