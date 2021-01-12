@@ -1,6 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Lightbox } from 'ngx-lightbox';
@@ -18,30 +17,27 @@ import { PlateService } from './plate.service';
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ])],
 })
-export class PlatesComponent implements OnInit, AfterViewInit {
+export class PlatesComponent implements OnInit {
   columnsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'processedPlateConfidence', 'receivedOn'];
   rowsToDisplay = ['openAlprCameraId', 'plateNumber', 'vehicleDescription', 'direction', 'processedPlateConfidence', 'receivedOn'];
   plates: MatTableDataSource<Plate>;
-
-  myControl = new FormControl();
-  options: string[] = ['One', 'Two', 'Three'];
   
+  public totalNumberOfPlates: number;
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
     private plateService: PlateService,
-    private lightbox: Lightbox) { }
-
-  ngOnInit(): void {
-    this.plateService.getRecentPlates()
-      .subscribe(result => {
-        this.plates = new MatTableDataSource<Plate>(result);
-        this.plates.paginator = this.paginator;
-      });
-  }
-
-  ngAfterViewInit(): void {
+    private lightbox: Lightbox) {
+    }
     
+  ngOnInit(): void {
+    this.plateService.getRecentPlates(5, 0)
+    .subscribe(result => {
+      this.plates = new MatTableDataSource<Plate>(result.plates);
+      this.totalNumberOfPlates = result.totalCount;
+      this.plates.paginator = this.paginator;
+    });
   }
 
   public openLightbox(url: string, plateNumber: string) {
@@ -52,5 +48,13 @@ export class PlatesComponent implements OnInit, AfterViewInit {
     }];
 
     this.lightbox.open(albums, 0);
+  }
+
+  public onPaginatorPage($event) {
+    this.plateService.getRecentPlates($event.pageSize, $event.pageIndex)
+      .subscribe(result => {
+        this.plates = new MatTableDataSource<Plate>(result.plates);
+        this.totalNumberOfPlates = result.totalCount;
+      });
   }
 }

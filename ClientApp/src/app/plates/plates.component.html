@@ -32,4 +32,7 @@
   </tr>
   <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
 </table>
-<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+<mat-paginator
+  [pageSizeOptions]="[5, 10, 25, 100]"
+  [length]="totalNumberOfPlates"
+  (page)="onPaginatorPage($event)"></mat-paginator>
