@@ -41,13 +41,20 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
             return licensePlates;
         }
 
+        public async Task<int> GetTotalNumberOfPlatesAsync(CancellationToken cancellationToken)
+        {
+            return await _processerContext.PlateGroups.CountAsync(cancellationToken);
+        }
+
         public async Task<List<LicensePlate>> GetRecentPlatesAsync(
-            int numberOfPlates,
+            int pageNumber,
+            int pageSize,
             CancellationToken cancellationToken)
         {
             var dbPlates = await _processerContext.PlateGroups
                 .OrderByDescending(x => x.ReceivedOnEpoch)
-                .Take(numberOfPlates)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
             var licensePlates = new List<LicensePlate>();

@@ -1,8 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "src/environments/environment";
-import { Plate } from "./plate";
+import { PlateResponse } from "./plateResponse";
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
@@ -11,7 +10,7 @@ export class PlateService {
     constructor(
         private http: HttpClient) { }
         
-    getRecentPlates(): Observable<Plate[]> {
-        return this.http.get<Plate[]>(`/${this.recentPlatesUrl}`);
+    getRecentPlates(pageSize: number, pageNumber: number): Observable<PlateResponse> {
+        return this.http.get<PlateResponse>(`/${this.recentPlatesUrl}?pageSize=${pageSize}&pageNumber=${pageNumber}`);
     }
 }
