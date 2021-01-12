@@ -60,7 +60,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
         {
             var httpClient = new HttpClient();
 
-            var startDate = new DateTimeOffset(2020, 11, 01, 0, 0, 0, TimeSpan.Zero);
+            var startDate = new DateTimeOffset(2019, 5, 5, 0, 0, 0, TimeSpan.Zero);
 
             var stopDate = DateTimeOffset.UtcNow;
 
