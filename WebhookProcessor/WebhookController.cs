@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    [Authorize]
     [ApiController]
     [Route("webhook")]
     public class WebhookController : ControllerBase
