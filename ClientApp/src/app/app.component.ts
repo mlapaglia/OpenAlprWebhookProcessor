@@ -3,6 +3,7 @@
 import { AccountService } from './_services';
 import { User } from './_models';
 import { FormControl } from '@angular/forms';
+import { PlateService } from './plates/plate.service';
 
 @Component({
     selector: 'app',
@@ -11,12 +12,22 @@ import { FormControl } from '@angular/forms';
 })
 export class AppComponent {
     user: User;
-    
-    constructor(private accountService: AccountService) {
-        this.accountService.user.subscribe(x => this.user = x);
+    public hydrationInProgress: boolean = false;
+
+    constructor(
+        private accountService: AccountService,
+        private plateService: PlateService) {
+            this.accountService.user.subscribe(x => this.user = x);
     }
 
-    logout() {
+    public logout() {
         this.accountService.logout();
+    }
+
+    public hydrate() {
+        this.hydrationInProgress = true;
+        this.plateService.hydrateDatabase().subscribe(_ => {
+            this.hydrationInProgress = false;
+        })
     }
 }

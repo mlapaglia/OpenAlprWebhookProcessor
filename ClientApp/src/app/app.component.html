@@ -3,6 +3,7 @@
     <div class="navbar-nav">
         <a class="nav-item nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         <a class="nav-item nav-link" routerLink="/users" routerLinkActive="active">Users</a>
+        <a class="nav-item nav-link" [disabled]="hydrationInProgress" (click)="hydrate()">Hydrate Database</a>
         <a class="nav-item nav-link" (click)="logout()">Logout</a>
     </div>
     <div class="navbar-nav ml-auto">
