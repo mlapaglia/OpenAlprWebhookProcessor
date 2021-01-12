@@ -27,5 +27,7 @@ namespace OpenAlprWebhookProcessor.Data
         public string VehicleDescription { get; set; }
 
         public double Direction { get; set; }
+
+        public string PlateCoordinates { get; set; }
     }
 }
