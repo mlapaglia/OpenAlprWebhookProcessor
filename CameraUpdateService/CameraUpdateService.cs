@@ -47,13 +47,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
             _webhooksToProcess.CompleteAdding();
             _webhooksToProcess.Dispose();
-
-            return Task.CompletedTask;
+            _cancellationTokenSource.Cancel();
+            await ForceClearOverlaysAsync();
         }
 
         private async Task ProcessJobsAsync()
@@ -104,6 +103,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private async Task ClearExpiredOverlaysAsync()
         {
+            await ForceClearOverlaysAsync();
+
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
                 foreach (var openAlprId in _camerasWithActiveOverlays)
@@ -114,27 +115,46 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     {
                         _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);
 
-                        switch (cameraToUpdate.Manufacturer)
-                        {
-                            case CameraManufacturer.Dahua:
-                                await DahuaCamera.ClearCameraTextAsync(
-                                    cameraToUpdate,
-                                    _cancellationTokenSource.Token);
-                                break;
-                            case CameraManufacturer.Hikvision:
-                                await HikvisionCamera.ClearCameraTextAsync(
-                                    cameraToUpdate,
-                                    _cancellationTokenSource.Token);
-                                break;
-                            default:
-                                break;
-                        }
+                        await ClearCameraOverlayAsync(cameraToUpdate);
 
                         _camerasWithActiveOverlays.TryRemove(openAlprId.Key, out var value);
                     }
                 }
 
                 await Task.Delay(1000);
+            }
+        }
+
+        private async Task ForceClearOverlaysAsync()
+        {
+            foreach (var openAlprId in _camerasWithActiveOverlays)
+            {
+                var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == openAlprId.Key);
+
+                _logger.LogInformation("force clearing overlay for: " + cameraToUpdate.OpenAlprCameraId);
+
+                await ClearCameraOverlayAsync(cameraToUpdate);
+
+                _camerasWithActiveOverlays.TryRemove(openAlprId.Key, out var value);
+            }
+        }
+
+        private async Task ClearCameraOverlayAsync(CameraConfiguration cameraToUpdate)
+        {
+            switch (cameraToUpdate.Manufacturer)
+            {
+                case CameraManufacturer.Dahua:
+                    await DahuaCamera.ClearCameraTextAsync(
+                        cameraToUpdate,
+                        _cancellationTokenSource.Token);
+                    break;
+                case CameraManufacturer.Hikvision:
+                    await HikvisionCamera.ClearCameraTextAsync(
+                        cameraToUpdate,
+                        _cancellationTokenSource.Token);
+                    break;
+                default:
+                    break;
             }
         }
     }
