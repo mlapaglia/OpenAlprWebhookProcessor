@@ -127,15 +127,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private async Task ForceClearOverlaysAsync()
         {
-            foreach (var openAlprId in _camerasWithActiveOverlays)
+            foreach (var cameraToUpdate in _cameraConfiguration.Cameras)
             {
-                var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == openAlprId.Key);
-
                 _logger.LogInformation("force clearing overlay for: " + cameraToUpdate.OpenAlprCameraId);
 
                 await ClearCameraOverlayAsync(cameraToUpdate);
-
-                _camerasWithActiveOverlays.TryRemove(openAlprId.Key, out var value);
             }
         }
 
