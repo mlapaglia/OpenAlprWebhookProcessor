@@ -74,8 +74,6 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                 while (firstRecordDate <= stopDate)
                 {
-                    
-
                     var apiResults = await GetOpenAlprPlateGroupsFromApiAsync(
                         httpClient,
                         firstRecordDate,
@@ -162,8 +160,15 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 $"end={dateRangeEnd.ToString("s", System.Globalization.CultureInfo.InvariantCulture)}");
 
             var result = await httpClient.GetAsync(requestUrl);
-
             var response = await result.Content.ReadAsStringAsync();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.LogError(
+                    "failed to get plate data, request: {0}, response: {1}",
+                    result.RequestMessage,
+                    response);
+            }
 
             return JsonSerializer.Deserialize<List<Response>>(response);
         }
@@ -189,8 +194,15 @@ namespace OpenAlprWebhookProcessor.Hydrator
                         $"end={currentRequestDate.AddDays(1).ToString("s", System.Globalization.CultureInfo.InvariantCulture)}");
 
                     var result = await httpClient.GetAsync(requestUrl);
-
                     var response = await result.Content.ReadAsStringAsync();
+
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        _logger.LogError(
+                            "failed to get earliest plate date request: {0} response: {1}",
+                            result.RequestMessage,
+                            response);
+                    }
 
                     numberOfResults = JsonSerializer.Deserialize<List<Response>>(response).Count;
 
@@ -202,6 +214,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             catch (Exception ex)
             {
                 _logger.LogError(ex, "failed to get earliest plate date");
+
                 throw;
             }
         }
