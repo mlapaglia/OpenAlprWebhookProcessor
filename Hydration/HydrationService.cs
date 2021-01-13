@@ -164,7 +164,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
             if (!result.IsSuccessStatusCode)
             {
-                _logger.LogError("failed to get plate data, response: {0}", response);
+                _logger.LogError(
+                    "failed to get plate data, request: {0}, response: {1}",
+                    result.RequestMessage,
+                    response);
             }
 
             return JsonSerializer.Deserialize<List<Response>>(response);
@@ -195,7 +198,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                     if (!result.IsSuccessStatusCode)
                     {
-                        _logger.LogError("failed to get earliest plate date request: {0} response: {1}", result.RequestMessage, response);
+                        _logger.LogError(
+                            "failed to get earliest plate date request: {0} response: {1}",
+                            result.RequestMessage,
+                            response);
                     }
 
                     numberOfResults = JsonSerializer.Deserialize<List<Response>>(response).Count;
