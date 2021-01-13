@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Utilities;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
+using System.Net;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
@@ -68,6 +69,11 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 startDate,
                 httpClient);
 
+            if(firstRecordDate == null)
+            {
+                return;
+            }
+
             try
             {
                 var responses = new List<Response>();
@@ -76,14 +82,14 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 {
                     var apiResults = await GetOpenAlprPlateGroupsFromApiAsync(
                         httpClient,
-                        firstRecordDate,
-                        firstRecordDate.AddDays(1));
+                        firstRecordDate.Value,
+                        firstRecordDate.Value.AddDays(1));
 
                     responses.AddRange(apiResults);
 
-                    _logger.LogInformation($"pulling plates from: {firstRecordDate.ToString("s")} to {firstRecordDate.AddDays(1).ToString("s")}, found {apiResults.Count} plates");
+                    _logger.LogInformation($"pulling plates from: {firstRecordDate.Value.ToString("s")} to {firstRecordDate.Value.AddDays(1).ToString("s")}, found {apiResults.Count} plates");
 
-                    firstRecordDate = firstRecordDate.AddDays(1);
+                    firstRecordDate = firstRecordDate.Value.AddDays(1);
                 }
 
                 var plateGroups = new List<PlateGroup>();
@@ -173,7 +179,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             return JsonSerializer.Deserialize<List<Response>>(response);
         }
 
-        private async Task<DateTimeOffset> FindEarliestPlateGroupAsync(
+        private async Task<DateTimeOffset?> FindEarliestPlateGroupAsync(
             DateTimeOffset dateRangeStart,
             HttpClient httpClient)
         {
@@ -198,10 +204,19 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                     if (!result.IsSuccessStatusCode)
                     {
-                        _logger.LogError(
-                            "failed to get earliest plate date request: {0} response: {1}",
-                            result.RequestMessage,
-                            response);
+                        if(result.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            _logger.LogError("unauthorized API call, do you have a commercial account?");
+                        }
+                        else
+                        {
+                            _logger.LogError(
+                                "failed to get earliest plate date request: {0} response: {1}",
+                                result.RequestMessage,
+                                response);
+                        }
+
+                        break;
                     }
 
                     numberOfResults = JsonSerializer.Deserialize<List<Response>>(response).Count;
