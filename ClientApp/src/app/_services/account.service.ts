@@ -28,15 +28,26 @@ export class AccountService {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
                 this.userSubject.next(user);
+                this.startRefreshTokenTimer();
                 return user;
             }));
     }
 
     logout() {
-        // remove user from local storage and set current user to null
+        this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe();
+        this.stopRefreshTokenTimer();
         localStorage.removeItem('user');
         this.userSubject.next(null);
         this.router.navigate(['/account/login']);
+    }
+
+    refreshToken() {
+        return this.http.post<any>(`/users/refresh-token`, {}, { withCredentials: true })
+            .pipe(map((user) => {
+                this.userSubject.next(user);
+                this.startRefreshTokenTimer();
+                return user;
+            }));
     }
 
     register(user: User) {
@@ -76,5 +87,21 @@ export class AccountService {
                 }
                 return x;
             }));
+    }
+
+    private refreshTokenTimeout;
+
+    private startRefreshTokenTimer() {
+        // parse json object from base64 encoded jwt token
+        const jwtToken = JSON.parse(atob(this.userValue.jwtToken.split('.')[1]));
+
+        // set a timeout to refresh the token a minute before it expires
+        const expires = new Date(jwtToken.exp * 1000);
+        const timeout = expires.getTime() - Date.now() - (60 * 1000);
+        this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
+    }
+
+    private stopRefreshTokenTimer() {
+        clearTimeout(this.refreshTokenTimeout);
     }
 }

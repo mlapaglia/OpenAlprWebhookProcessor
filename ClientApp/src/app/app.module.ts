@@ -1,4 +1,4 @@
-﻿import { NgModule } from '@angular/core';
+﻿import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -16,6 +16,8 @@ import { LightboxModule } from 'ngx-lightbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FastSearchComponent } from './fast-search/fast-search.component';
+import { AccountService } from './_services';
+import { appInitializer } from './_helpers/app.initializer';
 
 @NgModule({
     imports: [
@@ -40,6 +42,7 @@ import { FastSearchComponent } from './fast-search/fast-search.component';
         FastSearchComponent
     ],
     providers: [
+        { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     ],
