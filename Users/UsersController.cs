@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using System;
 using OpenAlprWebhookProcessor.Users.Register;
 using AutoMapper;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace OpenAlprWebhookProcessor.Users
 {
@@ -12,27 +14,28 @@ namespace OpenAlprWebhookProcessor.Users
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly IUserService _userService;
 
-        private IMapper _mapper;
-
-        private readonly JwtConfiguration _jwtConfiguration;
+        private readonly IMapper _mapper;
 
         public UsersController(
             IUserService userService,
-            IMapper mapper,
-            JwtConfiguration jwtConfiguration)
+            IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
-            _jwtConfiguration = jwtConfiguration;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody] AuthenticateRequest model)
+        public async Task<IActionResult> Authenticate(
+            [FromBody] AuthenticateRequest model,
+            CancellationToken cancellationToken)
         {
-            var response = _userService.Authenticate(model, GetIpAddress());
+            var response = await _userService.AuthenticateAsync(
+                model,
+                GetIpAddress(),
+                cancellationToken);
 
             if (response == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
@@ -44,13 +47,18 @@ namespace OpenAlprWebhookProcessor.Users
 
         [AllowAnonymous]
         [HttpPost("refresh-token")]
-        public IActionResult RefreshToken()
+        public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            var response = _userService.RefreshToken(refreshToken, GetIpAddress());
+            var response = await _userService.RefreshTokenAsync(
+                refreshToken,
+                GetIpAddress(),
+                cancellationToken);
 
             if (response == null)
+            {
                 return Unauthorized(new { message = "Invalid token" });
+            }
 
             SetTokenCookie(response.RefreshToken);
 
@@ -58,63 +66,76 @@ namespace OpenAlprWebhookProcessor.Users
         }
 
         [HttpPost("revoke-token")]
-        public IActionResult RevokeToken([FromBody] RevokeTokenRequest model)
+        public async Task<IActionResult> RevokeToken(
+            [FromBody] RevokeTokenRequest model,
+            CancellationToken cancellationToken)
         {
-            // accept token from request body or cookie
             var token = model.Token ?? Request.Cookies["refreshToken"];
 
             if (string.IsNullOrEmpty(token))
+            {
                 return BadRequest(new { message = "Token is required" });
+            }
 
-            var response = _userService.RevokeToken(token, GetIpAddress());
+            var response = await _userService.RevokeTokenAsync(
+                token,
+                GetIpAddress(),
+                cancellationToken);
 
             if (!response)
+            {
                 return NotFound(new { message = "Token not found" });
+            }
 
             return Ok(new { message = "Token revoked" });
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            // map model to entity
             var user = _mapper.Map<User>(model);
 
             try
             {
-                // create user
-                _userService.Create(user, model.Password);
+                await _userService.CreateAsync(user, model.Password);
                 return Ok();
             }
             catch (AppException ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var users = _userService.GetAll();
+            var users = await _userService.GetAllAsync(cancellationToken);
             return Ok(users);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var user = _userService.GetById(id);
+            var user = await _userService.GetByIdAsync(id, cancellationToken);
             if (user == null) return NotFound();
 
             return Ok(user);
         }
 
         [HttpGet("{id}/refresh-tokens")]
-        public IActionResult GetRefreshTokens(int id)
+        public async Task<IActionResult> GetRefreshTokens(int id, CancellationToken cancellationToken)
         {
-            var user = _userService.GetById(id);
-            if (user == null) return NotFound();
+            var user = await _userService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
 
             return Ok(user.RefreshTokens);
         }

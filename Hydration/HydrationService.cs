@@ -87,7 +87,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                     responses.AddRange(apiResults);
 
-                    _logger.LogInformation($"pulling plates from: {firstRecordDate.Value.ToString("s")} to {firstRecordDate.Value.AddDays(1).ToString("s")}, found {apiResults.Count} plates");
+                    _logger.LogInformation($"pulling plates from: {firstRecordDate.Value:s} to {firstRecordDate.Value.AddDays(1):s}, found {apiResults.Count} plates");
 
                     firstRecordDate = firstRecordDate.Value.AddDays(1);
                 }
@@ -192,7 +192,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             {
                 while (numberOfResults == 0)
                 {
-                    _logger.LogInformation($"searching from: {currentRequestDate.ToString("s")} to {currentRequestDate.AddDays(1).ToString("s")}");
+                    _logger.LogInformation($"searching from: {currentRequestDate:s} to {currentRequestDate.AddDays(1):s}");
 
                     var requestUrl = Flurl.Url.Combine(
                         _openAlprServerUrl.ToString(),

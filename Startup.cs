@@ -14,6 +14,9 @@ using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
+using OpenAlprWebhookProcessor.Settings.DeleteCamera;
+using OpenAlprWebhookProcessor.Settings.GetCameras;
+using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
 using OpenAlprWebhookProcessor.Users.Data;
 using OpenAlprWebhookProcessor.Users.Register;
@@ -92,11 +95,13 @@ namespace OpenAlprWebhookProcessor
             services.AddDbContext<UsersContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("UsersContext")));
 
-
             services.AddSingleton(agentConfiguration);
 
             services.AddScoped<WebhookHandler>();
             services.AddScoped<GetLicensePlateHandler>();
+            services.AddScoped<GetCameraRequestHandler>();
+            services.AddScoped<DeleteCameraHandler>();
+            services.AddScoped<UpsertCameraHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -120,11 +125,9 @@ namespace OpenAlprWebhookProcessor
             services.AddSingleton(mapper.CreateMapper());
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IWebHostEnvironment env,
-            UsersContext usersContext)
+            IWebHostEnvironment env)
         {
             MigrateDatabases(app);
 
@@ -135,7 +138,7 @@ namespace OpenAlprWebhookProcessor
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
                 app.UseHsts();
             }
 
@@ -172,15 +175,15 @@ namespace OpenAlprWebhookProcessor
                 endpoints.MapControllers();
             });
 
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
+            //app.UseSpa(spa =>
+            //{
+            //    spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-            });
+            //    if (env.IsDevelopment())
+            //    {
+            //        spa.UseAngularCliServer(npmScript: "start");
+            //    }
+            //});
         }
 
         private static void MigrateDatabases(IApplicationBuilder app)

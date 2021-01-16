@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OpenAlprWebhookProcessor.Users.Data;
 using System;
 using System.Collections.Generic;
@@ -7,32 +8,43 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Users
 {
     public interface IUserService
     {
-        AuthenticateResponse Authenticate(
+        Task<AuthenticateResponse> AuthenticateAsync(
             AuthenticateRequest request,
-            string ipAddress);
+            string ipAddress,
+            CancellationToken cancellationToken);
 
-        IEnumerable<User> GetAll();
+        Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
 
-        User GetById(int id);
+        Task<User> GetByIdAsync(
+            int id,
+            CancellationToken cancellationToken);
 
-        User Create(User user, string password);
+        Task<User> CreateAsync(
+            User user,
+            string password);
 
-        void Update(User requestedUser, string password = null);
+        Task UpdateAsync(
+            User requestedUser,
+            string password = null);
 
-        void Delete(int id);
+        Task DeleteAsync(int id);
 
-        AuthenticateResponse RefreshToken(
+        Task<AuthenticateResponse> RefreshTokenAsync(
             string token,
-            string ipAddress);
+            string ipAddress,
+            CancellationToken cancellationToken);
 
-        bool RevokeToken(
+        Task<bool> RevokeTokenAsync(
             string token,
-            string ipAddress);
+            string ipAddress,
+            CancellationToken cancellationToken);
     }
 
     public class UserService : IUserService
@@ -49,84 +61,90 @@ namespace OpenAlprWebhookProcessor.Users
             _jwtConfiguration = jwtConfiguration;
         }
 
-        public User Create(User user, string password)
+        public async Task<User> CreateAsync(User user, string password)
         {
-            // validation
             if (string.IsNullOrWhiteSpace(password))
+            {
                 throw new AppException("Password is required");
+            }
 
             if (_usersContext.Users.Any(x => x.Username == user.Username))
+            {
                 throw new AppException("Username \"" + user.Username + "\" is already taken");
+            }
 
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
             _usersContext.Users.Add(user);
-            _usersContext.SaveChanges();
+            await _usersContext.SaveChangesAsync();
 
             return user;
         }
 
-        public void Update(
+        public async Task UpdateAsync(
             User requestedUser,
             string password = null)
         {
-            var user = _usersContext.Users.Find(requestedUser.Id);
+            var user = await _usersContext.Users.FindAsync(requestedUser.Id);
 
             if (user == null)
+            {
                 throw new AppException("User not found");
+            }
 
-            if (!string.IsNullOrWhiteSpace(user.Username) && user.Username != user.Username)
+            if (!string.IsNullOrWhiteSpace(user.Username) && user.Username != requestedUser.Username)
             {
                 if (_usersContext.Users.Any(x => x.Username == user.Username))
                     throw new AppException("Username " + user.Username + " is already taken");
 
-                user.Username = user.Username;
+                user.Username = requestedUser.Username;
             }
 
             if (!string.IsNullOrWhiteSpace(user.FirstName))
             {
-                user.FirstName = user.FirstName;
+                user.FirstName = requestedUser.FirstName;
             }
 
             if (!string.IsNullOrWhiteSpace(user.LastName))
             {
-                user.LastName = user.LastName;
+                user.LastName = requestedUser.LastName;
             }
 
-            // update password if provided
             if (!string.IsNullOrWhiteSpace(password))
             {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
             }
 
             _usersContext.Users.Update(user);
-            _usersContext.SaveChanges();
+            await _usersContext.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var user = _usersContext.Users.Find(id);
+            var user = await _usersContext.Users.FindAsync(id);
+
             if (user != null)
             {
                 _usersContext.Users.Remove(user);
-                _usersContext.SaveChanges();
+                await _usersContext.SaveChangesAsync();
             }
         }
 
-        public AuthenticateResponse Authenticate(
-            AuthenticateRequest model,
-            string ipAddress)
+        public async Task<AuthenticateResponse> AuthenticateAsync(
+            AuthenticateRequest request,
+            string ipAddress,
+            CancellationToken cancellationToken)
         {
-            var user = _usersContext.Users
-                .SingleOrDefault(x => x.Username == model.Username);
+            var user = await _usersContext.Users
+                .SingleOrDefaultAsync(x =>
+                    x.Username == request.Username,
+                    cancellationToken);
 
             if (user == null)
             {
@@ -134,19 +152,20 @@ namespace OpenAlprWebhookProcessor.Users
             }
 
             if (!VerifyPasswordHash(
-                model.Password,
+                request.Password,
                 user.PasswordHash,
                 user.PasswordSalt))
             {
                 return null; 
             }
 
-            var jwtToken = generateJwtToken(user);
-            var refreshToken = generateRefreshToken(ipAddress);
+            var jwtToken = GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken(ipAddress);
 
             user.RefreshTokens.Add(refreshToken);
+
             _usersContext.Update(user);
-            _usersContext.SaveChanges();
+            await _usersContext.SaveChangesAsync(cancellationToken);
 
             return new AuthenticateResponse(
                 user,
@@ -154,70 +173,85 @@ namespace OpenAlprWebhookProcessor.Users
                 refreshToken.Token);
         }
 
-        public AuthenticateResponse RefreshToken(string token, string ipAddress)
+        public async Task<AuthenticateResponse> RefreshTokenAsync(
+            string token,
+            string ipAddress,
+            CancellationToken cancellationToken)
         {
-            var user = _usersContext.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+            var user = await _usersContext.Users.SingleOrDefaultAsync(u => 
+                u.RefreshTokens.Any(t => t.Token == token),
+                cancellationToken);
 
-            // return null if no user found with token
-            if (user == null) return null;
+            if (user == null)
+            {
+                throw new ArgumentException("unknown user");
+            }
 
             var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
 
-            // return null if token is no longer active
-            if (!refreshToken.IsActive) return null;
+            if (!refreshToken.IsActive)
+            {
+                throw new ArgumentException("user is already inactive");
+            }
 
-            // replace old refresh token with a new one and save
-            var newRefreshToken = generateRefreshToken(ipAddress);
+            var newRefreshToken = GenerateRefreshToken(ipAddress);
+
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
             refreshToken.ReplacedByToken = newRefreshToken.Token;
+
             user.RefreshTokens.Add(newRefreshToken);
             _usersContext.Update(user);
-            _usersContext.SaveChanges();
 
-            // generate new jwt
-            var jwtToken = generateJwtToken(user);
+            await _usersContext.SaveChangesAsync(cancellationToken);
 
-            return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
+            var jwtToken = GenerateJwtToken(user);
+
+            return new AuthenticateResponse(
+                user,
+                jwtToken,
+                newRefreshToken.Token);
         }
 
-        public bool RevokeToken(string token, string ipAddress)
+        public async Task<bool> RevokeTokenAsync(
+            string token,
+            string ipAddress,
+            CancellationToken cancellationToken)
         {
-            var user = _usersContext.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+            var user = await _usersContext.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token), cancellationToken);
 
-            // return false if no user found with token
             if (user == null) return false;
 
             var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
 
-            // return false if token is not active
             if (!refreshToken.IsActive) return false;
 
-            // revoke token and save
             refreshToken.Revoked = DateTime.UtcNow;
             refreshToken.RevokedByIp = ipAddress;
+
             _usersContext.Update(user);
-            _usersContext.SaveChanges();
+            await _usersContext.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        public IEnumerable<User> GetAll()
+        public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return _usersContext.Users;
+            return await _usersContext.Users.ToListAsync(cancellationToken);
         }
 
-        public User GetById(int id)
+        public async Task<User> GetByIdAsync(
+            int id,
+            CancellationToken cancellationToken)
         {
-            return _usersContext.Users.Find(id);
+            return await _usersContext.Users.FindAsync(id, cancellationToken);
         }
 
-        // helper methods
-
-        private string generateJwtToken(User user)
+        private string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfiguration.SecretKey);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -225,13 +259,16 @@ namespace OpenAlprWebhookProcessor.Users
                     new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
 
-        private RefreshToken generateRefreshToken(string ipAddress)
+        private static RefreshToken GenerateRefreshToken(string ipAddress)
         {
             using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
             {
@@ -252,8 +289,15 @@ namespace OpenAlprWebhookProcessor.Users
             out byte[] passwordHash,
             out byte[] passwordSalt)
         {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Value cannot be empty or whitespace only string.", nameof(password));
+            }
 
             using (var hmac = new HMACSHA512())
             {
@@ -267,12 +311,27 @@ namespace OpenAlprWebhookProcessor.Users
             byte[] storedHash,
             byte[] storedSalt)
         {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
-            if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
-            if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
+            if (password == null)
+            {
+                throw new ArgumentNullException(nameof(password));
+            }
 
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Value cannot be empty or whitespace only string.", nameof(password));
+            }
+
+            if (storedHash.Length != 64)
+            {
+                throw new ArgumentException("Invalid length of password hash (64 bytes expected).", nameof(storedHash));
+            }
+
+            if (storedSalt.Length != 128)
+            {
+                throw new ArgumentException("Invalid length of password salt (128 bytes expected).", nameof(storedSalt));
+            }
+
+            using (var hmac = new HMACSHA512(storedSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 for (int i = 0; i < computedHash.Length; i++)

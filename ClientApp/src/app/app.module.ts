@@ -8,16 +8,14 @@ import { AppComponent } from './app.component';
 import { AlertComponent } from './_components';
 import { HomeComponent } from './home';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PlatesComponent } from './plates/plates.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
 import { LightboxModule } from 'ngx-lightbox';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { FastSearchComponent } from './fast-search/fast-search.component';
 import { AccountService } from './_services';
 import { appInitializer } from './_helpers/app.initializer';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
     imports: [
@@ -26,20 +24,18 @@ import { appInitializer } from './_helpers/app.initializer';
         HttpClientModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        MatPaginatorModule,
-        MatTableModule,
         MatAutocompleteModule,
         LightboxModule,
         MatButtonModule,
-        MatIconModule,
         FormsModule,
+        MatTabsModule,
+        MatIconModule,
     ],
     declarations: [
         AppComponent,
         AlertComponent,
         HomeComponent,
-        PlatesComponent,
-        FastSearchComponent
+        FastSearchComponent,
     ],
     providers: [
         { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },

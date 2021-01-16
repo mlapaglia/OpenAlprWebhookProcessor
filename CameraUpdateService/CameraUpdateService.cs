@@ -41,8 +41,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Task.Run(async () => await ProcessJobsAsync());
-            Task.Run(async () => await ClearExpiredOverlaysAsync());
+            Task.Run(async () =>
+                await ProcessJobsAsync(),
+                cancellationToken);
+
+            Task.Run(async () => 
+                await ClearExpiredOverlaysAsync(),
+                cancellationToken);
 
             return Task.CompletedTask;
         }
