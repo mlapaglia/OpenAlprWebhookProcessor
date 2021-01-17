@@ -1,11 +1,10 @@
 export class Camera {
-    ipAddress: string;
     latitude: number;
     longitude: number;
     manufacturer: Manufacturer;
     modelNumber: string;
     openAlprName: string;
-    openAlprCameraId: string;
+    openAlprCameraId: number;
     cameraPassword: string;
     cameraUsername: string;
     updateOverlayTextUrl: string;

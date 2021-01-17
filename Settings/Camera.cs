@@ -1,5 +1,4 @@
 ﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
-using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -7,11 +6,9 @@ namespace OpenAlprWebhookProcessor.Settings
 {
     public class Camera
     {
-        public string IpAddress { get; set; }
-
         public int PlatesSeen { get; set; }
 
-        public Uri SampleImageUrl { get; set; }
+        public string SampleImageUrl { get; set; }
 
         public double Latitude { get; set; }
 
@@ -31,6 +28,6 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public string CameraUsername { get; set; }
 
-        public Uri UpdateOverlayTextUrl { get; set; }
+        public string UpdateOverlayTextUrl { get; set; }
     }
 }

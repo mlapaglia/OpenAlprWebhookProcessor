@@ -8,9 +8,10 @@ import { Camera } from '../camera';
 })
 export class CameraComponent implements OnInit {
   @Input() camera: Camera;
-  @Output() add: EventEmitter<string> = new EventEmitter();
-  @Output() edit: EventEmitter<string> = new EventEmitter();
-  @Output() delete: EventEmitter<string> = new EventEmitter();
+  @Output() add: EventEmitter<number> = new EventEmitter();
+  @Output() edit: EventEmitter<number> = new EventEmitter();
+  @Output() delete: EventEmitter<number> = new EventEmitter();
+  @Output() test: EventEmitter<number> = new EventEmitter();
 
   constructor() { }
 
@@ -27,5 +28,9 @@ export class CameraComponent implements OnInit {
 
   public removeCamera() {
     this.delete.emit(this.camera.openAlprCameraId);
+  }
+
+  public testCamera() {
+    this.test.emit(this.camera.openAlprCameraId);
   }
 }

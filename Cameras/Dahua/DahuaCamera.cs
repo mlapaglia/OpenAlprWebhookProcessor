@@ -1,5 +1,4 @@
-﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
-using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -11,27 +10,26 @@ namespace OpenAlprWebhookProcessor.Cameras
     public static class DahuaCamera
     {
         public static async Task ClearCameraTextAsync(
-            CameraConfiguration cameraToUpdate,
+             Data.Camera cameraToUpdate,
             CancellationToken cancellationToken)
         {
             var client = new HttpClient(new HttpClientHandler()
             {
                 UseDefaultCredentials = true,
                 Credentials = new NetworkCredential(
-                    cameraToUpdate.Username,
-                    cameraToUpdate.Password),
+                    cameraToUpdate.CameraUsername,
+                    cameraToUpdate.CameraPassword),
             });
 
             await SendUpdateCommandAsync(
                 client,
                 cameraToUpdate,
-                1,
                 "||||",
                 cancellationToken);
         }
 
         public static async Task SetCameraTextAsync(
-            CameraConfiguration cameraToUpdate,
+            Data.Camera cameraToUpdate,
             CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
@@ -39,22 +37,20 @@ namespace OpenAlprWebhookProcessor.Cameras
             {
                 UseDefaultCredentials = true,
                 Credentials = new NetworkCredential(
-                    cameraToUpdate.Username,
-                    cameraToUpdate.Password),
+                    cameraToUpdate.CameraUsername,
+                    cameraToUpdate.CameraPassword),
             });
 
             await SendUpdateCommandAsync(
                 client,
                 cameraToUpdate,
-                1,
                 $"{updateRequest.LicensePlate}|{updateRequest.VehicleDescription}|Processing Time: {updateRequest.OpenAlprProcessingTimeMs}ms|Confidence: {updateRequest.ProcessedPlateConfidence}%",
                 cancellationToken);
         }
 
         private static async Task SendUpdateCommandAsync(
             HttpClient client,
-            CameraConfiguration cameraToUpdate,
-            int textFieldId,
+            Data.Camera cameraToUpdate,
             string textToSet,
             CancellationToken cancellationToken)
         {

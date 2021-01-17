@@ -13,6 +13,8 @@ namespace OpenAlprWebhookProcessor.Data
 
         public CameraManufacturer Manufacturer { get; set; }
 
+        public string ModelNumber { get; set; }
+
         public string OpenAlprName { get; set; }
 
         public long OpenAlprCameraId { get; set; }
@@ -22,5 +24,9 @@ namespace OpenAlprWebhookProcessor.Data
         public string CameraUsername { get; set; }
 
         public string UpdateOverlayTextUrl { get; set; }
+
+        public string LatestProcessedPlateUuid { get; set; }
+
+        public int PlatesSeen { get; set; }
     }
 }

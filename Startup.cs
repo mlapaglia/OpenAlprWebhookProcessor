@@ -10,12 +10,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
 using OpenAlprWebhookProcessor.Settings.DeleteCamera;
 using OpenAlprWebhookProcessor.Settings.GetCameras;
+using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
 using OpenAlprWebhookProcessor.Users.Data;
@@ -75,14 +75,6 @@ namespace OpenAlprWebhookProcessor
 
             services.AddScoped<IUserService, UserService>();
 
-            var agentConfiguration = new AgentConfiguration();
-            Configuration.GetSection("OpenAlprAgent").Bind(agentConfiguration);
-
-            if (agentConfiguration.Cameras == null || agentConfiguration.Cameras.Count == 0)
-            {
-                throw new ArgumentException("no cameras found in appsettings, check your configuration");
-            }
-
             services.AddLogging(config =>
             {
                 config.AddDebug();
@@ -95,13 +87,15 @@ namespace OpenAlprWebhookProcessor
             services.AddDbContext<UsersContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("UsersContext")));
 
-            services.AddSingleton(agentConfiguration);
-
             services.AddScoped<WebhookHandler>();
             services.AddScoped<GetLicensePlateHandler>();
+            services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<DeleteCameraHandler>();
             services.AddScoped<UpsertCameraHandler>();
+            services.AddScoped<TestCameraHandler>();
+            services.AddScoped<UpsertAgentRequestHandler>();
+            services.AddScoped<GetAgentRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

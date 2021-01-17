@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Utilities;
-using OpenAlprWebhookProcessor.Cameras.Configuration;
 using System.Net;
 
 namespace OpenAlprWebhookProcessor.Hydrator
@@ -20,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
     {
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly Uri _openAlprServerUrl;
+        private Uri _openAlprServerUrl;
 
         private readonly IServiceScopeFactory _scopeFactory;
 
@@ -28,17 +27,11 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         public HydrationService(
             IServiceScopeFactory scopeFactory,
-            ILogger<HydrationService> logger,
-            AgentConfiguration agentConfiguration)
+            ILogger<HydrationService> logger)
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _scopeFactory = scopeFactory;
             _logger = logger;
-            _openAlprServerUrl = new Uri(
-                Flurl.Url.Combine(
-                    agentConfiguration.OpenAlprWebServerUrl.ToString(),
-                    "/api/search/plate",
-                    $"?api_key={agentConfiguration.OpenAlprWebServerApiKey}"));
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -69,9 +62,22 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 startDate,
                 httpClient);
 
-            if(firstRecordDate == null)
+            if (firstRecordDate == null)
             {
                 return;
+            }
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var agent = await processorContext.Agents.FirstOrDefaultAsync();
+
+                _openAlprServerUrl = new Uri(
+                    Flurl.Url.Combine(
+                        agent.OpenAlprWebServerUrl.ToString(),
+                        "/api/search/plate",
+                        $"?api_key={agent.OpenAlprWebServerApiKey}"));
             }
 
             try

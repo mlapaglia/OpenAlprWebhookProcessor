@@ -41,6 +41,7 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
                 existingCamera.Latitude = camera.Latitude;
                 existingCamera.Longitude = camera.Longitude;
                 existingCamera.Manufacturer = camera.Manufacturer;
+                existingCamera.ModelNumber = camera.ModelNumber;
                 existingCamera.OpenAlprCameraId = camera.OpenAlprCameraId;
                 existingCamera.OpenAlprName = camera.OpenAlprName;
                 existingCamera.UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl.ToString();

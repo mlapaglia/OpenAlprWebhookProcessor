@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Generic;
@@ -13,20 +12,18 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
     {
         private readonly ProcessorContext _processerContext;
 
-        private readonly AgentConfiguration _agentConfiguration;
-
         public GetLicensePlateHandler(
-            ProcessorContext processorContext,
-            AgentConfiguration agentConfiguration)
+            ProcessorContext processorContext)
         {
             _processerContext = processorContext;
-            _agentConfiguration = agentConfiguration;
         }
 
         public async Task<List<LicensePlate>> GetLicensePlatesAsync(
             string licensePlate,
             CancellationToken cancellationToken)
         {
+            var agent = await _processerContext.Agents.FirstOrDefaultAsync();
+
             var dbPlates = await _processerContext.PlateGroups
                 .Where(x => x.Number == licensePlate)
                 .ToListAsync(cancellationToken);
@@ -35,7 +32,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
 
             foreach (var plate in dbPlates)
             {
-                licensePlates.Add(MapPlate(plate));
+                licensePlates.Add(MapPlate(plate, agent));
             }
 
             return licensePlates;
@@ -51,6 +48,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
             int pageSize,
             CancellationToken cancellationToken)
         {
+            var agent = await _processerContext.Agents.FirstOrDefaultAsync();
+
             var dbPlates = await _processerContext.PlateGroups
                 .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Skip(pageNumber * pageSize)
@@ -61,20 +60,26 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
 
             foreach (var plate in dbPlates)
             {
-                licensePlates.Add(MapPlate(plate));
+                licensePlates.Add(MapPlate(plate, agent));
             }
 
             return licensePlates;
         }
 
-        public LicensePlate MapPlate(PlateGroup plate)
+        public LicensePlate MapPlate(
+            PlateGroup plate,
+            Agent agent)
         {
             return new LicensePlate()
             {
                 AlertDescription = plate.AlertDescription,
                 Direction = plate.Direction,
-                ImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), $"/img/{plate.OpenAlprUuid}.jpg")),
-                CropImageUrl = new Uri(Flurl.Url.Combine(_agentConfiguration.Endpoint.ToString(), $"/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}")),
+                ImageUrl = new Uri(Flurl.Url.Combine(
+                    agent.EndpointUrl,
+                    $"/img/{plate.OpenAlprUuid}.jpg")),
+                CropImageUrl = new Uri(Flurl.Url.Combine(
+                    agent.EndpointUrl,
+                    $"/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}")),
                 IsAlert = plate.IsAlert,
                 LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,

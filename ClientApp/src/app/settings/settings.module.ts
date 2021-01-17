@@ -8,7 +8,6 @@ import { MatListModule, } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { CamerasComponent } from './cameras/cameras.component';
-import { OpenalprWebserverComponent } from './openalpr-webserver/openalpr-webserver.component';
 import { OpenalprAgentComponent } from './openalpr-agent/openalpr-agent.component';
 import { CameraComponent } from './cameras/camera/camera.component';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,16 +19,13 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
     SettingsLayoutComponent,
     SettingsComponent,
     CamerasComponent,
-    OpenalprWebserverComponent,
-    OpenalprWebserverComponent,
-    OpenalprWebserverComponent,
     OpenalprAgentComponent,
     CameraComponent,
     EditCameraComponent,
@@ -49,6 +45,8 @@ import { MatOptionModule } from '@angular/material/core';
     MatInputModule,
     MatSelectModule,
     FormsModule,
+    MatButtonModule,
+    MatTooltipModule,
   ]
 })
 export class SettingsModule { }

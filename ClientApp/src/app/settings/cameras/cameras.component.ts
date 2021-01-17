@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Camera } from './camera';
-import { CameraService } from './camera.service';
+import { SettingsService } from '../settings.service';
 import { EditCameraComponent } from './edit-camera/edit-camera.component';
 
 @Component({
@@ -13,22 +13,21 @@ export class CamerasComponent implements OnInit {
   public cameras: Camera[];
   
   constructor(
-    private cameraService: CameraService,
+    private settingsService: SettingsService,
     public dialog: MatDialog) { }
-    private cameraEditId: string;
 
   ngOnInit(): void {
     this.getCameras();
   }
 
   public getCameras() {
-    this.cameraService.getCameras().subscribe(result => {
+    this.settingsService.getCameras().subscribe(result => {
       result.unshift(new Camera());
       this.cameras = result;
     });
   }
 
-  openEditDialog(cameraId: string): void {
+  openEditDialog(cameraId: number): void {
     var cameraToEdit = this.cameras.find(x => x.openAlprCameraId == cameraId);
 
     if (!cameraToEdit) {
@@ -42,8 +41,13 @@ export class CamerasComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         var cameraToSave = this.cameras.find(x => x.openAlprCameraId == cameraId);
-        this.cameraService.upsertCamera(cameraToSave).subscribe(result => {
 
+        if (!cameraToSave) {
+          cameraToSave = this.cameras[0];
+        }
+
+        this.settingsService.upsertCamera(cameraToSave).subscribe(result => {
+          this.getCameras();
         });
       }
     });
@@ -53,11 +57,18 @@ export class CamerasComponent implements OnInit {
     this.openEditDialog(null);
   }
 
-  public deleteCamera($event: string) {
-
+  public deleteCamera($event: number) {
+    this.settingsService.deleteCamera($event).subscribe(result => {
+      this.getCameras();
+    });
   }
 
-  public editCamera($event: string) {
+  public editCamera($event: number) {
     this.openEditDialog($event);
+  }
+
+  public testCamera($event: number) {
+    this.settingsService.testCamera($event).subscribe(result => {
+    });
   }
 }

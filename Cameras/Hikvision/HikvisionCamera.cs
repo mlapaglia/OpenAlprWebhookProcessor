@@ -7,7 +7,6 @@ using System.Xml;
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
-using OpenAlprWebhookProcessor.Cameras.Configuration;
 using System.Net;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 
@@ -16,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Cameras
     public static class HikvisionCamera
     {
         public static async Task ClearCameraTextAsync(
-            CameraConfiguration cameraToUpdate,
+            Data.Camera cameraToUpdate,
             CancellationToken cancellationToken)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
@@ -60,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         public static async Task SetCameraTextAsync(
-            CameraConfiguration cameraToUpdate,
+            Data.Camera cameraToUpdate,
             CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
@@ -105,7 +104,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         private static async Task PushCameraTextAsync(
-            CameraConfiguration cameraToUpdate,
+            Data.Camera cameraToUpdate,
             VideoOverlay videoOverlay,
             CancellationToken cancellationToken)
         {
@@ -113,8 +112,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             {
                 UseDefaultCredentials = true,
                 Credentials = new NetworkCredential(
-                    cameraToUpdate.Username,
-                    cameraToUpdate.Password),
+                    cameraToUpdate.CameraUsername,
+                    cameraToUpdate.CameraPassword),
             });
 
             using (var stringWriter = new StringWriter())

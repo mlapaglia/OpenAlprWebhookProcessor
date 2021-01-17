@@ -2,48 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210117150417_undo")]
+    partial class undo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.2");
-
-            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Agent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EndpointUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Hostname")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OpenAlprWebServerApiKey")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OpenAlprWebServerUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Uid")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Version")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Agents");
-                });
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Camera", b =>
                 {

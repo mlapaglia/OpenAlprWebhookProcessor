@@ -1,10 +1,6 @@
 <h1 mat-dialog-title>Edit Camera</h1>
 <mat-dialog-content fxLayout="row wrap" fxLayoutGap=20px>
   <mat-form-field appearance="outline">
-    <mat-label>IP Address</mat-label>
-    <input matInput [(ngModel)]="camera.ipAddress" required>
-  </mat-form-field>
-  <mat-form-field appearance="outline">
     <mat-label>Longitude</mat-label>
     <input matInput [(ngModel)]="camera.longitude">
   </mat-form-field>
@@ -15,8 +11,8 @@
   <mat-form-field appearance="outline">
     <mat-label>Manufacturer</mat-label>
     <mat-select matInput [(ngModel)]="camera.manufacturer" required>
-      <mat-option value="hikvision">Hikvision</mat-option>
-      <mat-option value="dahua">Dahua</mat-option>
+      <mat-option value="Hikvision">Hikvision</mat-option>
+      <mat-option value="Dahua">Dahua</mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field appearance="outline">
@@ -40,7 +36,7 @@
     <input matInput [(ngModel)]="camera.cameraPassword" [type]="hidePassword ? 'password' : 'text'" required>
     <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
   </mat-form-field>
-  <mat-form-field fxFlex="40" appearance="outline">
+  <mat-form-field fxFlex="100" appearance="outline">
     <mat-label>Camera Overlay Text Url</mat-label>
     <input matInput [(ngModel)]="camera.updateOverlayTextUrl" required>
   </mat-form-field>

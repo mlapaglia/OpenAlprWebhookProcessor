@@ -2,48 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210117042246_platesseen")]
+    partial class platesseen
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.2");
-
-            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Agent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EndpointUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Hostname")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OpenAlprWebServerApiKey")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OpenAlprWebServerUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Uid")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Version")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Agents");
-                });
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Camera", b =>
                 {
@@ -57,7 +30,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<string>("CameraUsername")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LatestProcessedPlateUuid")
+                    b.Property<string>("IpAddress")
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Latitude")
@@ -69,9 +42,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<int>("Manufacturer")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ModelNumber")
-                        .HasColumnType("TEXT");
-
                     b.Property<long>("OpenAlprCameraId")
                         .HasColumnType("INTEGER");
 
@@ -80,6 +50,9 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.Property<int>("PlatesSeen")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SampleImageUrl")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UpdateOverlayTextUrl")
                         .HasColumnType("TEXT");
