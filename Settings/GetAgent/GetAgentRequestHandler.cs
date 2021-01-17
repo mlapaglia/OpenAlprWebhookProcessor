@@ -17,6 +17,11 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
         {
             var agent = await _processorContext.Agents.FirstOrDefaultAsync();
 
+            if (agent == null)
+            {
+                return new Agent();
+            }
+
             return new Agent()
             {
                 EndpointUrl = agent.EndpointUrl,
@@ -26,18 +31,6 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                 Uid = agent.Uid,
                 Version = agent.Version,
             };
-        }
-
-        private static string CreateSampleImageUrl(
-            string imageUuid,
-            string cameraIpAddress)
-        {
-            if (!string.IsNullOrEmpty(imageUuid) || !string.IsNullOrEmpty(cameraIpAddress))
-            {
-                return null;
-            }
-
-            return Flurl.Url.Combine(cameraIpAddress, imageUuid);
         }
     }
 }
