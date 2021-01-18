@@ -103,6 +103,9 @@ namespace OpenAlprWebhookProcessor
             services.AddSingleton<HydrationService>();
             services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
 
+            services.AddSingleton<AlertService.AlertService>();
+            services.AddSingleton<IHostedService>(p => p.GetService<AlertService.AlertService>());
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });

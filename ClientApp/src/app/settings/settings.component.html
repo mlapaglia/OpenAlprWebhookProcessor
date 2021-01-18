@@ -4,13 +4,17 @@
 	[fixedTopGap]="0"
 	[fixedBottomGap]="0">
 		<mat-nav-list>
-			<mat-list-item (click)="openSettings('camera')"> 
+			<mat-list-item (click)="openSettings('camera')">
 				<span>Cameras</span>
 				<mat-icon mat-list-icon>videocam</mat-icon>
-            </mat-list-item>
-            <mat-list-item (click)="openSettings('agent')">
+			</mat-list-item>
+			<mat-list-item (click)="openSettings('agent')">
 				<span>OpenALPR Watchman Agent</span>
 				<mat-icon mat-list-icon>api</mat-icon>
+			</mat-list-item>
+			<mat-list-item (click)="openSettings('alert')">
+				<span>Alerts</span>
+				<mat-icon mat-list-icon>notifications_active</mat-icon>
 			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
@@ -18,7 +22,7 @@
 	<mat-sidenav-content fullscreen>
         <app-cameras *ngIf="visibleSetting == 'camera'"></app-cameras>
         <app-openalpr-webserver *ngIf="visibleSetting == 'webserver'"></app-openalpr-webserver>
-        <app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
+		<app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
 	</mat-sidenav-content>
 
 </mat-sidenav-container>

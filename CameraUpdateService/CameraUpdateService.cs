@@ -59,17 +59,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _webhooksToProcess.CompleteAdding();
             _webhooksToProcess.Dispose();
             _cancellationTokenSource.Cancel();
+
             await ForceClearOverlaysAsync();
         }
 
         private async Task ProcessJobsAsync()
         {
-            using (var scope = _scopeFactory.CreateScope())
+            foreach (var job in _webhooksToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                foreach (var job in _webhooksToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
+                using (var scope = _scopeFactory.CreateScope())
                 {
+                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
                     _logger.LogInformation("processing job for plate: " + job.LicensePlate);
 
                     try
@@ -80,6 +81,17 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         {
                             _logger.LogError($"Unable to find camera with OpenAlprId: {job.OpenAlprCameraId}, check your configuration.");
                             continue;
+                        }
+
+                        if (job.IsAlert)
+                        {
+                            var alertService = scope.ServiceProvider.GetRequiredService<AlertService.AlertService>();
+                            alertService.AddJob(new AlertService.AlertUpdateRequest()
+                            {
+                                CameraId = job.OpenAlprCameraId,
+                                Description = job.AlertDescription,
+                                OpenAlprGroupUuid = job.LicensePlateImageUuid,
+                            });
                         }
 
                         switch (cameraToUpdate.Manufacturer)

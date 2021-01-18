@@ -23,7 +23,7 @@
           <img style="cursor: pointer;" [src]="element.imageUrl" (click)="openLightbox(element.imageUrl, element.plateNumber)" width="300"/>
         </div>
         <div class="example-element-description">
-          <img src="{{element.cropImageUrl}}" />
+          <img [src]="element.cropImageUrl" />
         </div>
       </div>
     </td>
