@@ -33,23 +33,23 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                     OpenAlprName = camera.OpenAlprName,
                     PlatesSeen = camera.PlatesSeen,
                     UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
-                    SampleImageUrl = CreateSampleImageUrl(camera.LatestProcessedPlateUuid, camera.UpdateOverlayTextUrl),
+                    SampleImageUrl = await CreateSampleImageUrlAsync(camera.LatestProcessedPlateUuid),
                 });
             }
 
             return cameras;
         }
 
-        private static string CreateSampleImageUrl(
-            string imageUuid,
-            string cameraIpAddress)
+        private async Task<string> CreateSampleImageUrlAsync(string imageUuid)
         {
-            if (!string.IsNullOrEmpty(imageUuid) || !string.IsNullOrEmpty(cameraIpAddress))
+            var agent = await _processorContext.Agents.FirstOrDefaultAsync();
+
+            if (!string.IsNullOrEmpty(imageUuid) || !string.IsNullOrEmpty(agent.OpenAlprWebServerUrl))
             {
                 return null;
             }
 
-            return Flurl.Url.Combine(cameraIpAddress, imageUuid);
+            return $"{agent.OpenAlprWebServerUrl}/img/{imageUuid}.jpg";
         }
     }
 }
