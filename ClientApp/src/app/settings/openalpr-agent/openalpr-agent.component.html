@@ -1,7 +1,7 @@
 <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px *ngIf="agent">
     <mat-form-field fxFlex="80">
         <mat-label>Endpoint Url</mat-label>
-        <input matInput [(ngModel)]="agent.endpointUrl" placeholder="http(s)://x.x.x.x/webhook">
+        <input matInput [(ngModel)]="agent.endpointUrl" placeholder="http(s)://x.x.x.x:yyyy">
         <mat-icon matTooltip="The URL used to reach the Watchman Agent" style="cursor:default" matSuffix>help_center</mat-icon>
     </mat-form-field>
     <mat-form-field fxFlex="80">
