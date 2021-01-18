@@ -44,7 +44,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
         {
             var agent = await _processorContext.Agents.FirstOrDefaultAsync();
 
-            if (!string.IsNullOrEmpty(imageUuid) || !string.IsNullOrEmpty(agent.OpenAlprWebServerUrl))
+            if (string.IsNullOrEmpty(imageUuid) || string.IsNullOrEmpty(agent.OpenAlprWebServerUrl))
             {
                 return null;
             }
