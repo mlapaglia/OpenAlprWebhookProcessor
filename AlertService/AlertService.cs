@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.AlertService
 
         public AlertService(
             IServiceScopeFactory scopeFactory,
-            ILogger logger)
+            ILogger<AlertService> logger)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
