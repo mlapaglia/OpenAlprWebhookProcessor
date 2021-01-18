@@ -7,8 +7,5 @@
     <a mat-tab-link routerLink="/logout" (click)="logout()"><mat-icon>exit_to_app</mat-icon>Logout</a>
 </nav>
 
-<div class="app-container" [ngClass]="{ 'bg-light': user }">
-    <alert></alert>
-    <router-outlet></router-outlet>
-</div>
-
+<alert></alert>
+<router-outlet></router-outlet>

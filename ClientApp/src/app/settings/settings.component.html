@@ -1,21 +1,24 @@
-<mat-sidenav-container class="example-container" autosize>
-	<mat-sidenav #sidenav class="example-sidenav" mode="side" opened="true" (mouseenter)="mouseenter()" (mouseleave)="mouseleave()">
+<mat-sidenav-container class="example-container">
+	<mat-sidenav mode="side" opened
+	[fixedInViewport]="false"
+	[fixedTopGap]="0"
+	[fixedBottomGap]="0">
 		<mat-nav-list>
-			<mat-list-item class="parent" (click)="openSettings('camera')"> 
-				<span class="full-width">Cameras</span>
+			<mat-list-item (click)="openSettings('camera')"> 
+				<span>Cameras</span>
 				<mat-icon mat-list-icon>videocam</mat-icon>
             </mat-list-item>
-            <mat-list-item class="parent" (click)="openSettings('agent')">
-				<span class="full-width">OpenALPR Watchman Agent</span>
+            <mat-list-item (click)="openSettings('agent')">
+				<span>OpenALPR Watchman Agent</span>
 				<mat-icon mat-list-icon>api</mat-icon>
 			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
 
-	<div class="example-sidenav-content">
+	<mat-sidenav-content fullscreen>
         <app-cameras *ngIf="visibleSetting == 'camera'"></app-cameras>
         <app-openalpr-webserver *ngIf="visibleSetting == 'webserver'"></app-openalpr-webserver>
         <app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
-	</div>
+	</mat-sidenav-content>
 
 </mat-sidenav-container>
