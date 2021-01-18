@@ -12,26 +12,26 @@ export class SettingsService {
   constructor(private http: HttpClient) { }
 
   getCameras(): Observable<Camera[]> {
-    return this.http.get<Camera[]>(`http://localhost:5000/settings/cameras`);
+    return this.http.get<Camera[]>(`/settings/cameras`);
   }
 
   deleteCamera(cameraId: number): Observable<any> {
-    return this.http.post(`http://localhost:5000/settings/cameras/${cameraId}/delete`, null);
+    return this.http.post(`/settings/cameras/${cameraId}/delete`, null);
   }
 
   upsertCamera(camera: Camera) {
-    return this.http.post(`http://localhost:5000/settings/camera`, camera);
+    return this.http.post(`/settings/camera`, camera);
   }
 
   testCamera(cameraId: number) {
-    return this.http.post(`http://localhost:5000/settings/cameras/${cameraId}/test`, null);
+    return this.http.post(`/settings/cameras/${cameraId}/test`, null);
   }
 
   upsertAgent(agent: Agent) {
-    return this.http.post(`http://localhost:5000/settings/agent`, agent);
+    return this.http.post(`/settings/agent`, agent);
   }
 
   getAgent(): Observable<Agent> {
-    return this.http.get<Agent>(`http://localhost:5000/settings/agent`);
+    return this.http.get<Agent>(`/settings/agent`);
   }
 }
