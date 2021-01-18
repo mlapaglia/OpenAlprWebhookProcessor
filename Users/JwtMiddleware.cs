@@ -38,7 +38,7 @@ namespace OpenAlprWebhookProcessor.Users
 
             if (token != null)
             {
-                AttachUserToContext(
+                await AttachUserToContextAsync(
                     context,
                     userService,
                     token);
@@ -47,7 +47,7 @@ namespace OpenAlprWebhookProcessor.Users
             await _next(context);
         }
 
-        private void AttachUserToContext(
+        private async Task AttachUserToContextAsync(
             HttpContext context,
             IUserService userService,
             string token)
@@ -69,7 +69,7 @@ namespace OpenAlprWebhookProcessor.Users
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
 
-                context.Items["User"] = userService.GetById(userId);
+                context.Items["User"] = await userService.GetByIdAsync(userId, default);
             }
             catch
             {

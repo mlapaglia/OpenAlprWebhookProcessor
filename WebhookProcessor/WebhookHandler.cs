@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
@@ -32,6 +31,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             var updateRequest = new CameraUpdateRequest()
             {
+                LicensePlateImageUuid = webhook.Group.BestUuid,
                 LicensePlate = webhook.Group.BestPlateNumber,
                 LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
                 OpenAlprCameraId = webhook.Group.CameraId,

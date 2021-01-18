@@ -1,0 +1,12 @@
+<mat-grid-list cols="2" rowHeight="2:1" style="padding:16px;">
+    <div fxLayout="row wrap" fxLayoutGap="16px grid">
+        <app-camera
+            *ngFor="let camera of cameras"
+            [camera]="camera"
+            (add)="addCamera()"
+            (edit)="editCamera($event)"
+            (delete)="deleteCamera($event)"
+            (test)="testCamera($event)">
+        </app-camera>
+    </div>
+</mat-grid-list>

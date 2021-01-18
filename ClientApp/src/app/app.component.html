@@ -1,17 +1,11 @@
-﻿<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="user">
-    <div class="navbar-brand"><mat-icon aria-hidden="false" aria-label="vehicle direction">anchor</mat-icon> OpenALPR Webhook Processor</div>
-    <div class="navbar-nav">
-        <a class="nav-item nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        <a class="nav-item nav-link" routerLink="/users" routerLinkActive="active">Users</a>
-        <a class="nav-item nav-link" [disabled]="hydrationInProgress" (click)="hydrate()">Hydrate Database</a>
-        <a class="nav-item nav-link" (click)="logout()">Logout</a>
-    </div>
-    <div class="navbar-nav ml-auto">
-        <app-fast-search></app-fast-search>
-    </div>
+﻿<nav mat-tab-nav-bar *ngIf="user" [selectedIndex]="1">
+    <a mat-tab-link routerLink="/"><mat-icon>anchor</mat-icon>OpenALPR Webhook Processor</a>
+    <a mat-tab-link routerLink="/" ><mat-icon>home</mat-icon>Home</a>
+    <a mat-tab-link routerLink="/plates"><mat-icon>crop_16_9</mat-icon>Plates</a>
+    <a mat-tab-link routerLink="/users"><mat-icon>account_box</mat-icon>Users</a>
+    <a mat-tab-link routerLink="/settings"><mat-icon>settings</mat-icon>Settings</a>
+    <a mat-tab-link routerLink="/logout" (click)="logout()"><mat-icon>exit_to_app</mat-icon>Logout</a>
 </nav>
 
-<div class="app-container" [ngClass]="{ 'bg-light': user }">
-    <alert></alert>
-    <router-outlet></router-outlet>
-</div>
+<alert></alert>
+<router-outlet></router-outlet>

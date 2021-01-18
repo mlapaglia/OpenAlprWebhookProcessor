@@ -1,0 +1,37 @@
+<mat-card class="example-card" *ngIf="camera.openAlprCameraId">
+    <mat-card-header>
+      <div mat-card-avatar class="example-header-image"></div>
+      <mat-card-title>{{camera.openAlprName}}</mat-card-title>
+      <mat-card-subtitle>{{camera.manufacturer}} {{camera.modelNumber}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <div style="height:200px;" fxLayoutAlign="center">
+            <img mat-card-image class="sample-image" src="{{camera.sampleImageUrl}}" *ngIf="camera.sampleImageUrl" alt="last capture from camera">
+            <div *ngIf="!camera.sampleImageUrl" class="sample-image">
+                <mat-icon style="font-size: 100px;" [inline]="true">help_center</mat-icon>
+            </div>
+        </div>
+        <div>
+            <b>Camera Manufacturer: </b> {{camera.manufacturer}}
+        </div>
+        <div>
+            <b>Plates Seen:</b> {{camera.platesSeen}}
+        </div>
+        <div>
+            <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
+        </div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+        <button mat-button (click)="testCamera()"color="accent">Test</button>
+        <button mat-button (click)="editCamera()">Edit</button>
+        <button mat-button (click)="removeCamera()" color="warn">Remove</button>
+    </mat-card-actions>
+</mat-card>
+<mat-card class="example-card" *ngIf="!camera.openAlprCameraId">
+    <mat-card-header fxLayoutAlign="center">
+        <mat-card-title>Add new camera</mat-card-title>
+    </mat-card-header>
+      <mat-card-content fxLayoutAlign="center">
+          <mat-icon (click)="addCamera()" color="primary" style="font-size: 100px; cursor: pointer;" [inline]="true">add_box</mat-icon>
+      </mat-card-content>
+</mat-card>

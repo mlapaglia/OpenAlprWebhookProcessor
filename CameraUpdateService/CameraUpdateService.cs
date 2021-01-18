@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Cameras.Configuration;
+using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,21 +18,21 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly AgentConfiguration _cameraConfiguration;
+        private readonly ConcurrentDictionary<long, DateTime> _camerasWithActiveOverlays;
 
-        private readonly ConcurrentDictionary<int, DateTime> _camerasWithActiveOverlays;
+        private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly ILogger _logger;
 
         public CameraUpdateService(
-            ILogger<CameraUpdateService> logger,
-            AgentConfiguration cameraConfiguration)
+            IServiceScopeFactory scopeFactory,
+            ILogger<CameraUpdateService> logger)
         {
             _logger = logger;
-            _cameraConfiguration = cameraConfiguration;
+            _scopeFactory = scopeFactory;
             _webhooksToProcess = new BlockingCollection<CameraUpdateRequest>();
             _cancellationTokenSource = new CancellationTokenSource();
-            _camerasWithActiveOverlays = new ConcurrentDictionary<int, DateTime>();
+            _camerasWithActiveOverlays = new ConcurrentDictionary<long, DateTime>();
         }
 
         public void AddJob(CameraUpdateRequest request)
@@ -41,8 +43,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Task.Run(async () => await ProcessJobsAsync());
-            Task.Run(async () => await ClearExpiredOverlaysAsync());
+            Task.Run(async () =>
+                await ProcessJobsAsync(),
+                cancellationToken);
+
+            Task.Run(async () =>
+                await ClearExpiredOverlaysAsync(),
+                cancellationToken);
 
             return Task.CompletedTask;
         }
@@ -52,6 +59,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _webhooksToProcess.CompleteAdding();
             _webhooksToProcess.Dispose();
             _cancellationTokenSource.Cancel();
+
             await ForceClearOverlaysAsync();
         }
 
@@ -59,44 +67,65 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             foreach (var job in _webhooksToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                _logger.LogInformation("processing job for plate: " + job.LicensePlate);
-
-                try
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    var cameraToUpdate = _cameraConfiguration.Cameras.FirstOrDefault(x => x.OpenAlprCameraId == job.OpenAlprCameraId);
+                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                    if (cameraToUpdate == null)
+                    _logger.LogInformation("processing job for plate: " + job.LicensePlate);
+
+                    try
                     {
-                        _logger.LogError($"Unable to find camera with OpenAlprId: {job.OpenAlprCameraId}, check your configuration.");
-                        continue;
-                    }
+                        var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.OpenAlprCameraId == job.OpenAlprCameraId);
 
-                    switch (cameraToUpdate.Manufacturer)
+                        if (cameraToUpdate == null)
+                        {
+                            _logger.LogError($"Unable to find camera with OpenAlprId: {job.OpenAlprCameraId}, check your configuration.");
+                            continue;
+                        }
+
+                        if (job.IsAlert)
+                        {
+                            var alertService = scope.ServiceProvider.GetRequiredService<AlertService.AlertService>();
+                            alertService.AddJob(new AlertService.AlertUpdateRequest()
+                            {
+                                CameraId = job.OpenAlprCameraId,
+                                Description = job.AlertDescription,
+                                OpenAlprGroupUuid = job.LicensePlateImageUuid,
+                            });
+                        }
+
+                        switch (cameraToUpdate.Manufacturer)
+                        {
+                            case CameraManufacturer.Dahua:
+                                await DahuaCamera.SetCameraTextAsync(
+                                    cameraToUpdate,
+                                    job,
+                                    _cancellationTokenSource.Token);
+                                break;
+                            case CameraManufacturer.Hikvision:
+                                await HikvisionCamera.SetCameraTextAsync(
+                                    cameraToUpdate,
+                                    job,
+                                    _cancellationTokenSource.Token);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        _camerasWithActiveOverlays.AddOrUpdate(
+                            job.OpenAlprCameraId,
+                            DateTime.UtcNow,
+                            (oldkey, oldvalue) => DateTime.UtcNow);
+
+                        cameraToUpdate.PlatesSeen++;
+                        cameraToUpdate.LatestProcessedPlateUuid = job.LicensePlateImageUuid;
+
+                        await processorContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
                     {
-                        case CameraManufacturer.Dahua:
-                            await DahuaCamera.SetCameraTextAsync(
-                                cameraToUpdate,
-                                job,
-                                _cancellationTokenSource.Token);
-                            break;
-                        case CameraManufacturer.Hikvision:
-                            await HikvisionCamera.SetCameraTextAsync(
-                                cameraToUpdate,
-                                job,
-                                _cancellationTokenSource.Token);
-                            break;
-                        default:
-                            break;
+                        _logger.LogError(ex.Message);
                     }
-
-                    _camerasWithActiveOverlays.AddOrUpdate(
-                        job.OpenAlprCameraId,
-                        DateTime.UtcNow,
-                        (oldkey, oldvalue) => DateTime.UtcNow);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message);
                 }
             }
         }
@@ -107,17 +136,25 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                foreach (var openAlprId in _camerasWithActiveOverlays)
+                if (!_camerasWithActiveOverlays.IsEmpty)
                 {
-                    var cameraToUpdate = _cameraConfiguration.Cameras.First(x => x.OpenAlprCameraId == openAlprId.Key);
-
-                    if ((DateTime.UtcNow - openAlprId.Value) > TimeSpan.FromSeconds(5))
+                    using (var scope = _scopeFactory.CreateScope())
                     {
-                        _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);
+                        var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                        await ClearCameraOverlayAsync(cameraToUpdate);
+                        foreach (var openAlprId in _camerasWithActiveOverlays)
+                        {
+                            var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.OpenAlprCameraId == openAlprId.Key);
 
-                        _camerasWithActiveOverlays.TryRemove(openAlprId.Key, out var value);
+                            if ((DateTime.UtcNow - openAlprId.Value) > TimeSpan.FromSeconds(5))
+                            {
+                                _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);
+
+                                await ClearCameraOverlayAsync(cameraToUpdate);
+
+                                _camerasWithActiveOverlays.TryRemove(openAlprId.Key, out var value);
+                            }
+                        }
                     }
                 }
 
@@ -127,15 +164,20 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private async Task ForceClearOverlaysAsync()
         {
-            foreach (var cameraToUpdate in _cameraConfiguration.Cameras)
+            using (var scope = _scopeFactory.CreateScope())
             {
-                _logger.LogInformation("force clearing overlay for: " + cameraToUpdate.OpenAlprCameraId);
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                await ClearCameraOverlayAsync(cameraToUpdate);
+                foreach (var cameraToUpdate in await processorContext.Cameras.ToListAsync())
+                {
+                    _logger.LogInformation("force clearing overlay for: " + cameraToUpdate.OpenAlprCameraId);
+
+                    await ClearCameraOverlayAsync(cameraToUpdate);
+                }
             }
         }
 
-        private async Task ClearCameraOverlayAsync(CameraConfiguration cameraToUpdate)
+        private async Task ClearCameraOverlayAsync(Data.Camera cameraToUpdate)
         {
             switch (cameraToUpdate.Manufacturer)
             {
