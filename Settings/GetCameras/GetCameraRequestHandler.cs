@@ -44,12 +44,12 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
         {
             var agent = await _processorContext.Agents.FirstOrDefaultAsync();
 
-            if (string.IsNullOrEmpty(imageUuid) || string.IsNullOrEmpty(agent.OpenAlprWebServerUrl))
+            if (string.IsNullOrEmpty(imageUuid) || string.IsNullOrEmpty(agent.EndpointUrl))
             {
                 return null;
             }
 
-            return $"{agent.OpenAlprWebServerUrl}/img/{imageUuid}.jpg";
+            return Flurl.Url.Combine(agent.EndpointUrl, $"/img/{imageUuid}.jpg");
         }
     }
 }
