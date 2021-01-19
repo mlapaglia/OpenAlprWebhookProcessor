@@ -72,6 +72,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             await _processorContext.SaveChangesAsync();
 
             _logger.LogInformation("plate saved successfully");
+
+            await _processorHub.Clients.All.LicenePlateRecorded(updateRequest.LicensePlate);
         }
 
         public static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
