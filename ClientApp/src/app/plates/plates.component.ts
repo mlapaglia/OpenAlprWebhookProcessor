@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
@@ -18,7 +18,7 @@ import { PlateService } from './plate.service';
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ])],
 })
-export class PlatesComponent implements OnInit, AfterViewInit {
+export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   columnsToDisplay = [
     {
       id: 'openAlprCameraId',
@@ -60,6 +60,10 @@ export class PlatesComponent implements OnInit, AfterViewInit {
     
   ngOnInit(): void {
     this.getRecentPlates();
+  }
+
+  ngOnDestroy(): void {
+    this.signalRHub.licensePlateReceived.unsubscribe();
   }
 
   ngAfterViewInit(): void {
