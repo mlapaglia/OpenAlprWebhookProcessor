@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
@@ -13,6 +14,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         private readonly ILogger _logger;
 
+        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
         private readonly ProcessorContext _processorContext;
@@ -20,11 +23,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public WebhookHandler(
             ILogger<WebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
-            ProcessorContext processorContext)
+            ProcessorContext processorContext,
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
+            _processorHub = processorHub;
         }
 
         public async Task HandleWebhookAsync(Webhook webhook)
