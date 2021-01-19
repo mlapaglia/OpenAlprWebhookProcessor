@@ -77,7 +77,6 @@ export class PlatesComponent implements OnInit, AfterViewInit {
 
   public subscribeForUpdates() {
     this.signalRHub.licensePlateReceived.subscribe(result => {
-      console.log("refreshing to get plates" + result);
       this.getRecentPlates();
     });
   }

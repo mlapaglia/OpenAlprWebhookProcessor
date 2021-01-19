@@ -35,10 +35,4 @@ export class SignalrService {
       .stop()
       .then(() => console.log("Connection ended"));
   }
-
-  public subscribe() {
-    this.hubConnection.on('licenePlateRecorded', (data) => {
-      console.log("saw a plate: " + data);
-    });
-  }
 }
