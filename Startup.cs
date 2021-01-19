@@ -41,6 +41,7 @@ namespace OpenAlprWebhookProcessor
         {
             services.AddCors();
             services.AddControllersWithViews();
+            services.AddSignalR();
 
             var jwtConfiguration = new JwtConfiguration();
             Configuration.GetSection("Jwt").Bind(jwtConfiguration);
@@ -167,6 +168,7 @@ namespace OpenAlprWebhookProcessor
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ProcessorHub.ProcessorHub>("/processorhub");
             });
 
             app.UseSpa(spa =>
