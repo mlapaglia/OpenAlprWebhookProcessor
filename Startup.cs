@@ -14,7 +14,9 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
 using OpenAlprWebhookProcessor.Settings.DeleteCamera;
+using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetCameras;
+using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
@@ -96,7 +98,8 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertCameraHandler>();
             services.AddScoped<TestCameraHandler>();
             services.AddScoped<UpsertAgentRequestHandler>();
-            services.AddScoped<GetAgentRequestHandler>();
+            services.AddScoped<GetAlertsRequestHandler>();
+            services.AddScoped<GetIgnoresRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

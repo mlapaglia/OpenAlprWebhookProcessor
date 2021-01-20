@@ -21,6 +21,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AlertsComponent } from './alerts/alerts.component';
+import { IgnoresComponent } from './ignores/ignores.component';
+import { IgnoreComponent } from './ignores/ignore/ignore.component';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
   declarations: [
@@ -31,6 +34,8 @@ import { AlertsComponent } from './alerts/alerts.component';
     CameraComponent,
     EditCameraComponent,
     AlertsComponent,
+    IgnoresComponent,
+    IgnoreComponent,
   ],
   imports: [
     CommonModule,
@@ -49,6 +54,7 @@ import { AlertsComponent } from './alerts/alerts.component';
     FormsModule,
     MatButtonModule,
     MatTooltipModule,
+    MatTableModule
   ]
 })
 export class SettingsModule { }

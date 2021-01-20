@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Lightbox } from 'ngx-lightbox';
+import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateService } from './plate.service';
 
@@ -19,7 +20,7 @@ import { PlateService } from './plate.service';
     ])],
 })
 export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
-  columnsToDisplay = [
+  public columnsToDisplay = [
     {
       id: 'openAlprCameraId',
       name: "Camera Id"
@@ -37,7 +38,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       name: "Confidence %"
     }];
 
-  rowsToDisplay = [
+  public rowsToDisplay = [
     'openAlprCameraId',
     'plateNumber',
     'vehicleDescription',
@@ -46,10 +47,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     'receivedOn'
   ];
   
-  plates: MatTableDataSource<Plate>;
-  
+  public plates: MatTableDataSource<Plate>;
   public totalNumberOfPlates: number;
 
+  private subscriptions = new Subscription();
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
@@ -63,7 +65,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    this.signalRHub.licensePlateReceived.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -80,9 +82,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.signalRHub.licensePlateReceived.subscribe(result => {
+    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
       this.getRecentPlates();
-    });
+    }));
   }
 
   public openLightbox(url: string, plateNumber: string) {
