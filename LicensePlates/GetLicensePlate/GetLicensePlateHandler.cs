@@ -40,7 +40,18 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
 
         public async Task<int> GetTotalNumberOfPlatesAsync(CancellationToken cancellationToken)
         {
-            return await _processerContext.PlateGroups.CountAsync(cancellationToken);
+            var query = _processerContext.PlateGroups.AsQueryable();
+
+            var ignores = (await _processerContext.Ignores.ToListAsync())
+                .Select(x => x.PlateNumber)
+                .ToList();
+
+            if (ignores.Count > 0)
+            {
+                query = query.Where(x => !ignores.Contains(x.Number));
+            }
+
+            return await query.CountAsync(cancellationToken);
         }
 
         public async Task<List<LicensePlate>> GetRecentPlatesAsync(
