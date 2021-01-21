@@ -53,6 +53,11 @@ namespace OpenAlprWebhookProcessor
 
             using (var context = new UsersContext(optionsBuilder.Options))
             {
+                if (context.Database.GetPendingMigrations().Any())
+                {
+                    context.Database.Migrate();
+                }
+
                 var userService = new UserService(context);
                 var secretKey = userService.GetJwtSecretKeyAsync().Result;
 
@@ -203,13 +208,6 @@ namespace OpenAlprWebhookProcessor
                 if (processorContext.Database.GetPendingMigrations().Any())
                 {
                     processorContext.Database.Migrate();
-                }
-
-                var usersContext = scope.ServiceProvider.GetRequiredService<UsersContext>();
-
-                if (usersContext.Database.GetPendingMigrations().Any())
-                {
-                    usersContext.Database.Migrate();
                 }
             }
         }
