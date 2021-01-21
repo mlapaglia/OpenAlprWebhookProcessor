@@ -6,6 +6,8 @@ namespace OpenAlprWebhookProcessor.Users.Data
     {
         public DbSet<User> Users { get; set; }
 
+        public DbSet<JwtKey> JwtKeys { get; set; }
+
         public UsersContext(DbContextOptions<UsersContext> options)
             : base(options)
         {

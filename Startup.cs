@@ -26,12 +26,15 @@ using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
 using System.Linq;
-using System.Text;
 
 namespace OpenAlprWebhookProcessor
 {
     public class Startup
     {
+        private const string UsersContextConnectionString = "Data Source=config/users.db";
+
+        private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -45,31 +48,36 @@ namespace OpenAlprWebhookProcessor
             services.AddControllersWithViews();
             services.AddSignalR();
 
-            var jwtConfiguration = new JwtConfiguration();
-            Configuration.GetSection("Jwt").Bind(jwtConfiguration);
-            var key = Encoding.ASCII.GetBytes(jwtConfiguration.SecretKey);
+            var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
+            optionsBuilder.UseSqlite(UsersContextConnectionString);
 
-            services.AddSingleton(jwtConfiguration);
+            using (var context = new UsersContext(optionsBuilder.Options))
+            {
+                var userService = new UserService(context);
+                var secretKey = userService.GetJwtSecretKeyAsync().Result;
 
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                services.AddAuthentication(x =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                     // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
-                };
-            });
+                    };
+                });
+            }
+
+
 
             services.AddSpaStaticFiles(configuration =>
             {
@@ -85,10 +93,10 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddDbContext<ProcessorContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
+                options.UseSqlite(ProcessorContextConnectionString));
 
             services.AddDbContext<UsersContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("UsersContext")));
+                options.UseSqlite(UsersContextConnectionString));
 
             services.AddScoped<WebhookHandler>();
             services.AddScoped<GetLicensePlateHandler>();

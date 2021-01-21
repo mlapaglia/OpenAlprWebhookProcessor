@@ -36,6 +36,8 @@ namespace OpenAlprWebhookProcessor.Users
 
         Task DeleteAsync(int id);
 
+        Task<byte[]> GetJwtSecretKeyAsync();
+
         Task<AuthenticateResponse> RefreshTokenAsync(
             string token,
             string ipAddress,
@@ -51,14 +53,9 @@ namespace OpenAlprWebhookProcessor.Users
     {
         private readonly UsersContext _usersContext;
 
-        private readonly JwtConfiguration _jwtConfiguration;
-
-        public UserService(
-            UsersContext context,
-            JwtConfiguration jwtConfiguration)
+        public UserService(UsersContext context)
         {
             _usersContext = context;
-            _jwtConfiguration = jwtConfiguration;
         }
 
         public async Task<User> CreateAsync(User user, string password)
@@ -159,7 +156,7 @@ namespace OpenAlprWebhookProcessor.Users
                 return null; 
             }
 
-            var jwtToken = GenerateJwtToken(user);
+            var jwtToken = await GenerateJwtTokenAsync(user);
             var refreshToken = GenerateRefreshToken(ipAddress);
 
             user.RefreshTokens.Add(refreshToken);
@@ -205,7 +202,7 @@ namespace OpenAlprWebhookProcessor.Users
 
             await _usersContext.SaveChangesAsync(cancellationToken);
 
-            var jwtToken = GenerateJwtToken(user);
+            var jwtToken = await GenerateJwtTokenAsync(user);
 
             return new AuthenticateResponse(
                 user,
@@ -247,10 +244,29 @@ namespace OpenAlprWebhookProcessor.Users
             return await _usersContext.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        private string GenerateJwtToken(User user)
+        public async Task<byte[]> GetJwtSecretKeyAsync()
         {
+            var jwtKey = await _usersContext.JwtKeys.FirstOrDefaultAsync();
+
+            if (jwtKey == null)
+            {
+                jwtKey = new JwtKey
+                {
+                    Key = GenerateJwtSecretKey(30)
+                };
+
+                _usersContext.Add(jwtKey);
+                await _usersContext.SaveChangesAsync();
+            }
+
+            return Convert.FromBase64String(jwtKey.Key);
+        }
+
+        private async Task<string> GenerateJwtTokenAsync(User user)
+        {
+            var jwtSecretKey = await GetJwtSecretKeyAsync();
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtConfiguration.SecretKey);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -260,7 +276,7 @@ namespace OpenAlprWebhookProcessor.Users
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
+                    new SymmetricSecurityKey(jwtSecretKey),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -341,6 +357,14 @@ namespace OpenAlprWebhookProcessor.Users
             }
 
             return true;
+        }
+
+        private string GenerateJwtSecretKey(int keyLength)
+        {
+            RNGCryptoServiceProvider rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+            byte[] randomBytes = new byte[keyLength];
+            rngCryptoServiceProvider.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

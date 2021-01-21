@@ -13,17 +13,13 @@ namespace OpenAlprWebhookProcessor.Users
     {
         private readonly RequestDelegate _next;
 
-        private readonly JwtConfiguration _jwtConfiguration;
-
         private readonly ILogger _logger;
 
         public JwtMiddleware(
             RequestDelegate next,
-            JwtConfiguration jwtConfiguration,
             ILogger<JwtMiddleware> logger)
         {
             _next = next;
-            _jwtConfiguration = jwtConfiguration;
             _logger = logger;
         }
 
@@ -55,11 +51,11 @@ namespace OpenAlprWebhookProcessor.Users
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_jwtConfiguration.SecretKey);
+                var key = await userService.GetJwtSecretKeyAsync();
 
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
+                    ValidateIssuerSigningKey    = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -67,7 +63,7 @@ namespace OpenAlprWebhookProcessor.Users
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "unique_name").Value);
 
                 context.Items["User"] = await userService.GetByIdAsync(userId, default);
             }
