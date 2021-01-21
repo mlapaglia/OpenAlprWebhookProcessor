@@ -91,13 +91,31 @@ namespace OpenAlprWebhookProcessor.Users
         }
 
         [AllowAnonymous]
+        [HttpGet("canregister")]
+        public async Task<bool> CanRegister(CancellationToken cancellationToken)
+        {
+            var currentUsers = await _userService.GetAllAsync(cancellationToken);
+
+            return currentUsers.Count == 0;
+        }
+
+        [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register(
+            [FromBody] RegisterModel model,
+            CancellationToken cancellationToken)
         {
             var user = _mapper.Map<User>(model);
 
             try
             {
+                var currentUsers = await _userService.GetAllAsync(cancellationToken);
+
+                if (currentUsers.Count > 0)
+                {
+                    return Forbid();
+                }
+
                 await _userService.CreateAsync(user, model.Password);
                 return Ok();
             }
