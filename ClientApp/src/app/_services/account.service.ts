@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -51,7 +51,7 @@ export class AccountService {
   }
 
   canRegister() {
-    return this.http.get<boolean>(`/users/canregistr`);
+    return this.http.get<boolean>(`/users/canregister`);
   }
 
   register(user: User) {
