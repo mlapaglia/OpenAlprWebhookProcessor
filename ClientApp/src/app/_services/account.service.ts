@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -67,7 +67,7 @@ export class AccountService {
   }
 
   update(id, params) {
-    return this.http.put(`/users/${id}`, params)
+    return this.http.post(`/users/${id}`, params)
       .pipe(map(x => {
         // update stored user if the logged in user updated their own record
         if (id == this.userValue.id) {

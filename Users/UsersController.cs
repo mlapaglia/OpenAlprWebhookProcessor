@@ -143,6 +143,18 @@ namespace OpenAlprWebhookProcessor.Users
             return Ok(user);
         }
 
+        [HttpPost("{id}")]
+        public async Task<IActionResult> UpdatedById(
+            int id,
+            [FromBody] UpdateModel updateModel,
+            CancellationToken cancellationToken)
+        {
+            var user = await _userService.GetByIdAsync(id, cancellationToken);
+            await _userService.UpdateAsync(user, updateModel.Password);
+
+            return Ok();
+        }
+
         [HttpGet("{id}/refresh-tokens")]
         public async Task<IActionResult> GetRefreshTokens(int id, CancellationToken cancellationToken)
         {

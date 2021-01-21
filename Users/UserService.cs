@@ -244,7 +244,7 @@ namespace OpenAlprWebhookProcessor.Users
             int id,
             CancellationToken cancellationToken)
         {
-            return await _usersContext.Users.FindAsync(id, cancellationToken);
+            return await _usersContext.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         private string GenerateJwtToken(User user)
