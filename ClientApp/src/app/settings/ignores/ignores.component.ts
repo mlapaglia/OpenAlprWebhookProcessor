@@ -16,6 +16,7 @@ export class IgnoresComponent implements OnInit {
   public rowsToDisplay = [
     'plateNumber',
     'matchType',
+    'description',
     'delete',
   ];
 
@@ -26,10 +27,11 @@ export class IgnoresComponent implements OnInit {
   }
 
   public deleteIgnore(ignore: Ignore) {
-    
+    const arr = this.ignores.data.filter(item => item.id !== ignore.id);
   }
 
   public addIgnore() {
     this.ignores.data.push(new Ignore());
+    this.ignores._updateChangeSubscription();
   }
 }

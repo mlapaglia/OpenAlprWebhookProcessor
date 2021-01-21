@@ -45,7 +45,6 @@
 		<Folder Include="Settings\DeleteIgnore\" />
 		<Folder Include="Settings\DeleteAlert\" />
 		<Folder Include="Settings\UpsertAlert\" />
-		<Folder Include="Settings\UpsertIgnore\" />
 	</ItemGroup>
 
 	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

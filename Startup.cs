@@ -95,7 +95,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<DeleteCameraHandler>();
-            services.AddScoped<UpsertCameraHandler>();
+            services.AddScoped<UpsertIgnoreHandler>();
             services.AddScoped<TestCameraHandler>();
             services.AddScoped<UpsertAgentRequestHandler>();
             services.AddScoped<GetAlertsRequestHandler>();

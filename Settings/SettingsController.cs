@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly DeleteCameraHandler _deleteCameraHandler;
 
-        private readonly UpsertCameraHandler _upsertCameraHandler;
+        private readonly UpsertIgnoreHandler _upsertCameraHandler;
 
         private readonly TestCameraHandler _testCameraHandler;
 
@@ -36,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Settings
         public SettingsController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
-            UpsertCameraHandler upsertCameraHandler,
+            UpsertIgnoreHandler upsertCameraHandler,
             TestCameraHandler testCameraHandler,
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,

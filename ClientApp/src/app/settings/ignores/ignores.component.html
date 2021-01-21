@@ -1,5 +1,5 @@
 <div style="margin: 15px;">
-  <table mat-table [dataSource]="ignores" multiTemplateDataRows class="mat-elevation-z8">
+  <table mat-table [dataSource]="ignores" multiTemplateDataRows class="mat-elevation-z8" style="width:50%">
     <ng-container matColumnDef="plateNumber">
       <th mat-header-cell *matHeaderCellDef>Plate Number</th>
       <td mat-cell *matCellDef="let element">
@@ -20,11 +20,20 @@
         </mat-form-field>
       </td>
     </ng-container>
-    
+
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef>Description</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field>
+          <input matInput [(ngModel)]="element.description" required>
+        </mat-form-field>
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="delete">
       <th mat-header-cell *matHeaderCellDef> </th>
       <td mat-cell *matCellDef="let element">
-        <button mat-raised-button (click)="delete(element)">Delete</button>
+        <button mat-raised-button (click)="deleteIgnore(element)">Delete</button>
       </td>
     </ng-container>
 
@@ -36,4 +45,6 @@
     </tr>
   </table>
 </div>
-<button mat-raised-button (click)="addIgnore()">Add</button>
+<div style="margin: 15px;">
+  <button mat-raised-button (click)="addIgnore()">Add</button>
+</div>
