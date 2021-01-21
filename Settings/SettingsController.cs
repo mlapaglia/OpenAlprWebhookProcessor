@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly DeleteCameraHandler _deleteCameraHandler;
 
-        private readonly UpsertIgnoreHandler _upsertCameraHandler;
+        private readonly UpsertCameraHandler _upsertCameraHandler;
 
         private readonly TestCameraHandler _testCameraHandler;
 
@@ -33,15 +33,18 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly GetAlertsRequestHandler _getAlertsRequestHandler;
 
+        private readonly UpsertIgnoresRequestHandler _upsertIgnoresRequestHandler;
+
         public SettingsController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
-            UpsertIgnoreHandler upsertCameraHandler,
+            UpsertCameraHandler upsertCameraHandler,
             TestCameraHandler testCameraHandler,
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
-            GetAlertsRequestHandler getAlertsRequestHandler)
+            GetAlertsRequestHandler getAlertsRequestHandler,
+            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler)
         {
             _deleteCameraHandler = deleteCameraHandler;
             _getCameraHandler = getCameraHandler;
@@ -51,6 +54,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
             _getIgnoresRequestHandler = getIgnoresRequestHandler;
             _getAlertsRequestHandler = getAlertsRequestHandler;
+            _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
         }
 
         [HttpGet("cameras")]
@@ -94,7 +98,7 @@ namespace OpenAlprWebhookProcessor.Settings
         [HttpPost("alerts")]
         public async Task UpsertAlert([FromBody] Alert alert)
         {
-
+            
         }
 
         [HttpGet("alerts")]
@@ -110,9 +114,9 @@ namespace OpenAlprWebhookProcessor.Settings
         }
 
         [HttpPost("ignores")]
-        public async Task UpsertIgnore([FromBody] Ignore ignore)
+        public async Task UpsertIgnore([FromBody] List<Ignore> ignores)
         {
-
+            await _upsertIgnoresRequestHandler.UpsertIgnoresAsync(ignores);
         }
 
         [HttpGet("ignores")]
@@ -126,6 +130,5 @@ namespace OpenAlprWebhookProcessor.Settings
         {
 
         }
-
     }
 }

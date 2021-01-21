@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
@@ -20,20 +19,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly ILogger<LicensePlatesController> _logger;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
-
         private readonly GetLicensePlateHandler _getLicensePlateHandler;
 
         public LicensePlatesController(
             IConfiguration configuration,
             ILogger<LicensePlatesController> logger,
-            GetLicensePlateHandler getLicensePlateHandler,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            GetLicensePlateHandler getLicensePlateHandler)
         {
             _webRequestLoggingEnabled = configuration.GetValue("WebRequestLoggingEnabled", false);
             _logger = logger;
             _getLicensePlateHandler = getLicensePlateHandler;
-            _processorHub = processorHub;
         }
 
         [HttpGet("{licensePlate}")]

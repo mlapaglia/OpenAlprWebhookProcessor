@@ -24,6 +24,7 @@ import { AlertsComponent } from './alerts/alerts.component';
 import { IgnoresComponent } from './ignores/ignores.component';
 import { IgnoreComponent } from './ignores/ignore/ignore.component';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { MatTableModule } from '@angular/material/table';
     FormsModule,
     MatButtonModule,
     MatTooltipModule,
-    MatTableModule
+    MatTableModule,
+    MatProgressSpinnerModule
   ]
 })
 export class SettingsModule { }

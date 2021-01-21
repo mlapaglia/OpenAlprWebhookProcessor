@@ -10,7 +10,8 @@ import { Ignore } from './ignore/ignore';
 })
 export class IgnoresComponent implements OnInit {
   public ignores: MatTableDataSource<Ignore>;
-  
+  public isSaving: boolean = false;
+
   constructor(private settingsService: SettingsService) { }
 
   public rowsToDisplay = [
@@ -21,17 +22,35 @@ export class IgnoresComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.getIgnores();
+  }
+
+  private getIgnores() {
     this.settingsService.getIgnores().subscribe(result => {
       this.ignores = new MatTableDataSource<Ignore>(result);
     });
   }
 
   public deleteIgnore(ignore: Ignore) {
-    const arr = this.ignores.data.filter(item => item.id !== ignore.id);
+    this.ignores.data.forEach((item, index) => {
+      if(item === ignore) {
+        this.ignores.data.splice(index,1);
+      }
+    });
+
+    this.ignores._updateChangeSubscription();
   }
 
   public addIgnore() {
     this.ignores.data.push(new Ignore());
     this.ignores._updateChangeSubscription();
+  }
+
+  public saveIgnores() {
+    this.isSaving = true;
+    this.settingsService.upsertIgnores(this.ignores.data).subscribe(() => {
+      this.getIgnores();
+      this.isSaving = false;
+    });
   }
 }

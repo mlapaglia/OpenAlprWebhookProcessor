@@ -50,7 +50,18 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
         {
             var agent = await _processerContext.Agents.FirstOrDefaultAsync();
 
-            var dbPlates = await _processerContext.PlateGroups
+            var platesToIgnore = (await _processerContext.Ignores.ToListAsync(cancellationToken))
+                .Select(x => x.PlateNumber)
+                .ToList();
+
+            var dbPlatesQuery = _processerContext.PlateGroups.AsQueryable();
+
+            if (platesToIgnore.Count > 0)
+            {
+                dbPlatesQuery = dbPlatesQuery.Where(x => !platesToIgnore.Contains(x.Number));
+            }
+
+            var dbPlates = await dbPlatesQuery
                 .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
