@@ -126,4 +126,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.plates = new MatTableDataSource<Plate>(result.plates);
     });
   }
+
+  public clearFilters() {
+    this.filterEndOn = null;
+    this.filterStartOn = null;
+    this.filterPlateNumber = '';
+    this.filterStrictMatch = false;
+    this.filterIgnoredPlates = false;
+  }
 }
