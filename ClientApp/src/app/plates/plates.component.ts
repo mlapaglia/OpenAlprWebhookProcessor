@@ -7,7 +7,7 @@ import { SignalrService } from '@app/signalr/signalr.service';
 import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
-import { PlateService } from './plate.service';
+import { PlateRequest, PlateService } from './plate.service';
 
 @Component({
   selector: 'app-plates',
@@ -52,6 +52,15 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public plates: MatTableDataSource<Plate>;
   public totalNumberOfPlates: number;
 
+  public filterPlateNumber: string;
+  public filterStartOn: Date;
+  public filterEndOn: Date;
+  public filterStrictMatch: boolean;
+  public filterIgnoredPlates: boolean;
+
+  private pageSize: number = 10;
+  private pageNumber: number = 0;
+
   private subscriptions = new Subscription();
   
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -67,7 +76,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
-    this.getRecentPlates();
+    this.searchPlates();
   }
 
   ngOnDestroy(): void {
@@ -78,18 +87,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscribeForUpdates();
   }
 
-  public getRecentPlates() {
-    this.plateService.getRecentPlates(5, 0)
-      .subscribe(result => {
-        this.plates = new MatTableDataSource<Plate>(result.plates);
-        this.totalNumberOfPlates = result.totalCount;
-        this.plates.paginator = this.paginator;
-      });
-  }
-
   public subscribeForUpdates() {
     this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
-      this.getRecentPlates();
+      this.searchPlates();
     }));
   }
 
@@ -104,10 +104,26 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public onPaginatorPage($event) {
-    this.plateService.getRecentPlates($event.pageSize, $event.pageIndex)
-      .subscribe(result => {
-        this.plates = new MatTableDataSource<Plate>(result.plates);
-        this.totalNumberOfPlates = result.totalCount;
-      });
+    this.pageSize = $event.pageSize;
+    this.pageNumber = $event.pageIndex;
+
+    this.searchPlates();
+  }
+
+  public searchPlates() {
+    var request = new PlateRequest();
+
+    request.pageNumber = this.pageNumber;
+    request.pageSize = this.pageSize;
+    request.endSearchOn = this.filterEndOn;
+    request.startSearchOn = this.filterStartOn;
+    request.plateNumber = this.filterPlateNumber;
+    request.strictMatch = this.filterStrictMatch;
+    request.filterIgnoredPlates = this.filterIgnoredPlates;
+
+    this.plateService.searchPlates(request).subscribe(result => {
+      this.totalNumberOfPlates = result.totalCount;
+      this.plates = new MatTableDataSource<Plate>(result.plates);
+    });
   }
 }

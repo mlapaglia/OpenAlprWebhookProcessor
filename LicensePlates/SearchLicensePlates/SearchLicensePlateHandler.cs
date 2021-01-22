@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +16,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             _processerContext = processorContext;
         }
         
-        public async Task<GetLicensePlateResponse> HandleAsync(
+        public async Task<SearchLicensePlateResponse> HandleAsync(
             SearchLicensePlateRequest request,
             CancellationToken cancellationToken)
         {
@@ -67,7 +66,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 licensePlates.Add(PlateMapper.MapPlate(plate, agent));
             }
 
-            return new GetLicensePlateResponse()
+            return new SearchLicensePlateResponse()
             {
                 Plates = licensePlates,
                 TotalCount = totalCount,

@@ -12,7 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
+using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using OpenAlprWebhookProcessor.Settings.DeleteCamera;
 using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetCameras;
@@ -102,7 +102,6 @@ namespace OpenAlprWebhookProcessor
                 options.UseSqlite(UsersContextConnectionString));
 
             services.AddScoped<WebhookHandler>();
-            services.AddScoped<GetLicensePlateHandler>();
             services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<DeleteCameraHandler>();
@@ -112,6 +111,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetAlertsRequestHandler>();
             services.AddScoped<GetIgnoresRequestHandler>();
             services.AddScoped<UpsertCameraHandler>();
+            services.AddScoped<SearchLicensePlateHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

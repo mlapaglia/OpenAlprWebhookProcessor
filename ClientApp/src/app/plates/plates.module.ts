@@ -15,7 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
@@ -40,6 +40,7 @@ import { MatDividerModule } from '@angular/material/divider';
     MatButtonModule,
     MatFormFieldModule,
     ReactiveFormsModule,
+    FormsModule,
     MatCheckboxModule,
     MatDividerModule,
   ]
