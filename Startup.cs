@@ -82,8 +82,6 @@ namespace OpenAlprWebhookProcessor
                 });
             }
 
-
-
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";

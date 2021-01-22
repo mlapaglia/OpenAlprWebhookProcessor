@@ -16,20 +16,34 @@ import { AccountService } from './_services';
 import { appInitializer } from './_helpers/app.initializer';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
     imports: [
         BrowserModule,
+        AppRoutingModule,
+        FormsModule,
         ReactiveFormsModule,
         HttpClientModule,
-        AppRoutingModule,
         BrowserAnimationsModule,
         MatAutocompleteModule,
         LightboxModule,
         MatButtonModule,
-        FormsModule,
         MatTabsModule,
         MatIconModule,
+        MatCardModule,
+        FlexLayoutModule,
+        MatDatepickerModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatCheckboxModule,
+        MatDividerModule,
     ],
     declarations: [
         AppComponent,

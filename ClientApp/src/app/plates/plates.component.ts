@@ -1,5 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
@@ -47,6 +48,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     'receivedOn'
   ];
   
+  public range: FormGroup;
   public plates: MatTableDataSource<Plate>;
   public totalNumberOfPlates: number;
 
@@ -58,6 +60,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private plateService: PlateService,
     private lightbox: Lightbox,
     private signalRHub: SignalrService) {
+      this.range = new FormGroup({
+        start: new FormControl(),
+        end: new FormControl()
+      });
     }
     
   ngOnInit(): void {

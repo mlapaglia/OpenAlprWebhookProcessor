@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,7 +31,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
 
             foreach (var plate in dbPlates)
             {
-                licensePlates.Add(MapPlate(plate, agent));
+                licensePlates.Add(PlateMapper.MapPlate(plate, agent));
             }
 
             return licensePlates;
@@ -82,35 +81,10 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate
 
             foreach (var plate in dbPlates)
             {
-                licensePlates.Add(MapPlate(plate, agent));
+                licensePlates.Add(PlateMapper.MapPlate(plate, agent));
             }
 
             return licensePlates;
-        }
-
-        public LicensePlate MapPlate(
-            PlateGroup plate,
-            Agent agent)
-        {
-            return new LicensePlate()
-            {
-                AlertDescription = plate.AlertDescription,
-                Direction = plate.Direction,
-                ImageUrl = new Uri(Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    $"/img/{plate.OpenAlprUuid}.jpg")),
-                CropImageUrl = new Uri(Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    $"/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}")),
-                IsAlert = plate.IsAlert,
-                LicensePlateJpegBase64 = plate.Jpeg,
-                OpenAlprCameraId = plate.OpenAlprCameraId,
-                OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,
-                PlateNumber = plate.Number,
-                ProcessedPlateConfidence = plate.Confidence,
-                ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
-                VehicleDescription = plate.VehicleDescription,
-            };
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
+using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,20 +14,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
     [Route("licensePlates")]
     public class LicensePlatesController : ControllerBase
     {
-        private readonly bool _webRequestLoggingEnabled;
-
-        private readonly ILogger<LicensePlatesController> _logger;
-
         private readonly GetLicensePlateHandler _getLicensePlateHandler;
 
+        private readonly SearchLicensePlateHandler _searchLicensePlateHandler;
+
         public LicensePlatesController(
-            IConfiguration configuration,
-            ILogger<LicensePlatesController> logger,
-            GetLicensePlateHandler getLicensePlateHandler)
+            GetLicensePlateHandler getLicensePlateHandler,
+            SearchLicensePlateHandler searchLicensePlateHandler)
         {
-            _webRequestLoggingEnabled = configuration.GetValue("WebRequestLoggingEnabled", false);
-            _logger = logger;
             _getLicensePlateHandler = getLicensePlateHandler;
+            _searchLicensePlateHandler = searchLicensePlateHandler;
         }
 
         [HttpGet("{licensePlate}")]
@@ -36,11 +31,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             string licensePlate,
             CancellationToken cancellationToken)
         {
-            if (_webRequestLoggingEnabled)
-            {
-                _logger.LogInformation("request received {0}", licensePlate);
-            }
-
             return await _getLicensePlateHandler.GetLicensePlatesAsync(
                 licensePlate,
                 cancellationToken);
@@ -52,11 +42,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             int pageSize = 10,
             int pageNumber = 0)
         {
-            if (_webRequestLoggingEnabled)
-            {
-                _logger.LogInformation("recent plates request received num: {0} page {1}", pageSize, pageNumber);
-            }
-
             var plates = await _getLicensePlateHandler.GetRecentPlatesAsync(
                 pageNumber,
                 pageSize,
@@ -69,6 +54,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 Plates = plates,
                 TotalCount = totalCount,
             };
+        }
+
+        [HttpGet("search")]
+        public async Task<GetLicensePlateResponse> SearchPlates(
+            [FromBody] SearchLicensePlateRequest request,
+            CancellationToken cancellationToken)
+        {
+            return await _searchLicensePlateHandler.HandleAsync(
+                request,
+                cancellationToken);
         }
     }
 }
