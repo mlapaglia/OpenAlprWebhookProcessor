@@ -52,6 +52,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             var totalCount = await dbRequest.CountAsync(cancellationToken);
 
             dbRequest = dbRequest
+                .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Skip(request.PageNumber * request.PageSize)
                 .Take(request.PageSize);
 
