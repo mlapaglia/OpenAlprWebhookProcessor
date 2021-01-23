@@ -13,12 +13,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             {
                 AlertDescription = plate.AlertDescription,
                 Direction = plate.Direction,
-                ImageUrl = new Uri(Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    $"/img/{plate.OpenAlprUuid}.jpg")),
-                CropImageUrl = new Uri(Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    $"/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}")),
+                ImageUrl = new Uri($"/images/{plate.OpenAlprUuid}.jpg", UriKind.Relative),
+                CropImageUrl = new Uri($"/images/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}", UriKind.Relative),
                 IsAlert = plate.IsAlert,
                 LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,

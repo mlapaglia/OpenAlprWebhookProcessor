@@ -1,7 +1,10 @@
 using AutoMapper;
+using Hangfire;
+using Hangfire.SQLite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
@@ -26,6 +30,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -34,6 +39,8 @@ namespace OpenAlprWebhookProcessor
         private const string UsersContextConnectionString = "Data Source=config/users.db";
 
         private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
+
+        private const string HangfireContextConnectionString = "Data Source=config/hangfire.db;";
 
         public Startup(IConfiguration configuration)
         {
@@ -76,8 +83,20 @@ namespace OpenAlprWebhookProcessor
                         IssuerSigningKey = new SymmetricSecurityKey(secretKey),
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
-                    ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (string.IsNullOrWhiteSpace(context.Token)
+                                && context.HttpContext.Request.Path.StartsWithSegments("/images", StringComparison.OrdinalIgnoreCase))
+                            {
+                                context.Token = context.Request.Cookies["jwtToken"];
+                            }
+                            
+                            return Task.CompletedTask;
+                        }
                     };
                 });
             }
@@ -112,6 +131,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetIgnoresRequestHandler>();
             services.AddScoped<UpsertCameraHandler>();
             services.AddScoped<SearchLicensePlateHandler>();
+            services.AddScoped<GetImageHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -133,11 +153,20 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddSingleton(mapper.CreateMapper());
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSQLiteStorage(HangfireContextConnectionString));
+
+            services.AddHangfireServer();
         }
 
         public void Configure(
             IApplicationBuilder app,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IBackgroundJobClient backgroundJobs)
         {
             MigrateDatabases(app);
 
@@ -168,6 +197,9 @@ namespace OpenAlprWebhookProcessor
                 app.UseSpaStaticFiles();
             }
 
+            app.UseHangfireDashboard();
+            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+
             app.UseRouting();
 
             app.UseCors(x => x
@@ -184,6 +216,7 @@ namespace OpenAlprWebhookProcessor
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ProcessorHub.ProcessorHub>("/processorhub");
+                endpoints.MapHangfireDashboard();
             });
 
             app.UseSpa(spa =>

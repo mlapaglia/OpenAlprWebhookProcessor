@@ -25,7 +25,7 @@ export class SignalrService {
       })
       .catch(err => console.log('Error while starting connection: ' + err));
 
-      this.hubConnection.on('LicenePlateRecorded', (plateNumber) => {
+      this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {
         this.licensePlateReceived.next(plateNumber);
       });
   }

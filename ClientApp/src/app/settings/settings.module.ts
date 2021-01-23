@@ -24,9 +24,10 @@ import { IgnoresComponent } from './ignores/ignores.component';
 import { IgnoreComponent } from './ignores/ignore/ignore.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDatepickerModule, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ScheduleComponent } from './schedule/schedule.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     AlertsComponent,
     IgnoresComponent,
     IgnoreComponent,
+    ScheduleComponent,
   ],
   imports: [
     CommonModule,

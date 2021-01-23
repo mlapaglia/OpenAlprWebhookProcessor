@@ -54,7 +54,7 @@ namespace OpenAlprWebhookProcessor.Users
 
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey    = true,
+                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
