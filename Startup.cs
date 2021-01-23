@@ -1,10 +1,7 @@
 using AutoMapper;
-using Hangfire;
-using Hangfire.SQLite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -153,20 +150,11 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddSingleton(mapper.CreateMapper());
-
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSQLiteStorage(HangfireContextConnectionString));
-
-            services.AddHangfireServer();
         }
 
         public void Configure(
             IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IBackgroundJobClient backgroundJobs)
+            IWebHostEnvironment env)
         {
             MigrateDatabases(app);
 
@@ -197,9 +185,6 @@ namespace OpenAlprWebhookProcessor
                 app.UseSpaStaticFiles();
             }
 
-            app.UseHangfireDashboard();
-            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
-
             app.UseRouting();
 
             app.UseCors(x => x
@@ -216,7 +201,6 @@ namespace OpenAlprWebhookProcessor
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ProcessorHub.ProcessorHub>("/processorhub");
-                endpoints.MapHangfireDashboard();
             });
 
             app.UseSpa(spa =>

@@ -18,10 +18,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
 		<PackageReference Include="Bogus" Version="32.0.2" />
-		<PackageReference Include="CoordinateSharp" Version="2.9.5.1" />
 		<PackageReference Include="Flurl" Version="3.0.1" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.19" />
-		<PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.2">
