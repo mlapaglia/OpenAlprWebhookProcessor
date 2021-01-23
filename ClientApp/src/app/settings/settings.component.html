@@ -20,10 +20,6 @@
 				<span>Ignores</span>
 				<mat-icon mat-list-icon>alarm_off</mat-icon>
 			</mat-list-item>
-			<mat-list-item (click)="openSettings('schedule')">
-				<span>Schedule</span>
-				<mat-icon mat-list-icon>pending_actions</mat-icon>
-			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
 
@@ -32,7 +28,6 @@
         <app-openalpr-webserver *ngIf="visibleSetting == 'webserver'"></app-openalpr-webserver>
 		<app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
 		<app-ignores *ngIf="visibleSetting == 'ignore'"></app-ignores>
-		<app-schedule *ngIf="visibleSetting == 'schedule'"></app-schedule>
 	</mat-sidenav-content>
 
 </mat-sidenav-container>
