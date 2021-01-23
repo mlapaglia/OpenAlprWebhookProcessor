@@ -1,11 +1,13 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Lightbox } from 'ngx-lightbox';
+import { Subscription } from 'rxjs';
 import { Plate } from './plate';
-import { PlateService } from './plate.service';
+import { PlateRequest, PlateService } from './plate.service';
 
 @Component({
   selector: 'app-plates',
@@ -19,7 +21,7 @@ import { PlateService } from './plate.service';
     ])],
 })
 export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
-  columnsToDisplay = [
+  public columnsToDisplay = [
     {
       id: 'openAlprCameraId',
       name: "Camera Id"
@@ -37,7 +39,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       name: "Confidence %"
     }];
 
-  rowsToDisplay = [
+  public rowsToDisplay = [
     'openAlprCameraId',
     'plateNumber',
     'vehicleDescription',
@@ -46,43 +48,49 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     'receivedOn'
   ];
   
-  plates: MatTableDataSource<Plate>;
-  
+  public range: FormGroup;
+  public plates: MatTableDataSource<Plate>;
   public totalNumberOfPlates: number;
 
+  public filterPlateNumber: string;
+  public filterStartOn: Date;
+  public filterEndOn: Date;
+  public filterStrictMatch: boolean;
+  public filterIgnoredPlates: boolean;
+
+  private pageSize: number = 10;
+  private pageNumber: number = 0;
+
+  private subscriptions = new Subscription();
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
     private plateService: PlateService,
     private lightbox: Lightbox,
     private signalRHub: SignalrService) {
+      this.range = new FormGroup({
+        start: new FormControl(),
+        end: new FormControl()
+      });
     }
     
   ngOnInit(): void {
-    this.getRecentPlates();
+    this.searchPlates();
   }
 
   ngOnDestroy(): void {
-    this.signalRHub.licensePlateReceived.unsubscribe();
+    this.subscriptions.unsubscribe();
   }
 
   ngAfterViewInit(): void {
     this.subscribeForUpdates();
   }
 
-  public getRecentPlates() {
-    this.plateService.getRecentPlates(5, 0)
-      .subscribe(result => {
-        this.plates = new MatTableDataSource<Plate>(result.plates);
-        this.totalNumberOfPlates = result.totalCount;
-        this.plates.paginator = this.paginator;
-      });
-  }
-
   public subscribeForUpdates() {
-    this.signalRHub.licensePlateReceived.subscribe(result => {
-      this.getRecentPlates();
-    });
+    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
+      this.searchPlates();
+    }));
   }
 
   public openLightbox(url: string, plateNumber: string) {
@@ -96,10 +104,34 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public onPaginatorPage($event) {
-    this.plateService.getRecentPlates($event.pageSize, $event.pageIndex)
-      .subscribe(result => {
-        this.plates = new MatTableDataSource<Plate>(result.plates);
-        this.totalNumberOfPlates = result.totalCount;
-      });
+    this.pageSize = $event.pageSize;
+    this.pageNumber = $event.pageIndex;
+
+    this.searchPlates();
+  }
+
+  public searchPlates() {
+    var request = new PlateRequest();
+
+    request.pageNumber = this.pageNumber;
+    request.pageSize = this.pageSize;
+    request.endSearchOn = this.filterEndOn;
+    request.startSearchOn = this.filterStartOn;
+    request.plateNumber = this.filterPlateNumber;
+    request.strictMatch = this.filterStrictMatch;
+    request.filterIgnoredPlates = this.filterIgnoredPlates;
+
+    this.plateService.searchPlates(request).subscribe(result => {
+      this.totalNumberOfPlates = result.totalCount;
+      this.plates = new MatTableDataSource<Plate>(result.plates);
+    });
+  }
+
+  public clearFilters() {
+    this.filterEndOn = null;
+    this.filterStartOn = null;
+    this.filterPlateNumber = '';
+    this.filterStrictMatch = false;
+    this.filterIgnoredPlates = false;
   }
 }

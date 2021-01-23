@@ -5,16 +5,26 @@ import { PlateResponse } from "./plateResponse";
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
-    private recentPlatesUrl = 'licenseplates/recent';
+    private searchPlatesUrl = 'licenseplates/search'
     private hydrateDatabaseUrl = "hydration/start";
 
     constructor(private http: HttpClient) { }
-        
-    getRecentPlates(pageSize: number, pageNumber: number): Observable<PlateResponse> {
-        return this.http.get<PlateResponse>(`/${this.recentPlatesUrl}?pageSize=${pageSize}&pageNumber=${pageNumber}`);
+
+    searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
+        return this.http.post<PlateResponse>(`/${this.searchPlatesUrl}`, plateRequest);
     }
 
     hydrateDatabase(): Observable<any> {
         return this.http.post(`/${this.hydrateDatabaseUrl}`, {});
     }
+}
+
+export class PlateRequest {
+    plateNumber: string;
+    startSearchOn: Date;
+    endSearchOn: Date;
+    strictMatch: boolean;
+    filterIgnoredPlates: boolean;
+    pageNumber: number;
+    pageSize: number;
 }

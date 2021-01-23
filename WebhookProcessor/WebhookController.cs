@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System.IO;
@@ -13,18 +12,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     [Route("webhook")]
     public class WebhookController : ControllerBase
     {
-        private readonly bool _webRequestLoggingEnabled;
-
         private readonly ILogger<WebhookController> _logger;
 
         private readonly WebhookHandler _webhookHandler;
 
         public WebhookController(
-            IConfiguration configuration,
             ILogger<WebhookController> logger,
             WebhookHandler webhookHandler)
         {
-            _webRequestLoggingEnabled = configuration.GetValue("WebRequestLoggingEnabled", false);
             _logger = logger;
             _webhookHandler = webhookHandler;
         }
@@ -35,11 +30,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
                 var rawWebhook = await reader.ReadToEndAsync();
-
-                if (_webRequestLoggingEnabled)
-                {
-                    _logger.LogInformation("request received {0}", rawWebhook);
-                }
 
                 Webhook webhook;
 

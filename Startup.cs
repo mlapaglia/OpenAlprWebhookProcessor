@@ -12,9 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlate;
+using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using OpenAlprWebhookProcessor.Settings.DeleteCamera;
+using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetCameras;
+using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
@@ -24,12 +26,15 @@ using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
 using System.Linq;
-using System.Text;
 
 namespace OpenAlprWebhookProcessor
 {
     public class Startup
     {
+        private const string UsersContextConnectionString = "Data Source=config/users.db";
+
+        private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -43,31 +48,39 @@ namespace OpenAlprWebhookProcessor
             services.AddControllersWithViews();
             services.AddSignalR();
 
-            var jwtConfiguration = new JwtConfiguration();
-            Configuration.GetSection("Jwt").Bind(jwtConfiguration);
-            var key = Encoding.ASCII.GetBytes(jwtConfiguration.SecretKey);
+            var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
+            optionsBuilder.UseSqlite(UsersContextConnectionString);
 
-            services.AddSingleton(jwtConfiguration);
-
-            services.AddAuthentication(x =>
+            using (var context = new UsersContext(optionsBuilder.Options))
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                if (context.Database.GetPendingMigrations().Any())
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    context.Database.Migrate();
+                }
+
+                var userService = new UserService(context);
+                var secretKey = userService.GetJwtSecretKeyAsync().Result;
+
+                services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                     // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
-                };
-            });
+                    };
+                });
+            }
 
             services.AddSpaStaticFiles(configuration =>
             {
@@ -83,20 +96,22 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddDbContext<ProcessorContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("ProcessorContext")));
+                options.UseSqlite(ProcessorContextConnectionString));
 
             services.AddDbContext<UsersContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("UsersContext")));
+                options.UseSqlite(UsersContextConnectionString));
 
             services.AddScoped<WebhookHandler>();
-            services.AddScoped<GetLicensePlateHandler>();
             services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<DeleteCameraHandler>();
-            services.AddScoped<UpsertCameraHandler>();
+            services.AddScoped<UpsertIgnoresRequestHandler>();
             services.AddScoped<TestCameraHandler>();
             services.AddScoped<UpsertAgentRequestHandler>();
-            services.AddScoped<GetAgentRequestHandler>();
+            services.AddScoped<GetAlertsRequestHandler>();
+            services.AddScoped<GetIgnoresRequestHandler>();
+            services.AddScoped<UpsertCameraHandler>();
+            services.AddScoped<SearchLicensePlateHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -191,13 +206,6 @@ namespace OpenAlprWebhookProcessor
                 if (processorContext.Database.GetPendingMigrations().Any())
                 {
                     processorContext.Database.Migrate();
-                }
-
-                var usersContext = scope.ServiceProvider.GetRequiredService<UsersContext>();
-
-                if (usersContext.Database.GetPendingMigrations().Any())
-                {
-                    usersContext.Database.Migrate();
                 }
             }
         }

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Settings.DeleteCamera;
+using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetCameras;
+using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,13 +29,22 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly UpsertAgentRequestHandler _upsertAgentRequestHandler;
 
+        private readonly GetIgnoresRequestHandler _getIgnoresRequestHandler;
+
+        private readonly GetAlertsRequestHandler _getAlertsRequestHandler;
+
+        private readonly UpsertIgnoresRequestHandler _upsertIgnoresRequestHandler;
+
         public SettingsController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
             UpsertCameraHandler upsertCameraHandler,
             TestCameraHandler testCameraHandler,
             GetAgentRequestHandler getAgentRequestHandler,
-            UpsertAgentRequestHandler upsertAgentRequestHandler)
+            UpsertAgentRequestHandler upsertAgentRequestHandler,
+            GetIgnoresRequestHandler getIgnoresRequestHandler,
+            GetAlertsRequestHandler getAlertsRequestHandler,
+            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler)
         {
             _deleteCameraHandler = deleteCameraHandler;
             _getCameraHandler = getCameraHandler;
@@ -40,6 +52,9 @@ namespace OpenAlprWebhookProcessor.Settings
             _testCameraHandler = testCameraHandler;
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
+            _getIgnoresRequestHandler = getIgnoresRequestHandler;
+            _getAlertsRequestHandler = getAlertsRequestHandler;
+            _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
         }
 
         [HttpGet("cameras")]
@@ -54,7 +69,7 @@ namespace OpenAlprWebhookProcessor.Settings
             await _upsertCameraHandler.UpsertCameraAsync(camera);
         }
 
-        [HttpPost("cameras/{cameraId}/delete")]
+        [HttpDelete("cameras/{cameraId}")]
         public async Task CreateCamera(long cameraId)
         {
             await _deleteCameraHandler.HandleAsync(cameraId);
@@ -78,6 +93,42 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task UpsertAgent([FromBody] Agent agent)
         {
             await _upsertAgentRequestHandler.HandleAsync(agent);
+        }
+
+        [HttpPost("alerts")]
+        public async Task UpsertAlert([FromBody] Alert alert)
+        {
+            
+        }
+
+        [HttpGet("alerts")]
+        public async Task<List<Alert>> GetAlerts()
+        {
+            return await _getAlertsRequestHandler.HandleAsync();
+        }
+
+        [HttpDelete("alerts/{alertId}")]
+        public async Task DeleteAlert(Guid alert)
+        {
+
+        }
+
+        [HttpPost("ignores")]
+        public async Task UpsertIgnore([FromBody] List<Ignore> ignores)
+        {
+            await _upsertIgnoresRequestHandler.UpsertIgnoresAsync(ignores);
+        }
+
+        [HttpGet("ignores")]
+        public async Task<List<Ignore>> GetIgnores()
+        {
+            return await _getIgnoresRequestHandler.HandleAsync();
+        }
+
+        [HttpDelete("ignores/{ignoreId}")]
+        public async Task DeleteIgnore(Guid alert)
+        {
+
         }
     }
 }

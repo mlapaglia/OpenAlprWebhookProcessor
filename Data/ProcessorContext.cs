@@ -10,9 +10,13 @@ namespace OpenAlprWebhookProcessor.Data
         }
 
         public DbSet<PlateGroup> PlateGroups { get; set; }
-        
+
         public DbSet<Camera> Cameras { get; set; }
 
         public DbSet<Agent> Agents { get; set; }
+
+        public DbSet<Ignore> Ignores { get; set; }
+
+        public DbSet<Alert> Alerts { get; set; }
     }
 }

@@ -16,6 +16,10 @@
 				<span>Alerts</span>
 				<mat-icon mat-list-icon>notifications_active</mat-icon>
 			</mat-list-item>
+			<mat-list-item (click)="openSettings('ignore')">
+				<span>Ignores</span>
+				<mat-icon mat-list-icon>alarm_off</mat-icon>
+			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
 
@@ -23,6 +27,7 @@
         <app-cameras *ngIf="visibleSetting == 'camera'"></app-cameras>
         <app-openalpr-webserver *ngIf="visibleSetting == 'webserver'"></app-openalpr-webserver>
 		<app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
+		<app-ignores *ngIf="visibleSetting == 'ignore'"></app-ignores>
 	</mat-sidenav-content>
 
 </mat-sidenav-container>
