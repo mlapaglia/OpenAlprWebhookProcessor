@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
@@ -26,6 +27,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor;
 using Serilog;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -34,6 +36,8 @@ namespace OpenAlprWebhookProcessor
         private const string UsersContextConnectionString = "Data Source=config/users.db";
 
         private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
+
+        private const string HangfireContextConnectionString = "Data Source=config/hangfire.db;";
 
         public Startup(IConfiguration configuration)
         {
@@ -76,8 +80,20 @@ namespace OpenAlprWebhookProcessor
                         IssuerSigningKey = new SymmetricSecurityKey(secretKey),
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
-                    ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (string.IsNullOrWhiteSpace(context.Token)
+                                && context.HttpContext.Request.Path.StartsWithSegments("/images", StringComparison.OrdinalIgnoreCase))
+                            {
+                                context.Token = context.Request.Cookies["jwtToken"];
+                            }
+                            
+                            return Task.CompletedTask;
+                        }
                     };
                 });
             }
@@ -112,6 +128,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetIgnoresRequestHandler>();
             services.AddScoped<UpsertCameraHandler>();
             services.AddScoped<SearchLicensePlateHandler>();
+            services.AddScoped<GetImageHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

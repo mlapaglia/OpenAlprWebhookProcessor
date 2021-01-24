@@ -40,8 +40,7 @@ namespace OpenAlprWebhookProcessor.Users
             if (response == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
-            SetTokenCookie(response.RefreshToken);
-
+            SetTokenCookie(response.RefreshToken, response.JwtToken);
             return Ok(response);
         }
 
@@ -60,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Users
                 return Unauthorized(new { message = "Invalid token" });
             }
 
-            SetTokenCookie(response.RefreshToken);
+            SetTokenCookie(response.RefreshToken, response.JwtToken);
 
             return Ok(response);
         }
@@ -86,6 +85,9 @@ namespace OpenAlprWebhookProcessor.Users
             {
                 return NotFound(new { message = "Token not found" });
             }
+
+            Response.Cookies.Delete("jwtToken");
+            Response.Cookies.Delete("refreshToken");
 
             return Ok(new { message = "Token revoked" });
         }
@@ -170,14 +172,23 @@ namespace OpenAlprWebhookProcessor.Users
             return Ok(user.RefreshTokens);
         }
 
-        private void SetTokenCookie(string token)
+        private void SetTokenCookie(
+            string refreshToken,
+            string authenticationToken)
         {
-            var cookieOptions = new CookieOptions
+            var refreshCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
-            Response.Cookies.Append("refreshToken", token, cookieOptions);
+            Response.Cookies.Append("refreshToken", refreshToken, refreshCookieOptions);
+
+            var authenticateCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            };
+            Response.Cookies.Append("jwtToken", authenticationToken, authenticateCookieOptions);
         }
 
         private string GetIpAddress()

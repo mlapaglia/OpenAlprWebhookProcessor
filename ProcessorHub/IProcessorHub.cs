@@ -4,6 +4,6 @@ namespace OpenAlprWebhookProcessor.ProcessorHub
 {
     public interface IProcessorHub
     {
-        Task LicenePlateRecorded(string plateNumber);
+        Task LicensePlateRecorded(string plateNumber);
     }
 }
