@@ -110,8 +110,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchPlates();
   }
 
-  public searchPlates() {
+  public searchPlates(plateNumber: string = '') {
     var request = new PlateRequest();
+
+    if (plateNumber !== '') {
+      this.filterPlateNumber = plateNumber;
+    }
 
     request.pageNumber = this.pageNumber;
     request.pageSize = this.pageSize;
@@ -133,5 +137,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterPlateNumber = '';
     this.filterStrictMatch = false;
     this.filterIgnoredPlates = false;
+
+    this.searchPlates();
   }
 }

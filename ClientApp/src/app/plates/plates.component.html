@@ -26,6 +26,10 @@
             </div>
             <div class="example-element-description">
               <img [src]="element.cropImageUrl" />
+              
+            </div>
+            <div class="example-element-description">
+              <button mat-raised-button color="primary" (click)="searchPlates(element.plateNumber)">Search for plate</button>
             </div>
           </div>
         </td>
@@ -63,7 +67,7 @@
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Plate Number</mat-label>
-          <input matInput [(ngModel)]="filterPlateNumber" placeholder="LRN2DRV">
+          <input matInput [(ngModel)]="filterPlateNumber" (keyup.enter)="searchPlates()" placeholder="LRN2DRV">
         </mat-form-field>
         <mat-divider></mat-divider>
         <div style="padding-top:10px;">
@@ -79,8 +83,8 @@
 
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button color="primary" (click)="searchPlates()">Apply</button>
-        <button mat-button color="primary" (click)="clearFilters()">Clear</button>
+        <button mat-raised-button color="primary" (click)="searchPlates()">Apply</button>
+        <button mat-raised-button color="warn" (click)="clearFilters()">Clear</button>
       </mat-card-actions>
     </mat-card>
   </div>
