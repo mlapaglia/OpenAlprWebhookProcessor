@@ -3,6 +3,8 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { Ignore } from '@app/settings/ignores/ignore/ignore';
+import { SettingsService } from '@app/settings/settings.service';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
@@ -58,6 +60,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterStrictMatch: boolean;
   public filterIgnoredPlates: boolean;
 
+  public addingToIgnoreList: boolean;
+
   private pageSize: number = 10;
   private pageNumber: number = 0;
 
@@ -68,7 +72,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private plateService: PlateService,
     private lightbox: Lightbox,
-    private signalRHub: SignalrService) {
+    private signalRHub: SignalrService,
+    private settingsService: SettingsService) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -94,7 +99,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public openLightbox(url: string, plateNumber: string) {
-    var albums =[ {
+    var albums = [{
       src: url,
       caption: plateNumber,
       thumb: url
@@ -139,5 +144,18 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterIgnoredPlates = false;
 
     this.searchPlates();
+  }
+
+  public addToIgnoreList(plateNumber: string = '') {
+    this.addingToIgnoreList = true;
+    var ignore = new Ignore();
+
+    ignore.plateNumber = plateNumber;
+    ignore.strictMatch = true;
+    ignore.description = 'Added from plate list';
+
+    this.settingsService.addIgnore(ignore).subscribe(() => {
+      this.addingToIgnoreList = false;
+    });
   }
 }

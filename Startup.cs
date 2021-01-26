@@ -37,8 +37,6 @@ namespace OpenAlprWebhookProcessor
 
         private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
 
-        private const string HangfireContextConnectionString = "Data Source=config/hangfire.db;";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -135,6 +133,9 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<HydrationService>();
             services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
+
+            services.AddSingleton<AlertService.AlertService>();
+            services.AddSingleton<IHostedService>(p => p.GetService<AlertService.AlertService>());
 
             services.AddSwaggerGen(c =>
             {

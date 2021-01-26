@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.AlertService;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Utilities;
@@ -20,16 +23,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly ProcessorContext _processorContext;
 
+        private readonly AlertService.AlertService _alertService;
+
         public WebhookHandler(
             ILogger<WebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+            AlertService.AlertService alertService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
             _processorHub = processorHub;
+            _alertService = alertService;
         }
 
         public async Task HandleWebhookAsync(Webhook webhook)
@@ -74,6 +81,23 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _logger.LogInformation("plate saved successfully");
 
             await _processorHub.Clients.All.LicensePlateRecorded(updateRequest.LicensePlate);
+
+            var alert = await _processorContext.Alerts
+                .Where(x => x.PlateNumber == updateRequest.LicensePlate)
+                .FirstOrDefaultAsync();
+
+            if (alert != null)
+            {
+                var alertUpdateRequest = new AlertUpdateRequest()
+                {
+                    CameraId = updateRequest.OpenAlprCameraId,
+                    Description = alert.Description,
+                    OpenAlprGroupUuid = updateRequest.LicensePlateImageUuid
+                };
+
+                _alertService.AddJob(alertUpdateRequest);
+            }
+            
         }
 
         public static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)

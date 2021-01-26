@@ -11,13 +11,9 @@ export class IgnoreComponent implements OnInit {
   
   constructor() { }
 
-
-
   ngOnInit(): void {
   }
 
   public deleteIgnore(ignore: Ignore) {
-    
   }
-
 }

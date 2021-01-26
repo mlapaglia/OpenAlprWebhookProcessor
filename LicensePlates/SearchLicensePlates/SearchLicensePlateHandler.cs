@@ -39,14 +39,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.ReceivedOnEpoch <= endEpochMilliseconds);
             }
 
-            if (!request.FilterIgnoredPlates)
-            {
-                var platesToIgnore = await GetPlatesToIgnoreAsync(cancellationToken);
+            var platesToIgnore = await GetPlatesToIgnoreAsync(cancellationToken);
 
-                if (platesToIgnore.Count > 0)
-                {
-                    dbRequest = dbRequest.Where(x => !platesToIgnore.Contains(x.Number));
-                }
+            if (!request.FilterIgnoredPlates && platesToIgnore.Count > 0)
+            {
+                dbRequest = dbRequest.Where(x => !platesToIgnore.Contains(x.Number));
             }
 
             var totalCount = await dbRequest.CountAsync(cancellationToken);
@@ -60,11 +57,9 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
             var licensePlates = new List<LicensePlate>();
 
-            var agent = await _processerContext.Agents.FirstOrDefaultAsync(cancellationToken);
-
             foreach (var plate in results)
             {
-                licensePlates.Add(PlateMapper.MapPlate(plate, agent));
+                licensePlates.Add(PlateMapper.MapPlate(plate, platesToIgnore));
             }
 
             return new SearchLicensePlateResponse()

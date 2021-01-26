@@ -18,6 +18,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         public bool IsAlert { get; set; }
 
+        public bool IsIgnore { get; set; }
+
         public string AlertDescription { get; set; }
 
         public DateTimeOffset ReceivedOn { get; set; }
