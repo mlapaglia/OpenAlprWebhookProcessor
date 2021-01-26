@@ -70,8 +70,8 @@ namespace OpenAlprWebhookProcessor.Settings
             await _upsertCameraHandler.UpsertCameraAsync(camera);
         }
 
-        [HttpDelete("cameras/{cameraId}")]
-        public async Task CreateCamera(long cameraId)
+        [HttpPost("cameras/{cameraId}/delete")]
+        public async Task DeleteCamera(long cameraId)
         {
             await _deleteCameraHandler.HandleAsync(cameraId);
         }
