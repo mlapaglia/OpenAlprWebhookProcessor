@@ -3,6 +3,7 @@ using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings.GetAlerts
@@ -16,11 +17,11 @@ namespace OpenAlprWebhookProcessor.Settings.GetAlerts
             _processorContext = processorContext;
         }
 
-        public async Task<List<Alert>> HandleAsync()
+        public async Task<List<Alert>> HandleAsync(CancellationToken cancellationToken)
         {
             var alerts = new List<Alert>();
 
-            foreach (var alert in await _processorContext.Alerts.ToListAsync())
+            foreach (var alert in await _processorContext.Alerts.ToListAsync(cancellationToken))
             {
                 alerts.Add(new Alert());
             }

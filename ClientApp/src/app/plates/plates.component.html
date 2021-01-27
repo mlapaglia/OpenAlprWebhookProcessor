@@ -26,10 +26,12 @@
             </div>
             <div class="example-element-description">
               <img [src]="element.cropImageUrl" />
-              
             </div>
             <div class="example-element-description">
               <button mat-raised-button color="primary" (click)="searchPlates(element.plateNumber)">Search for plate</button>
+            </div>
+            <div class="example-element-description">
+              <button mat-raised-button color="primary" [class.spinner]="addingToIgnoreList" [disabled]="element.isIgnore || addingToIgnoreList" (click)="addToIgnoreList(element.plateNumber)">Add to ignore list</button>
             </div>
           </div>
         </td>

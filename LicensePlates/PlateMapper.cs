@@ -1,5 +1,6 @@
 ﻿using OpenAlprWebhookProcessor.Data;
 using System;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -7,7 +8,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
     {
         public static LicensePlate MapPlate(
             PlateGroup plate,
-            Agent agent)
+            List<string> platesToIgnore)
         {
             return new LicensePlate()
             {
@@ -16,6 +17,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 ImageUrl = new Uri($"/images/{plate.OpenAlprUuid}.jpg", UriKind.Relative),
                 CropImageUrl = new Uri($"/images/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}", UriKind.Relative),
                 IsAlert = plate.IsAlert,
+                IsIgnore = platesToIgnore.Contains(plate.Number),
                 LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,

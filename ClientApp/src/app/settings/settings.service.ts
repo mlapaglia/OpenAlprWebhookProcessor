@@ -17,7 +17,7 @@ export class SettingsService {
   }
 
   deleteCamera(cameraId: number): Observable<any> {
-    return this.http.delete(`/settings/cameras/${cameraId}`, null);
+    return this.http.post(`/settings/cameras/${cameraId}/delete`, null);
   }
 
   upsertCamera(camera: Camera) {
@@ -46,5 +46,9 @@ export class SettingsService {
 
   upsertIgnores(ignores: Ignore[]) {
     return this.http.post(`/settings/ignores`, ignores);
+  }
+
+  addIgnore(ignore: Ignore) {
+    return this.http.post(`/settings/ignores/add`, ignore);
   }
 }

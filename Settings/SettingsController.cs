@@ -8,6 +8,7 @@ using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -69,8 +70,8 @@ namespace OpenAlprWebhookProcessor.Settings
             await _upsertCameraHandler.UpsertCameraAsync(camera);
         }
 
-        [HttpDelete("cameras/{cameraId}")]
-        public async Task CreateCamera(long cameraId)
+        [HttpPost("cameras/{cameraId}/delete")]
+        public async Task DeleteCamera(long cameraId)
         {
             await _deleteCameraHandler.HandleAsync(cameraId);
         }
@@ -102,15 +103,21 @@ namespace OpenAlprWebhookProcessor.Settings
         }
 
         [HttpGet("alerts")]
-        public async Task<List<Alert>> GetAlerts()
+        public async Task<List<Alert>> GetAlerts(CancellationToken cancellationToken)
         {
-            return await _getAlertsRequestHandler.HandleAsync();
+            return await _getAlertsRequestHandler.HandleAsync(cancellationToken);
         }
 
         [HttpDelete("alerts/{alertId}")]
         public async Task DeleteAlert(Guid alert)
         {
 
+        }
+
+        [HttpPost("ignores/add")]
+        public async Task AddIgnore([FromBody] Ignore ignore)
+        {
+            await _upsertIgnoresRequestHandler.AddIgnoreAsync(ignore);
         }
 
         [HttpPost("ignores")]

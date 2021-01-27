@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
@@ -17,14 +18,18 @@ namespace OpenAlprWebhookProcessor.AlertService
 
         private readonly ILogger _logger;
 
+        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+
         public AlertService(
             IServiceScopeFactory scopeFactory,
-            ILogger<AlertService> logger)
+            ILogger<AlertService> logger,
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
+            _processorHub = processorHub;
         }
 
         public void AddJob(AlertUpdateRequest request)
@@ -55,6 +60,7 @@ namespace OpenAlprWebhookProcessor.AlertService
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
+                    await _processorHub.Clients.All.LicensePlateAlerted(job.OpenAlprGroupUuid);
                 }
             }
         }
