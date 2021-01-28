@@ -1,8 +1,10 @@
-﻿namespace OpenAlprWebhookProcessor.AlertService
+﻿using System;
+
+namespace OpenAlprWebhookProcessor.AlertService
 {
     public class AlertUpdateRequest
     {
-        public long CameraId { get; set; }
+        public Guid CameraId { get; set; }
 
         public string Description { get; set; }
 

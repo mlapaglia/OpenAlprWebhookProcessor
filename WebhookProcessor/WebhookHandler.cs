@@ -41,12 +41,21 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public async Task HandleWebhookAsync(Webhook webhook)
         {
+            var camera = await _processorContext.Cameras
+                .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
+                .FirstOrDefaultAsync();
+
+            if (camera == null)
+            {
+                throw new ArgumentException("unknown camera, skipping");
+            }
+
             var updateRequest = new CameraUpdateRequest()
             {
                 LicensePlateImageUuid = webhook.Group.BestUuid,
                 LicensePlate = webhook.Group.BestPlateNumber,
                 LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
-                OpenAlprCameraId = webhook.Group.CameraId,
+                Id = camera.Id,
                 OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
                 ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                 IsAlert = webhook.DataType == "alpr_alert",
@@ -90,7 +99,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             {
                 var alertUpdateRequest = new AlertUpdateRequest()
                 {
-                    CameraId = updateRequest.OpenAlprCameraId,
+                    CameraId = updateRequest.Id,
                     Description = alert.Description,
                     OpenAlprGroupUuid = updateRequest.LicensePlateImageUuid
                 };

@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly ConcurrentDictionary<long, DateTime> _camerasWithActiveOverlays;
+        private readonly ConcurrentDictionary<Guid, DateTime> _camerasWithActiveOverlays;
 
         private readonly IServiceScopeFactory _scopeFactory;
 
@@ -32,7 +32,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _scopeFactory = scopeFactory;
             _webhooksToProcess = new BlockingCollection<CameraUpdateRequest>();
             _cancellationTokenSource = new CancellationTokenSource();
-            _camerasWithActiveOverlays = new ConcurrentDictionary<long, DateTime>();
+            _camerasWithActiveOverlays = new ConcurrentDictionary<Guid, DateTime>();
         }
 
         public void AddJob(CameraUpdateRequest request)
@@ -75,11 +75,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     try
                     {
-                        var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.OpenAlprCameraId == job.OpenAlprCameraId);
+                        var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == job.Id);
 
                         if (cameraToUpdate == null)
                         {
-                            _logger.LogError($"Unable to find camera with OpenAlprId: {job.OpenAlprCameraId}, check your configuration.");
+                            _logger.LogError($"Unable to find camera with OpenAlprId: {job.Id}, check your configuration.");
                             continue;
                         }
 
@@ -88,7 +88,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                             var alertService = scope.ServiceProvider.GetRequiredService<AlertService.AlertService>();
                             alertService.AddJob(new AlertService.AlertUpdateRequest()
                             {
-                                CameraId = job.OpenAlprCameraId,
+                                CameraId = job.Id,
                                 Description = job.AlertDescription,
                                 OpenAlprGroupUuid = job.LicensePlateImageUuid,
                             });
@@ -113,7 +113,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         }
 
                         _camerasWithActiveOverlays.AddOrUpdate(
-                            job.OpenAlprCameraId,
+                            job.Id,
                             DateTime.UtcNow,
                             (oldkey, oldvalue) => DateTime.UtcNow);
 
@@ -144,7 +144,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                         foreach (var openAlprId in _camerasWithActiveOverlays)
                         {
-                            var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.OpenAlprCameraId == openAlprId.Key);
+                            var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == openAlprId.Key);
 
                             if ((DateTime.UtcNow - openAlprId.Value) > TimeSpan.FromSeconds(5))
                             {

@@ -1,8 +1,10 @@
-﻿namespace OpenAlprWebhookProcessor.CameraUpdateService
+﻿using System;
+
+namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public class CameraUpdateRequest
     {
-        public long OpenAlprCameraId { get; set; }
+        public Guid Id { get; set; }
 
         public string VehicleDescription { get; set; }
 

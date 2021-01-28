@@ -16,7 +16,7 @@ export class SettingsService {
     return this.http.get<Camera[]>(`/settings/cameras`);
   }
 
-  deleteCamera(cameraId: number): Observable<any> {
+  deleteCamera(cameraId: string): Observable<any> {
     return this.http.post(`/settings/cameras/${cameraId}/delete`, null);
   }
 
@@ -24,7 +24,7 @@ export class SettingsService {
     return this.http.post(`/settings/camera`, camera);
   }
 
-  testCamera(cameraId: number) {
+  testCamera(cameraId: string) {
     return this.http.post(`/settings/cameras/${cameraId}/test`, null);
   }
 
