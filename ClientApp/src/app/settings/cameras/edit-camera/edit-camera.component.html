@@ -1,12 +1,12 @@
 <h1 mat-dialog-title>Edit Camera</h1>
 <mat-dialog-content fxLayout="row wrap" fxLayoutGap=20px>
   <mat-form-field appearance="outline">
-    <mat-label>Longitude</mat-label>
-    <input matInput [(ngModel)]="camera.longitude">
+    <mat-label>Latitude</mat-label>
+    <input type="number" matInput [(ngModel)]="camera.latitude">
   </mat-form-field>
   <mat-form-field appearance="outline">
-    <mat-label>Latitude</mat-label>
-    <input matInput [(ngModel)]="camera.latitude">
+    <mat-label>Longitude</mat-label>
+    <input type="number" matInput [(ngModel)]="camera.longitude">
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Manufacturer</mat-label>
