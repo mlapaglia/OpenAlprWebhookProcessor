@@ -1,5 +1,5 @@
-<div style="margin: 15px;" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="20px" fxLayoutAlign="space-around">
-  <div  fxFlex="80%">
+<div style="margin: 15px;" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="20px" fxLayoutAlign="space-around">
+  <div fxFlex="80%">
     <table mat-table [dataSource]="plates" multiTemplateDataRows class="mat-elevation-z8">
       <ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnsToDisplay">
         <th mat-header-cell *matHeaderCellDef> {{column.name}} </th>
