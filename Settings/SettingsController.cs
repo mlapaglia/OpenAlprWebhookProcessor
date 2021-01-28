@@ -71,13 +71,13 @@ namespace OpenAlprWebhookProcessor.Settings
         }
 
         [HttpPost("cameras/{cameraId}/delete")]
-        public async Task DeleteCamera(long cameraId)
+        public async Task DeleteCamera(Guid cameraId)
         {
             await _deleteCameraHandler.HandleAsync(cameraId);
         }
 
         [HttpPost("cameras/{cameraId}/test")]
-        public IActionResult TestCamera(long cameraId)
+        public IActionResult TestCamera(Guid cameraId)
         {
             _testCameraHandler.SendTestCameraOverlay(cameraId);
 

@@ -1,12 +1,12 @@
 <h1 mat-dialog-title>Edit Camera</h1>
 <mat-dialog-content fxLayout="row wrap" fxLayoutGap=20px>
   <mat-form-field appearance="outline">
-    <mat-label>Longitude</mat-label>
-    <input matInput [(ngModel)]="camera.longitude">
+    <mat-label>Latitude</mat-label>
+    <input type="number" matInput [(ngModel)]="camera.latitude">
   </mat-form-field>
   <mat-form-field appearance="outline">
-    <mat-label>Latitude</mat-label>
-    <input matInput [(ngModel)]="camera.latitude">
+    <mat-label>Longitude</mat-label>
+    <input type="number" matInput [(ngModel)]="camera.longitude">
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Manufacturer</mat-label>
@@ -25,7 +25,7 @@
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>OpenALPR Id</mat-label>
-    <input matInput [(ngModel)]="camera.openAlprCameraId" required>
+    <input type="number" matInput [(ngModel)]="camera.openAlprCameraId" required>
   </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Camera Username</mat-label>
@@ -43,5 +43,5 @@
 </mat-dialog-content>
 <div mat-dialog-actions align="end">
   <button mat-raised-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-raised-button color="primary" [mat-dialog-close]="true" cdkFocusInitial color="primary">Save</button>
+  <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Save</button>
 </div>

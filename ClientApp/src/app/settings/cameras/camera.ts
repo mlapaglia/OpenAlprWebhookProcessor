@@ -1,4 +1,5 @@
 export class Camera {
+    id: string;
     latitude: number;
     longitude: number;
     manufacturer: Manufacturer;

@@ -23,6 +23,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
             {
                 cameras.Add(new Camera()
                 {
+                    Id = camera.Id,
                     CameraPassword = camera.CameraPassword,
                     CameraUsername = camera.CameraUsername,
                     Latitude = camera.Latitude,

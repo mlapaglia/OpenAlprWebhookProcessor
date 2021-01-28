@@ -16,12 +16,13 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
         public async Task UpsertCameraAsync(Camera camera)
         {
             var existingCamera = await _processorContext.Cameras
-                .FirstOrDefaultAsync(x => x.OpenAlprCameraId == camera.OpenAlprCameraId);
+                .FirstOrDefaultAsync(x => x.Id == camera.Id);
 
             if (existingCamera == null)
             {
                 existingCamera = new Data.Camera()
                 {
+                    Id = camera.Id,
                     CameraPassword = camera.CameraPassword,
                     CameraUsername = camera.CameraUsername,
                     Latitude = camera.Latitude,

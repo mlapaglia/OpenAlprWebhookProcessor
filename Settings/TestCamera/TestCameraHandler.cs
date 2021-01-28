@@ -1,4 +1,6 @@
-﻿namespace OpenAlprWebhookProcessor.Settings.TestCamera
+﻿using System;
+
+namespace OpenAlprWebhookProcessor.Settings.TestCamera
 {
     public class TestCameraHandler
     {
@@ -9,13 +11,13 @@
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public void SendTestCameraOverlay(long cameraId)
+        public void SendTestCameraOverlay(Guid cameraId)
         {
             _cameraUpdateService.AddJob(new CameraUpdateService.CameraUpdateRequest()
             {
+                Id = cameraId,
                 LicensePlate = "test",
                 AlertDescription = "test",
-                OpenAlprCameraId = cameraId,
                 OpenAlprProcessingTimeMs = 1000,
                 ProcessedPlateConfidence = 100,
                 VehicleDescription = "test vehicle"

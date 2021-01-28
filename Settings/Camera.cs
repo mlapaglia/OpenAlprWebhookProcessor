@@ -1,4 +1,5 @@
 ﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
+using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -6,6 +7,8 @@ namespace OpenAlprWebhookProcessor.Settings
 {
     public class Camera
     {
+        public Guid Id { get; set; }
+
         public int PlatesSeen { get; set; }
 
         public string SampleImageUrl { get; set; }

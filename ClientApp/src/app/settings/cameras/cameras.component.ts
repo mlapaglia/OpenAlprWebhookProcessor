@@ -27,8 +27,8 @@ export class CamerasComponent implements OnInit {
     });
   }
 
-  openEditDialog(cameraId: number): void {
-    var cameraToEdit = this.cameras.find(x => x.openAlprCameraId == cameraId);
+  openEditDialog(cameraId: string): void {
+    var cameraToEdit = this.cameras.find(x => x.id == cameraId);
 
     if (!cameraToEdit) {
       cameraToEdit = this.cameras[0];
@@ -40,7 +40,7 @@ export class CamerasComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        var cameraToSave = this.cameras.find(x => x.openAlprCameraId == cameraId);
+        var cameraToSave = this.cameras.find(x => x.id == cameraId);
 
         if (!cameraToSave) {
           cameraToSave = this.cameras[0];
@@ -57,17 +57,17 @@ export class CamerasComponent implements OnInit {
     this.openEditDialog(null);
   }
 
-  public deleteCamera($event: number) {
+  public deleteCamera($event: string) {
     this.settingsService.deleteCamera($event).subscribe(result => {
       this.getCameras();
     });
   }
 
-  public editCamera($event: number) {
+  public editCamera($event: string) {
     this.openEditDialog($event);
   }
 
-  public testCamera($event: number) {
+  public testCamera($event: string) {
     this.settingsService.testCamera($event).subscribe(result => {
     });
   }
