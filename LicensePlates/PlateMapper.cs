@@ -8,7 +8,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
     {
         public static LicensePlate MapPlate(
             PlateGroup plate,
-            List<string> platesToIgnore)
+            List<string> platesToIgnore,
+            List<string> platesToAlert)
         {
             return new LicensePlate()
             {
@@ -16,7 +17,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 Direction = plate.Direction,
                 ImageUrl = new Uri($"/images/{plate.OpenAlprUuid}.jpg", UriKind.Relative),
                 CropImageUrl = new Uri($"/images/crop/{plate.OpenAlprUuid}?{plate.PlateCoordinates}", UriKind.Relative),
-                IsAlert = plate.IsAlert,
+                IsAlert = platesToAlert.Contains(plate.Number),
                 IsIgnore = platesToIgnore.Contains(plate.Number),
                 LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,

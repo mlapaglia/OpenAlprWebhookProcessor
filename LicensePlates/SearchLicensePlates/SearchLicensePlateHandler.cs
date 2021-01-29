@@ -57,9 +57,14 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
             var licensePlates = new List<LicensePlate>();
 
+            var platesToAlert = await GetPlatesToAlertAsync(cancellationToken);
+
             foreach (var plate in results)
             {
-                licensePlates.Add(PlateMapper.MapPlate(plate, platesToIgnore));
+                licensePlates.Add(PlateMapper.MapPlate(
+                    plate,
+                    platesToIgnore,
+                    platesToAlert));
             }
 
             return new SearchLicensePlateResponse()
@@ -72,6 +77,13 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
         private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken)
         {
             return (await _processerContext.Ignores.ToListAsync(cancellationToken))
+                .Select(x => x.PlateNumber)
+                .ToList();
+        }
+
+        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
+        {
+            return (await _processerContext.Alerts.ToListAsync(cancellationToken))
                 .Select(x => x.PlateNumber)
                 .ToList();
         }
