@@ -43,6 +43,8 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
 
         public async Task UpsertIgnoresAsync(List<Ignore> ignores)
         {
+            ignores = ignores.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
+
             var dbIgnores = await _processorContext.Ignores.ToListAsync();
 
             var ignoresToRemove = dbIgnores.Where(p => !ignores.Any(p2 => p2.Id == p.Id));

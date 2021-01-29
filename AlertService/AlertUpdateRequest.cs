@@ -8,6 +8,6 @@ namespace OpenAlprWebhookProcessor.AlertService
 
         public string Description { get; set; }
 
-        public string OpenAlprGroupUuid { get; set; }
+        public Guid LicensePlateId { get; set; }
     }
 }

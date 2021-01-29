@@ -127,6 +127,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertCameraHandler>();
             services.AddScoped<SearchLicensePlateHandler>();
             services.AddScoped<GetImageHandler>();
+            services.AddScoped<UpsertAlertsRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

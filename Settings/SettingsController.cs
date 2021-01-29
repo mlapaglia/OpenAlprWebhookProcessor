@@ -36,6 +36,8 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly UpsertIgnoresRequestHandler _upsertIgnoresRequestHandler;
 
+        private readonly UpsertAlertsRequestHandler _upsertAlertsRequestHandler;
+
         public SettingsController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
@@ -45,7 +47,8 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
             GetAlertsRequestHandler getAlertsRequestHandler,
-            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler)
+            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
+            UpsertAlertsRequestHandler upsertAlertsRequestHandler)
         {
             _deleteCameraHandler = deleteCameraHandler;
             _getCameraHandler = getCameraHandler;
@@ -56,6 +59,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _getIgnoresRequestHandler = getIgnoresRequestHandler;
             _getAlertsRequestHandler = getAlertsRequestHandler;
             _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
+            _upsertAlertsRequestHandler = upsertAlertsRequestHandler;
         }
 
         [HttpGet("cameras")]
@@ -96,22 +100,22 @@ namespace OpenAlprWebhookProcessor.Settings
             await _upsertAgentRequestHandler.HandleAsync(agent);
         }
 
-        [HttpPost("alerts")]
-        public async Task UpsertAlert([FromBody] Alert alert)
+        [HttpPost("alerts/add")]
+        public async Task AddAlert([FromBody] Alert alert)
         {
-            
+            await _upsertAlertsRequestHandler.AddAlertAsync(alert);
+        }
+
+        [HttpPost("alerts")]
+        public async Task UpsertAlerts([FromBody] List<Alert> alerts)
+        {
+            await _upsertAlertsRequestHandler.UpsertAlertsAsync(alerts);
         }
 
         [HttpGet("alerts")]
         public async Task<List<Alert>> GetAlerts(CancellationToken cancellationToken)
         {
             return await _getAlertsRequestHandler.HandleAsync(cancellationToken);
-        }
-
-        [HttpDelete("alerts/{alertId}")]
-        public async Task DeleteAlert(Guid alert)
-        {
-
         }
 
         [HttpPost("ignores/add")]
@@ -130,12 +134,6 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task<List<Ignore>> GetIgnores()
         {
             return await _getIgnoresRequestHandler.HandleAsync();
-        }
-
-        [HttpDelete("ignores/{ignoreId}")]
-        public async Task DeleteIgnore(Guid alert)
-        {
-
         }
     }
 }

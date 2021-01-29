@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AlertService } from '@app/_services';
 import * as signalR from "@microsoft/signalr";
 import { Subject } from 'rxjs';
 
@@ -7,10 +8,12 @@ import { Subject } from 'rxjs';
 })
 export class SignalrService {
   private hubConnection: signalR.HubConnection;
+
   public connectionEstablished = new Subject<Boolean>();
   public licensePlateReceived = new Subject<string>();
+  public licensePlateAlerted = new Subject<string>();
 
-  constructor() { }
+  constructor(private alertService: AlertService) { }
   
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -27,6 +30,10 @@ export class SignalrService {
 
       this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {
         this.licensePlateReceived.next(plateNumber);
+      });
+
+      this.hubConnection.on('LicensePlateAlerted', (plateNumber) => {
+        this.alertService.info(`Alert! Plate Number: ${plateNumber}`)
       });
   }
 

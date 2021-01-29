@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,7 +63,11 @@ namespace OpenAlprWebhookProcessor.AlertService
             {
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    await _processorHub.Clients.All.LicensePlateAlerted(job.OpenAlprGroupUuid);
+                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                    var plate = await processorContext.PlateGroups.Where(x => x.Id == job.LicensePlateId).FirstOrDefaultAsync();
+
+                    await _processorHub.Clients.All.LicensePlateAlerted(plate.Id.ToString());
                 }
             }
         }

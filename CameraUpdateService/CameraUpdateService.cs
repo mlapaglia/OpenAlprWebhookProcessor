@@ -83,17 +83,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                             continue;
                         }
 
-                        if (job.IsAlert)
-                        {
-                            var alertService = scope.ServiceProvider.GetRequiredService<AlertService.AlertService>();
-                            alertService.AddJob(new AlertService.AlertUpdateRequest()
-                            {
-                                CameraId = job.Id,
-                                Description = job.AlertDescription,
-                                OpenAlprGroupUuid = job.LicensePlateImageUuid,
-                            });
-                        }
-
                         switch (cameraToUpdate.Manufacturer)
                         {
                             case CameraManufacturer.Dahua:

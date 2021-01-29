@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,9 +19,17 @@ namespace OpenAlprWebhookProcessor.Settings.GetAlerts
         {
             var alerts = new List<Alert>();
 
-            foreach (var alert in await _processorContext.Alerts.ToListAsync(cancellationToken))
+            foreach (var dbAlert in await _processorContext.Alerts.ToListAsync())
             {
-                alerts.Add(new Alert());
+                var alert = new Alert()
+                {
+                    Id = dbAlert.Id,
+                    PlateNumber = dbAlert.PlateNumber,
+                    StrictMatch = dbAlert.IsStrictMatch,
+                    Description = dbAlert.Description,
+                };
+
+                alerts.Add(alert);
             }
 
             return alerts;

@@ -69,7 +69,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             _cameraUpdateService.AddJob(updateRequest);
 
-            _processorContext.PlateGroups.Add(new PlateGroup()
+            var plateGroup = new PlateGroup()
             {
                 AlertDescription = webhook.Description,
                 PlateCoordinates = FormatLicensePlateXyCoordinates(webhook.Group.BestPlate.Coordinates),
@@ -83,7 +83,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                 ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 VehicleDescription = updateRequest.VehicleDescription,
-            });
+            };
+
+            _processorContext.PlateGroups.Add(plateGroup);
 
             await _processorContext.SaveChangesAsync();
 
@@ -101,7 +103,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     CameraId = updateRequest.Id,
                     Description = alert.Description,
-                    OpenAlprGroupUuid = updateRequest.LicensePlateImageUuid
+                    LicensePlateId = plateGroup.Id,
                 };
 
                 _alertService.AddJob(alertUpdateRequest);
