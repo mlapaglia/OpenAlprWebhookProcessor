@@ -38,12 +38,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
-      <tr mat-row *matRowDef="let element; columns: rowsToDisplay;"
+      <tr [ngClass]="{'alert': element.isAlert === true, 'ignore': element.isIgnore === true}" mat-row *matRowDef="let element; columns: rowsToDisplay;"
           class="example-element-row"
           [class.example-expanded-row]="expandedElement === element"
           (click)="expandedElement = expandedElement === element ? null : element">
       </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"  class="example-detail-row"></tr>
     </table>
     <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"
