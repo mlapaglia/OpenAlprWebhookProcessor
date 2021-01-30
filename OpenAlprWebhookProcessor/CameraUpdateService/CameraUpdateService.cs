@@ -20,16 +20,16 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly ConcurrentDictionary<Guid, DateTime> _camerasWithActiveOverlays;
 
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         private readonly ILogger _logger;
 
         public CameraUpdateService(
-            IServiceScopeFactory scopeFactory,
+            IServiceProvider serviceProvider,
             ILogger<CameraUpdateService> logger)
         {
             _logger = logger;
-            _scopeFactory = scopeFactory;
+            _serviceProvider = serviceProvider;
             _webhooksToProcess = new BlockingCollection<CameraUpdateRequest>();
             _cancellationTokenSource = new CancellationTokenSource();
             _camerasWithActiveOverlays = new ConcurrentDictionary<Guid, DateTime>();
@@ -67,7 +67,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             foreach (var job in _webhooksToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                using (var scope = _scopeFactory.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
@@ -127,7 +127,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 if (!_camerasWithActiveOverlays.IsEmpty)
                 {
-                    using (var scope = _scopeFactory.CreateScope())
+                    using (var scope = _serviceProvider.CreateScope())
                     {
                         var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
@@ -153,7 +153,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private async Task ForceClearOverlaysAsync()
         {
-            using (var scope = _scopeFactory.CreateScope())
+            using (var scope = _serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 

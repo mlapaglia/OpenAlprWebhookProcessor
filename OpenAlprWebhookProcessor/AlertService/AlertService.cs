@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
@@ -17,19 +18,19 @@ namespace OpenAlprWebhookProcessor.AlertService
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IServiceProvider _serviceProvider;
 
         private readonly ILogger _logger;
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
         public AlertService(
-            IServiceScopeFactory scopeFactory,
+            IServiceProvider serviceProvider,
             ILogger<AlertService> logger,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
         {
             _logger = logger;
-            _scopeFactory = scopeFactory;
+            _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
             _processorHub = processorHub;
@@ -61,7 +62,7 @@ namespace OpenAlprWebhookProcessor.AlertService
         {
             foreach (var job in _alertsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                using (var scope = _scopeFactory.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 

@@ -38,16 +38,16 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
-          dotnet restore "OpenAlprWebhookProcessor.csproj"
-          dotnet build "OpenAlprWebhookProcessor.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
+          dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
+          dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
         uses: softprops/action-gh-release@v1
         if: contains(github.ref, 'alpha') != true
         with:
-          files: "OpenAlprWebHookProcessor*"
+          files: "OpenAlprWebhookProcessor/OpenAlprWebHookProcessor*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,7 +55,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: contains(github.ref, 'alpha')
         with:
-          files: "OpenAlprWebHookProcessor*"
+          files: "OpenAlprWebhookProcessor/OpenAlprWebHookProcessor*"
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
