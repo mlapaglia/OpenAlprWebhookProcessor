@@ -11,14 +11,14 @@ WORKDIR /src
 RUN curl -sL https://deb.nodesource.com/setup_15.x |  bash -
 RUN apt-get install -y nodejs
 
-COPY ["OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj", ""]
-RUN dotnet restore "./OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
+COPY ["OpenAlprWebhookProcessor.csproj", ""]
+RUN dotnet restore "./OpenAlprWebhookProcessor.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o /app/build
+RUN dotnet build "OpenAlprWebhookProcessor.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o /app/publish
+RUN dotnet publish "OpenAlprWebhookProcessor.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
