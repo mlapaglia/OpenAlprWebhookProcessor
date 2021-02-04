@@ -6,6 +6,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Ignore } from '@app/settings/ignores/ignore/ignore';
 import { SettingsService } from '@app/settings/settings.service';
 import { SignalrService } from '@app/signalr/signalr.service';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
@@ -73,7 +75,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private plateService: PlateService,
     private lightbox: Lightbox,
     private signalRHub: SignalrService,
-    private settingsService: SettingsService) {
+    private settingsService: SettingsService,
+    private snackbarService: SnackbarService) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -156,6 +159,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.settingsService.addIgnore(ignore).subscribe(() => {
       this.addingToIgnoreList = false;
+      this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
     });
   }
 }

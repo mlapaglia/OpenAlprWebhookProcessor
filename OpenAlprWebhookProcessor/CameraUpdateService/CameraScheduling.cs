@@ -61,7 +61,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
                             camera.Id,
                             isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise),
-                            isSunUp ? cameraSunsetAt : cameraSunriseAt );
+                            isSunUp ? cameraSunsetAt : cameraSunriseAt);
                 }
 
                 await processorContext.SaveChangesAsync();

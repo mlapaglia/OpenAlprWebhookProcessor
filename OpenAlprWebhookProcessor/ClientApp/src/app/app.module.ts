@@ -24,6 +24,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';;
+import { SnackbarComponent } from './snackbar/snackbar.component'
 
 @NgModule({
     imports: [
@@ -46,12 +48,14 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
         MatCheckboxModule,
         MatDividerModule,
         MatSlideToggleModule,
+        MatSnackBarModule
     ],
     declarations: [
         AppComponent,
         AlertComponent,
         HomeComponent,
-        FastSearchComponent,
+        FastSearchComponent,
+        SnackbarComponent
     ],
     providers: [
         { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
