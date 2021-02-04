@@ -56,7 +56,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                 return null;
             }
 
-            return Flurl.Url.Combine($"/img/{imageUuid}.jpg");
+            return Flurl.Url.Combine($"/images/{imageUuid}.jpg");
         }
     }
 }

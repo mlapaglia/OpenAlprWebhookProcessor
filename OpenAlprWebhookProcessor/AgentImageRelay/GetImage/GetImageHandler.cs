@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.AgentImageRelay.GetImage
             var result = await httpClient.GetAsync(
                 Flurl.Url.Combine(
                     agent.EndpointUrl,
-                    "/images/",
+                    "/img/",
                     imageId),
                 cancellationToken);
 
@@ -56,7 +56,7 @@ namespace OpenAlprWebhookProcessor.AgentImageRelay.GetImage
             var result = await httpClient.GetAsync(
                 Flurl.Url.Combine(
                     agent.EndpointUrl,
-                    "/images/crop/",
+                    "/crop/",
                     imageId),
                 cancellationToken);
 
