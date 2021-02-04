@@ -6,9 +6,16 @@
     </mat-card-header>
     <mat-card-content>
         <div style="height:200px;" fxLayoutAlign="center">
-            <img mat-card-image class="sample-image" src="{{camera.sampleImageUrl}}" *ngIf="camera.sampleImageUrl" alt="last capture from camera">
+            <img
+                mat-card-image class="sample-image"
+                src="{{camera.sampleImageUrl}}"
+                *ngIf="camera.sampleImageUrl"
+                alt="last capture from camera">
             <div *ngIf="!camera.sampleImageUrl" class="sample-image">
-                <mat-icon style="font-size: 100px;" [inline]="true">help_center</mat-icon>
+                <mat-icon
+                    style="font-size: 100px;"
+                    [inline]="true"
+                    matTooltip="Image will display after first plate capture">help_center</mat-icon>
             </div>
         </div>
         <div>

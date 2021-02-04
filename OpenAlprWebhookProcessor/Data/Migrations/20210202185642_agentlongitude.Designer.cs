@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210202185642_agentlongitude")]
+    partial class agentlongitude
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +47,6 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.Property<int>("SunsetOffset")
                         .HasColumnType("INTEGER");
-
-                    b.Property<double>("TimeZoneOffset")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("Uid")
                         .HasColumnType("TEXT");
@@ -124,9 +123,6 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.Property<int?>("SunsetOffset")
                         .HasColumnType("INTEGER");
-
-                    b.Property<double?>("TimezoneOffset")
-                        .HasColumnType("REAL");
 
                     b.Property<bool>("UpdateDayNightModeEnabled")
                         .HasColumnType("INTEGER");

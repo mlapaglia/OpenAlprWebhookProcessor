@@ -23,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
     imports: [
@@ -44,6 +45,7 @@ import { MatDividerModule } from '@angular/material/divider';
         MatFormFieldModule,
         MatCheckboxModule,
         MatDividerModule,
+        MatSlideToggleModule,
     ],
     declarations: [
         AppComponent,

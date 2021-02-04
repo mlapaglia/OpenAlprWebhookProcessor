@@ -13,9 +13,9 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public string SampleImageUrl { get; set; }
 
-        public double Latitude { get; set; }
+        public double? Latitude { get; set; }
 
-        public double Longitude { get; set; }
+        public double? Longitude { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [DisplayName("Manufacturer")]
@@ -32,5 +32,17 @@ namespace OpenAlprWebhookProcessor.Settings
         public string CameraUsername { get; set; }
 
         public string UpdateOverlayTextUrl { get; set; }
+
+        public bool UpdateOverlayEnabled { get; set; }
+
+        public string DayNightModeUrl { get; set; }
+
+        public bool DayNightModeEnabled { get; set; }
+
+        public int? SunsetOffset { get; set; }
+
+        public int? SunriseOffset { get; set; }
+
+        public double? TimezoneOffset { get; set; }
     }
 }

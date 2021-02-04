@@ -23,8 +23,13 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                 {
                     EndpointUrl = agent.EndpointUrl,
                     Hostname = agent.Hostname,
+                    Latitude = agent.Latitude,
+                    Longitude = agent.Longitude,
                     OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,
                     OpenAlprWebServerUrl = agent.OpenAlprWebServerUrl,
+                    SunriseOffset = agent.SunriseOffset,
+                    SunsetOffset = agent.SunsetOffset,
+                    TimeZoneOffset = agent.TimezoneOffset,
                     Uid = agent.Uid,
                     Version = agent.Version,
                 };
@@ -35,8 +40,13 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
             {
                 dbAgent.EndpointUrl = agent.EndpointUrl;
                 dbAgent.Hostname = agent.Hostname;
+                dbAgent.Latitude = agent.Latitude;
+                dbAgent.Longitude = agent.Longitude;
                 dbAgent.OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey;
                 dbAgent.OpenAlprWebServerUrl = agent.OpenAlprWebServerUrl;
+                dbAgent.SunsetOffset = agent.SunsetOffset;
+                dbAgent.SunriseOffset = agent.SunriseOffset;
+                dbAgent.TimeZoneOffset = agent.TimezoneOffset;
                 dbAgent.Uid = agent.Uid;
                 dbAgent.Version = agent.Version;
             }

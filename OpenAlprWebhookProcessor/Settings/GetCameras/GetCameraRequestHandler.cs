@@ -34,7 +34,13 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                     OpenAlprName = camera.OpenAlprName,
                     PlatesSeen = camera.PlatesSeen,
                     UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
+                    UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
+                    DayNightModeUrl = camera.UpdateDayNightModeUrl,
+                    DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
                     SampleImageUrl = await CreateSampleImageUrlAsync(camera.LatestProcessedPlateUuid),
+                    SunriseOffset = camera.SunriseOffset,
+                    SunsetOffset = camera.SunsetOffset,
+                    TimezoneOffset = camera.TimezoneOffset,
                 });
             }
 
@@ -50,7 +56,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetCameras
                 return null;
             }
 
-            return Flurl.Url.Combine(agent.EndpointUrl, $"/img/{imageUuid}.jpg");
+            return Flurl.Url.Combine($"/img/{imageUuid}.jpg");
         }
     }
 }

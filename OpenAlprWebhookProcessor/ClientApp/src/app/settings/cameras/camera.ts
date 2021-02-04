@@ -8,10 +8,16 @@ export class Camera {
     openAlprCameraId: number;
     cameraPassword: string;
     cameraUsername: string;
+    updateOverlayEnabled: boolean;
     updateOverlayTextUrl: string;
+    dayNightModeEnabled: boolean;
+    dayNightModeUrl: string;
+    sunriseOffset: number;
+    sunsetOffset: number;
     platesSeen: number;
     sampleImageUrl: string;
-
+    timezoneOffset: number;
+    
     constructor(init?:Partial<Camera>) {
         Object.assign(this, init);
     }

@@ -9,9 +9,14 @@ namespace OpenAlprWebhookProcessor.Settings.DeleteCamera
     {
         private readonly ProcessorContext _processorContext;
 
-        public DeleteCameraHandler(ProcessorContext processorContext)
+        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+
+        public DeleteCameraHandler(
+            ProcessorContext processorContext,
+            CameraUpdateService.CameraUpdateService cameraUpdateService)
         {
             _processorContext = processorContext;
+            _cameraUpdateService = cameraUpdateService;
         }
 
         public async Task HandleAsync(Guid cameraId)
@@ -20,6 +25,8 @@ namespace OpenAlprWebhookProcessor.Settings.DeleteCamera
 
             _processorContext.Remove(camera);
             await _processorContext.SaveChangesAsync();
+
+            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
         }
     }
 }

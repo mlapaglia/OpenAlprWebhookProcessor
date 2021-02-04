@@ -13,7 +13,7 @@ namespace OpenAlprWebhookProcessor.Settings.TestCamera
 
         public void SendTestCameraOverlay(Guid cameraId)
         {
-            _cameraUpdateService.AddJob(new CameraUpdateService.CameraUpdateRequest()
+            _cameraUpdateService.ScheduleOverlayRequest(new CameraUpdateService.CameraUpdateRequest()
             {
                 Id = cameraId,
                 LicensePlate = "test",

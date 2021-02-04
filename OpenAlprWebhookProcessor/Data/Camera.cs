@@ -7,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Data
     {
         public Guid Id { get; set; }
 
-        public double Latitude { get; set; }
+        public double? Latitude { get; set; }
 
-        public double Longitude { get; set; }
+        public double? Longitude { get; set; }
 
         public CameraManufacturer Manufacturer { get; set; }
 
@@ -25,8 +25,22 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string UpdateOverlayTextUrl { get; set; }
 
+        public bool UpdateOverlayEnabled { get; set; }
+
+        public string UpdateDayNightModeUrl { get; set; }
+
+        public string NextDayNightScheduleId { get; set; }
+
+        public bool UpdateDayNightModeEnabled { get; set; }
+
         public string LatestProcessedPlateUuid { get; set; }
 
         public int PlatesSeen { get; set; }
+
+        public int? SunsetOffset { get; set; }
+
+        public int? SunriseOffset { get; set; }
+
+        public double? TimezoneOffset { get; set; }
     }
 }

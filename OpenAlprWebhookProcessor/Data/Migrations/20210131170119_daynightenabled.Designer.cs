@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210131170119_daynightenabled")]
+    partial class daynightenabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,26 +30,11 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<string>("Hostname")
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("REAL");
-
-                    b.Property<double>("Longitude")
-                        .HasColumnType("REAL");
-
                     b.Property<string>("OpenAlprWebServerApiKey")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OpenAlprWebServerUrl")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("SunriseOffset")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SunsetOffset")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("TimeZoneOffset")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("Uid")
                         .HasColumnType("TEXT");
@@ -95,19 +82,16 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<string>("LatestProcessedPlateUuid")
                         .HasColumnType("TEXT");
 
-                    b.Property<double?>("Latitude")
+                    b.Property<double>("Latitude")
                         .HasColumnType("REAL");
 
-                    b.Property<double?>("Longitude")
+                    b.Property<double>("Longitude")
                         .HasColumnType("REAL");
 
                     b.Property<int>("Manufacturer")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ModelNumber")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NextDayNightScheduleId")
                         .HasColumnType("TEXT");
 
                     b.Property<long>("OpenAlprCameraId")
@@ -119,23 +103,11 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<int>("PlatesSeen")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("SunriseOffset")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("SunsetOffset")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double?>("TimezoneOffset")
-                        .HasColumnType("REAL");
-
                     b.Property<bool>("UpdateDayNightModeEnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("UpdateDayNightModeUrl")
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("UpdateOverlayEnabled")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UpdateOverlayTextUrl")
                         .HasColumnType("TEXT");

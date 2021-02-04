@@ -67,7 +67,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             }
 
-            _cameraUpdateService.AddJob(updateRequest);
+            _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
 
             var plateGroup = new PlateGroup()
             {

@@ -1,4 +1,6 @@
 using AutoMapper;
+using Hangfire;
+using Hangfire.SQLite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +39,8 @@ namespace OpenAlprWebhookProcessor
 
         private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
 
+        private const string HangfireContextConnectionString = "Data Source=config/hangfire.db;";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -49,6 +53,14 @@ namespace OpenAlprWebhookProcessor
             services.AddCors();
             services.AddControllersWithViews();
             services.AddSignalR();
+
+            var processorOptionsBuilder = new DbContextOptionsBuilder<ProcessorContext>();
+            processorOptionsBuilder.UseSqlite(ProcessorContextConnectionString);
+
+            using (var context = new ProcessorContext(processorOptionsBuilder.Options))
+            {
+                context.Database.Migrate();
+            }
 
             var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
             optionsBuilder.UseSqlite(UsersContextConnectionString);
@@ -152,14 +164,20 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddSingleton(mapper.CreateMapper());
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSQLiteStorage(HangfireContextConnectionString, new SQLiteStorageOptions()));
+
+            services.AddHangfireServer();
         }
 
         public void Configure(
             IApplicationBuilder app,
             IWebHostEnvironment env)
         {
-            MigrateDatabases(app);
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -182,6 +200,8 @@ namespace OpenAlprWebhookProcessor
             });
 
             app.UseStaticFiles();
+            app.UseHangfireDashboard();
+
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
@@ -203,6 +223,7 @@ namespace OpenAlprWebhookProcessor
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<ProcessorHub.ProcessorHub>("/processorhub");
+                endpoints.MapHangfireDashboard();
             });
 
             app.UseSpa(spa =>
@@ -214,19 +235,6 @@ namespace OpenAlprWebhookProcessor
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-        }
-
-        private static void MigrateDatabases(IApplicationBuilder app)
-        {
-            using (var scope = app.ApplicationServices.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                if (processorContext.Database.GetPendingMigrations().Any())
-                {
-                    processorContext.Database.Migrate();
-                }
-            }
         }
     }
 }

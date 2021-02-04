@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
@@ -8,9 +10,14 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
     {
         private readonly ProcessorContext _processorContext;
 
-        public UpsertCameraHandler(ProcessorContext processorContext)
+        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+
+        public UpsertCameraHandler(
+            ProcessorContext processorContext,
+            CameraUpdateService.CameraUpdateService cameraUpdateService)
         {
             _processorContext = processorContext;
+            _cameraUpdateService = cameraUpdateService;
         }
 
         public async Task UpsertCameraAsync(Camera camera)
@@ -30,7 +37,13 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
                     Manufacturer = camera.Manufacturer,
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
-                    UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl.ToString(),
+                    UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
+                    UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
+                    UpdateDayNightModeUrl = camera.DayNightModeUrl,
+                    UpdateDayNightModeEnabled = camera.DayNightModeEnabled,
+                    SunriseOffset = camera.SunriseOffset,
+                    SunsetOffset = camera.SunsetOffset,
+                    TimezoneOffset = camera.TimezoneOffset,
                 };
 
                 _processorContext.Add(existingCamera);
@@ -45,10 +58,25 @@ namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
                 existingCamera.ModelNumber = camera.ModelNumber;
                 existingCamera.OpenAlprCameraId = camera.OpenAlprCameraId;
                 existingCamera.OpenAlprName = camera.OpenAlprName;
-                existingCamera.UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl.ToString();
+                existingCamera.UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl;
+                existingCamera.UpdateOverlayEnabled = camera.UpdateOverlayEnabled;
+                existingCamera.UpdateDayNightModeUrl = camera.DayNightModeUrl;
+                existingCamera.UpdateDayNightModeEnabled = camera.DayNightModeEnabled;
+                existingCamera.SunriseOffset = camera.SunriseOffset;
+                existingCamera.SunsetOffset = camera.SunsetOffset;
+                existingCamera.TimezoneOffset = camera.TimezoneOffset;
             }
 
             await _processorContext.SaveChangesAsync();
+
+            if (existingCamera.UpdateDayNightModeEnabled)
+            {
+                await _cameraUpdateService.ScheduleDayNightTaskAsync();
+            }
+            else
+            {
+                await _cameraUpdateService.DeleteSunriseSunsetAsync(existingCamera.Id);
+            }
         }
     }
 }

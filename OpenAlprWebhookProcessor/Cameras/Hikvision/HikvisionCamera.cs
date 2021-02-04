@@ -9,13 +9,23 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net;
 using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
-    public static class HikvisionCamera
+    public class HikvisionCamera : ICamera
     {
-        public static async Task ClearCameraTextAsync(
-            Data.Camera cameraToUpdate,
+        private readonly Data.Camera _camera;
+
+        private readonly HttpClient _httpClient;
+
+        public HikvisionCamera(Data.Camera camera)
+        {
+            _camera = camera;
+            _httpClient = CreateHttpClient();
+        }
+
+        public async Task ClearCameraTextAsync(
             CancellationToken cancellationToken)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
@@ -53,13 +63,11 @@ namespace OpenAlprWebhookProcessor.Cameras
                 });
 
             await PushCameraTextAsync(
-                cameraToUpdate,
                 videoOverlayRequest,
                 cancellationToken);
         }
 
-        public static async Task SetCameraTextAsync(
-            Data.Camera cameraToUpdate,
+        public async Task SetCameraTextAsync(
             CameraUpdateRequest updateRequest,
             CancellationToken cancellationToken)
         {
@@ -98,24 +106,20 @@ namespace OpenAlprWebhookProcessor.Cameras
                 });
 
             await PushCameraTextAsync(
-                cameraToUpdate,
                 videoOverlayRequest,
                 cancellationToken);
         }
 
-        private static async Task PushCameraTextAsync(
-            Data.Camera cameraToUpdate,
+        public async Task TriggerDayNightModeAsync(
+            SunriseSunset sunriseSunset,
+            CancellationToken cancellationToken)
+        {
+        }
+
+        private async Task PushCameraTextAsync(
             VideoOverlay videoOverlay,
             CancellationToken cancellationToken)
         {
-            var client = new HttpClient(new HttpClientHandler()
-            {
-                UseDefaultCredentials = true,
-                Credentials = new NetworkCredential(
-                    cameraToUpdate.CameraUsername,
-                    cameraToUpdate.CameraPassword),
-            });
-
             using (var stringWriter = new StringWriter())
             {
                 using (XmlWriter writer = XmlWriter.Create(stringWriter))
@@ -125,17 +129,28 @@ namespace OpenAlprWebhookProcessor.Cameras
                         writer,
                         videoOverlay);
 
-                    var response = await client.PutAsync(
-                        cameraToUpdate.UpdateOverlayTextUrl,
+                    var response = await _httpClient.PutAsync(
+                        _camera.UpdateOverlayTextUrl,
                         new StringContent(stringWriter.ToString()),
                         cancellationToken);
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new ArgumentException("unable to update video overlay: " + await response.Content.ReadAsStringAsync());
+                        throw new ArgumentException("unable to update video overlay: " + await response.Content.ReadAsStringAsync(cancellationToken));
                     }
                 }
             }
+        }
+
+        private HttpClient CreateHttpClient()
+        {
+            return new HttpClient(new HttpClientHandler()
+            {
+                UseDefaultCredentials = true,
+                Credentials = new NetworkCredential(
+                    _camera.CameraUsername,
+                    _camera.CameraPassword),
+            });
         }
 
         private static VideoOverlay CreateBaseVideoOverlayRequest()
