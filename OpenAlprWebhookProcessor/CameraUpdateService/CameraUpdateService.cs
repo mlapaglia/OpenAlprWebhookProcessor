@@ -189,7 +189,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        private async Task ClearExpiredOverlayAsync(Guid cameraId)
+        public async Task ClearExpiredOverlayAsync(Guid cameraId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
