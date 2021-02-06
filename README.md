@@ -13,18 +13,19 @@ This service accepts license plate webhooks from the OpenALPR web server. The we
 ![image](https://user-images.githubusercontent.com/4184746/104876130-035caf80-5925-11eb-8b24-cd47ef551295.png)
 
 ## Quick Start
-The container needs 1 port for incoming connections, and an appsettings.json volume to configure the cameras to update. Check the `ConfigurationExamples` folder for guidance.
-
 **command line**
 
     dotnet ./OpenAlprWebhookProcessor.dll
 
 ## Docker Configuration
+The container needs 1 port for incoming connections and a volume to mount the databses for plate/settings storage
+
 **docker cli**
 
     docker run -d \
     --name=openalprwebhookprocessor \
     --net=bridge \
+    -v /host/path/:/app/config/ \
     -p 3859:80 \
     mlapaglia/openalprwebhookprocessor
     
