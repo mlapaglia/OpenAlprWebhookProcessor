@@ -9,10 +9,10 @@ namespace OpenAlprWebhookProcessor.Migrations
             migrationBuilder.RenameColumn(
                 name: "Number",
                 table: "PlateGroups",
-                newName: "PossibleNumbers");
+                newName: "BestNumber");
 
             migrationBuilder.AddColumn<string>(
-                name: "BestNumber",
+                name: "PossibleNumbers",
                 table: "PlateGroups",
                 type: "TEXT",
                 nullable: true);
@@ -21,11 +21,11 @@ namespace OpenAlprWebhookProcessor.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "BestNumber",
+                name: "PossibleNumbers",
                 table: "PlateGroups");
 
             migrationBuilder.RenameColumn(
-                name: "PossibleNumbers",
+                name: "BestNumber",
                 table: "PlateGroups",
                 newName: "Number");
         }

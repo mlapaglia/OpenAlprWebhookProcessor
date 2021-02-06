@@ -9,7 +9,7 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    [Migration("20210206135732_lenientplates")]
+    [Migration("20210206142616_lenientplates")]
     partial class lenientplates
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
