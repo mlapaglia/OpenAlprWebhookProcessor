@@ -135,7 +135,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 Confidence = double.Parse(fields.BestConfidence),
                 Direction = fields.DirectionOfTravelDegrees,
                 IsAlert = false,
-                Number = fields.BestPlate,
+                BestNumber = fields.BestPlate,
                 OpenAlprCameraId = fields.CameraId,
                 OpenAlprProcessingTimeMs = double.Parse(fields.ProcessingTimeMs),
                 OpenAlprUuid = fields.BestUuid,

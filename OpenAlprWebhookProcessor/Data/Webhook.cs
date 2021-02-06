@@ -18,7 +18,9 @@ namespace OpenAlprWebhookProcessor.Data
 
         public long ReceivedOnEpoch { get; set; }
 
-        public string Number { get; set; }
+        public string BestNumber { get; set; }
+
+        public string PossibleNumbers { get; set; }
 
         public string Jpeg { get; set; }
 

@@ -78,7 +78,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 OpenAlprCameraId = webhook.Group.CameraId,
                 OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
                 OpenAlprUuid = webhook.Group.BestUuid,
-                Number = webhook.Group.BestPlateNumber,
+                BestNumber = webhook.Group.BestPlateNumber,
+                PossibleNumbers = string.Join(",", webhook.Group.Candidates.Select(x => x.Plate).ToArray()),
                 Jpeg = webhook.Group.BestPlate.PlateCropJpeg,
                 Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                 ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -111,7 +112,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             
         }
 
-        public static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
+        private static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
         {
             return VehicleUtilities.FormatLicensePlateImageCoordinates(
                 new List<int>()
