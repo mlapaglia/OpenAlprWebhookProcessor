@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.AlertService;
+using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Utilities;
@@ -23,14 +23,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly ProcessorContext _processorContext;
 
-        private readonly AlertService.AlertService _alertService;
+        private readonly AlertService _alertService;
 
         public WebhookHandler(
             ILogger<WebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            AlertService.AlertService alertService)
+            AlertService alertService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
@@ -105,6 +105,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     CameraId = updateRequest.Id,
                     Description = alert.Description,
                     LicensePlateId = plateGroup.Id,
+                    IsStrictMatch = alert.IsStrictMatch,
                 };
 
                 _alertService.AddJob(alertUpdateRequest);

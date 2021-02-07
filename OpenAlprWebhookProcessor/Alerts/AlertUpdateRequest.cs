@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.AlertService
+namespace OpenAlprWebhookProcessor.Alerts
 {
     public class AlertUpdateRequest
     {
@@ -9,5 +9,7 @@ namespace OpenAlprWebhookProcessor.AlertService
         public string Description { get; set; }
 
         public Guid LicensePlateId { get; set; }
+
+        public bool IsStrictMatch { get; set; }
     }
 }

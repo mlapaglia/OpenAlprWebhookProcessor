@@ -12,12 +12,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
+using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using OpenAlprWebhookProcessor.Settings;
-using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
@@ -143,8 +143,8 @@ namespace OpenAlprWebhookProcessor
             services.AddSingleton<HydrationService>();
             services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
 
-            services.AddSingleton<AlertService.AlertService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<AlertService.AlertService>());
+            services.AddSingleton<AlertService>();
+            services.AddSingleton<IHostedService>(p => p.GetService<AlertService>());
 
             services.AddSwaggerGen(c =>
             {

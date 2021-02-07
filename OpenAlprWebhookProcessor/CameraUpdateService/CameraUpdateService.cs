@@ -180,6 +180,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextClearOverlayScheduleId))
                     {
+                        _logger.LogInformation($"cancelling redundant clear overlay job: {cameraToUpdate.NextClearOverlayScheduleId}");
                         _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
                     }
 

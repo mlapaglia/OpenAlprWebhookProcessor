@@ -48,20 +48,4 @@ export class SettingsService {
   addIgnore(ignore: Ignore) {
     return this.http.post(`/settings/ignores/add`, ignore);
   }
-
-  getAlerts(): Observable<Alert[]> {
-    return this.http.get<Alert[]>(`/settings/alerts`);
-  }
-
-  deleteAlert(alertId: string) {
-    return this.http.delete(`/settings/alerts/${alertId}`, null);
-  }
-
-  upsertAlerts(alerts: Alert[]) {
-    return this.http.post(`/settings/alerts`, alerts);
-  }
-
-  addAlert(alert: Alert) {
-    return this.http.post(`/settings/alerts/add`, alert);
-  }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
+namespace OpenAlprWebhookProcessor.Alerts
 {
     public class UpsertAlertsRequestHandler
     {

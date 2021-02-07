@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.GetAlerts
+namespace OpenAlprWebhookProcessor.Alerts
 {
     public class GetAlertsRequestHandler
     {

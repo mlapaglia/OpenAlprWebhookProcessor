@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
         {
             _processerContext = processorContext;
         }
-        
+
         public async Task<SearchLicensePlateResponse> HandleAsync(
             SearchLicensePlateRequest request,
             CancellationToken cancellationToken)
@@ -52,11 +52,23 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.ReceivedOnEpoch <= endEpochMilliseconds);
             }
 
-            var platesToIgnore = await GetPlatesToIgnoreAsync(cancellationToken);
+            var platesToIgnore = await _processerContext.Ignores.ToListAsync(cancellationToken);
 
-            if (!request.FilterIgnoredPlates && platesToIgnore.Count > 0)
+            if (!request.FilterIgnoredPlates)
             {
-                dbRequest = dbRequest.Where(x => !platesToIgnore.Contains(x.BestNumber));
+                foreach (var plateToIgnore in platesToIgnore)
+                {
+                    if (plateToIgnore.IsStrictMatch)
+                    {
+                        dbRequest = dbRequest.Where(x => plateToIgnore.PlateNumber != x.BestNumber);
+                    }
+                    else
+                    {
+                        dbRequest = dbRequest.Where(x =>
+                            plateToIgnore.PlateNumber != x.BestNumber
+                            || !x.PossibleNumbers.Contains(plateToIgnore.PlateNumber));
+                    }
+                }
             }
 
             var totalCount = await dbRequest.CountAsync(cancellationToken);
@@ -76,7 +88,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             {
                 licensePlates.Add(PlateMapper.MapPlate(
                     plate,
-                    platesToIgnore,
+                    platesToIgnore.Select(x => x.PlateNumber).ToList(),
                     platesToAlert));
             }
 
@@ -85,13 +97,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 Plates = licensePlates,
                 TotalCount = totalCount,
             };
-        }
-
-        private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken)
-        {
-            return (await _processerContext.Ignores.ToListAsync(cancellationToken))
-                .Select(x => x.PlateNumber)
-                .ToList();
         }
 
         private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)

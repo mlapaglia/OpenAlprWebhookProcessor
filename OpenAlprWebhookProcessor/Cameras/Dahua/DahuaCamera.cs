@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             CancellationToken cancellationToken)
         {
             var response = await _httpClient.PostAsync(
-                $"{_camera.UpdateDayNightModeUrl} + {(sunriseSunset == SunriseSunset.Sunrise ? 1 : 0)}",
+                $"{_camera.UpdateDayNightModeUrl}{(sunriseSunset == SunriseSunset.Sunrise ? 1 : 0)}",
                 null,
                 cancellationToken);
 

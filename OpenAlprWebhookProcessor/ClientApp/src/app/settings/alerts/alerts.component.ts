@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Alert } from '@app/_models';
-import { SettingsService } from '../settings.service';
+import { AlertsService } from './alerts.service';
 
 @Component({
   selector: 'app-alerts',
@@ -12,7 +12,7 @@ export class AlertsComponent implements OnInit {
   public alerts: MatTableDataSource<Alert>;
   public isSaving: boolean = false;
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(private alertsService: AlertsService) { }
 
   public rowsToDisplay = [
     'plateNumber',
@@ -26,7 +26,7 @@ export class AlertsComponent implements OnInit {
   }
 
   private getAlerts() {
-    this.settingsService.getAlerts().subscribe(result => {
+    this.alertsService.getAlerts().subscribe(result => {
       this.alerts = new MatTableDataSource<Alert>(result);
     });
   }
@@ -48,9 +48,13 @@ export class AlertsComponent implements OnInit {
 
   public saveAlerts() {
     this.isSaving = true;
-    this.settingsService.upsertAlerts(this.alerts.data).subscribe(() => {
+    this.alertsService.upsertAlerts(this.alerts.data).subscribe(() => {
       this.getAlerts();
       this.isSaving = false;
     });
+  }
+
+  public testAlerts() {
+
   }
 }

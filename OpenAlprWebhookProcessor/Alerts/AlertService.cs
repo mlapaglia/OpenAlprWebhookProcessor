@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.AlertService
+namespace OpenAlprWebhookProcessor.Alerts
 {
     public class AlertService : IHostedService
     {
@@ -66,9 +66,24 @@ namespace OpenAlprWebhookProcessor.AlertService
                 {
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                    var plate = await processorContext.PlateGroups.Where(x => x.Id == job.LicensePlateId).FirstOrDefaultAsync();
+                    var plateGroups = processorContext.PlateGroups.AsQueryable();
 
-                    await _processorHub.Clients.All.LicensePlateAlerted(plate.Id.ToString());
+                    if (job.IsStrictMatch)
+                    {
+                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId || x.PossibleNumbers.Contains(job.LicensePlateId.ToString()));
+                    }
+                    else
+                    {
+                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId);
+                    }
+
+                    var result = await plateGroups.FirstOrDefaultAsync();
+
+                    if (result != null)
+                    {
+                        _logger.LogInformation($"alerting for: {result.Id}");
+                        await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
+                    }
                 }
             }
         }

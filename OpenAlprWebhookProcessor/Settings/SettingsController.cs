@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Settings.GetAlerts;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -21,26 +18,18 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly GetIgnoresRequestHandler _getIgnoresRequestHandler;
 
-        private readonly GetAlertsRequestHandler _getAlertsRequestHandler;
-
         private readonly UpsertIgnoresRequestHandler _upsertIgnoresRequestHandler;
-
-        private readonly UpsertAlertsRequestHandler _upsertAlertsRequestHandler;
 
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
-            GetAlertsRequestHandler getAlertsRequestHandler,
-            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
-            UpsertAlertsRequestHandler upsertAlertsRequestHandler)
+            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
             _getIgnoresRequestHandler = getIgnoresRequestHandler;
-            _getAlertsRequestHandler = getAlertsRequestHandler;
             _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
-            _upsertAlertsRequestHandler = upsertAlertsRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -53,24 +42,6 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task UpsertAgent([FromBody] Agent agent)
         {
             await _upsertAgentRequestHandler.HandleAsync(agent);
-        }
-
-        [HttpPost("alerts/add")]
-        public async Task AddAlert([FromBody] Alert alert)
-        {
-            await _upsertAlertsRequestHandler.AddAlertAsync(alert);
-        }
-
-        [HttpPost("alerts")]
-        public async Task UpsertAlerts([FromBody] List<Alert> alerts)
-        {
-            await _upsertAlertsRequestHandler.UpsertAlertsAsync(alerts);
-        }
-
-        [HttpGet("alerts")]
-        public async Task<List<Alert>> GetAlerts(CancellationToken cancellationToken)
-        {
-            return await _getAlertsRequestHandler.HandleAsync(cancellationToken);
         }
 
         [HttpPost("ignores/add")]
