@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     sunriseSunset));
         }
 
-        public static async Task ScheduleDayNightTaskAsync(
+        public static async Task ScheduleDayNightTasksAsync(
             CameraUpdateService cameraUpdateService,
             IServiceProvider serviceProvider,
             IBackgroundJobClient backgroundJobClient)
@@ -37,47 +37,60 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 foreach (var camera in camerasToUpdate)
                 {
-                    var timeZoneOffset = camera.TimezoneOffset ?? agent.TimeZoneOffset;
-                    var latitude = camera.Latitude ?? agent.Latitude;
-                    var longitude = camera.Longitude ?? agent.Longitude;
-                    var sunriseOffset = camera.SunriseOffset ?? agent.SunriseOffset;
-                    var sunsetOffset = camera.SunsetOffset ?? agent.SunsetOffset;
-
-                    var nextSunrise = Celestial.Get_Next_SunRise(
-                        latitude,
-                        longitude,
-                        DateTime.Now,
-                        timeZoneOffset);
-
-                    var nextSunset = Celestial.Get_Next_SunSet(
-                        latitude,
-                        longitude,
-                        DateTime.Now,
-                        timeZoneOffset);
-
-                    var isSunUp = Celestial.CalculateCelestialTimes(
-                        latitude,
-                        longitude,
-                        DateTime.Now,
-                        timeZoneOffset).IsSunUp;
-
-                    var cameraSunriseAt = nextSunrise.AddHours(sunriseOffset);
-                    var cameraSunsetAt = nextSunset.AddHours(sunsetOffset);
-
-                    if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
-                    {
-                        backgroundJobClient.Delete(camera.NextDayNightScheduleId);
-                    }
-
-                    camera.NextDayNightScheduleId = backgroundJobClient.Schedule(
-                        () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
-                            camera.Id,
-                            isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise),
-                            isSunUp ? cameraSunsetAt : cameraSunriseAt);
+                    ScheduleDayNightTask(
+                        cameraUpdateService,
+                        backgroundJobClient,
+                        agent,
+                        camera);
                 }
 
                 await processorContext.SaveChangesAsync();
             }
+        }
+
+        public static void ScheduleDayNightTask(
+            CameraUpdateService cameraUpdateService,
+            IBackgroundJobClient backgroundJobClient,
+            Agent agent,
+            Camera camera)
+        {
+            var timeZoneOffset = camera.TimezoneOffset ?? agent.TimeZoneOffset;
+            var latitude = camera.Latitude ?? agent.Latitude;
+            var longitude = camera.Longitude ?? agent.Longitude;
+            var sunriseOffset = camera.SunriseOffset ?? agent.SunriseOffset;
+            var sunsetOffset = camera.SunsetOffset ?? agent.SunsetOffset;
+
+            var nextSunrise = Celestial.Get_Next_SunRise(
+                latitude,
+                longitude,
+                DateTime.Now,
+                timeZoneOffset);
+
+            var nextSunset = Celestial.Get_Next_SunSet(
+                latitude,
+                longitude,
+                DateTime.Now,
+                timeZoneOffset);
+
+            var isSunUp = Celestial.CalculateCelestialTimes(
+                latitude,
+                longitude,
+                DateTime.Now,
+                timeZoneOffset).IsSunUp;
+
+            var cameraSunriseAt = nextSunrise.AddHours(sunriseOffset);
+            var cameraSunsetAt = nextSunset.AddHours(sunsetOffset);
+
+            if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
+            {
+                backgroundJobClient.Delete(camera.NextDayNightScheduleId);
+            }
+
+            camera.NextDayNightScheduleId = backgroundJobClient.Schedule(
+                () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
+                    camera.Id,
+                    isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise),
+                    isSunUp ? cameraSunsetAt : cameraSunriseAt);
         }
 
         public static bool IsSunUp(

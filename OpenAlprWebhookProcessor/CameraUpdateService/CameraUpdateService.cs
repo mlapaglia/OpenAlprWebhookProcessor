@@ -104,6 +104,17 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     await camera.TriggerDayNightModeAsync(
                         sunriseSunset,
                         _cancellationTokenSource.Token);
+
+                    var agent = await processorContext.Agents.FirstOrDefaultAsync();
+
+                    CameraScheduling.ScheduleDayNightTask(
+                        this,
+                        _backgroundJobClient,
+                        agent,
+                        cameraToUpdate);
+
+                    await processorContext.SaveChangesAsync();
+
                 }
                 catch (Exception ex)
                 {
@@ -118,7 +129,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 await ForceSunriseSunsetAsync();
 
-                await CameraScheduling.ScheduleDayNightTaskAsync(
+                await CameraScheduling.ScheduleDayNightTasksAsync(
                     this,
                     _serviceProvider,
                     _backgroundJobClient);
@@ -138,7 +149,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public async Task ScheduleDayNightTaskAsync()
         {
-            await CameraScheduling.ScheduleDayNightTaskAsync(
+            await CameraScheduling.ScheduleDayNightTasksAsync(
                 this,
                 _serviceProvider,
                 _backgroundJobClient);
