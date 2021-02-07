@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Hangfire.Storage.Monitoring;
+using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,22 +12,41 @@ namespace OpenAlprWebhookProcessor.Cameras
     {
         private readonly ProcessorContext _processorContext;
 
-        public GetCameraRequestHandler(ProcessorContext processorContext)
+        private readonly JobStorage _jobStorage;
+
+        public GetCameraRequestHandler(
+            ProcessorContext processorContext,
+            JobStorage jobStorage)
         {
             _processorContext = processorContext;
+            _jobStorage = jobStorage;
         }
 
         public async Task<List<Camera>> HandleAsync()
         {
             var cameras = new List<Camera>();
 
-            foreach(var camera in await _processorContext.Cameras.ToListAsync())
+            var monitoringApi = _jobStorage.GetMonitoringApi();
+
+            var agent = await _processorContext.Agents.FirstOrDefaultAsync();
+
+            foreach (var camera in await _processorContext.Cameras.ToListAsync())
             {
+                JobDetailsDto nextDayNightCommand = null;
+
+                if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
+                {
+                    nextDayNightCommand = monitoringApi.JobDetails(camera.NextDayNightScheduleId);
+                }
+
                 cameras.Add(new Camera()
                 {
                     Id = camera.Id,
                     CameraPassword = camera.CameraPassword,
                     CameraUsername = camera.CameraUsername,
+                    DayNightModeUrl = camera.UpdateDayNightModeUrl,
+                    DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
+                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera, nextDayNightCommand?.History[0]?.Data["EnqueueAt"]),
                     Latitude = camera.Latitude,
                     Longitude = camera.Longitude,
                     Manufacturer = camera.Manufacturer,
@@ -32,14 +54,12 @@ namespace OpenAlprWebhookProcessor.Cameras
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
                     PlatesSeen = camera.PlatesSeen,
-                    UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
-                    UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
-                    DayNightModeUrl = camera.UpdateDayNightModeUrl,
-                    DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
                     SampleImageUrl = await CreateSampleImageUrlAsync(camera.LatestProcessedPlateUuid),
                     SunriseOffset = camera.SunriseOffset,
                     SunsetOffset = camera.SunsetOffset,
                     TimezoneOffset = camera.TimezoneOffset,
+                    UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
+                    UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
                 });
             }
 
@@ -56,6 +76,20 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
 
             return Flurl.Url.Combine($"/images/{imageUuid}.jpg");
+        }
+
+        private DateTimeOffset? GetNextScheduledExecutionDate(
+            Agent agent,
+            Data.Camera camera,
+            string dateToEnqueueAt)
+        {
+            if (dateToEnqueueAt == null)
+            {
+                return null;
+            }
+
+            return DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(dateToEnqueueAt))
+                .AddHours(camera.TimezoneOffset ?? agent.TimeZoneOffset);
         }
     }
 }

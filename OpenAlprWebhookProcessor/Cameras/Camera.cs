@@ -44,5 +44,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         public int? SunriseOffset { get; set; }
 
         public double? TimezoneOffset { get; set; }
+
+        public DateTimeOffset? DayNightNextScheduledCommand { get; set; }
     }
 }

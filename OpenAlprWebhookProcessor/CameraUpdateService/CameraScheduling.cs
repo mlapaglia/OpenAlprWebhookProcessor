@@ -46,19 +46,19 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     var nextSunrise = Celestial.Get_Next_SunRise(
                         latitude,
                         longitude,
-                        DateTime.UtcNow,
+                        DateTime.Now,
                         timeZoneOffset);
 
                     var nextSunset = Celestial.Get_Next_SunSet(
                         latitude,
                         longitude,
-                        DateTime.UtcNow,
+                        DateTime.Now,
                         timeZoneOffset);
 
                     var isSunUp = Celestial.CalculateCelestialTimes(
                         latitude,
                         longitude,
-                        DateTime.UtcNow,
+                        DateTime.Now,
                         timeZoneOffset).IsSunUp;
 
                     var cameraSunriseAt = nextSunrise.AddHours(sunriseOffset);

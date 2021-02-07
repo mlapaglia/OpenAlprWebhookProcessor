@@ -12,6 +12,7 @@ export class Camera {
     updateOverlayTextUrl: string;
     dayNightModeEnabled: boolean;
     dayNightModeUrl: string;
+    dayNightNextScheduledCommand: Date;
     sunriseOffset: number;
     sunsetOffset: number;
     platesSeen: number;
