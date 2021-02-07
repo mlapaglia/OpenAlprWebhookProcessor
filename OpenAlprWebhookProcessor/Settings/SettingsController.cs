@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Settings.DeleteCamera;
 using OpenAlprWebhookProcessor.Settings.GetAlerts;
-using OpenAlprWebhookProcessor.Settings.GetCameras;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
-using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using System;
 using System.Collections.Generic;
@@ -18,14 +15,6 @@ namespace OpenAlprWebhookProcessor.Settings
     [Route("settings")]
     public class SettingsController : ControllerBase
     {
-        private readonly GetCameraRequestHandler _getCameraHandler;
-
-        private readonly DeleteCameraHandler _deleteCameraHandler;
-
-        private readonly UpsertCameraHandler _upsertCameraHandler;
-
-        private readonly TestCameraHandler _testCameraHandler;
-
         private readonly GetAgentRequestHandler _getAgentRequestHandler;
 
         private readonly UpsertAgentRequestHandler _upsertAgentRequestHandler;
@@ -39,10 +28,6 @@ namespace OpenAlprWebhookProcessor.Settings
         private readonly UpsertAlertsRequestHandler _upsertAlertsRequestHandler;
 
         public SettingsController(
-            GetCameraRequestHandler getCameraHandler,
-            DeleteCameraHandler deleteCameraHandler,
-            UpsertCameraHandler upsertCameraHandler,
-            TestCameraHandler testCameraHandler,
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
@@ -50,42 +35,12 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
             UpsertAlertsRequestHandler upsertAlertsRequestHandler)
         {
-            _deleteCameraHandler = deleteCameraHandler;
-            _getCameraHandler = getCameraHandler;
-            _upsertCameraHandler = upsertCameraHandler;
-            _testCameraHandler = testCameraHandler;
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
             _getIgnoresRequestHandler = getIgnoresRequestHandler;
             _getAlertsRequestHandler = getAlertsRequestHandler;
             _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
             _upsertAlertsRequestHandler = upsertAlertsRequestHandler;
-        }
-
-        [HttpGet("cameras")]
-        public async Task<List<Camera>> GetCameras()
-        {
-            return await _getCameraHandler.HandleAsync();
-        }
-
-        [HttpPost("camera")]
-        public async Task UpsertCamera([FromBody] Camera camera)
-        {
-            await _upsertCameraHandler.UpsertCameraAsync(camera);
-        }
-
-        [HttpPost("cameras/{cameraId}/delete")]
-        public async Task DeleteCamera(Guid cameraId)
-        {
-            await _deleteCameraHandler.HandleAsync(cameraId);
-        }
-
-        [HttpPost("cameras/{cameraId}/test")]
-        public IActionResult TestCamera(Guid cameraId)
-        {
-            _testCameraHandler.SendTestCameraOverlay(cameraId);
-
-            return Ok();
         }
 
         [HttpGet("agent")]

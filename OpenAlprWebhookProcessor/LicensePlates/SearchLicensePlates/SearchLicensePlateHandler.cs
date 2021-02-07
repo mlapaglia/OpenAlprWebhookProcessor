@@ -24,15 +24,19 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
             if (!string.IsNullOrWhiteSpace(request.PlateNumber))
             {
+                request.PlateNumber = request.PlateNumber
+                    .Trim()
+                    .ToLower();
+
                 if (request.StrictMatch)
                 {
-                    dbRequest = dbRequest.Where(x => x.BestNumber.Contains(request.PlateNumber));
+                    dbRequest = dbRequest.Where(x => x.BestNumber.ToLower().Contains(request.PlateNumber));
                 }
                 else
                 {
                     dbRequest = dbRequest.Where(x =>
-                        x.BestNumber.Contains(request.PlateNumber)
-                        || x.PossibleNumbers.Contains(request.PlateNumber));
+                        x.BestNumber.ToLower().Contains(request.PlateNumber)
+                        || x.PossibleNumbers.ToLower().Contains(request.PlateNumber));
                 }
             }
 

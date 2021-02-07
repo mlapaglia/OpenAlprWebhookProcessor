@@ -2,7 +2,7 @@
 using OpenAlprWebhookProcessor.Data;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.GetCameras
+namespace OpenAlprWebhookProcessor.Settings
 {
     public class UpsertAgentRequestHandler
     {

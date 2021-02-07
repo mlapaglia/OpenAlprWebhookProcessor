@@ -1,6 +1,5 @@
 using AutoMapper;
 using Hangfire;
-using Hangfire.SQLite;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,14 +12,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
+using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
-using OpenAlprWebhookProcessor.Settings.DeleteCamera;
+using OpenAlprWebhookProcessor.Settings;
 using OpenAlprWebhookProcessor.Settings.GetAlerts;
-using OpenAlprWebhookProcessor.Settings.GetCameras;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
-using OpenAlprWebhookProcessor.Settings.TestCamera;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Users;
 using OpenAlprWebhookProcessor.Users.Data;
@@ -38,8 +36,6 @@ namespace OpenAlprWebhookProcessor
         private const string UsersContextConnectionString = "Data Source=config/users.db";
 
         private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
-
-        private const string HangfireContextConnectionString = "Data Source=config/hangfire.db;";
 
         public Startup(IConfiguration configuration)
         {
@@ -169,7 +165,7 @@ namespace OpenAlprWebhookProcessor
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSQLiteStorage(HangfireContextConnectionString, new SQLiteStorageOptions()));
+                .UseInMemoryStorage());
 
             services.AddHangfireServer();
         }

@@ -10,6 +10,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public static class CameraScheduling
     {
+        public static void ExecuteSingleDayNightTask(
+            SunriseSunset sunriseSunset,
+            Guid cameraId,
+            CameraUpdateService cameraUpdateService,
+            IBackgroundJobClient backgroundJobClient)
+        {
+            backgroundJobClient.Enqueue(
+                () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
+                    cameraId,
+                    sunriseSunset));
+        }
+
         public static async Task ScheduleDayNightTaskAsync(
             CameraUpdateService cameraUpdateService,
             IServiceProvider serviceProvider,

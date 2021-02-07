@@ -3,7 +3,7 @@ using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.DeleteCamera
+namespace OpenAlprWebhookProcessor.Cameras
 {
     public class DeleteCameraHandler
     {

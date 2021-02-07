@@ -66,9 +66,4 @@ export class CamerasComponent implements OnInit {
   public editCamera($event: string) {
     this.openEditDialog($event);
   }
-
-  public testCamera($event: string) {
-    this.settingsService.testCamera($event).subscribe(result => {
-    });
-  }
 }

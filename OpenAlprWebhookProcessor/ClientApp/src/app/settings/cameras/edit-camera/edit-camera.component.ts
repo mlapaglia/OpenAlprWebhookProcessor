@@ -1,7 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Camera } from '../camera';
+import { EditCameraService } from './edit-camera.service';
 
 @Component({
   selector: 'app-edit-camera',
@@ -29,9 +32,29 @@ export class EditCameraComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<EditCameraComponent>,
+    private snackBarService: SnackbarService,
+    private editCameraService: EditCameraService,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
     this.camera = this.data.camera;
+  }
+
+  public triggerDayMode() {
+    this.editCameraService.triggerDayMode(this.camera.id).subscribe(result => {
+      this.snackBarService.create("day mode test sent successfully", SnackBarType.Info);
+    });
+  }
+
+  public triggerNightMode() {
+    this.editCameraService.triggerNightMode(this.camera.id).subscribe(result => {
+      this.snackBarService.create("night mode test sent successfully", SnackBarType.Info);
+    });
+  }
+
+  public testOverlay() {
+    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(result => {
+      this.snackBarService.create("overlay test sent successfully", SnackBarType.Info);
+    });
   }
 }

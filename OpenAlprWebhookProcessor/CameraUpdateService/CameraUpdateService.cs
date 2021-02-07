@@ -139,9 +139,20 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         public async Task ScheduleDayNightTaskAsync()
         {
             await CameraScheduling.ScheduleDayNightTaskAsync(
-            this,
-            _serviceProvider,
-            _backgroundJobClient);
+                this,
+                _serviceProvider,
+                _backgroundJobClient);
+        }
+
+        public void EnqueueDayNight(
+            Guid cameraId,
+            SunriseSunset sunriseSunset)
+        {
+            CameraScheduling.ExecuteSingleDayNightTask(
+                sunriseSunset,
+                cameraId,
+                this,
+                _backgroundJobClient);
         }
 
         public void ScheduleOverlayRequest(CameraUpdateRequest cameraUpdateRequest)
@@ -177,10 +188,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                        () => ClearExpiredOverlayAsync(cameraUpdateRequest.Id),
                        TimeSpan.FromSeconds(5));
 
-                    cameraToUpdate.PlatesSeen++;
-                    cameraToUpdate.LatestProcessedPlateUuid = cameraUpdateRequest.LicensePlateImageUuid;
-
-                    await processorContext.SaveChangesAsync();
+                    if (!cameraUpdateRequest.IsTest)
+                    {
+                        cameraToUpdate.PlatesSeen++;
+                        cameraToUpdate.LatestProcessedPlateUuid = cameraUpdateRequest.LicensePlateImageUuid;
+                        await processorContext.SaveChangesAsync();
+                    }
                 }
                 catch (Exception ex)
                 {

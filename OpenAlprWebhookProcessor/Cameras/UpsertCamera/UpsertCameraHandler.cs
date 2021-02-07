@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
+namespace OpenAlprWebhookProcessor.Cameras
 {
     public class UpsertCameraHandler
     {
