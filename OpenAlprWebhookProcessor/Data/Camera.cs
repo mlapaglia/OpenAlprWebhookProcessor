@@ -31,6 +31,8 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string NextDayNightScheduleId { get; set; }
 
+        public string NextClearOverlayScheduleId { get; set; }
+
         public bool UpdateDayNightModeEnabled { get; set; }
 
         public string LatestProcessedPlateUuid { get; set; }

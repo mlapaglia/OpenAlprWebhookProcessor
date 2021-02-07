@@ -167,7 +167,10 @@ namespace OpenAlprWebhookProcessor
                 .UseRecommendedSerializerSettings()
                 .UseInMemoryStorage());
 
-            services.AddHangfireServer();
+            services.AddHangfireServer(options =>
+            {
+                options.SchedulePollingInterval = TimeSpan.Zero;
+            });
         }
 
         public void Configure(

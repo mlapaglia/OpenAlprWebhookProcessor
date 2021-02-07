@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Cameras

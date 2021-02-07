@@ -22,7 +22,7 @@ export class SettingsService {
   }
 
   upsertCamera(camera: Camera) {
-    return this.http.post(`camera`, camera);
+    return this.http.post(`cameras`, camera);
   }
 
   upsertAgent(agent: Agent) {

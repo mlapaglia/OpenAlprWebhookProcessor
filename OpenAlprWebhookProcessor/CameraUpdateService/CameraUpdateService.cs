@@ -178,13 +178,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         throw new ArgumentException($"unknown camera Id: {cameraUpdateRequest.Id}");
                     }
 
+                    if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextClearOverlayScheduleId))
+                    {
+                        _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
+                    }
+
                     var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
                     await camera.SetCameraTextAsync(
                         cameraUpdateRequest,
                         _cancellationTokenSource.Token);
 
-                    _backgroundJobClient.Schedule(
+                    cameraToUpdate.NextClearOverlayScheduleId = _backgroundJobClient.Schedule(
                        () => ClearExpiredOverlayAsync(cameraUpdateRequest.Id),
                        TimeSpan.FromSeconds(5));
 
@@ -192,8 +197,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     {
                         cameraToUpdate.PlatesSeen++;
                         cameraToUpdate.LatestProcessedPlateUuid = cameraUpdateRequest.LicensePlateImageUuid;
-                        await processorContext.SaveChangesAsync();
                     }
+
+                    await processorContext.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
@@ -216,6 +222,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 await camera.ClearCameraTextAsync(
                     _cancellationTokenSource.Token);
+
+                cameraToUpdate.NextClearOverlayScheduleId = string.Empty;
+
+                await processorContext.SaveChangesAsync();
             }
         }
 
@@ -233,7 +243,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     await camera.ClearCameraTextAsync(
                         _cancellationTokenSource.Token);
+
+                    cameraToUpdate.NextClearOverlayScheduleId = string.Empty;
                 }
+
+                await processorContext.SaveChangesAsync();
             }
         }
     }
