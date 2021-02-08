@@ -46,7 +46,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     CameraUsername = camera.CameraUsername,
                     DayNightModeUrl = camera.UpdateDayNightModeUrl,
                     DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
-                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera, nextDayNightCommand?.History[0]?.Data["EnqueueAt"]),
+                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera, nextDayNightCommand),
                     Latitude = camera.Latitude,
                     Longitude = camera.Longitude,
                     Manufacturer = camera.Manufacturer,
@@ -81,14 +81,14 @@ namespace OpenAlprWebhookProcessor.Cameras
         private DateTimeOffset? GetNextScheduledExecutionDate(
             Agent agent,
             Data.Camera camera,
-            string dateToEnqueueAt)
+            JobDetailsDto dateToEnqueueAt)
         {
-            if (dateToEnqueueAt == null)
+            if (dateToEnqueueAt == null || dateToEnqueueAt?.History[0]?.Data["EnqueueAt"] == null)
             {
                 return null;
             }
 
-            return DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(dateToEnqueueAt))
+            return DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(dateToEnqueueAt.History[0].Data["EnqueueAt"]))
                 .AddHours(camera.TimezoneOffset ?? agent.TimeZoneOffset);
         }
     }
