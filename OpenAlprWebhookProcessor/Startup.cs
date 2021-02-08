@@ -169,7 +169,7 @@ namespace OpenAlprWebhookProcessor
 
             services.AddHangfireServer(options =>
             {
-                options.SchedulePollingInterval = TimeSpan.Zero;
+                options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
             });
         }
 

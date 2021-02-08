@@ -83,7 +83,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             Data.Camera camera,
             JobDetailsDto dateToEnqueueAt)
         {
-            if (dateToEnqueueAt == null || dateToEnqueueAt?.History[0]?.Data["EnqueueAt"] == null)
+            if (dateToEnqueueAt == null || !dateToEnqueueAt.History[0].Data.ContainsKey("EnqueueAt"))
             {
                 return null;
             }
