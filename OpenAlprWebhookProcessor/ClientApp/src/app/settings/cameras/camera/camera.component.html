@@ -1,4 +1,4 @@
-<mat-card class="example-card" *ngIf="camera.openAlprCameraId">
+<mat-card class="example-card" *ngIf="camera.id">
     <mat-card-header>
       <div mat-card-avatar class="example-header-image"></div>
       <mat-card-title>{{camera.openAlprName}}</mat-card-title>
@@ -33,7 +33,7 @@
         <button mat-button (click)="removeCamera()" color="warn">Remove</button>
     </mat-card-actions>
 </mat-card>
-<mat-card class="example-card" *ngIf="!camera.openAlprCameraId">
+<mat-card class="example-card" *ngIf="!camera.id">
     <mat-card-header fxLayoutAlign="center">
         <mat-card-title>Add new camera</mat-card-title>
     </mat-card-header>
