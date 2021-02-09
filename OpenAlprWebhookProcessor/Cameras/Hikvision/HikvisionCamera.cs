@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         public HikvisionCamera(Data.Camera camera)
         {
             _camera = camera;
-            _httpClient = CreateHttpClient();
+            _httpClient = GetHttpClient();
         }
 
         public async Task ClearCameraTextAsync(
@@ -142,7 +142,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
         }
 
-        private HttpClient CreateHttpClient()
+        private HttpClient GetHttpClient()
         {
             return new HttpClient(new HttpClientHandler()
             {
@@ -167,7 +167,11 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var result = await _httpClient.GetAsync(
+                $"http://{_camera.IpAddress}/ISAPI/Streaming/channels/1/picture",
+                cancellationToken);
+
+            return await result.Content.ReadAsStreamAsync(cancellationToken);
         }
     }
 }

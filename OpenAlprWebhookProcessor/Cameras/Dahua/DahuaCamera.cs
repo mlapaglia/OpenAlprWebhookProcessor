@@ -90,9 +90,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            var httpClient = GetHttpClient();
-
-            var result = await httpClient.GetAsync(
+            var result = await _httpClient.GetAsync(
                 $"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi",
                 cancellationToken);
 
