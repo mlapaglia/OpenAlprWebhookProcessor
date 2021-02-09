@@ -6,12 +6,23 @@
     </mat-card-header>
     <mat-card-content>
         <div style="height:200px;" fxLayoutAlign="center">
+            <div [hidden]="!isLoadingImage">
+                <mat-progress-spinner
+                    style="margin-top: 50%;"
+                    color="primary"
+                    mode="indeterminate">
+                </mat-progress-spinner>
+            </div>
             <img
-                mat-card-image class="sample-image"
+                mat-card-image
+                class="sample-image"
                 src="{{camera.sampleImageUrl}}"
                 *ngIf="camera.sampleImageUrl"
+                [hidden]="isLoadingImage || isLoadingFailed"
+                (load)="imageLoaded()"
+                (error)="imageFailedToLoad()"
                 alt="last capture from camera">
-            <div *ngIf="!camera.sampleImageUrl" class="sample-image">
+            <div *ngIf="!camera.sampleImageUrl || isLoadingFailed" class="sample-image">
                 <mat-icon
                     style="font-size: 100px;"
                     [inline]="true"

@@ -26,6 +26,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';;
 import { SnackbarComponent } from './snackbar/snackbar.component'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
     imports: [
@@ -48,13 +49,14 @@ import { SnackbarComponent } from './snackbar/snackbar.component'
         MatCheckboxModule,
         MatDividerModule,
         MatSlideToggleModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatProgressSpinnerModule
     ],
     declarations: [
         AppComponent,
         AlertComponent,
         HomeComponent,
-        FastSearchComponent,
+        FastSearchComponent,
         SnackbarComponent
     ],
     providers: [

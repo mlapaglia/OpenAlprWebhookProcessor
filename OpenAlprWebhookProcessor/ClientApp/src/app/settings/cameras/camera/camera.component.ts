@@ -13,9 +13,15 @@ export class CameraComponent implements OnInit {
   @Output() delete: EventEmitter<string> = new EventEmitter();
   @Output() test: EventEmitter<string> = new EventEmitter();
 
+  public isLoadingImage: boolean = true;
+  public isLoadingFailed: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {
+    if (!this.camera.sampleImageUrl) {
+      this.isLoadingImage = false;
+    }
   }
 
   public addCamera() {
@@ -32,5 +38,14 @@ export class CameraComponent implements OnInit {
 
   public testCamera() {
     this.test.emit(this.camera.id);
+  }
+
+  public imageLoaded() {
+    this.isLoadingImage = false;
+  }
+
+  public imageFailedToLoad() {
+    this.isLoadingImage = false;
+    this.isLoadingFailed = true;
   }
 }

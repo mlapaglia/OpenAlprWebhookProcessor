@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.AgentImageRelay.GetImage
+namespace OpenAlprWebhookProcessor.ImageRelay
 {
     public class GetImageHandler
     {

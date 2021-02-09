@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.AgentImageRelay.SnapshotRelay
+namespace OpenAlprWebhookProcessor.ImageRelay
 {
     public class GetSnapshotHandler
     {
