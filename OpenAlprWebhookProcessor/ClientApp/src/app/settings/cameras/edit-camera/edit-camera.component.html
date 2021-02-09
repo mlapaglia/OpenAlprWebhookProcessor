@@ -76,7 +76,6 @@
         <mat-label>Camera Day/Night Mode Url</mat-label>
         <input matInput [(ngModel)]="camera.dayNightModeUrl">
       </mat-form-field>
-      <span>Next Scheduled Day/Night Toggle: {{camera.dayNightNextScheduledCommand}}</span>
     </mat-dialog-content>
     <div mat-dialog-actions align="left">
       <button mat-raised-button cdkFocusInitial [disabled]="camera.dayNightModeUrl == ''" (click)="triggerNightMode()">Trigger Night Mode</button>

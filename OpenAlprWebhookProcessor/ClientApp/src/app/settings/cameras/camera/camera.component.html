@@ -41,7 +41,13 @@
             </div>
         </div>
         <div *ngIf="camera.dayNightModeEnabled">
-            <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
+            <div>
+                <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
+            </div>
+            <div>
+                <b>Next Day/Night Toggle:</b> {{camera.dayNightNextScheduledCommand | date:"medium"}}
+            </div>
+            
         </div>
     </mat-card-content>
     <mat-card-actions align="end" style="margin: auto 0 0;">
@@ -55,7 +61,11 @@
     </mat-card-header>
     <mat-card-content fxLayoutAlign="center">
         <div style="height:200px;" fxLayoutAlign="center">
-            <mat-icon (click)="addCamera()" color="primary" style="font-size: 100px; cursor: pointer; margin: 50%;" [inline]="true">add_box</mat-icon>
+            <mat-icon
+                (click)="addCamera()"
+                color="primary"
+                style="font-size: 100px; cursor: pointer; margin: 50%;"
+                [inline]="true">add_box</mat-icon>
         </div>
     </mat-card-content>
 </mat-card>
