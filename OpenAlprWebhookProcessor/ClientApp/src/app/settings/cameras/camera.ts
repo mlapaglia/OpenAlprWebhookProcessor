@@ -2,6 +2,7 @@ export class Camera {
     id: string;
     latitude: number;
     longitude: number;
+    ipAddress: string;
     manufacturer: Manufacturer;
     modelNumber: string;
     openAlprName: string;

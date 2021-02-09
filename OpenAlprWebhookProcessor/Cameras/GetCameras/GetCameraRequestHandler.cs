@@ -47,6 +47,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     DayNightModeUrl = camera.UpdateDayNightModeUrl,
                     DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
                     DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera, nextDayNightCommand),
+                    IpAddress = camera.IpAddress,
                     Latitude = camera.Latitude,
                     Longitude = camera.Longitude,
                     Manufacturer = camera.Manufacturer,
@@ -54,7 +55,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
                     PlatesSeen = camera.PlatesSeen,
-                    SampleImageUrl = await CreateSampleImageUrlAsync(camera.LatestProcessedPlateUuid),
+                    SampleImageUrl = await CreateSampleImageUrlAsync(camera),
                     SunriseOffset = camera.SunriseOffset,
                     SunsetOffset = camera.SunsetOffset,
                     TimezoneOffset = camera.TimezoneOffset,
@@ -66,16 +67,24 @@ namespace OpenAlprWebhookProcessor.Cameras
             return cameras;
         }
 
-        private async Task<string> CreateSampleImageUrlAsync(string imageUuid)
+        private async Task<string> CreateSampleImageUrlAsync(
+            Data.Camera camera)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync();
-
-            if (string.IsNullOrEmpty(imageUuid) || string.IsNullOrEmpty(agent.EndpointUrl))
+            if (camera.UpdateOverlayEnabled)
             {
-                return null;
-            }
+                var agent = await _processorContext.Agents.FirstOrDefaultAsync();
 
-            return Flurl.Url.Combine($"/images/{imageUuid}.jpg");
+                if (string.IsNullOrEmpty(camera.LatestProcessedPlateUuid) || string.IsNullOrEmpty(agent.EndpointUrl))
+                {
+                    return null;
+                }
+
+                return Flurl.Url.Combine($"/images/{camera.LatestProcessedPlateUuid}.jpg");
+            }
+            else
+            {
+                return Flurl.Url.Combine($"/images/{camera.Id}/snapshot.jpg");
+            }
         }
 
         private DateTimeOffset? GetNextScheduledExecutionDate(

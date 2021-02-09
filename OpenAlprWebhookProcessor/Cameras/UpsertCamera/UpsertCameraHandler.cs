@@ -30,6 +30,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     Id = camera.Id,
                     CameraPassword = camera.CameraPassword,
                     CameraUsername = camera.CameraUsername,
+                    IpAddress = camera.IpAddress,
                     Latitude = camera.Latitude,
                     Longitude = camera.Longitude,
                     Manufacturer = camera.Manufacturer,
@@ -50,6 +51,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             {
                 existingCamera.CameraPassword = camera.CameraPassword;
                 existingCamera.CameraUsername = camera.CameraUsername;
+                existingCamera.IpAddress = camera.IpAddress;
                 existingCamera.Latitude = camera.Latitude;
                 existingCamera.Longitude = camera.Longitude;
                 existingCamera.Manufacturer = camera.Manufacturer;

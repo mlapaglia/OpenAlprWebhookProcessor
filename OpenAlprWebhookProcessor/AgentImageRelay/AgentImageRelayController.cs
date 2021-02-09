@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
+using OpenAlprWebhookProcessor.AgentImageRelay.SnapshotRelay;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,9 +16,14 @@ namespace OpenAlprWebhookProcessor.AgentImageRelay
     {
         private readonly GetImageHandler _getImageHandler;
 
-        public AgentImageRelayController(GetImageHandler getImageHandler)
+        private readonly GetSnapshotHandler _getSnapshotHandler;
+
+        public AgentImageRelayController(
+            GetImageHandler getImageHandler,
+            GetSnapshotHandler getSnapshotHandler)
         {
             _getImageHandler = getImageHandler;
+            _getSnapshotHandler = getSnapshotHandler;
         }
 
         [HttpGet("{imageId}")]
@@ -40,6 +44,17 @@ namespace OpenAlprWebhookProcessor.AgentImageRelay
             CancellationToken cancellationToken)
         {
             return await _getImageHandler.GetCropImageFromAgentAsync($"{imageId}?x1={x1}&x2={x2}&y1={y1}&y2={y2}", cancellationToken);
+        }
+
+
+        [HttpGet("{cameraId}/snapshot.jpg")]
+        public async Task<Stream> GetSnapshot(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _getSnapshotHandler.GetSnapshotAsync(
+                cameraId,
+                cancellationToken);
         }
     }
 }

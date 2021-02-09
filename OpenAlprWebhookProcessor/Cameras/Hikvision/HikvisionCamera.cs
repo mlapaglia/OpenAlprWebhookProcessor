@@ -164,5 +164,10 @@ namespace OpenAlprWebhookProcessor.Cameras
                 },
             };
         }
+
+        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

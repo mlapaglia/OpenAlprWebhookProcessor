@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.AgentImageRelay.GetImage;
+using OpenAlprWebhookProcessor.AgentImageRelay.SnapshotRelay;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
@@ -136,6 +137,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<SearchLicensePlateHandler>();
             services.AddScoped<GetImageHandler>();
             services.AddScoped<UpsertAlertsRequestHandler>();
+            services.AddScoped<GetSnapshotHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

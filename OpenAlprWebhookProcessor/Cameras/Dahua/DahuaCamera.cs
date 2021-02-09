@@ -1,5 +1,6 @@
 ﻿using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -85,6 +86,17 @@ namespace OpenAlprWebhookProcessor.Cameras
                 _camera.CameraUsername,
                 _camera.CameraPassword),
             });
+        }
+
+        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
+        {
+            var httpClient = GetHttpClient();
+
+            var result = await httpClient.GetAsync(
+                $"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi",
+                cancellationToken);
+
+            return await result.Content.ReadAsStreamAsync(cancellationToken);
         }
     }
 }

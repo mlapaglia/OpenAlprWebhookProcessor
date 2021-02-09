@@ -1,7 +1,7 @@
 <mat-card class="example-card" *ngIf="camera.id">
     <mat-card-header>
       <div mat-card-avatar class="example-header-image"></div>
-      <mat-card-title>{{camera.openAlprName}}</mat-card-title>
+      <mat-card-title>{{camera.ipAddress}}</mat-card-title>
       <mat-card-subtitle>{{camera.manufacturer}} {{camera.modelNumber}}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
@@ -21,14 +21,19 @@
         <div>
             <b>Camera Manufacturer: </b> {{camera.manufacturer}}
         </div>
-        <div>
-            <b>Plates Seen:</b> {{camera.platesSeen}}
+        <div *ngIf="camera.updateOverlayEnabled">
+            <div>
+                <b>OpenALPR Name:</b> {{camera.openAlprName}}
+            </div>
+            <div>
+                <b>Plates Seen:</b> {{camera.platesSeen}}
+            </div>
         </div>
-        <div>
+        <div *ngIf="camera.dayNightModeEnabled">
             <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
         </div>
     </mat-card-content>
-    <mat-card-actions align="end">
+    <mat-card-actions align="end" style="margin: auto 0 0;">
         <button mat-button (click)="editCamera()">Edit</button>
         <button mat-button (click)="removeCamera()" color="warn">Remove</button>
     </mat-card-actions>
