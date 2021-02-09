@@ -45,7 +45,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         }
 
 
-        [HttpGet("{cameraId}/snapshot")]
+        [HttpGet("{cameraId}/snapshot.jpg")]
         public async Task<Stream> GetSnapshot(
             Guid cameraId,
             CancellationToken cancellationToken)
