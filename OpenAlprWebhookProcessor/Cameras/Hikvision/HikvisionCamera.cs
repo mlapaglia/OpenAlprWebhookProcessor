@@ -114,6 +114,17 @@ namespace OpenAlprWebhookProcessor.Cameras
             SunriseSunset sunriseSunset,
             CancellationToken cancellationToken)
         {
+            var body = new StringContent($"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>");
+            
+            var response = await _httpClient.PostAsync(
+                $"{_camera.UpdateDayNightModeUrl}/ISAPI/Image/channels/1",
+                body,
+                cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("unable to set sunrise/sunset: " + await response.Content.ReadAsStringAsync(cancellationToken));
+            }
         }
 
         private async Task PushCameraTextAsync(
