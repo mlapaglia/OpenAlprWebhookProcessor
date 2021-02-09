@@ -21,6 +21,7 @@ export class SignalrService {
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('/processorhub')
+      .withAutomaticReconnect()
       .build();
 
     this.hubConnection
@@ -42,14 +43,28 @@ export class SignalrService {
       this.hubConnection.on('LicensePlateAlerted', (plateNumber) => {
         this.snackbarService.create(`Alert! Plate Number: ${plateNumber}`, SnackBarType.Alert);
       });
+
+      this.hubConnection.onreconnected(() => {
+        console.log("Connection reconnected");
+        this.snackbarService.create(`Reconnected to server!`, SnackBarType.Connected);
+      });
+
+      this.hubConnection.onreconnecting(() => {
+        console.log("Connection reconnecting");
+        this.snackbarService.create(`Reconnecting to server...`, SnackBarType.Disconnected);
+      })
+
+      this.hubConnection.onclose(() => {
+        console.log("Connection ended");
+        this.snackbarService.create(`Connection lost`, SnackBarType.Disconnected);
+      });
   }
 
   public stopConnection() {
     this.hubConnection
       .stop()
       .then(() => {
-        console.log("Connection ended");
-        this.snackbarService.create(`Connection lost`, SnackBarType.Disconnected);
+        this.snackbarService.create(`Connection closed`, SnackBarType.Disconnected);
       });
   }
 }
