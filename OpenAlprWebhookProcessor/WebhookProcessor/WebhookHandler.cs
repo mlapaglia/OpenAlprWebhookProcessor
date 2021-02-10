@@ -50,24 +50,30 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 throw new ArgumentException("unknown camera, skipping");
             }
 
-            var updateRequest = new CameraUpdateRequest()
-            {
-                LicensePlateImageUuid = webhook.Group.BestUuid,
-                LicensePlate = webhook.Group.BestPlateNumber,
-                LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
-                Id = camera.Id,
-                OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
-                ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
-                IsAlert = webhook.DataType == "alpr_alert",
-                AlertDescription = webhook.Description,
-            };
+            string vehicleDescription = null;
 
             if (webhook.Group.Vehicle != null)
             {
-                updateRequest.VehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
+                vehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             }
 
-            _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
+            if (camera.UpdateOverlayEnabled)
+            {
+                var updateRequest = new CameraUpdateRequest()
+                {
+                    LicensePlateImageUuid = webhook.Group.BestUuid,
+                    LicensePlate = webhook.Group.BestPlateNumber,
+                    LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
+                    Id = camera.Id,
+                    OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
+                    ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                    IsAlert = webhook.DataType == "alpr_alert",
+                    AlertDescription = webhook.Description,
+                    VehicleDescription = vehicleDescription,
+                };
+
+                _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
+            }
 
             var plateGroup = new PlateGroup()
             {
@@ -83,7 +89,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 Jpeg = webhook.Group.BestPlate.PlateCropJpeg,
                 Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                 ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                VehicleDescription = updateRequest.VehicleDescription,
+                VehicleDescription = vehicleDescription,
             };
 
             _processorContext.PlateGroups.Add(plateGroup);
@@ -92,17 +98,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             _logger.LogInformation("plate saved successfully");
 
-            await _processorHub.Clients.All.LicensePlateRecorded(updateRequest.LicensePlate);
+            await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
 
             var alert = await _processorContext.Alerts
-                .Where(x => x.PlateNumber == updateRequest.LicensePlate)
+                .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber)
                 .FirstOrDefaultAsync();
 
             if (alert != null)
             {
                 var alertUpdateRequest = new AlertUpdateRequest()
                 {
-                    CameraId = updateRequest.Id,
+                    CameraId = camera.Id,
                     Description = alert.Description,
                     LicensePlateId = plateGroup.Id,
                     IsStrictMatch = alert.IsStrictMatch,
@@ -110,7 +116,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                 _alertService.AddJob(alertUpdateRequest);
             }
-            
         }
 
         private static string FormatLicensePlateXyCoordinates(List<Coordinate> coordinates)
