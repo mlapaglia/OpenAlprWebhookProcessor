@@ -97,8 +97,9 @@ namespace OpenAlprWebhookProcessor.Cameras
                 return null;
             }
 
-            return DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(dateToEnqueueAt.History[0].Data["EnqueueAt"]))
-                .AddMinutes(camera.TimezoneOffset ?? agent.TimeZoneOffset);
+            return DateTimeOffset.FromUnixTimeMilliseconds(
+                Convert.ToInt64(dateToEnqueueAt.History[0].Data["EnqueueAt"]))
+                .ToOffset(TimeSpan.FromHours(camera.TimezoneOffset ?? agent.TimeZoneOffset));
         }
     }
 }

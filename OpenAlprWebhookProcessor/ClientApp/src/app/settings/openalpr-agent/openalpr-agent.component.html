@@ -47,21 +47,21 @@
         <input matInput [(ngModel)]="agent.longitude" placeholder="87.6359">
     </mat-form-field>
     <mat-form-field fxFlex="40">
-        <mat-label>Sunset Minutes Offset (+/-)</mat-label>
+        <mat-label>Sunset Offset (minutes +/-)</mat-label>
         <mat-icon 
-            matTooltip="Default sunset offsets to turn camera to night mode ahead of the actual sunset (-1 is an hour before)"
+            matTooltip="Default sunset offsets to turn camera to night mode ahead of the actual sunset (-60 is an hour before)"
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.sunsetOffset">
       </mat-form-field>
       <mat-form-field fxFlex="40">
-        <mat-label>Sunrise Minutes Offset (+/-)</mat-label>
+        <mat-label>Sunrise Offset (minutes +/-)</mat-label>
         <mat-icon 
-            matTooltip="Default sunrise offsets to turn camera to day mode after of the actual sunrise (1 is an hour after"
+            matTooltip="Default sunrise offsets to turn camera to day mode after of the actual sunrise (60 is an hour after"
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.sunriseOffset">
       </mat-form-field>
       <mat-form-field fxFlex="40">
-        <mat-label>Timezone Offset (+/-)</mat-label>
+        <mat-label>Timezone Offset (hours +/-)</mat-label>
         <mat-icon 
             matTooltip="Default timezone offset to use for calculating sunset/sunrise (EST is -5)"
             style="cursor:default" matSuffix>help_center</mat-icon>
