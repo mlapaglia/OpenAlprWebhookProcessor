@@ -78,8 +78,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 DateTime.Now,
                 timeZoneOffset).IsSunUp;
 
-            var cameraSunriseAt = nextSunrise.AddHours(sunriseOffset);
-            var cameraSunsetAt = nextSunset.AddHours(sunsetOffset);
+            var cameraSunriseAt = nextSunrise.AddMinutes(sunriseOffset);
+            var cameraSunsetAt = nextSunset.AddMinutes(sunsetOffset);
 
             if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
             {
