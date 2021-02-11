@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService
@@ -36,7 +37,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 var agent = await processorContext.Agents.FirstOrDefaultAsync();
 
-                foreach (var camera in camerasToUpdate)
+                foreach (var camera in camerasToUpdate.Where(x => x.UpdateOverlayEnabled))
                 {
                     ScheduleDayNightTask(
                         cameraUpdateService,
