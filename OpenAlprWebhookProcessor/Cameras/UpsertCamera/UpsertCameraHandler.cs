@@ -36,6 +36,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     Manufacturer = camera.Manufacturer,
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
+                    OpenAlprEnabled = camera.OpenAlprEnabled,
                     UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
                     UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
                     UpdateDayNightModeUrl = camera.DayNightModeUrl,
@@ -58,6 +59,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                 existingCamera.ModelNumber = camera.ModelNumber;
                 existingCamera.OpenAlprCameraId = camera.OpenAlprCameraId;
                 existingCamera.OpenAlprName = camera.OpenAlprName;
+                existingCamera.OpenAlprEnabled = camera.OpenAlprEnabled;
                 existingCamera.UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl;
                 existingCamera.UpdateOverlayEnabled = camera.UpdateOverlayEnabled;
                 existingCamera.UpdateDayNightModeUrl = camera.DayNightModeUrl;

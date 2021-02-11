@@ -25,8 +25,8 @@
       <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
     </mat-form-field>
   </mat-dialog-content>
-  <h2 mat-dialog-title>Overlays<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.updateOverlayEnabled"></mat-slide-toggle></h2>
-  <div *ngIf="camera.updateOverlayEnabled" [@inOutAnimation]>
+  <h2 mat-dialog-title>OpenALPR Integration<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.openAlprEnabled"></mat-slide-toggle></h2>
+  <div *ngIf="camera.openAlprEnabled" [@inOutAnimation]>
     <mat-dialog-content
       fxLayout="row wrap"
       fxLayoutGap=20px>
@@ -38,6 +38,13 @@
         <mat-label>OpenALPR Id</mat-label>
         <input type="number" matInput [(ngModel)]="camera.openAlprCameraId" required>
       </mat-form-field>
+    </mat-dialog-content>
+  </div>
+  <h2 mat-dialog-title style="padding-top:40px;">Overlays<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.updateOverlayEnabled"></mat-slide-toggle></h2>
+  <div *ngIf="camera.updateOverlayEnabled" [@inOutAnimation]>
+    <mat-dialog-content
+      fxLayout="row wrap"
+      fxLayoutGap=20px>
       <mat-form-field fxFlex="100" appearance="outline">
         <mat-label>Camera Overlay Text Url</mat-label>
         <input matInput [(ngModel)]="camera.updateOverlayTextUrl" required>

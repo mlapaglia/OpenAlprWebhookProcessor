@@ -50,6 +50,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 throw new ArgumentException("unknown camera, skipping");
             }
 
+            if (!camera.OpenAlprEnabled)
+            {
+                throw new ArgumentException("camera has OpenALPR integration disabled, skipping");
+            }
+
             string vehicleDescription = null;
 
             if (webhook.Group.Vehicle != null)

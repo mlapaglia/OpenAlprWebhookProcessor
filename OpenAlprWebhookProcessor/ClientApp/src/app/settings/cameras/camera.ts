@@ -14,6 +14,7 @@ export class Camera {
     dayNightModeEnabled: boolean;
     dayNightModeUrl: string;
     dayNightNextScheduledCommand: Date;
+    openAlprEnabled: boolean;
     sunriseOffset: number;
     sunsetOffset: number;
     platesSeen: number;

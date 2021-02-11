@@ -46,5 +46,7 @@ namespace OpenAlprWebhookProcessor.Data
         public double? TimezoneOffset { get; set; }
 
         public string IpAddress { get; set; }
+
+        public bool OpenAlprEnabled { get; set; }
     }
 }

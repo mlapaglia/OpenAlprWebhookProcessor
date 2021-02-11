@@ -54,6 +54,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     ModelNumber = camera.ModelNumber,
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
+                    OpenAlprEnabled = camera.OpenAlprEnabled,
                     PlatesSeen = camera.PlatesSeen,
                     SampleImageUrl = await CreateSampleImageUrlAsync(camera),
                     SunriseOffset = camera.SunriseOffset,
