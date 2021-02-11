@@ -37,7 +37,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 var agent = await processorContext.Agents.FirstOrDefaultAsync();
 
-                foreach (var camera in camerasToUpdate.Where(x => x.UpdateOverlayEnabled))
+                foreach (var camera in camerasToUpdate.Where(x => x.UpdateDayNightModeEnabled))
                 {
                     ScheduleDayNightTask(
                         cameraUpdateService,
