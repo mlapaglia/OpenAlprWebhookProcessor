@@ -51,7 +51,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         camera.Id,
                         CameraScheduling.IsSunUp(
                             agent.Latitude,
-                            agent.Longitude) ? SunriseSunset.Sunrise : SunriseSunset.Sunset));
+                            agent.Longitude) ? SunriseSunset.Sunrise : SunriseSunset.Sunset,
+                        false));
                 }
             }
         }
@@ -83,7 +84,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public async Task ProcessSunriseSunsetJobAsync(
             Guid cameraId,
-            SunriseSunset sunriseSunset)
+            SunriseSunset sunriseSunset,
+            bool scheduleNextJob)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -105,16 +107,20 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         sunriseSunset,
                         _cancellationTokenSource.Token);
 
-                    var agent = await processorContext.Agents.FirstOrDefaultAsync();
+                    if (scheduleNextJob)
+                    {
+                        _logger.LogInformation($"Scheduling next job for {cameraId}");
 
-                    CameraScheduling.ScheduleDayNightTask(
-                        this,
-                        _backgroundJobClient,
-                        agent,
-                        cameraToUpdate);
+                        var agent = await processorContext.Agents.FirstOrDefaultAsync();
 
-                    await processorContext.SaveChangesAsync();
+                        CameraScheduling.ScheduleDayNightTask(
+                            this,
+                            _backgroundJobClient,
+                            agent,
+                            cameraToUpdate);
 
+                        await processorContext.SaveChangesAsync();
+                    }
                 }
                 catch (Exception ex)
                 {

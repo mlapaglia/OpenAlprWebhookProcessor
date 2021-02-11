@@ -19,7 +19,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             backgroundJobClient.Enqueue(
                 () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
                     cameraId,
-                    sunriseSunset));
+                    sunriseSunset,
+                    false));
         }
 
         public static async Task ScheduleDayNightTasksAsync(
@@ -89,8 +90,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             camera.NextDayNightScheduleId = backgroundJobClient.Schedule(
                 () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
                     camera.Id,
-                    isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise),
-                    isSunUp ? cameraSunsetAt : cameraSunriseAt);
+                    isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
+                    true),
+                isSunUp ? cameraSunsetAt : cameraSunriseAt);
         }
 
         public static bool IsSunUp(
