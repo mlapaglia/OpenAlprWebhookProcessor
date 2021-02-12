@@ -1,0 +1,51 @@
+<div style="margin: 15px;">
+    <table mat-table [dataSource]="alerts" multiTemplateDataRows class="mat-elevation-z8" style="width:50%">
+      <ng-container matColumnDef="plateNumber">
+        <th mat-header-cell *matHeaderCellDef>Plate Number</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput [(ngModel)]="element.plateNumber" required>
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="matchType">
+        <th mat-header-cell *matHeaderCellDef>Match Type</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <mat-select matInput [(ngModel)]="element.strictMatch" required>
+              <mat-option [value]="true">Strict</mat-option>
+              <mat-option [value]="false">Lenient</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput [(ngModel)]="element.description">
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="warn" (click)="deleteAlert(element)">Delete</button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
+      <tr mat-row *matRowDef="let element; columns: rowsToDisplay;"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElement === element"
+          (click)="expandedElement = expandedElement === element ? null : element">
+      </tr>
+    </table>
+  </div>
+  <div style="margin: 15px;">
+    <button mat-raised-button color="primary" (click)="addAlert()" style="margin: 15px;">Add</button>
+    <button mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveAlerts()">Save</button>
+  </div>

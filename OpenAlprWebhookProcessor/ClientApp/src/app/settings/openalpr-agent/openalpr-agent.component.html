@@ -1,0 +1,71 @@
+<div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px *ngIf="agent">
+    <mat-form-field fxFlex="80">
+        <mat-label>Endpoint Url</mat-label>
+        <input matInput [(ngModel)]="agent.endpointUrl" placeholder="http(s)://x.x.x.x:yyyy">
+        <mat-icon matTooltip="The URL used to reach the Watchman Agent" style="cursor:default" matSuffix>help_center</mat-icon>
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>Hostname</mat-label>
+        <input matInput maxlength="12" #hostnameInput [(ngModel)]="agent.hostname" placeholder="56ygf6e34879">
+        <mat-icon matTooltip="From the OpenALPR web server agent configuration page" style="cursor:default" matSuffix>help_center</mat-icon>
+        <mat-hint align="end">{{hostnameInput.value?.length || 0}}/12</mat-hint>
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>Uid</mat-label>
+        <input matInput [(ngModel)]="agent.uid" maxlength="40" #uidInput placeholder="U8HGWA66CW58AV9Q7YB4JJ749CV7WXNQLLNIBT4N">
+        <mat-icon matTooltip="From the OpenALPR web server agent configuration page" style="cursor:default" matSuffix>help_center</mat-icon>
+        <mat-hint align="end">{{uidInput.value?.length || 0}}/40</mat-hint>
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>OpenAlpr Web Server API Key</mat-label>
+        <mat-icon matTooltip="From the OpenALPR user profile configuration page (top right corner of site)" style="cursor:default" matSuffix>help_center</mat-icon>
+        <input matInput [(ngModel)]="agent.openAlprWebServerApiKey" #apiKeyInput maxlength="40" placeholder="U8HGWA66CW58AV9Q7YB4JJ749CV7WXNQLLNIBT4N">
+        <mat-hint align="end">{{apiKeyInput.value?.length || 0}}/40</mat-hint>
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>OpenAlpr Web Server Url</mat-label>
+        <mat-icon matTooltip="The URL used to reach the OpenALPR server. Usually just https://cloud.openalpr.com" style="cursor:default" matSuffix>help_center</mat-icon>
+        <input matInput [(ngModel)]="agent.openAlprWebServerUrl" placeholder="https://cloud.openalpr.com/">
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>Version</mat-label>
+        <mat-icon matTooltip="The version of the Watchman Agent running" style="cursor:default" matSuffix>help_center</mat-icon>
+        <input matInput [(ngModel)]="agent.version" placeholder="2.8.101">
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>Latitude</mat-label>
+        <mat-icon 
+            matTooltip="GPS coordinates of the agent installation, used as the default value for calculating sunrise and sunset times"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input matInput [(ngModel)]="agent.latitude" placeholder="41.8789">
+    </mat-form-field>
+    <mat-form-field fxFlex="80">
+        <mat-label>Longitude</mat-label>
+        <mat-icon 
+            matTooltip="GPS coordinates of the agent installation, used as the default value for calculating sunrise and sunset times"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input matInput [(ngModel)]="agent.longitude" placeholder="87.6359">
+    </mat-form-field>
+    <mat-form-field fxFlex="40">
+        <mat-label>Sunset Offset (minutes +/-)</mat-label>
+        <mat-icon 
+            matTooltip="Default sunset offsets to turn camera to night mode ahead of the actual sunset (-60 is an hour before)"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input type="number" matInput [(ngModel)]="agent.sunsetOffset">
+      </mat-form-field>
+      <mat-form-field fxFlex="40">
+        <mat-label>Sunrise Offset (minutes +/-)</mat-label>
+        <mat-icon 
+            matTooltip="Default sunrise offsets to turn camera to day mode after of the actual sunrise (60 is an hour after"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input type="number" matInput [(ngModel)]="agent.sunriseOffset">
+      </mat-form-field>
+      <mat-form-field fxFlex="40">
+        <mat-label>Timezone Offset (hours +/-)</mat-label>
+        <mat-icon 
+            matTooltip="Default timezone offset to use for calculating sunset/sunrise (EST is -5)"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
+      </mat-form-field>
+    <button mat-raised-button color="primary" fxFlex="80" [disabled]="isSaving" (click)="saveAgent()">Save</button>
+</div>
