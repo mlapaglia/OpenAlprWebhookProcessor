@@ -14,6 +14,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
         public bool FilterIgnoredPlates { get; set; }
 
+        public bool RegexSearchEnabled { get; set; }
+
         public int PageNumber { get; set; }
 
         public int PageSize { get; set; }

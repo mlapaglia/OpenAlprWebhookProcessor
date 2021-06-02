@@ -61,6 +61,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterEndOn: Date;
   public filterStrictMatch: boolean;
   public filterIgnoredPlates: boolean;
+  public regexSearchEnabled: boolean;
 
   public addingToIgnoreList: boolean;
 
@@ -132,6 +133,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.plateNumber = this.filterPlateNumber;
     request.strictMatch = this.filterStrictMatch;
     request.filterIgnoredPlates = this.filterIgnoredPlates;
+    request.regexSearchEnabled = this.regexSearchEnabled;
 
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
@@ -145,6 +147,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterPlateNumber = '';
     this.filterStrictMatch = false;
     this.filterIgnoredPlates = false;
+    this.regexSearchEnabled = false;
 
     this.searchPlates();
   }

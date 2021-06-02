@@ -2,6 +2,7 @@
 using OpenAlprWebhookProcessor.Data;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -69,6 +70,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                             || !x.PossibleNumbers.Contains(plateToIgnore.PlateNumber));
                     }
                 }
+            }
+
+            if (request.RegexSearchEnabled)
+            {
+                dbRequest = dbRequest.Where(x => Regex.IsMatch(x.BestNumber, request.PlateNumber));
             }
 
             var totalCount = await dbRequest.CountAsync(cancellationToken);

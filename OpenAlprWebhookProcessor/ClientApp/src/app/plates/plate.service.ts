@@ -31,6 +31,7 @@ export class PlateRequest {
     endSearchOn: Date;
     strictMatch: boolean;
     filterIgnoredPlates: boolean;
+    regexSearchEnabled: boolean
     pageNumber: number;
     pageSize: number;
 }
