@@ -33,6 +33,10 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 {
                     dbRequest = dbRequest.Where(x => x.BestNumber.Contains(request.PlateNumber));
                 }
+                else if (request.RegexSearchEnabled)
+                {
+                    dbRequest = dbRequest.Where(x => Regex.IsMatch(x.BestNumber, request.PlateNumber));
+                }
                 else
                 {
                     dbRequest = dbRequest.Where(x =>
@@ -70,11 +74,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                             || !x.PossibleNumbers.Contains(plateToIgnore.PlateNumber));
                     }
                 }
-            }
-
-            if (request.RegexSearchEnabled)
-            {
-                dbRequest = dbRequest.Where(x => Regex.IsMatch(x.BestNumber, request.PlateNumber));
             }
 
             var totalCount = await dbRequest.CountAsync(cancellationToken);
