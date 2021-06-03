@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { DayCount, DayCounts } from "./plateCountResponse";
+import { DayCounts } from "./plateCountResponse";
 
 @Injectable({ providedIn: 'root' })
 export class HomeService {

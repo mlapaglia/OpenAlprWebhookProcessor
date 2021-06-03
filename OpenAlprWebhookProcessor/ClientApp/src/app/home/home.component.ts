@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
     ngOnInit() {
         this.homeService.getPlatesCount().subscribe(result => {
             this.plateCounts = [];
-            
+
             result.counts.forEach(x => {
                 this.plateCounts.push(
                 {
@@ -39,12 +39,4 @@ export class HomeComponent implements OnInit {
     xAxisLabel = 'Date';
     showYAxisLabel = true;
     yAxisLabel = 'Plates Seen';
-
-    colorScheme = {
-        domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
-    };
-
-    onSelect(event) {
-        console.log(event);
-      }
 }
