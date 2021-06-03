@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +14,14 @@ namespace OpenAlprWebhookProcessor.LicensePlates
     {
         private readonly SearchLicensePlateHandler _searchLicensePlateHandler;
 
-        public LicensePlatesController(SearchLicensePlateHandler searchLicensePlateHandler)
+        private readonly GetLicensePlateCountsHandler _getLicensePlateCountsHandler;
+
+        public LicensePlatesController(
+            SearchLicensePlateHandler searchLicensePlateHandler,
+            GetLicensePlateCountsHandler getLicensePlateCountsHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
+            _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
         }
 
         [HttpPost("search")]
@@ -24,6 +30,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             CancellationToken cancellationToken)
         {
             return await _searchLicensePlateHandler.HandleAsync(
+                request,
+                cancellationToken);
+        }
+        
+        [HttpGet("counts")]
+        public async Task<GetLicensePlateCountsResponse> GetLicensePlateCounts(CancellationToken cancellationToken)
+        {
+            var request = new GetLicensePlateCountsRequest();
+
+            return await _getLicensePlateCountsHandler.HandleAsync(
                 request,
                 cancellationToken);
         }
