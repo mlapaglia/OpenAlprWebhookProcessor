@@ -16,6 +16,7 @@ using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.ImageRelay;
+using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using OpenAlprWebhookProcessor.Settings;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
@@ -137,6 +138,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetImageHandler>();
             services.AddScoped<UpsertAlertsRequestHandler>();
             services.AddScoped<GetSnapshotHandler>();
+            services.AddScoped<GetLicensePlateCountsHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

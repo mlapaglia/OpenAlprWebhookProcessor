@@ -27,6 +27,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';;
 import { SnackbarComponent } from './snackbar/snackbar.component'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
     imports: [
@@ -50,7 +51,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         MatDividerModule,
         MatSlideToggleModule,
         MatSnackBarModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        NgxChartsModule
     ],
     declarations: [
         AppComponent,

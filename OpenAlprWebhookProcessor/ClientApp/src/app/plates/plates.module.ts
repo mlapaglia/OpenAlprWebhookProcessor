@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { MatDividerModule } from '@angular/material/divider';
     FormsModule,
     MatCheckboxModule,
     MatDividerModule,
+    NgxChartsModule
   ]
 })
 export class PlatesModule { }
