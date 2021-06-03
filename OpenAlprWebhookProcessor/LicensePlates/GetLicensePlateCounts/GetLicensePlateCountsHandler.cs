@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts
             GetLicensePlateCountsRequest request,
             CancellationToken cancellationToken)
         {
-            var aWeekAgo = DateTimeOffset.UtcNow.AddDays(-365).ToUnixTimeMilliseconds();
+            var aWeekAgo = DateTimeOffset.UtcNow.AddDays(7).ToUnixTimeMilliseconds();
 
             var results = await _processerContext.PlateGroups
                 .Where(x => x.ReceivedOnEpoch > aWeekAgo)
