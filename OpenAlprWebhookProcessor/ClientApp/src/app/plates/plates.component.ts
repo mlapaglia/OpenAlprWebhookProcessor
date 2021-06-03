@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Ignore } from '@app/settings/ignores/ignore/ignore';
@@ -12,6 +12,7 @@ import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 @Component({
   selector: 'app-plates',
@@ -57,10 +58,14 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public totalNumberOfPlates: number;
 
   public filterPlateNumber: string;
+  public filterPlateNumberIsValid: boolean = true;
   public filterStartOn: Date;
   public filterEndOn: Date;
   public filterStrictMatch: boolean;
+  public filterStrictMatchEnabled: boolean = true;
   public filterIgnoredPlates: boolean;
+  public filterIgnoredPlatesEnabled: boolean = true;
+  public regexSearchEnabled: boolean;
 
   public addingToIgnoreList: boolean;
 
@@ -97,7 +102,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public subscribeForUpdates() {
     this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
-      this.searchPlates();
+        this.searchPlates();
     }));
   }
 
@@ -121,6 +126,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public searchPlates(plateNumber: string = '') {
     var request = new PlateRequest();
 
+    if (!this.filterPlateNumberIsValid) {
+      return;
+    }
+
     if (plateNumber !== '') {
       this.filterPlateNumber = plateNumber;
     }
@@ -132,6 +141,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.plateNumber = this.filterPlateNumber;
     request.strictMatch = this.filterStrictMatch;
     request.filterIgnoredPlates = this.filterIgnoredPlates;
+    request.regexSearchEnabled = this.regexSearchEnabled;
 
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
@@ -143,8 +153,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterEndOn = null;
     this.filterStartOn = null;
     this.filterPlateNumber = '';
+    this.filterPlateNumberIsValid = true;
     this.filterStrictMatch = false;
+    this.filterStrictMatchEnabled = true;
     this.filterIgnoredPlates = false;
+    this.filterIgnoredPlatesEnabled = true;
+    this.regexSearchEnabled = false;
 
     this.searchPlates();
   }
@@ -161,5 +175,45 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.addingToIgnoreList = false;
       this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
     });
+  }
+
+  public validateSearchPlateNumber() {
+    if (this.filterPlateNumber == '') {
+      this.filterPlateNumberIsValid = true;
+    }
+
+    if (this.regexSearchEnabled) {
+      try {
+        new RegExp(this.filterPlateNumber);
+        this.filterPlateNumberIsValid = true;
+      }
+      catch {
+        this.filterPlateNumberIsValid = false;
+      }
+    }
+    else {
+      this.filterPlateNumberIsValid = true;
+    }
+  }
+
+  public regexSearchToggled() {
+    if (this.regexSearchEnabled) {
+      this.filterStrictMatch = false;
+      this.filterStrictMatchEnabled = false;
+      this.filterIgnoredPlates = false;
+      this.filterIgnoredPlatesEnabled = false;
+    }
+    else {
+      this.filterStrictMatchEnabled = true;
+      this.filterIgnoredPlatesEnabled = true;
+    }
+    this.validateSearchPlateNumber();
+  }
+}
+
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }
 }

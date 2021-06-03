@@ -2,6 +2,7 @@
 using OpenAlprWebhookProcessor.Data;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,6 +32,10 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 if (request.StrictMatch)
                 {
                     dbRequest = dbRequest.Where(x => x.BestNumber.Contains(request.PlateNumber));
+                }
+                else if (request.RegexSearchEnabled)
+                {
+                    dbRequest = dbRequest.Where(x => Regex.IsMatch(x.BestNumber, request.PlateNumber));
                 }
                 else
                 {

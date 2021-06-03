@@ -359,7 +359,7 @@ namespace OpenAlprWebhookProcessor.Users
             return true;
         }
 
-        private string GenerateJwtSecretKey(int keyLength)
+        private static string GenerateJwtSecretKey(int keyLength)
         {
             RNGCryptoServiceProvider rngCryptoServiceProvider = new RNGCryptoServiceProvider();
             byte[] randomBytes = new byte[keyLength];
