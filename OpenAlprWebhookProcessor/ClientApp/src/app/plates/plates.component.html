@@ -64,31 +64,46 @@
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
-          <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-          <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Plate Number</mat-label>
-          <input matInput [(ngModel)]="filterPlateNumber" (keyup.enter)="searchPlates()" placeholder="LRN2DRV">
+          <input matInput
+            [(ngModel)]="filterPlateNumber"
+            (keyup.enter)="searchPlates()"
+            (input)="validateSearchPlateNumber()"
+            placeholder="LRN2DRV" />
         </mat-form-field>
-        <mat-divider></mat-divider>
+        <mat-error *ngIf="!filterPlateNumberIsValid && regexSearchEnabled">Invalid regex pattern</mat-error>
+        <mat-error *ngIf="!filterPlateNumberIsValid && !regexSearchEnabled">Invalid search term</mat-error>
         <div style="padding-top:10px;">
           <ul class="options-list">
             <li>
-              <mat-checkbox color="primary" [(ngModel)]="filterIgnoredPlates">Include Ignored Plates</mat-checkbox>
+              <mat-checkbox 
+                color="primary"
+                [(ngModel)]="filterIgnoredPlates"
+                [disabled]="!filterIgnoredPlatesEnabled">Include Ignored Plates</mat-checkbox>
             </li>
             <li>
-              <mat-checkbox color="primary" [(ngModel)]="regexSearchEnabled">Regex Search</mat-checkbox>
+              <mat-checkbox
+                color="primary"
+                (change)="regexSearchToggled()"
+                [(ngModel)]="regexSearchEnabled">Regex Search</mat-checkbox>
             </li>
             <li>
-              <mat-checkbox color="primary" [(ngModel)]="filterStrictMatch">Lenient Matches</mat-checkbox>
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="filterStrictMatch"
+                [disabled]="!filterStrictMatchEnabled">Lenient Matches</mat-checkbox>
             </li>
           </ul>
         </div>
 
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="searchPlates()">Apply</button>
+        <button mat-raised-button
+          color="primary"
+          [disabled]="!this.filterPlateNumberIsValid"
+          (click)="searchPlates()">Apply</button>
         <button mat-raised-button color="warn" (click)="clearFilters()">Clear</button>
       </mat-card-actions>
     </mat-card>
