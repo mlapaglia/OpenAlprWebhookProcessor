@@ -20,6 +20,10 @@
 				<span>Ignores</span>
 				<mat-icon mat-list-icon>alarm_off</mat-icon>
 			</mat-list-item>
+			<mat-list-item (click)="openSettings('forwards')">
+				<span>Webhook Forwards</span>
+				<mat-icon mat-list-icon>forward_to_inbox</mat-icon>
+			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
 
@@ -29,6 +33,7 @@
 		<app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
 		<app-ignores *ngIf="visibleSetting == 'ignore'"></app-ignores>
 		<app-alerts *ngIf="visibleSetting == 'alert'"></app-alerts>
+		<app-forwards *ngIf="visibleSetting == 'forwards'"></app-forwards>
 	</mat-sidenav-content>
 
 </mat-sidenav-container>

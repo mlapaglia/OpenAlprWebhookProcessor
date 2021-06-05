@@ -28,6 +28,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ForwardsComponent } from './forwards/forwards.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     AlertsComponent,
     IgnoresComponent,
     IgnoreComponent,
+    ForwardsComponent,
   ],
   imports: [
     CommonModule,
@@ -64,6 +67,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatNativeDateModule,
     FlexLayoutModule,
     MatSlideToggleModule,
+    MatCheckboxModule,
   ]
 })
 export class SettingsModule { }

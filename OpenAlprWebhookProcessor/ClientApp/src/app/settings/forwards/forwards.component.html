@@ -1,0 +1,36 @@
+<div style="margin: 15px;">
+    <table mat-table [dataSource]="forwards" multiTemplateDataRows class="mat-elevation-z8" style="width:50%">
+      <ng-container matColumnDef="destination">
+        <th mat-header-cell *matHeaderCellDef>Destination</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput [(ngModel)]="element.destination" required>
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="ignoreSslErrors">
+        <th mat-header-cell *matHeaderCellDef>Ignore Ssl Errors</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.ignoreSslErrors"></mat-checkbox>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="warn" (click)="deleteForward(element)">Delete</button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
+      <tr mat-row *matRowDef="let element; columns: rowsToDisplay;"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElement === element">
+      </tr>
+    </table>
+  </div>
+  <div style="margin: 15px;">
+    <button mat-raised-button color="primary" (click)="addForward()" style="margin: 15px;">Add</button>
+    <button mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveForwards()">Save</button>
+  </div>

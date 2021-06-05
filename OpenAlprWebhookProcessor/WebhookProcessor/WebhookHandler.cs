@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -39,11 +40,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _alertService = alertService;
         }
 
-        public async Task HandleWebhookAsync(Webhook webhook)
+        public async Task HandleWebhookAsync(
+            Webhook webhook,
+            CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras
                 .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (camera == null)
             {
@@ -99,7 +102,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             _processorContext.PlateGroups.Add(plateGroup);
 
-            await _processorContext.SaveChangesAsync();
+            await _processorContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("plate saved successfully");
 
@@ -107,7 +110,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             var alert = await _processorContext.Alerts
                 .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (alert != null)
             {
@@ -120,6 +123,24 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 };
 
                 _alertService.AddJob(alertUpdateRequest);
+            }
+
+            var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+
+            foreach (var forward in forwards)
+            {
+                try
+                {
+                    await WebhookForwarder.ForwardWebhookAsync(
+                        webhook,
+                        forward.FowardingDestination,
+                        forward.IgnoreSslErrors,
+                        cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                }
             }
         }
 
