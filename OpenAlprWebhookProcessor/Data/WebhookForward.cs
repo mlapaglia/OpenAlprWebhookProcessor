@@ -9,5 +9,11 @@ namespace OpenAlprWebhookProcessor.Data
         public Uri FowardingDestination { get; set; }
 
         public bool IgnoreSslErrors { get; set; }
+
+        public bool ForwardSinglePlates { get; set; }
+
+        public bool ForwardGroupPreviews { get; set; }
+
+        public bool ForwardGroups { get; set; }
     }
 }

@@ -14,7 +14,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class WebhookHandler
+    public class GroupWebhookHandler
     {
         private readonly ILogger _logger;
 
@@ -26,8 +26,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly AlertService _alertService;
 
-        public WebhookHandler(
-            ILogger<WebhookHandler> logger,
+        public GroupWebhookHandler(
+            ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
@@ -132,17 +132,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             foreach (var forward in forwards)
             {
-                try
+                if (forward.ForwardGroups || (forward.ForwardGroupPreviews && webhook.Group.IsPreview))
                 {
-                    await WebhookForwarder.ForwardWebhookAsync(
-                        webhook,
-                        forward.FowardingDestination,
-                        forward.IgnoreSslErrors,
-                        cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                    try
+                    {
+                        await WebhookForwarder.ForwardWebhookAsync(
+                            webhook,
+                            forward.FowardingDestination,
+                            forward.IgnoreSslErrors,
+                            cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                    }
                 }
             }
         }

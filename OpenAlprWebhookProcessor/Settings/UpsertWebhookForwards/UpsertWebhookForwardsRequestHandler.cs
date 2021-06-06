@@ -27,12 +27,15 @@ namespace OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards
 
             var forwardsToUpdate = dbForwards.Where(x => webhookForwards.Any(p2 => p2.Id == x.Id));
 
-            foreach (var alertToUpdate in forwardsToUpdate)
+            foreach (var forwardToUpdate in forwardsToUpdate)
             {
-                var updatedAlert = webhookForwards.First(x => x.Id == alertToUpdate.Id);
+                var updatedForward = webhookForwards.First(x => x.Id == forwardToUpdate.Id);
 
-                alertToUpdate.FowardingDestination = updatedAlert.Destination;
-                alertToUpdate.IgnoreSslErrors = updatedAlert.IgnoreSslErrors;
+                forwardToUpdate.FowardingDestination = updatedForward.Destination;
+                forwardToUpdate.IgnoreSslErrors = updatedForward.IgnoreSslErrors;
+                forwardToUpdate.ForwardGroupPreviews = updatedForward.ForwardGroupPreviews;
+                forwardToUpdate.ForwardSinglePlates = updatedForward.ForwardSinglePlates;
+                forwardToUpdate.ForwardGroups = updatedForward.ForwardGroups;
             }
 
             var alertsToAdd = webhookForwards.Where(x => !dbForwards.Any(p2 => p2.Id == x.Id));
@@ -43,6 +46,9 @@ namespace OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards
                 {
                     FowardingDestination = alertToAdd.Destination,
                     IgnoreSslErrors = alertToAdd.IgnoreSslErrors,
+                    ForwardGroupPreviews = alertToAdd.ForwardGroupPreviews,
+                    ForwardGroups = alertToAdd.ForwardGroups,
+                    ForwardSinglePlates = alertToAdd.ForwardSinglePlates,
                 };
 
                 _processorContext.WebhookForwards.Add(addedForward);
