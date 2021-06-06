@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -25,7 +26,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post()
+        public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
@@ -51,7 +52,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                 _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
 
-                await _webhookHandler.HandleWebhookAsync(webhook);
+                await _webhookHandler.HandleWebhookAsync(
+                    webhook,
+                    cancellationToken);
             }
 
             return Ok();

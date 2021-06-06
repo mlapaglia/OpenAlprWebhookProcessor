@@ -18,5 +18,7 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<Ignore> Ignores { get; set; }
 
         public DbSet<Alert> Alerts { get; set; }
+
+        public DbSet<WebhookForward> WebhookForwards { get; set; }
     }
 }

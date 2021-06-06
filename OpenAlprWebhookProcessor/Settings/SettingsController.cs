@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
+using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -20,16 +22,24 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly UpsertIgnoresRequestHandler _upsertIgnoresRequestHandler;
 
+        private readonly GetWebhookForwardsRequestHandler _getWebhookForwardsRequestHandler;
+
+        private readonly UpsertWebhookForwardsRequestHandler _upsertWebhookForwardsRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
-            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler)
+            UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
+            GetWebhookForwardsRequestHandler getWebhookForwardsRequestHandler,
+            UpsertWebhookForwardsRequestHandler upsertWebhookForwardsRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
             _getIgnoresRequestHandler = getIgnoresRequestHandler;
             _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
+            _getWebhookForwardsRequestHandler = getWebhookForwardsRequestHandler;
+            _upsertWebhookForwardsRequestHandler = upsertWebhookForwardsRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -60,6 +70,18 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task<List<Ignore>> GetIgnores()
         {
             return await _getIgnoresRequestHandler.HandleAsync();
+        }
+
+        [HttpGet("forwards")]
+        public async Task<List<WebhookForward>> GetForwards(CancellationToken cancellationToken)
+        {
+            return await _getWebhookForwardsRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpPost("forwards")]
+        public async Task UpsertForwards([FromBody] List<WebhookForward> ignores)
+        {
+            await _upsertWebhookForwardsRequestHandler.HandleAsync(ignores);
         }
     }
 }
