@@ -8,6 +8,6 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public Uri? Destination { get; set; }
 
-        public bool IgnoreSslErorrs { get; set; }
+        public bool IgnoreSslErrors { get; set; }
     }
 }

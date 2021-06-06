@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 {
                     Destination = webhook.FowardingDestination,
                     Id = webhook.Id,
-                    IgnoreSslErorrs = webhook.IgnoreSslErrors,
+                    IgnoreSslErrors = webhook.IgnoreSslErrors,
                 };
 
                 forwards.Add(forward);
