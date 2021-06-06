@@ -15,14 +15,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         private readonly ILogger<WebhookController> _logger;
 
-        private readonly GroupWebhookHandler _webhookHandler;
+        private readonly GroupWebhookHandler _groupWebhookHandler;
+
+        private readonly SinglePlateWebhookHandler _singlePlateWebhookHandler;
 
         public WebhookController(
             ILogger<WebhookController> logger,
-            GroupWebhookHandler webhookHandler)
+            GroupWebhookHandler webhookHandler,
+            SinglePlateWebhookHandler singlePlateWebhookHandler)
         {
             _logger = logger;
-            _webhookHandler = webhookHandler;
+            _groupWebhookHandler = webhookHandler;
+            _singlePlateWebhookHandler = singlePlateWebhookHandler;
         }
 
         [HttpPost]
@@ -39,7 +43,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     _logger.LogInformation("parsing alert webhook");
                     var alertGroupResult = JsonSerializer.Deserialize<Webhook>(rawWebhook);
 
-                    await _webhookHandler.HandleWebhookAsync(
+                    await _groupWebhookHandler.HandleWebhookAsync(
                     alertGroupResult,
                     cancellationToken);
                 }
@@ -51,7 +55,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         Group = JsonSerializer.Deserialize<Group>(rawWebhook)
                     };
 
-                    await _webhookHandler.HandleWebhookAsync(
+                    await _groupWebhookHandler.HandleWebhookAsync(
                         groupResult,
                         cancellationToken);
                 }
@@ -59,6 +63,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     _logger.LogInformation("parsing single webhook");
                     var singlePlateResult = JsonSerializer.Deserialize<SinglePlate>(rawWebhook);
+
+                    await _singlePlateWebhookHandler.HandleWebhookAsync(
+                        singlePlateResult,
+                        cancellationToken);
                 }
                 else if (rawWebhook.Contains("openalpr_webhook\": \"test"))
                 {
