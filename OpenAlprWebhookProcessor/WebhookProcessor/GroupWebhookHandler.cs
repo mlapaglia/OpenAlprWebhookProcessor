@@ -14,7 +14,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class WebhookHandler
+    public class GroupWebhookHandler
     {
         private readonly ILogger _logger;
 
@@ -26,8 +26,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly AlertService _alertService;
 
-        public WebhookHandler(
-            ILogger<WebhookHandler> logger,
+        public GroupWebhookHandler(
+            ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,

@@ -14,6 +14,9 @@ export class ForwardsComponent implements OnInit {
 
   public rowsToDisplay = [
     'destination',
+    'forwardSinglePlates',
+    'forwardGroupPreviews',
+    'forwardGroups',
     'ignoreSslErrors',
     'delete',
   ];

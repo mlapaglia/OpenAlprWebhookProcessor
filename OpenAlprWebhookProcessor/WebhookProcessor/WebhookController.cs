@@ -15,11 +15,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         private readonly ILogger<WebhookController> _logger;
 
-        private readonly WebhookHandler _webhookHandler;
+        private readonly GroupWebhookHandler _webhookHandler;
 
         public WebhookController(
             ILogger<WebhookController> logger,
-            WebhookHandler webhookHandler)
+            GroupWebhookHandler webhookHandler)
         {
             _logger = logger;
             _webhookHandler = webhookHandler;
@@ -28,15 +28,37 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
+
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
                 var rawWebhook = await reader.ReadToEndAsync();
 
-                Webhook webhook;
-
                 if (rawWebhook.Contains("alpr_alert"))
                 {
-                    webhook = JsonSerializer.Deserialize<Webhook>(rawWebhook);
+                    _logger.LogInformation("parsing alert webhook");
+                    var alertGroupResult = JsonSerializer.Deserialize<Webhook>(rawWebhook);
+
+                    await _webhookHandler.HandleWebhookAsync(
+                    alertGroupResult,
+                    cancellationToken);
+                }
+                else if (rawWebhook.Contains("alpr_group"))
+                {
+                    _logger.LogInformation("parsing plate group webhook");
+                    var groupResult = new Webhook
+                    {
+                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
+                    };
+
+                    await _webhookHandler.HandleWebhookAsync(
+                        groupResult,
+                        cancellationToken);
+                }
+                else if (rawWebhook.Contains("alpr_results"))
+                {
+                    _logger.LogInformation("parsing single webhook");
+                    var singlePlateResult = JsonSerializer.Deserialize<SinglePlate>(rawWebhook);
                 }
                 else if (rawWebhook.Contains("openalpr_webhook\": \"test"))
                 {
@@ -44,17 +66,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
                 else
                 {
-                    webhook = new Webhook
-                    {
-                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
-                    };
+                    _logger.LogInformation("Unknown payload received, ignoring");
                 }
-
-                _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
-
-                await _webhookHandler.HandleWebhookAsync(
-                    webhook,
-                    cancellationToken);
             }
 
             return Ok();

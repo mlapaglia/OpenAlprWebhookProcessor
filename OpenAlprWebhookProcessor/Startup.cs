@@ -125,7 +125,8 @@ namespace OpenAlprWebhookProcessor
             services.AddDbContext<UsersContext>(options =>
                 options.UseSqlite(UsersContextConnectionString));
 
-            services.AddScoped<WebhookHandler>();
+            services.AddScoped<GroupWebhookHandler>();
+            services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<DeleteCameraHandler>();

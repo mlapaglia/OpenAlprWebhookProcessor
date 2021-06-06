@@ -1,5 +1,4 @@
-﻿using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -10,7 +9,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     public static class WebhookForwarder
     {
         public static async Task ForwardWebhookAsync(
-            Webhook webhook,
+            object webhook,
             Uri forwardUrl,
             bool ignoreSslErrors,
             CancellationToken cancellationToken)

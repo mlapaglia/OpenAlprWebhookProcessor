@@ -8,6 +8,27 @@
           </mat-form-field>
         </td>
       </ng-container>
+
+      <ng-container matColumnDef="forwardSinglePlates">
+        <th mat-header-cell *matHeaderCellDef>Forward Single Plate Webhooks</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.forwardSinglePlates"></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="forwardGroupPreviews">
+        <th mat-header-cell *matHeaderCellDef>Forward Group Preview Webhooks</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.forwardGroupPreviews"></mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="forwardGroups">
+        <th mat-header-cell *matHeaderCellDef>Forward Group Webhooks</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.forwardGroups"></mat-checkbox>
+        </td>
+      </ng-container>
   
       <ng-container matColumnDef="ignoreSslErrors">
         <th mat-header-cell *matHeaderCellDef>Ignore Ssl Errors</th>
