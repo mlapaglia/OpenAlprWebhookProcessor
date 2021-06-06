@@ -132,17 +132,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             foreach (var forward in forwards)
             {
-                try
+                if (forward.ForwardGroups || (forward.ForwardGroupPreviews && webhook.Group.IsPreview))
                 {
-                    await WebhookForwarder.ForwardWebhookAsync(
-                        webhook,
-                        forward.FowardingDestination,
-                        forward.IgnoreSslErrors,
-                        cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                    try
+                    {
+                        await WebhookForwarder.ForwardWebhookAsync(
+                            webhook,
+                            forward.FowardingDestination,
+                            forward.IgnoreSslErrors,
+                            cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                    }
                 }
             }
         }
