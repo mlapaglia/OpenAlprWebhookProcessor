@@ -72,6 +72,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     return Ok("Test successful");
                 }
+                else if (rawWebhook.Contains("heartbeat"))
+                {
+                    _logger.LogInformation("received heartbeat from agent");
+                }
                 else
                 {
                     _logger.LogInformation("Unknown payload received, ignoring");
