@@ -57,6 +57,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     OpenAlprProcessingTimeMs = Math.Round(webhook.ProcessingTimeMs, 2),
                     ProcessedPlateConfidence = Math.Round(webhook.Results[0].Confidence, 2),
                     IsAlert = webhook.DataType == "alpr_alert",
+                    IsSinglePlate = true,
                 };
 
                 _cameraUpdateService.ScheduleOverlayRequest(updateRequest);

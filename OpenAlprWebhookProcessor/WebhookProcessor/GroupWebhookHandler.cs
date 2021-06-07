@@ -76,6 +76,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
                     ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
                     IsAlert = webhook.DataType == "alpr_alert",
+                    IsPreviewGroup = webhook.Group.IsPreview,
                     AlertDescription = webhook.Description,
                     VehicleDescription = vehicleDescription,
                 };
