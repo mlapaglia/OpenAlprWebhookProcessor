@@ -62,8 +62,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         [JsonPropertyName("best_plate")]
         public Plate BestPlate { get; set; }
 
+        [JsonPropertyName("plate_path")]
+        public List<Path> PlatePath { get; set; }
+
         [JsonPropertyName("best_confidence")]
-        public double Plate { get; set; }
+        public double BestConfidence { get; set; }
 
         [JsonPropertyName("best_uuid")]
         public string BestUuid { get; set; }
@@ -84,7 +87,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public int BestImageWidth { get; set; }
 
         [JsonPropertyName("best_image_height")]
-        public int BeightImageHeight { get; set; }
+        public int BestImageHeight { get; set; }
 
         [JsonPropertyName("travel_direction")]
         public double TravelDirection { get; set; }
@@ -97,6 +100,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         [JsonPropertyName("vehicle")]
         public Vehicle Vehicle { get; set; }
+
+        [JsonPropertyName("vehicle_signature")]
+        public string VehicleSignature { get; set; }
 
         [JsonPropertyName("web_server_config")]
         public WebServerConfig WebServerConfig { get; set; }
