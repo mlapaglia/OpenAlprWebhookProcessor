@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,12 +18,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly GetLicensePlateCountsHandler _getLicensePlateCountsHandler;
 
+        private readonly DeleteLicensePlateGroupRequestHandler _deleteLicensePlateGroupHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
-            GetLicensePlateCountsHandler getLicensePlateCountsHandler)
+            GetLicensePlateCountsHandler getLicensePlateCountsHandler,
+            DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
+            _deleteLicensePlateGroupHandler = deleteLicensePlateGroupHandler;
         }
 
         [HttpPost("search")]
@@ -31,6 +37,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         {
             return await _searchLicensePlateHandler.HandleAsync(
                 request,
+                cancellationToken);
+        }
+
+        [HttpDelete("{plateId}")]
+        public async Task DeletePlate(
+            Guid plateId,
+            CancellationToken cancellationToken)
+        {
+            await _deleteLicensePlateGroupHandler.HandleAsync(
+                plateId,
                 cancellationToken);
         }
         

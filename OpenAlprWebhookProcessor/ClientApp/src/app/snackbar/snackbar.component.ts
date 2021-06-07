@@ -24,6 +24,8 @@ export class SnackbarComponent implements OnInit {
         return 'signal_cellular_off';
       case SnackBarType.Saved:
         return 'saved';
+      case SnackBarType.Deleted:
+        return 'delete';
     }
   }
 }

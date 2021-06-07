@@ -16,6 +16,7 @@ using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.ImageRelay;
+using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using OpenAlprWebhookProcessor.Settings;
@@ -141,6 +142,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertAlertsRequestHandler>();
             services.AddScoped<GetSnapshotHandler>();
             services.AddScoped<GetLicensePlateCountsHandler>();
+            services.AddScoped<DeleteLicensePlateGroupRequestHandler>();
             services.AddScoped<GetWebhookForwardsRequestHandler>();
             services.AddScoped<UpsertWebhookForwardsRequestHandler>();
 

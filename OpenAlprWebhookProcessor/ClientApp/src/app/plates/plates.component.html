@@ -33,6 +33,9 @@
             <div class="example-element-description">
               <button mat-raised-button color="primary" [class.spinner]="addingToIgnoreList" [disabled]="element.isIgnore || addingToIgnoreList" (click)="addToIgnoreList(element.plateNumber)">Add to ignore list</button>
             </div>
+            <div class="example-element-description">
+              <button mat-raised-button color="warn" [class.spinner]="deletingPlate" [disabled]="deletingPlate" (click)="deletePlate(element.id, element.plateNumber)">Delete Plate</button>
+            </div>
           </div>
         </td>
       </ng-container>
