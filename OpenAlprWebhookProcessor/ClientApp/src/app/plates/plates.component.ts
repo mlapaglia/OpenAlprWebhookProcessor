@@ -183,8 +183,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.plateService.deletePlate(plateId).subscribe(() => {
       this.deletingPlate = false;
-      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
       this.searchPlates();
+      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
     });
   }
 
