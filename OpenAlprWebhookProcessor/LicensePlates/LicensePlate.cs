@@ -4,6 +4,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 {
     public class LicensePlate
     {
+        public Guid Id { get; set; }
+
         public int OpenAlprCameraId { get; set; }
 
         public string VehicleDescription { get; set; }

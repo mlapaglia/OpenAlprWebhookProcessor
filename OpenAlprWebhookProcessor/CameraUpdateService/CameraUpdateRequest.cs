@@ -22,6 +22,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public bool IsTest { get; set; }
 
+        public bool IsSinglePlate { get; set; }
+
+        public bool IsPreviewGroup { get; set; }
+
         public string AlertDescription { get; set; }
     }
 }

@@ -68,6 +68,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public regexSearchEnabled: boolean;
 
   public addingToIgnoreList: boolean;
+  public deletingPlate: boolean;
 
   private pageSize: number = 10;
   private pageNumber: number = 0;
@@ -174,6 +175,16 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.settingsService.addIgnore(ignore).subscribe(() => {
       this.addingToIgnoreList = false;
       this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
+    });
+  }
+
+  public deletePlate(plateId: string = '', plateNumber: string = '') {
+    this.deletingPlate = true;
+
+    this.plateService.deletePlate(plateId).subscribe(() => {
+      this.deletingPlate = false;
+      this.searchPlates();
+      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
     });
   }
 

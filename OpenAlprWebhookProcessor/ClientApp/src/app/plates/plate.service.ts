@@ -7,13 +7,18 @@ import { PlateResponse } from "./plateResponse";
 @Injectable({ providedIn: 'root' })
 export class PlateService {
     private getRelayImageUrl = 'images';
-    private searchPlatesUrl = 'licenseplates/search'
+    private searchPlatesUrl = 'licenseplates/search';
+    private deletePlateUrl = 'licenseplates';
     private hydrateDatabaseUrl = "hydration/start";
 
     constructor(private http: HttpClient) { }
 
     searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
         return this.http.post<PlateResponse>(`/${this.searchPlatesUrl}`, plateRequest);
+    }
+
+    deletePlate(plateId: string): Observable<any> {
+        return this.http.delete(`/${this.deletePlateUrl}/${plateId}`);
     }
 
     getRelayImage(imageId: string) {

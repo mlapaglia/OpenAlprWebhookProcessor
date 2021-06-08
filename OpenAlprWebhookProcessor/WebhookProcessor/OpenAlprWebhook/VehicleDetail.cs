@@ -2,7 +2,7 @@
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class MakeModel
+    public class VehicleDetail
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

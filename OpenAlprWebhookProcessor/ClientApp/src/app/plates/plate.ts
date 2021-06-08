@@ -1,6 +1,8 @@
 import { Url } from "url";
 
 export interface Plate {
+    id: string;
+    
     openAlprCameraId: number;
 
     vehicleDescription: string;

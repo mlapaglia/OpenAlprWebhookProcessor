@@ -211,7 +211,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                        () => ClearExpiredOverlayAsync(cameraUpdateRequest.Id),
                        TimeSpan.FromSeconds(5));
 
-                    if (!cameraUpdateRequest.IsTest)
+                    if (!cameraUpdateRequest.IsTest
+                        && !cameraUpdateRequest.IsPreviewGroup
+                        && !cameraUpdateRequest.IsSinglePlate)
                     {
                         cameraToUpdate.PlatesSeen++;
                         cameraToUpdate.LatestProcessedPlateUuid = cameraUpdateRequest.LicensePlateImageUuid;
