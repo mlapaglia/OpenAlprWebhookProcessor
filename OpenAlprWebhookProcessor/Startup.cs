@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,8 @@ using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
+using OpenAlprWebhookProcessor.SystemLogs;
+using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.Settings;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
@@ -243,6 +246,15 @@ namespace OpenAlprWebhookProcessor
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.File(
+                    "log-.txt",
+                    rollingInterval: RollingInterval.Day)
+                .WriteTo.Console()
+                .WriteTo.Signalr(app.ApplicationServices.GetService<IHubContext<ProcessorHub.ProcessorHub, IProcessorHub>>())
+                .CreateLogger();
         }
     }
 }

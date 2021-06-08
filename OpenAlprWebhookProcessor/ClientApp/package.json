@@ -24,6 +24,7 @@
     "@angular/router": "^11.0.7",
     "@microsoft/signalr": "^5.0.2",
     "@swimlane/ngx-charts": "^18.0.1",
+    "ngx-highlightjs": "^4.1.4",
     "ngx-lightbox": "^2.2.2",
     "rxjs": "^6.6.3",
     "tslib": "^2.1.0",

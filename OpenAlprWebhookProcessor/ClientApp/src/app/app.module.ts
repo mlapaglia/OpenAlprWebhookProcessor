@@ -28,6 +28,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';;
 import { SnackbarComponent } from './snackbar/snackbar.component'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 
 @NgModule({
     imports: [
@@ -52,7 +53,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         MatSlideToggleModule,
         MatSnackBarModule,
         MatProgressSpinnerModule,
-        NgxChartsModule
+        NgxChartsModule,
+        HighlightModule,
     ],
     declarations: [
         AppComponent,
@@ -65,6 +67,15 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
         { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+        {
+            provide: HIGHLIGHT_OPTIONS,
+            useValue: {
+              coreLibraryLoader: () => import('highlight.js/lib/core'),
+              languages: {
+                plaintext: () => import('highlight.js/lib/languages/plaintext'),
+              }
+            }
+          }
     ],
     bootstrap: [AppComponent]
 })

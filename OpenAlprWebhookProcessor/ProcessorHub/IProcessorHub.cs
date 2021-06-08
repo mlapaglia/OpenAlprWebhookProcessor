@@ -7,5 +7,7 @@ namespace OpenAlprWebhookProcessor.ProcessorHub
         Task LicensePlateRecorded(string plateNumber);
 
         Task LicensePlateAlerted(string plateNumber);
+
+        Task ProcessInformationLogged(string log);
     }
 }
