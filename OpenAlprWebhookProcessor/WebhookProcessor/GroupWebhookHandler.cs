@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 throw new ArgumentException("camera has OpenALPR integration disabled, skipping");
             }
 
-            if (!webhook.Group.IsParked)
+            if (webhook.Group.IsParked)
             {
                 _logger.LogInformation($"parked car: {webhook.Group.BestPlateNumber}, ignoring.");
                 return;
