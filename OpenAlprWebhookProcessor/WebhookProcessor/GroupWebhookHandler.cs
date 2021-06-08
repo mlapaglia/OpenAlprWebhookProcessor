@@ -61,6 +61,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             if (!webhook.Group.IsParked)
             {
                 _logger.LogInformation($"parked car: {webhook.Group.BestPlateNumber}, ignoring.");
+                return;
             }
 
             string vehicleDescription = null;
