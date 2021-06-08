@@ -21,18 +21,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly SinglePlateWebhookHandler _singlePlateWebhookHandler;
 
-        private readonly ProcessorContext _processorContext;
-
         public WebhookController(
             ILogger<WebhookController> logger,
             GroupWebhookHandler webhookHandler,
-            SinglePlateWebhookHandler singlePlateWebhookHandler,
-            ProcessorContext processorContext)
+            SinglePlateWebhookHandler singlePlateWebhookHandler)
         {
             _logger = logger;
             _groupWebhookHandler = webhookHandler;
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
-            _processorContext = processorContext;
         }
 
         [HttpPost]
@@ -65,6 +61,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         groupResult,
                         cancellationToken);
                 }
+                else if (rawWebhook.Contains("\"data_type\": \"vehicle\""))
+                {
+                    _logger.LogInformation("parsing vehicle webhook");
+                    var groupResult = new Webhook
+                    {
+                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
+                    };
+
+                    await _groupWebhookHandler.HandleWebhookAsync(
+                        groupResult,
+                        cancellationToken);
+                }
                 else if (rawWebhook.Contains("alpr_results"))
                 {
                     _logger.LogInformation("parsing single webhook");
@@ -84,17 +92,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
                 else
                 {
-                    var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
-
-                    foreach (var forward in forwards)
-                    {
-                        await WebhookForwarder.ForwardWebhookAsync(
-                            rawWebhook,
-                            forward.FowardingDestination,
-                            forward.IgnoreSslErrors,
-                            cancellationToken);
-                    }
-
                     _logger.LogInformation("Unknown payload received, ignoring: " + rawWebhook);
                 }
             }
