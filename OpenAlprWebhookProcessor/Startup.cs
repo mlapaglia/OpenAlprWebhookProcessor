@@ -20,7 +20,7 @@ using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
-using OpenAlprWebhookProcessor.Logs;
+using OpenAlprWebhookProcessor.SystemLogs;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.Settings;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
