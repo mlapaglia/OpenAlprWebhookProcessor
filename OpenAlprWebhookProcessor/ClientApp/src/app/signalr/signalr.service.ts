@@ -13,6 +13,7 @@ export class SignalrService {
   public connectionEstablished = new Subject<Boolean>();
   public licensePlateReceived = new Subject<string>();
   public licensePlateAlerted = new Subject<string>();
+  public processInformationLogged = new Subject<string>();
 
   constructor(
     private snackbarService: SnackbarService
@@ -34,6 +35,10 @@ export class SignalrService {
       .catch(err => {
         console.log('Error while starting connection: ' + err)
         this.snackbarService.create(`Connection lost`, SnackBarType.Disconnected);
+      });
+
+      this.hubConnection.on('ProcessInformationLogged', (logMessage) => {
+        this.processInformationLogged.next(logMessage);
       });
 
       this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {

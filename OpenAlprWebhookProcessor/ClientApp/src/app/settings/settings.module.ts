@@ -30,6 +30,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ForwardsComponent } from './forwards/forwards.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { LogsComponent } from './logs/logs.component';
+import { HighlightModule } from 'ngx-highlightjs';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     IgnoresComponent,
     IgnoreComponent,
     ForwardsComponent,
+    LogsComponent,
   ],
   imports: [
     CommonModule,
@@ -68,6 +71,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     FlexLayoutModule,
     MatSlideToggleModule,
     MatCheckboxModule,
+    HighlightModule,
   ]
 })
 export class SettingsModule { }
