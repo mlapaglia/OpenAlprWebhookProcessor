@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System.IO;
 using System.Text;
@@ -19,14 +21,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly SinglePlateWebhookHandler _singlePlateWebhookHandler;
 
+        private readonly ProcessorContext _processorContext;
+
         public WebhookController(
             ILogger<WebhookController> logger,
             GroupWebhookHandler webhookHandler,
-            SinglePlateWebhookHandler singlePlateWebhookHandler)
+            SinglePlateWebhookHandler singlePlateWebhookHandler,
+            ProcessorContext processorContext)
         {
             _logger = logger;
             _groupWebhookHandler = webhookHandler;
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
+            _processorContext = processorContext;
         }
 
         [HttpPost]
@@ -78,6 +84,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
                 else
                 {
+                    var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+
+                    foreach (var forward in forwards)
+                    {
+                        await WebhookForwarder.ForwardWebhookAsync(
+                            rawWebhook,
+                            forward.FowardingDestination,
+                            forward.IgnoreSslErrors,
+                            cancellationToken);
+                    }
+
                     _logger.LogInformation("Unknown payload received, ignoring: " + rawWebhook);
                 }
             }
