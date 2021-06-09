@@ -2,8 +2,8 @@
 {
     public class ZoomFocus
     {
-        public string Zoom { get; set; }
+        public decimal Zoom { get; set; }
 
-        public string Focus { get; set; }
+        public decimal Focus { get; set; }
     }
 }

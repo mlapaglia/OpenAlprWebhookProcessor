@@ -129,8 +129,8 @@ namespace OpenAlprWebhookProcessor.Cameras
 
             return new ZoomFocus()
             {
-                Focus = Regex.Match(response, "status\\.Focus=(.*)\\r").Groups[1].Value,
-                Zoom = Regex.Match(response, "status\\.Zoom=(.*)\\r").Groups[1].Value,
+                Focus = decimal.Parse(Regex.Match(response, "status\\.Focus=(.*)\\r").Groups[1].Value),
+                Zoom = decimal.Parse(Regex.Match(response, "status\\.Zoom=(.*)\\r").Groups[1].Value),
             };
         }
     }

@@ -68,7 +68,7 @@ export class EditCameraComponent implements OnInit {
   }
 
   public setZoomFocus() {
-    this.editCameraService.setZoomAndFocus(this.camera.id, this.zoomFocus).subscribe(result => {
+    this.editCameraService.setZoomAndFocus(this.camera.id, this.zoomFocus).subscribe(_ => {
       this.getZoomFocus();
     });
   }
