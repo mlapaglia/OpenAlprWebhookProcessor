@@ -18,7 +18,6 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public DahuaCamera(Data.Camera camera)
         {
-
             _camera = camera;
             _httpClient = GetHttpClient();
         }
@@ -85,8 +84,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             {
                 UseDefaultCredentials = true,
                 Credentials = new NetworkCredential(
-                _camera.CameraUsername,
-                _camera.CameraPassword),
+                    _camera.CameraUsername,
+                    _camera.CameraPassword),
             });
         }
 

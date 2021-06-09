@@ -29,6 +29,8 @@ import { EditCameraService } from './edit-camera.service';
 export class EditCameraComponent implements OnInit {
   public camera: Camera;
   public hidePassword = true;
+  public cameraCurrentFocus = '';
+  public cameraCurrentZoom = '';
 
   constructor(
     public dialogRef: MatDialogRef<EditCameraComponent>,
@@ -38,29 +40,31 @@ export class EditCameraComponent implements OnInit {
 
   ngOnInit(): void {
     this.camera = this.data.camera;
+    this.getZoomFocus();
   }
 
   public triggerDayMode() {
-    this.editCameraService.triggerDayMode(this.camera.id).subscribe(result => {
+    this.editCameraService.triggerDayMode(this.camera.id).subscribe(_ => {
       this.snackBarService.create("day mode test sent successfully", SnackBarType.Info);
     });
   }
 
   public triggerNightMode() {
-    this.editCameraService.triggerNightMode(this.camera.id).subscribe(result => {
+    this.editCameraService.triggerNightMode(this.camera.id).subscribe(_ => {
       this.snackBarService.create("night mode test sent successfully", SnackBarType.Info);
     });
   }
 
   public testOverlay() {
-    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(result => {
+    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(_ => {
       this.snackBarService.create("overlay test sent successfully", SnackBarType.Info);
     });
   }
 
   public getZoomFocus() {
     this.editCameraService.getZoomAndFocus(this.camera.id).subscribe(result => {
-      console.log(result);
+      this.cameraCurrentFocus = result.focus;
+      this.cameraCurrentZoom = result.zoom;
     });
   }
 

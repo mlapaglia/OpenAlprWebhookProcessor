@@ -39,8 +39,6 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public bool DayNightModeEnabled { get; set; }
 
-        public bool ZoomFocusEnabled { get; set; }
-
         public string DayZoom { get; set; }
 
         public string DayFocus { get; set; }

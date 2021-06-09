@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ZoomFocus } from './zoomfocus';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,8 @@ export class EditCameraService {
     return this.http.post(`/cameras/${cameraId}/test/overlay`, null);
   }
 
-  getZoomAndFocus(cameraId: string): Observable<any> {
-    return this.http.get<any>(`/cameras/${cameraId}/zoomAndFocus`);
+  getZoomAndFocus(cameraId: string): Observable<ZoomFocus> {
+    return this.http.get<ZoomFocus>(`/cameras/${cameraId}/zoomAndFocus`);
   }
 
   setZoomAndFocus(cameraId: string) {
