@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System.IO;
 using System.Text;
@@ -78,7 +80,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
                 else
                 {
-                    _logger.LogInformation("Unknown payload received, ignoring");
+                    _logger.LogInformation("Unknown payload received, ignoring: " + rawWebhook);
                 }
             }
 

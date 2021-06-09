@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Linq;
@@ -100,12 +101,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     if (cameraToUpdate == null)
                     {
                         _logger.LogError($"Unable to find camera with OpenAlprId: {cameraId}, check your configuration.");
+                        return;
                     }
 
                     var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
                     await camera.TriggerDayNightModeAsync(
                         sunriseSunset,
                         _cancellationTokenSource.Token);
+
+                    await TriggerZoomAndFocusAsync(
+                        sunriseSunset,
+                        cameraToUpdate,
+                        camera);
 
                     if (scheduleNextJob)
                     {
@@ -249,6 +256,47 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
+        public async Task<ZoomFocus> GetZoomAndFocusAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var dbCamera = await processorContext.Cameras.FirstOrDefaultAsync(
+                    x => x.Id == cameraId,
+                    cancellationToken);
+
+                var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+
+                return await camera.GetZoomAndFocusAsync(cancellationToken);
+            }
+        }
+
+        public async Task SetZoomAndFocusAsync(
+            Guid cameraId,
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var dbCamera = await processorContext.Cameras.FirstOrDefaultAsync(
+                    x => x.Id == cameraId,
+                    cancellationToken);
+
+                var camera = CameraFactory.Create(
+                    dbCamera.Manufacturer,
+                    dbCamera);
+
+                await camera.SetZoomAndFocusAsync(
+                    zoomAndFocus,
+                    cancellationToken);
+            }
+        }
+
         private async Task ForceClearOverlaysAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -268,6 +316,36 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
 
                 await processorContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task TriggerZoomAndFocusAsync(
+            SunriseSunset sunriseSunset,
+            Data.Camera cameraToUpdate,
+            ICamera camera)
+        {
+            ZoomFocus zoomFocus = null;
+
+            if (sunriseSunset == SunriseSunset.Sunrise && cameraToUpdate.DayFocus.HasValue && cameraToUpdate.DayZoom.HasValue)
+            {
+                zoomFocus = new ZoomFocus()
+                {
+                    Focus = cameraToUpdate.DayFocus.Value,
+                    Zoom = cameraToUpdate.DayZoom.Value,
+                };
+            }
+            else if (sunriseSunset == SunriseSunset.Sunset && cameraToUpdate.NightFocus.HasValue && cameraToUpdate.NightZoom.HasValue)
+            {
+                zoomFocus = new ZoomFocus()
+                {
+                    Focus = cameraToUpdate.NightFocus.Value,
+                    Zoom = cameraToUpdate.NightZoom.Value,
+                };
+            }
+
+            if (zoomFocus != null)
+            {
+                await camera.SetZoomAndFocusAsync(zoomFocus, default);
             }
         }
     }

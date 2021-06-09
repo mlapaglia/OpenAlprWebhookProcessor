@@ -77,10 +77,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     LicensePlateImageUuid = webhook.Group.BestUuid,
                     LicensePlate = webhook.Group.BestPlateNumber,
-                    LicensePlateJpeg = Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg),
+                    LicensePlateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null,
                     Id = camera.Id,
-                    OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
-                    ProcessedPlateConfidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                    OpenAlprProcessingTimeMs = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2) : 0,
+                    ProcessedPlateConfidence = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.Confidence, 2) : 0,
                     IsAlert = webhook.DataType == "alpr_alert",
                     IsPreviewGroup = webhook.Group.IsPreview,
                     AlertDescription = webhook.Description,

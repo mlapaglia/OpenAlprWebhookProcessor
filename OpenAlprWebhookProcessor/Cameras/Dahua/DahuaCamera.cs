@@ -1,8 +1,10 @@
-﻿using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +18,6 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public DahuaCamera(Data.Camera camera)
         {
-
             _camera = camera;
             _httpClient = GetHttpClient();
         }
@@ -83,8 +84,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             {
                 UseDefaultCredentials = true,
                 Credentials = new NetworkCredential(
-                _camera.CameraUsername,
-                _camera.CameraPassword),
+                    _camera.CameraUsername,
+                    _camera.CameraPassword),
             });
         }
 
@@ -95,6 +96,42 @@ namespace OpenAlprWebhookProcessor.Cameras
                 cancellationToken);
 
             return await result.Content.ReadAsStreamAsync(cancellationToken);
+        }
+
+        public async Task SetZoomAndFocusAsync(
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken)
+        {
+            var response = await _httpClient.PostAsync(
+                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=adjustFocus&focus={zoomAndFocus.Focus}&zoom={zoomAndFocus.Zoom}",
+                null,
+                cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("unable to set zoom/focus: " + await response.Content.ReadAsStringAsync(cancellationToken));
+            }
+        }
+
+        public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
+        {
+            var result = await _httpClient.PostAsync(
+                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=getFocusStatus",
+                null,
+                cancellationToken);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("error getting zoom and focus");
+            }
+
+            var response = await result.Content.ReadAsStringAsync(cancellationToken);
+
+            return new ZoomFocus()
+            {
+                Focus = decimal.Parse(Regex.Match(response, "status\\.Focus=(.*)\\r").Groups[1].Value),
+                Zoom = decimal.Parse(Regex.Match(response, "status\\.Zoom=(.*)\\r").Groups[1].Value),
+            };
         }
     }
 }
