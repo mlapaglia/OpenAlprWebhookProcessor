@@ -282,9 +282,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     x => x.Id == cameraId,
                     cancellationToken);
 
-                var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+                var camera = CameraFactory.Create(
+                    dbCamera.Manufacturer,
+                    dbCamera);
 
-                await camera.SetZoomAndFocusAsync(zoomAndFocus, cancellationToken);
+                await camera.SetZoomAndFocusAsync(
+                    zoomAndFocus,
+                    cancellationToken);
             }
         }
 
