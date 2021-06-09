@@ -9,7 +9,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
@@ -183,6 +183,18 @@ namespace OpenAlprWebhookProcessor.Cameras
                 cancellationToken);
 
             return await result.Content.ReadAsStreamAsync(cancellationToken);
+        }
+
+        public Task SetZoomAndFocusAsync(
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

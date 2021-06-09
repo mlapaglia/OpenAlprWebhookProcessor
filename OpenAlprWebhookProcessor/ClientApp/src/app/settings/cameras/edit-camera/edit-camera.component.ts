@@ -57,4 +57,13 @@ export class EditCameraComponent implements OnInit {
       this.snackBarService.create("overlay test sent successfully", SnackBarType.Info);
     });
   }
+
+  public getZoomFocus() {
+    this.editCameraService.getZoomAndFocus(this.camera.id).subscribe(result => {
+      console.log(result);
+    });
+  }
+
+  public setZoomFocus() {
+  }
 }

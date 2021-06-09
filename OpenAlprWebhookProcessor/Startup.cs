@@ -34,6 +34,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -133,6 +134,8 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<GetAgentRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
+            services.AddScoped<SetZoomAndFocusHandler>();
+            services.AddScoped<GetZoomAndFocusHandler>();
             services.AddScoped<DeleteCameraHandler>();
             services.AddScoped<UpsertIgnoresRequestHandler>();
             services.AddScoped<TestCameraHandler>();

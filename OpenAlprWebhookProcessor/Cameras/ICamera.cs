@@ -1,4 +1,5 @@
-﻿using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,12 @@ namespace OpenAlprWebhookProcessor.Cameras
         Task TriggerDayNightModeAsync(
             SunriseSunset sunriseSunset,
             CancellationToken cancellationToken);
+
+        Task SetZoomAndFocusAsync(
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken);
+
+        Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken);
 
         Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken);
     }

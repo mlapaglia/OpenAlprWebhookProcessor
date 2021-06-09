@@ -61,18 +61,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         groupResult,
                         cancellationToken);
                 }
-                else if (rawWebhook.Contains("\"vehicle\""))
-                {
-                    _logger.LogInformation("parsing vehicle webhook");
-                    var groupResult = new Webhook
-                    {
-                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
-                    };
-
-                    await _groupWebhookHandler.HandleWebhookAsync(
-                        groupResult,
-                        cancellationToken);
-                }
                 else if (rawWebhook.Contains("alpr_results"))
                 {
                     _logger.LogInformation("parsing single webhook");

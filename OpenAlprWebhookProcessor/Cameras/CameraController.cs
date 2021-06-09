@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Cameras
@@ -19,16 +21,24 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private readonly TestCameraHandler _testCameraHandler;
 
+        private readonly GetZoomAndFocusHandler _getZoomAndFocusHandler;
+
+        private readonly SetZoomAndFocusHandler _setZoomAndFocusHandler;
+
         public CameraController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
             UpsertCameraHandler upsertCameraHandler,
-            TestCameraHandler testCameraHandler)
+            TestCameraHandler testCameraHandler,
+            GetZoomAndFocusHandler getZoomAndFocusHandler,
+            SetZoomAndFocusHandler setZoomAndFocusHandler)
         {
             _getCameraHandler = getCameraHandler;
             _deleteCameraHandler = deleteCameraHandler;
             _upsertCameraHandler = upsertCameraHandler;
             _testCameraHandler = testCameraHandler;
+            _getZoomAndFocusHandler = getZoomAndFocusHandler;
+            _setZoomAndFocusHandler = setZoomAndFocusHandler;
         }
 
         [HttpGet]
@@ -75,6 +85,28 @@ namespace OpenAlprWebhookProcessor.Cameras
                 CameraUpdateService.SunriseSunset.Sunrise);
 
             return Ok();
+        }
+
+        [HttpGet("{cameraId}/zoomAndFocus")]
+        public async Task<ZoomFocus> GetZoomAndFocus(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _getZoomAndFocusHandler.HandleAsync(
+                cameraId,
+                cancellationToken);
+        }
+
+        [HttpPost("{cameraId}/zoomAndFocus")]
+        public async Task SetZoomAndFocus(
+            Guid cameraId,
+            [FromBody] ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken)
+        {
+            await _setZoomAndFocusHandler.HandleAsync(
+                cameraId,
+                zoomAndFocus,
+                cancellationToken);
         }
     }
 }

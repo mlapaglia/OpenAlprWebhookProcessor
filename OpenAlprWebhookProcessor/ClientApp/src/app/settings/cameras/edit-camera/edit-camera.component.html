@@ -89,6 +89,33 @@
       <button mat-raised-button cdkFocusInitial [disabled]="camera.dayNightModeUrl == ''" (click)="triggerDayMode()">Trigger Day Mode</button>
     </div>
   </div>
+  <h2 mat-dialog-title style="padding-top:40px;">Zoom/Focus Adjustment<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.zoomFocusEnabled"></mat-slide-toggle></h2>
+  <div *ngIf="camera.zoomFocusEnabled" [@inOutAnimation]>
+    <mat-dialog-content
+      fxLayout="row wrap"
+      fxLayoutGap=20px>
+      <mat-form-field appearance="outline">
+        <mat-label>Day Zoom</mat-label>
+        <input type="number" matInput [(ngModel)]="camera.dayZoom">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Day Focus</mat-label>
+        <input type="number" matInput [(ngModel)]="camera.dayFocus">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Night Zoom</mat-label>
+        <input type="number" matInput [(ngModel)]="camera.nightZoom">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Night Focus</mat-label>
+        <input type="number" matInput [(ngModel)]="camera.nightFocus">
+      </mat-form-field>
+    </mat-dialog-content>
+    <div mat-dialog-actions align="left">
+      <button mat-raised-button cdkFocusInitial (click)="getZoomFocus()">Get Current Zoom/Focus</button>
+      <button mat-raised-button cdkFocusInitial (click)="setZoomFocus()">Set Zoom Focus</button>
+    </div>
+  </div>
 <div mat-dialog-actions align="end">
   <button mat-raised-button [mat-dialog-close]="false">Cancel</button>
   <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Save</button>

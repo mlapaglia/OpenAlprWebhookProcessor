@@ -11,6 +11,11 @@ export class Camera {
     cameraUsername: string;
     updateOverlayEnabled: boolean;
     updateOverlayTextUrl: string;
+    zoomFocusEnabled: boolean;
+    nightZoom: string;
+    nightFocus: string;
+    dayZoom: string;
+    dayFocus: string;
     dayNightModeEnabled: boolean;
     dayNightModeUrl: string;
     dayNightNextScheduledCommand: Date;

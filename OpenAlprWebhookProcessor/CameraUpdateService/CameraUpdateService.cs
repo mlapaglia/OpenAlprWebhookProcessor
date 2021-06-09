@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Linq;
@@ -100,6 +101,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     if (cameraToUpdate == null)
                     {
                         _logger.LogError($"Unable to find camera with OpenAlprId: {cameraId}, check your configuration.");
+                        return;
                     }
 
                     var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
@@ -246,6 +248,43 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 cameraToUpdate.NextClearOverlayScheduleId = string.Empty;
 
                 await processorContext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<ZoomFocus> GetZoomAndFocusAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var dbCamera = await processorContext.Cameras.FirstOrDefaultAsync(
+                    x => x.Id == cameraId,
+                    cancellationToken);
+
+                var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+
+                return await camera.GetZoomAndFocusAsync(cancellationToken);
+            }
+        }
+
+        public async Task SetZoomAndFocusAsync(
+            Guid cameraId,
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var dbCamera = await processorContext.Cameras.FirstOrDefaultAsync(
+                    x => x.Id == cameraId,
+                    cancellationToken);
+
+                var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+
+                await camera.SetZoomAndFocusAsync(zoomAndFocus, cancellationToken);
             }
         }
 
