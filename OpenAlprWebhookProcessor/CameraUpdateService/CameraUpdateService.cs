@@ -109,6 +109,23 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         sunriseSunset,
                         _cancellationTokenSource.Token);
 
+                    if (sunriseSunset == SunriseSunset.Sunrise && cameraToUpdate.DayFocus.HasValue && cameraToUpdate.DayZoom.HasValue)
+                    {
+                        await camera.SetZoomAndFocusAsync(new ZoomFocus()
+                        {
+                            Focus = cameraToUpdate.DayFocus.Value,
+                            Zoom = cameraToUpdate.DayZoom.Value,
+                        }, default);
+                    }
+                    else if (sunriseSunset == SunriseSunset.Sunset && cameraToUpdate.NightFocus.HasValue && cameraToUpdate.NightZoom.HasValue)
+                    {
+                        await camera.SetZoomAndFocusAsync(new ZoomFocus()
+                        {
+                            Focus = cameraToUpdate.NightFocus.Value,
+                            Zoom = cameraToUpdate.NightZoom.Value,
+                        }, default);
+                    }
+
                     if (scheduleNextJob)
                     {
                         _logger.LogInformation($"Scheduling next job for {cameraId}");

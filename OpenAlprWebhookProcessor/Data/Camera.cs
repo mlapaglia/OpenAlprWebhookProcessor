@@ -27,6 +27,14 @@ namespace OpenAlprWebhookProcessor.Data
 
         public bool UpdateOverlayEnabled { get; set; }
 
+        public decimal? DayZoom { get; set; }
+
+        public decimal? DayFocus { get; set; }
+
+        public decimal? NightZoom { get; set; }
+
+        public decimal? NightFocus { get; set; }
+
         public string UpdateDayNightModeUrl { get; set; }
 
         public string NextDayNightScheduleId { get; set; }

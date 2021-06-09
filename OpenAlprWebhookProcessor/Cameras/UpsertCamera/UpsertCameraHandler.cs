@@ -34,6 +34,10 @@ namespace OpenAlprWebhookProcessor.Cameras
                     Latitude = camera.Latitude,
                     Longitude = camera.Longitude,
                     Manufacturer = camera.Manufacturer,
+                    NightFocus = camera.NightFocus,
+                    DayFocus = camera.DayFocus,
+                    DayZoom = camera.DayZoom,
+                    NightZoom = camera.NightZoom,
                     OpenAlprCameraId = camera.OpenAlprCameraId,
                     OpenAlprName = camera.OpenAlprName,
                     OpenAlprEnabled = camera.OpenAlprEnabled,
@@ -57,6 +61,10 @@ namespace OpenAlprWebhookProcessor.Cameras
                 existingCamera.Longitude = camera.Longitude;
                 existingCamera.Manufacturer = camera.Manufacturer;
                 existingCamera.ModelNumber = camera.ModelNumber;
+                existingCamera.NightFocus = camera.NightFocus;
+                existingCamera.DayFocus = camera.DayFocus;
+                existingCamera.DayZoom = camera.DayZoom;
+                existingCamera.NightZoom = camera.NightZoom;
                 existingCamera.OpenAlprCameraId = camera.OpenAlprCameraId;
                 existingCamera.OpenAlprName = camera.OpenAlprName;
                 existingCamera.OpenAlprEnabled = camera.OpenAlprEnabled;
