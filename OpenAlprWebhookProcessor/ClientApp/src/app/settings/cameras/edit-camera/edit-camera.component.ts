@@ -5,6 +5,7 @@ import { SnackbarService } from '@app/snackbar/snackbar.service';
 import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Camera } from '../camera';
 import { EditCameraService } from './edit-camera.service';
+import { ZoomFocus } from './zoomfocus';
 
 @Component({
   selector: 'app-edit-camera',
@@ -29,8 +30,7 @@ import { EditCameraService } from './edit-camera.service';
 export class EditCameraComponent implements OnInit {
   public camera: Camera;
   public hidePassword = true;
-  public cameraCurrentFocus = '';
-  public cameraCurrentZoom = '';
+  public zoomFocus: ZoomFocus;
 
   constructor(
     public dialogRef: MatDialogRef<EditCameraComponent>,
@@ -63,11 +63,11 @@ export class EditCameraComponent implements OnInit {
 
   public getZoomFocus() {
     this.editCameraService.getZoomAndFocus(this.camera.id).subscribe(result => {
-      this.cameraCurrentFocus = result.focus;
-      this.cameraCurrentZoom = result.zoom;
+      this.zoomFocus = result;
     });
   }
 
   public setZoomFocus() {
+    this.editCameraService.setZoomAndFocus(this.camera.id, this.zoomFocus);
   }
 }

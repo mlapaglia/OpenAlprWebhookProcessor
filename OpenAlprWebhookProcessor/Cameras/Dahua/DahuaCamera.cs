@@ -120,6 +120,11 @@ namespace OpenAlprWebhookProcessor.Cameras
                 null,
                 cancellationToken);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("error getting zoom and focus");
+            }
+
             var response = await result.Content.ReadAsStringAsync(cancellationToken);
 
             return new ZoomFocus()

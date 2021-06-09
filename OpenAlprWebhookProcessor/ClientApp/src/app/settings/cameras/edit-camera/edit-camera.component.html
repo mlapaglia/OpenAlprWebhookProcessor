@@ -101,11 +101,11 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Current Focus</mat-label>
-        <input type="number" disabled matInput [(ngModel)]="cameraCurrentFocus">
+        <input type="number" matInput [(ngModel)]="zoomFocus.focus">
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Current Zoom</mat-label>
-        <input type="number" disabled matInput [(ngModel)]="cameraCurrentZoom">
+        <input type="number" matInput [(ngModel)]="zoomFocus.zoom">
       </mat-form-field>
     </mat-dialog-content>
     <div mat-dialog-actions align="left">
