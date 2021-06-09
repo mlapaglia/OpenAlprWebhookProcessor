@@ -109,22 +109,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         sunriseSunset,
                         _cancellationTokenSource.Token);
 
-                    if (sunriseSunset == SunriseSunset.Sunrise && cameraToUpdate.DayFocus.HasValue && cameraToUpdate.DayZoom.HasValue)
-                    {
-                        await camera.SetZoomAndFocusAsync(new ZoomFocus()
-                        {
-                            Focus = cameraToUpdate.DayFocus.Value,
-                            Zoom = cameraToUpdate.DayZoom.Value,
-                        }, default);
-                    }
-                    else if (sunriseSunset == SunriseSunset.Sunset && cameraToUpdate.NightFocus.HasValue && cameraToUpdate.NightZoom.HasValue)
-                    {
-                        await camera.SetZoomAndFocusAsync(new ZoomFocus()
-                        {
-                            Focus = cameraToUpdate.NightFocus.Value,
-                            Zoom = cameraToUpdate.NightZoom.Value,
-                        }, default);
-                    }
+                    await TriggerZoomAndFocusAsync(
+                        sunriseSunset,
+                        cameraToUpdate,
+                        camera);
 
                     if (scheduleNextJob)
                     {
@@ -328,6 +316,36 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
 
                 await processorContext.SaveChangesAsync();
+            }
+        }
+
+        private async Task TriggerZoomAndFocusAsync(
+            SunriseSunset sunriseSunset,
+            Data.Camera cameraToUpdate,
+            ICamera camera)
+        {
+            ZoomFocus zoomFocus = null;
+
+            if (sunriseSunset == SunriseSunset.Sunrise && cameraToUpdate.DayFocus.HasValue && cameraToUpdate.DayZoom.HasValue)
+            {
+                zoomFocus = new ZoomFocus()
+                {
+                    Focus = cameraToUpdate.DayFocus.Value,
+                    Zoom = cameraToUpdate.DayZoom.Value,
+                };
+            }
+            else if (sunriseSunset == SunriseSunset.Sunset && cameraToUpdate.NightFocus.HasValue && cameraToUpdate.NightZoom.HasValue)
+            {
+                zoomFocus = new ZoomFocus()
+                {
+                    Focus = cameraToUpdate.NightFocus.Value,
+                    Zoom = cameraToUpdate.NightZoom.Value,
+                };
+            }
+
+            if (zoomFocus != null)
+            {
+                await camera.SetZoomAndFocusAsync(zoomFocus, default);
             }
         }
     }
