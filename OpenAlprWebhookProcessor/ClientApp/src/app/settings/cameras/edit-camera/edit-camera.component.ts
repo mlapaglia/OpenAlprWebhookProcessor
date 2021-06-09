@@ -30,7 +30,7 @@ import { ZoomFocus } from './zoomfocus';
 export class EditCameraComponent implements OnInit {
   public camera: Camera;
   public hidePassword = true;
-  public zoomFocus: ZoomFocus;
+  public zoomFocus: ZoomFocus = new ZoomFocus();
 
   constructor(
     public dialogRef: MatDialogRef<EditCameraComponent>,
@@ -68,6 +68,8 @@ export class EditCameraComponent implements OnInit {
   }
 
   public setZoomFocus() {
-    this.editCameraService.setZoomAndFocus(this.camera.id, this.zoomFocus);
+    this.editCameraService.setZoomAndFocus(this.camera.id, this.zoomFocus).subscribe(result => {
+      this.getZoomFocus();
+    });
   }
 }
