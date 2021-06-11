@@ -62,6 +62,7 @@ namespace OpenAlprWebhookProcessor
 
             using (var context = new ProcessorContext(processorOptionsBuilder.Options))
             {
+                context.Database.EnsureCreated();
                 context.Database.Migrate();
             }
 
@@ -72,6 +73,7 @@ namespace OpenAlprWebhookProcessor
             {
                 if (context.Database.GetPendingMigrations().Any())
                 {
+                    context.Database.EnsureCreated();
                     context.Database.Migrate();
                 }
 
