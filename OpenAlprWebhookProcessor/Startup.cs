@@ -35,14 +35,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using System.IO;
 
 namespace OpenAlprWebhookProcessor
 {
     public class Startup
     {
-        private const string UsersContextConnectionString = "Data Source=config/users.db";
+        private const string configurationDirectory = "config";
 
-        private const string ProcessorContextConnectionString = "Data Source=config/processor.db";
+        private readonly string UsersContextConnectionString = $"Data Source={configurationDirectory}/users.db";
+
+        private readonly string ProcessorContextConnectionString = $"Data Source={configurationDirectory}/processor.db";
 
         public Startup(IConfiguration configuration)
         {
@@ -59,6 +62,8 @@ namespace OpenAlprWebhookProcessor
 
             var processorOptionsBuilder = new DbContextOptionsBuilder<ProcessorContext>();
             processorOptionsBuilder.UseSqlite(ProcessorContextConnectionString);
+
+            Directory.CreateDirectory(configurationDirectory);
 
             using (var context = new ProcessorContext(processorOptionsBuilder.Options))
             {
