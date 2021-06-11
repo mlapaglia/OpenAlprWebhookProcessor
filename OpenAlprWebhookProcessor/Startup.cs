@@ -36,6 +36,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
+using Microsoft.Net.Http.Headers;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -218,7 +219,16 @@ namespace OpenAlprWebhookProcessor
                 c.RoutePrefix = "/swagger";
             });
 
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    const int durationInSeconds = 60 * 60 * 24;
+                    ctx.Context.Response.Headers[HeaderNames.CacheControl] =
+                        "public,max-age=" + durationInSeconds;
+                }
+            });
+
             app.UseHangfireDashboard();
 
             if (!env.IsDevelopment())
