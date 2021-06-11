@@ -3,12 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { Ignore } from '@app/settings/ignores/ignore/ignore';
-import { SettingsService } from '@app/settings/settings.service';
 import { SignalrService } from '@app/signalr/signalr.service';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
-import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
@@ -67,8 +62,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlatesEnabled: boolean = true;
   public regexSearchEnabled: boolean;
 
-  public addingToIgnoreList: boolean;
-  public deletingPlate: boolean;
   public isLoading: boolean;
 
   private pageSize: number = 10;
@@ -80,10 +73,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   
   constructor(
     private plateService: PlateService,
-    private lightbox: Lightbox,
-    private signalRHub: SignalrService,
-    private settingsService: SettingsService,
-    private snackbarService: SnackbarService) {
+    private signalRHub: SignalrService) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -106,16 +96,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
         this.searchPlates();
     }));
-  }
-
-  public openLightbox(url: string, plateNumber: string) {
-    var albums = [{
-      src: url,
-      caption: plateNumber,
-      thumb: url
-    }];
-
-    this.lightbox.open(albums, 0);
   }
 
   public onPaginatorPage($event) {
@@ -165,30 +145,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.regexSearchEnabled = false;
 
     this.searchPlates();
-  }
-
-  public addToIgnoreList(plateNumber: string = '') {
-    this.addingToIgnoreList = true;
-    var ignore = new Ignore();
-
-    ignore.plateNumber = plateNumber;
-    ignore.strictMatch = true;
-    ignore.description = 'Added from plate list';
-
-    this.settingsService.addIgnore(ignore).subscribe(() => {
-      this.addingToIgnoreList = false;
-      this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
-    });
-  }
-
-  public deletePlate(plateId: string = '', plateNumber: string = '') {
-    this.deletingPlate = true;
-
-    this.plateService.deletePlate(plateId).subscribe(() => {
-      this.deletingPlate = false;
-      this.searchPlates();
-      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
-    });
   }
 
   public validateSearchPlateNumber() {

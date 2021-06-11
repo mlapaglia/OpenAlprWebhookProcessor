@@ -19,11 +19,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PlateComponent } from './plate/plate.component';
 
 @NgModule({
   declarations: [
     PlatesLayoutComponent,
     PlatesComponent,
+    PlateComponent,
   ],
   imports: [
     CommonModule,
