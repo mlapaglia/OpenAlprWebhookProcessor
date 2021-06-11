@@ -1,4 +1,4 @@
-<div class="example-element-detail" style="display: flex;" *ngIf="isExpanded">
+<div class="example-element-detail" style="display: flex;" [@detailExpand]="isExpanded ? 'expanded' : 'collapsed'">
     <div class="example-element-description" [hidden]="!loadingImage">
         <mat-progress-spinner
             style="margin-top: 50%;"
