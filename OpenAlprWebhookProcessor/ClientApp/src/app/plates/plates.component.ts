@@ -69,6 +69,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public addingToIgnoreList: boolean;
   public deletingPlate: boolean;
+  public isLoading: boolean;
 
   private pageSize: number = 10;
   private pageNumber: number = 0;
@@ -144,9 +145,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.filterIgnoredPlates = this.filterIgnoredPlates;
     request.regexSearchEnabled = this.regexSearchEnabled;
 
+    this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = new MatTableDataSource<Plate>(result.plates);
+      this.isLoading = false;
     });
   }
 

@@ -18,6 +18,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     MatInputModule,
     MatButtonModule,
     MatFormFieldModule,
+    MatProgressSpinnerModule,
     ReactiveFormsModule,
     FormsModule,
     MatCheckboxModule,

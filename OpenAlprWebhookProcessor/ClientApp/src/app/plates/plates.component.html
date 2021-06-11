@@ -48,10 +48,20 @@
       </tr>
       <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"  class="example-detail-row"></tr>
     </table>
-    <mat-paginator
+    <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
+      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center; margin-right:10px;">
+        <mat-progress-spinner 
+          color="primary" 
+          mode="indeterminate"
+          diameter="25">
+        </mat-progress-spinner>
+      </div>
+      <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"
       [length]="totalNumberOfPlates"
       (page)="onPaginatorPage($event)"></mat-paginator>
+    </div>
+
   </div>
   <div>
     <mat-card class="example-card">

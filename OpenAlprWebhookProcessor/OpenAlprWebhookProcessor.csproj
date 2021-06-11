@@ -13,6 +13,7 @@
 		<UserSecretsId>eb21a92f-53a0-4b29-8342-fb1def2e11f1</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerfileContext>.</DockerfileContext>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<ItemGroup>
