@@ -58,14 +58,20 @@
                              (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Self aware panel
+              <table>
+                <tr>
+                  <td>{{plate.openAlprCameraId}}</td>
+                  <td>{{plate.plateNumber}}</td>
+                  <td>{{plate.vehicleDescription}}</td>
+                  <td><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></td>
+                  <td>{{plate.receivedOn | date:"medium"}}</td>
+                  <td>Currently I am {{panelOpenState ? 'open' : 'closed'}}</td>
+                </tr>
+              </table>
             </mat-panel-title>
-            <mat-panel-description>
-              Currently I am {{panelOpenState ? 'open' : 'closed'}}
-            </mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            <p><img [src]="plate.imageUrl"/></p>
+            <p><img [src]="plate.imageUrl" width="300"/></p>
             <p><img [src]="plate.cropImageUrl"/></p>
             <p>I'm visible because I am open</p>
           </ng-template>
