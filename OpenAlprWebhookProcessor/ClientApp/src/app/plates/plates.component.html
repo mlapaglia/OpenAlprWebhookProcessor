@@ -71,10 +71,15 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            <p><img [src]="plate.imageUrl" width="300"/></p>
-            <p><img [src]="plate.cropImageUrl"/></p>
-            <p>I'm visible because I am open</p>
+            <app-plate
+                [plate]="plate"
+                (searchPlatesEvent)="searchPlates($event)"></app-plate>
           </ng-template>
+          <mat-action-row>
+            <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
+            <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
+            <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
+          </mat-action-row>
         </mat-expansion-panel>
       </div>
     </mat-accordion>

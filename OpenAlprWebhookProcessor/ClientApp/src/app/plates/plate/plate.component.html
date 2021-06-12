@@ -1,12 +1,12 @@
-<div class="example-element-detail" style="display: flex;">
-    <div class="example-element-description" [hidden]="!loadingImage">
-        <mat-progress-spinner style="margin-top: 50%;"
+<div style="display: flex; align-items: flex-end; margin-top:35px">
+    <div [hidden]="!loadingImage">
+        <mat-progress-spinner
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
-    <div class="example-element-description">
+    <div>
         <img style="cursor: pointer;"
             [src]="plate.imageUrl"
             [hidden]="loadingImage || loadingImageFailed"
@@ -15,36 +15,27 @@
             (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
             width="300"/>
     </div>
-    <div class="example-element-description" *ngIf="!plate.imageUrl || loadingImageFailed" class="sample-image">
+    <div *ngIf="!plate.imageUrl || loadingImageFailed">
         <mat-icon style="font-size: 100px;"
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
-    <div class="example-element-description" [hidden]="!loadingPlateImage">
-        <mat-progress-spinner style="margin-top: 50%;"
+    <div [hidden]="!loadingPlateImage">
+        <mat-progress-spinner
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
-    <div class="example-element-description">
+    <div >
         <img [src]="plate.cropImageUrl"
             [hidden]="loadingPlateImage || loadingPlateImageFailed"
             (load)="plateImageLoaded()"
             (error)="plateImageFailedToLoad()" />
     </div>
-    <div class="example-element-description" *ngIf="!plate.cropImageUrl || loadingPlateImageFailed" class="sample-image">
+    <div *ngIf="!plate.cropImageUrl || loadingPlateImageFailed">
         <mat-icon style="font-size: 100px;"
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-    </div>
-    <div class="example-element-description">
-        <button mat-raised-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
-    </div>
-    <div class="example-element-description">
-        <button mat-raised-button color="primary" [class.spinner]="addingToIgnoreList" [disabled]="plate.isIgnore || addingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
-    </div>
-    <div class="example-element-description">
-        <button mat-raised-button color="warn" [class.spinner]="deletingPlate" [disabled]="deletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete Plate</button>
     </div>
 </div>

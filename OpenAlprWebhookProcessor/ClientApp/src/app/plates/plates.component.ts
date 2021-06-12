@@ -8,6 +8,10 @@ import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
+import { Ignore } from '@app/settings/ignores/ignore/ignore';
+import { SettingsService } from '@app/settings/settings.service';
 
 @Component({
   selector: 'app-plates',
@@ -63,6 +67,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlatesEnabled: boolean = true;
   public regexSearchEnabled: boolean;
 
+  public isDeletingPlate: boolean;
+  public isAddingToIgnoreList: boolean;
   public isLoading: boolean;
 
   private pageSize: number = 10;
@@ -74,7 +80,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   
   constructor(
     private plateService: PlateService,
-    private signalRHub: SignalrService) {
+    private signalRHub: SignalrService,
+    private snackbarService: SnackbarService,
+    private settingsService: SettingsService) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -132,6 +140,30 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.plates = new MatTableDataSource<Plate>(result.plates);
       this.rawPlates = result.plates;
       this.isLoading = false;
+    });
+  }
+
+  public deletePlate(plateId: string = '', plateNumber: string = '') {
+    this.isDeletingPlate = true;
+
+    this.plateService.deletePlate(plateId).subscribe(() => {
+      this.isDeletingPlate = false;
+      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
+      this.searchPlates();
+    });
+  }
+
+  public addToIgnoreList(plateNumber: string = '') {
+    this.isAddingToIgnoreList = true;
+    var ignore = new Ignore();
+
+    ignore.plateNumber = plateNumber;
+    ignore.strictMatch = true;
+    ignore.description = 'Added from plate list';
+
+    this.settingsService.addIgnore(ignore).subscribe(() => {
+      this.isAddingToIgnoreList = false;
+      this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
     });
   }
 
