@@ -57,17 +57,15 @@
         <mat-expansion-panel (opened)="panelOpenState = true"
                              (closed)="panelOpenState = false">
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              <table>
-                <tr>
-                  <td>{{plate.openAlprCameraId}}</td>
-                  <td>{{plate.plateNumber}}</td>
-                  <td>{{plate.vehicleDescription}}</td>
-                  <td><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></td>
-                  <td>{{plate.receivedOn | date:"medium"}}</td>
-                  <td>Currently I am {{panelOpenState ? 'open' : 'closed'}}</td>
-                </tr>
-              </table>
+            <mat-panel-title style="display:block !important">
+              <div style="display:flex; justify-content: space-between; flex-wrap: nowrap;">
+                <div>{{plate.openAlprCameraId}}</div>
+                <div>{{plate.plateNumber}}</div>
+                <div>{{plate.vehicleDescription}}</div>
+                <div><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></div>
+                <div>{{plate.receivedOn | date:"medium"}}</div>
+              </div>
+
             </mat-panel-title>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
