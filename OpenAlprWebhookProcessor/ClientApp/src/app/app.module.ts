@@ -23,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';;
 import { SnackbarComponent } from './snackbar/snackbar.component'
@@ -53,6 +54,7 @@ import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
         MatSlideToggleModule,
         MatSnackBarModule,
         MatProgressSpinnerModule,
+        MatExpansionModule,
         NgxChartsModule,
         HighlightModule,
     ],

@@ -20,6 +20,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PlateComponent } from './plate/plate.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { PlateComponent } from './plate/plate.component';
     MatButtonModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
+    MatExpansionModule,
     ReactiveFormsModule,
     FormsModule,
     MatCheckboxModule,

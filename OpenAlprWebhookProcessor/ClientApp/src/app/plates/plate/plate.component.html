@@ -1,15 +1,13 @@
 <div class="example-element-detail" style="display: flex;">
     <div class="example-element-description" [hidden]="!loadingImage">
-        <mat-progress-spinner
-            style="margin-top: 50%;"
+        <mat-progress-spinner style="margin-top: 50%;"
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
     <div class="example-element-description">
-        <img
-            style="cursor: pointer;"
+        <img style="cursor: pointer;"
             [src]="plate.imageUrl"
             [hidden]="loadingImage || loadingImageFailed"
             (load)="imageLoaded()"
@@ -18,31 +16,27 @@
             width="300"/>
     </div>
     <div class="example-element-description" *ngIf="!plate.imageUrl || loadingImageFailed" class="sample-image">
-        <mat-icon
-            style="font-size: 100px;"
+        <mat-icon style="font-size: 100px;"
             [inline]="true"
-            matTooltip="Image will display after first plate capture">help_center</mat-icon>
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
     <div class="example-element-description" [hidden]="!loadingPlateImage">
-        <mat-progress-spinner
-            style="margin-top: 50%;"
+        <mat-progress-spinner style="margin-top: 50%;"
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
     <div class="example-element-description">
-        <img
-        [src]="plate.cropImageUrl"
-        [hidden]="loadingPlateImage || loadingPlateImageFailed"
-        (load)="plateImageLoaded()"
-        (error)="plateImageFailedToLoad()" />
+        <img [src]="plate.cropImageUrl"
+            [hidden]="loadingPlateImage || loadingPlateImageFailed"
+            (load)="plateImageLoaded()"
+            (error)="plateImageFailedToLoad()" />
     </div>
     <div class="example-element-description" *ngIf="!plate.cropImageUrl || loadingPlateImageFailed" class="sample-image">
-        <mat-icon
-            style="font-size: 100px;"
+        <mat-icon style="font-size: 100px;"
             [inline]="true"
-            matTooltip="Image will display after first plate capture">help_center</mat-icon>
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
     <div class="example-element-description">
         <button mat-raised-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>

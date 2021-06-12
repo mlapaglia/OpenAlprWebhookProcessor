@@ -30,10 +30,12 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
-      <tr [ngClass]="{'alert': element.isAlert === true, 'ignore': element.isIgnore === true}" mat-row *matRowDef="let element; columns: rowsToDisplay;"
-          class="example-element-row"
-          [class.example-expanded-row]="expandedElement === element"
-          (click)="expandedElement = expandedElement === element ? null : element">
+      <tr [ngClass]="{'alert': element.isAlert === true, 'ignore': element.isIgnore === true}"
+        mat-row
+        *matRowDef="let element; columns: rowsToDisplay;"
+        class="example-element-row"
+        [class.example-expanded-row]="expandedElement === element"
+        (click)="expandedElement = expandedElement === element ? null : element">
       </tr>
       <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"  class="example-detail-row"></tr>
     </table>
@@ -50,7 +52,26 @@
       [length]="totalNumberOfPlates"
       (page)="onPaginatorPage($event)"></mat-paginator>
     </div>
-
+    <mat-accordion>
+      <div *ngFor="let plate of rawPlates">
+        <mat-expansion-panel (opened)="panelOpenState = true"
+                             (closed)="panelOpenState = false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Self aware panel
+            </mat-panel-title>
+            <mat-panel-description>
+              Currently I am {{panelOpenState ? 'open' : 'closed'}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <p><img [src]="plate.imageUrl"/></p>
+            <p><img [src]="plate.cropImageUrl"/></p>
+            <p>I'm visible because I am open</p>
+          </ng-template>
+        </mat-expansion-panel>
+      </div>
+    </mat-accordion>
   </div>
   <div>
     <mat-card class="example-card">
