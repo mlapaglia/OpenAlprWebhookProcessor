@@ -29,7 +29,6 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-
             return await _getImageHandler.GetImageFromAgentAsync(imageId, cancellationToken);
         }
 
