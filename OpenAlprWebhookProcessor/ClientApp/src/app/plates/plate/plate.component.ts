@@ -16,7 +16,6 @@ import { PlateService } from '../plate.service';
 export class PlateComponent implements OnInit {
   @Output() searchPlatesEvent = new EventEmitter<string>();
   @Input() plate: Plate;
-  @Input() isExpanded: boolean;
 
   public addingToIgnoreList: boolean;
   public deletingPlate: boolean;

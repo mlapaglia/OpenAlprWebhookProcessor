@@ -21,6 +21,7 @@
         <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length + 2">
           <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
               <app-plate
+                *ngIf="element === expandedElement"
                 [plate]="element"
                 [isExpanded]="element === expandedElement"
                 (searchPlatesEvent)="searchPlates($event)"></app-plate>
