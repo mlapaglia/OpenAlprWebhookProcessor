@@ -1,71 +1,29 @@
 <div style="margin: 15px;" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="20px" fxLayoutAlign="space-around">
   <div fxFlex="80%">
-    <table mat-table [dataSource]="plates" multiTemplateDataRows class="mat-elevation-z8">
-      <ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnsToDisplay">
-        <th mat-header-cell *matHeaderCellDef> {{column.name}} </th>
-        <td mat-cell *matCellDef="let element"> {{element[column.id]}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="direction">
-        <th mat-header-cell *matHeaderCellDef> Direction </th>
-        <td mat-cell *matCellDef="let element"><mat-icon [style.transform]="'rotate(' + (element.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon> </td>
-      </ng-container>
-      
-      <ng-container matColumnDef="receivedOn">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element">{{element.receivedOn | date:"medium"}}</td>
-      </ng-container>
-
-      <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
-      <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length + 2">
-          <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-              <app-plate
-                *ngIf="element === expandedElement"
-                [plate]="element"
-                [isExpanded]="element === expandedElement"
-                (searchPlatesEvent)="searchPlates($event)"></app-plate>
-          </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
-      <tr [ngClass]="{'alert': element.isAlert === true, 'ignore': element.isIgnore === true}"
-        mat-row
-        *matRowDef="let element; columns: rowsToDisplay;"
-        class="example-element-row"
-        [class.example-expanded-row]="expandedElement === element"
-        (click)="expandedElement = expandedElement === element ? null : element">
-      </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"  class="example-detail-row"></tr>
-    </table>
-    <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
-      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center; margin-right:10px;">
-        <mat-progress-spinner 
-          color="primary" 
-          mode="indeterminate"
-          diameter="25">
-        </mat-progress-spinner>
-      </div>
-      <mat-paginator
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      [length]="totalNumberOfPlates"
-      (page)="onPaginatorPage($event)"></mat-paginator>
-    </div>
     <mat-accordion>
-      <div *ngFor="let plate of rawPlates">
-        <mat-expansion-panel (opened)="panelOpenState = true"
-                             (closed)="panelOpenState = false">
+      <mat-expansion-panel [hideToggle]="true" [disabled]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title style="display:block !important">
+            <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: nowrap;">
+              <span>Camera Id</span>
+              <span>Plate Number</span>
+              <span>Vehicle Description</span>
+              <span>Vehicle Direction</span>
+              <span>Date</span>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+        <mat-expansion-panel *ngFor="let plate of plates">
           <mat-expansion-panel-header>
             <mat-panel-title style="display:block !important">
-              <div style="display:flex; justify-content: space-between; flex-wrap: nowrap;">
+              <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: nowrap;">
                 <div>{{plate.openAlprCameraId}}</div>
                 <div>{{plate.plateNumber}}</div>
                 <div>{{plate.vehicleDescription}}</div>
                 <div><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></div>
                 <div>{{plate.receivedOn | date:"medium"}}</div>
               </div>
-
             </mat-panel-title>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
@@ -79,8 +37,20 @@
             <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
           </mat-action-row>
         </mat-expansion-panel>
-      </div>
     </mat-accordion>
+    <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
+      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center; margin-right:10px;">
+        <mat-progress-spinner 
+          color="primary" 
+          mode="indeterminate"
+          diameter="25">
+        </mat-progress-spinner>
+      </div>
+      <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [length]="totalNumberOfPlates"
+      (page)="onPaginatorPage($event)"></mat-paginator>
+    </div>
   </div>
   <div>
     <mat-card class="example-card">

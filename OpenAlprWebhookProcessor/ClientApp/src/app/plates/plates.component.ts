@@ -51,10 +51,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     'processedPlateConfidence',
     'receivedOn'
   ];
+
   panelOpenState = false;
   public range: FormGroup;
-  public plates: MatTableDataSource<Plate>;
-  public rawPlates: Plate[] = [];
+  public plates: Plate[] = [];
   public totalNumberOfPlates: number;
 
   public filterPlateNumber: string;
@@ -71,7 +71,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public isAddingToIgnoreList: boolean;
   public isLoading: boolean;
 
-  private pageSize: number = 10;
+  private pageSize: number = 5;
   private pageNumber: number = 0;
 
   private subscriptions = new Subscription();
@@ -137,8 +137,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
-      this.plates = new MatTableDataSource<Plate>(result.plates);
-      this.rawPlates = result.plates;
+      this.plates = result.plates;
       this.isLoading = false;
     });
   }
