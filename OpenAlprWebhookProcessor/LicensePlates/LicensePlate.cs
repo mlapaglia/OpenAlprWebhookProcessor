@@ -16,8 +16,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         public double ProcessedPlateConfidence { get; set; }
 
-        public string LicensePlateJpegBase64 { get; set; }
-
         public bool IsAlert { get; set; }
 
         public bool IsIgnore { get; set; }

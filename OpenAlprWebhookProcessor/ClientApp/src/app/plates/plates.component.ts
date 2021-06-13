@@ -163,6 +163,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.settingsService.addIgnore(ignore).subscribe(() => {
       this.isAddingToIgnoreList = false;
       this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
+      this.searchPlates();
     });
   }
 

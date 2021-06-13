@@ -20,7 +20,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 Id = plate.Id,
                 IsAlert = platesToAlert.Contains(plate.BestNumber),
                 IsIgnore = platesToIgnore.Contains(plate.BestNumber),
-                LicensePlateJpegBase64 = plate.Jpeg,
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,
                 PlateNumber = plate.BestNumber,

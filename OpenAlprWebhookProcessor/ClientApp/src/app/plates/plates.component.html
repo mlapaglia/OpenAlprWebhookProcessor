@@ -14,10 +14,10 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
       </mat-expansion-panel>
-        <mat-expansion-panel *ngFor="let plate of plates">
+        <mat-expansion-panel *ngFor="let plate of plates" [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
           <mat-expansion-panel-header>
             <mat-panel-title style="display:block !important">
-              <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: nowrap;">
+              <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap;">
                 <div>{{plate.openAlprCameraId}}</div>
                 <div>{{plate.plateNumber}}</div>
                 <div>{{plate.vehicleDescription}}</div>
