@@ -1,12 +1,12 @@
-<div style="display: flex; align-items: flex-end; margin-top:35px">
-    <div [hidden]="!loadingImage">
+<div style="display: flex; align-items: flex-end; margin-top:35px; align-content: space-around;">
+    <div [hidden]="!loadingImage" fxFlex="20">
         <mat-progress-spinner
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
-    <div>
+    <div fxFlex="20">
         <img style="cursor: pointer;"
             [src]="plate.imageUrl"
             [hidden]="loadingImage || loadingImageFailed"
@@ -15,27 +15,39 @@
             (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
             width="300"/>
     </div>
-    <div *ngIf="!plate.imageUrl || loadingImageFailed">
+    <div *ngIf="!plate.imageUrl || loadingImageFailed" fxFlex="20">
         <mat-icon style="font-size: 100px;"
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
-    <div [hidden]="!loadingPlateImage">
+    <div [hidden]="!loadingPlateImage" fxFlex="20">
         <mat-progress-spinner
             color="primary"
             mode="indeterminate"
             diameter="100">
         </mat-progress-spinner>
     </div>
-    <div >
+    <div fxFlex="20">
         <img [src]="plate.cropImageUrl"
             [hidden]="loadingPlateImage || loadingPlateImageFailed"
             (load)="plateImageLoaded()"
             (error)="plateImageFailedToLoad()" />
     </div>
-    <div *ngIf="!plate.cropImageUrl || loadingPlateImageFailed">
+    <div *ngIf="!plate.cropImageUrl || loadingPlateImageFailed" fxFlex="20">
         <mat-icon style="font-size: 100px;"
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+    </div>
+    <div fxFlex="20">
+        <table>
+            <tr>
+                <td>Processing Time</td>
+                <td>{{plate.openAlprProcessingTimeMs}}ms</td>
+            </tr>
+            <tr>
+                <td>Possible plate numbers</td>
+                <td>{{plate.possiblePlateNumbers}}</td>
+            </tr>
+        </table>
     </div>
 </div>
