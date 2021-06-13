@@ -1,15 +1,15 @@
 <div style="margin: 15px;" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="20px" fxLayoutAlign="space-around">
-  <div fxFlex="80%">
+  <div fxFlex="80">
     <mat-accordion>
       <mat-expansion-panel [hideToggle]="true" [disabled]="true">
         <mat-expansion-panel-header>
           <mat-panel-title style="display:block !important">
-            <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: nowrap;">
-              <span>Camera Id</span>
-              <span>Plate Number</span>
-              <span>Vehicle Description</span>
-              <span>Vehicle Direction</span>
-              <span>Date</span>
+            <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: nowrap;">
+              <span fxFlex="10">Camera Id</span>
+              <span fxFlex="20">Plate Number</span>
+              <span fxFlex="20">Vehicle Description</span>
+              <span fxFlex="20">Vehicle Direction</span>
+              <span fxFlex="30">Date</span>
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
@@ -17,12 +17,12 @@
         <mat-expansion-panel *ngFor="let plate of plates" [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
           <mat-expansion-panel-header>
             <mat-panel-title style="display:block !important">
-              <div style="display:flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap;">
-                <div>{{plate.openAlprCameraId}}</div>
-                <div>{{plate.plateNumber}}</div>
-                <div>{{plate.vehicleDescription}}</div>
-                <div><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></div>
-                <div>{{plate.receivedOn | date:"medium"}}</div>
+              <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
+                <span fxFlex="10">{{plate.openAlprCameraId}}</span>
+                <span fxFlex="20">{{plate.plateNumber}}</span>
+                <span fxFlex="20"> {{plate.vehicleDescription}}</span>
+                <span fxFlex="20"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
+                <span fxFlex="30">{{plate.receivedOn | date:"medium"}}</span>
               </div>
             </mat-panel-title>
           </mat-expansion-panel-header>
@@ -52,22 +52,22 @@
       (page)="onPaginatorPage($event)"></mat-paginator>
     </div>
   </div>
-  <div>
+  <div fxFlex="20">
     <mat-card class="example-card">
       <mat-card-header>
         <mat-card-title>Filters</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" style="width: 80%;">
           <mat-label>Enter a date range</mat-label>
-          <mat-date-range-input [rangePicker]="picker">
+          <mat-date-range-input [rangePicker]="picker" >
             <input matStartDate [(ngModel)]="filterStartOn" placeholder="Start date">
             <input matEndDate [(ngModel)]="filterEndOn" placeholder="End date">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" style="width: 80%;">
           <mat-label>Plate Number</mat-label>
           <input matInput
             [(ngModel)]="filterPlateNumber"
@@ -99,7 +99,6 @@
             </li>
           </ul>
         </div>
-
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button

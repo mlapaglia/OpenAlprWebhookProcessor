@@ -9,7 +9,7 @@ export interface Plate {
 
     plateNumber: string;
 
-    OpenAlprProcessingTimeMs: number;
+    openAlprProcessingTimeMs: number;
 
     processedPlateConfidence: number;
 
