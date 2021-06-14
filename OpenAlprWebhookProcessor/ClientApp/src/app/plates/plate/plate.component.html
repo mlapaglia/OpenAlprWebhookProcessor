@@ -1,49 +1,41 @@
-<div style="display: flex; align-items: flex-end; margin-top:35px; align-content: space-around;">
-    <div fxFlex="20">
-        <div [hidden]="!loadingImage">
-            <mat-progress-spinner
-                color="primary"
-                mode="indeterminate"
-                diameter="100">
-            </mat-progress-spinner>
-        </div>
-        <div>
-            <img style="cursor: pointer;"
-                [src]="plate.imageUrl"
-                [hidden]="loadingImage || loadingImageFailed"
-                (load)="imageLoaded()"
-                (error)="imageFailedToLoad()"
-                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
-                width="300"/>
-        </div>
-        <div *ngIf="!plate.imageUrl || loadingImageFailed">
-            <mat-icon style="font-size: 100px;"
-                [inline]="true"
-                matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-        </div>
+<div style="display:flex; margin-top:35px; flex-wrap: wrap; justify-content: space-between;">
+    <div fxFlex="40">
+        <mat-progress-spinner
+            color="primary"
+            mode="indeterminate"
+            diameter="100"
+            [hidden]="!loadingImage">
+        </mat-progress-spinner>
+        <img [src]="plate.imageUrl"
+            style="cursor: pointer; width: 100%;"
+            [hidden]="loadingImage || loadingImageFailed"
+            (load)="imageLoaded()"
+            (error)="imageFailedToLoad()"
+            (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
+            width="300"/>
+        <mat-icon style="font-size: 100px;"
+            *ngIf="!plate.imageUrl || loadingImageFailed"
+            [inline]="true"
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+    </div>
+    <div fxFlex="40">
+        <mat-progress-spinner
+            [hidden]="!loadingPlateImage"
+            color="primary"
+            mode="indeterminate"
+            diameter="100">
+        </mat-progress-spinner>
+        <img [src]="plate.cropImageUrl"
+            style="width: 100%"
+            [hidden]="loadingPlateImage || loadingPlateImageFailed"
+            (load)="plateImageLoaded()"
+            (error)="plateImageFailedToLoad()" />
+        <mat-icon style="font-size: 100px;"
+            *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
+            [inline]="true"
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
     <div fxFlex="20">
-        <div [hidden]="!loadingPlateImage">
-            <mat-progress-spinner
-                color="primary"
-                mode="indeterminate"
-                diameter="100">
-            </mat-progress-spinner>
-        </div>
-        <div>
-            <img [src]="plate.cropImageUrl"
-                [hidden]="loadingPlateImage || loadingPlateImageFailed"
-                (load)="plateImageLoaded()"
-                (error)="plateImageFailedToLoad()" />
-        </div>
-        <div *ngIf="!plate.cropImageUrl || loadingPlateImageFailed">
-            <mat-icon style="font-size: 100px;"
-                [inline]="true"
-                matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-        </div>
-    </div>
-    <div fxFlex="40"></div>
-    <div fxFlex="20" class="justify-content: flex-end;">
         <table>
             <tr>
                 <td>Processing Time</td>
