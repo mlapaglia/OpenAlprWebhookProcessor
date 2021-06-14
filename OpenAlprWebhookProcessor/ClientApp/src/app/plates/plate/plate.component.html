@@ -7,7 +7,7 @@
             [hidden]="!loadingImage">
         </mat-progress-spinner>
         <img [src]="plate.imageUrl"
-            style="cursor: pointer; width: 100%;"
+            style="cursor: pointer; width: 90%;"
             [hidden]="loadingImage || loadingImageFailed"
             (load)="imageLoaded()"
             (error)="imageFailedToLoad()"
@@ -26,7 +26,7 @@
             diameter="100">
         </mat-progress-spinner>
         <img [src]="plate.cropImageUrl"
-            style="width: 100%"
+            style="width: 90%"
             [hidden]="loadingPlateImage || loadingPlateImageFailed"
             (load)="plateImageLoaded()"
             (error)="plateImageFailedToLoad()" />
