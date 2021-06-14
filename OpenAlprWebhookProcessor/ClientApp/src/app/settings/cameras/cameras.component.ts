@@ -46,7 +46,7 @@ export class CamerasComponent implements OnInit {
           cameraToSave = this.cameras[0];
         }
 
-        this.settingsService.upsertCamera(cameraToSave).subscribe(result => {
+        this.settingsService.upsertCamera(cameraToSave).subscribe(_ => {
           this.getCameras();
         });
       }
@@ -58,7 +58,7 @@ export class CamerasComponent implements OnInit {
   }
 
   public deleteCamera($event: string) {
-    this.settingsService.deleteCamera($event).subscribe(result => {
+    this.settingsService.deleteCamera($event).subscribe(_ => {
       this.getCameras();
     });
   }

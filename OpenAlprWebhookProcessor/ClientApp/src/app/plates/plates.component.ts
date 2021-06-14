@@ -3,16 +3,15 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { Ignore } from '@app/settings/ignores/ignore/ignore';
-import { SettingsService } from '@app/settings/settings.service';
 import { SignalrService } from '@app/signalr/signalr.service';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
-import { Lightbox } from 'ngx-lightbox';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
+import { Ignore } from '@app/settings/ignores/ignore/ignore';
+import { SettingsService } from '@app/settings/settings.service';
 
 @Component({
   selector: 'app-plates',
@@ -52,9 +51,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     'processedPlateConfidence',
     'receivedOn'
   ];
-  
+
+  panelOpenState = false;
   public range: FormGroup;
-  public plates: MatTableDataSource<Plate>;
+  public plates: Plate[] = [];
   public totalNumberOfPlates: number;
 
   public filterPlateNumber: string;
@@ -67,10 +67,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlatesEnabled: boolean = true;
   public regexSearchEnabled: boolean;
 
-  public addingToIgnoreList: boolean;
-  public deletingPlate: boolean;
+  public isDeletingPlate: boolean;
+  public isAddingToIgnoreList: boolean;
+  public isLoading: boolean;
 
-  private pageSize: number = 10;
+  private pageSize: number = 5;
   private pageNumber: number = 0;
 
   private subscriptions = new Subscription();
@@ -79,10 +80,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   
   constructor(
     private plateService: PlateService,
-    private lightbox: Lightbox,
     private signalRHub: SignalrService,
-    private settingsService: SettingsService,
-    private snackbarService: SnackbarService) {
+    private snackbarService: SnackbarService,
+    private settingsService: SettingsService) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -105,16 +105,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
         this.searchPlates();
     }));
-  }
-
-  public openLightbox(url: string, plateNumber: string) {
-    var albums = [{
-      src: url,
-      caption: plateNumber,
-      thumb: url
-    }];
-
-    this.lightbox.open(albums, 0);
   }
 
   public onPaginatorPage($event) {
@@ -144,9 +134,36 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.filterIgnoredPlates = this.filterIgnoredPlates;
     request.regexSearchEnabled = this.regexSearchEnabled;
 
+    this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
-      this.plates = new MatTableDataSource<Plate>(result.plates);
+      this.plates = result.plates;
+      this.isLoading = false;
+    });
+  }
+
+  public deletePlate(plateId: string = '', plateNumber: string = '') {
+    this.isDeletingPlate = true;
+
+    this.plateService.deletePlate(plateId).subscribe(() => {
+      this.isDeletingPlate = false;
+      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
+      this.searchPlates();
+    });
+  }
+
+  public addToIgnoreList(plateNumber: string = '') {
+    this.isAddingToIgnoreList = true;
+    var ignore = new Ignore();
+
+    ignore.plateNumber = plateNumber;
+    ignore.strictMatch = true;
+    ignore.description = 'Added from plate list';
+
+    this.settingsService.addIgnore(ignore).subscribe(() => {
+      this.isAddingToIgnoreList = false;
+      this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
+      this.searchPlates();
     });
   }
 
@@ -162,30 +179,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.regexSearchEnabled = false;
 
     this.searchPlates();
-  }
-
-  public addToIgnoreList(plateNumber: string = '') {
-    this.addingToIgnoreList = true;
-    var ignore = new Ignore();
-
-    ignore.plateNumber = plateNumber;
-    ignore.strictMatch = true;
-    ignore.description = 'Added from plate list';
-
-    this.settingsService.addIgnore(ignore).subscribe(() => {
-      this.addingToIgnoreList = false;
-      this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
-    });
-  }
-
-  public deletePlate(plateId: string = '', plateNumber: string = '') {
-    this.deletingPlate = true;
-
-    this.plateService.deletePlate(plateId).subscribe(() => {
-      this.deletingPlate = false;
-      this.searchPlates();
-      this.snackbarService.create(`${plateNumber} deleted`, SnackBarType.Deleted);
-    });
   }
 
   public validateSearchPlateNumber() {

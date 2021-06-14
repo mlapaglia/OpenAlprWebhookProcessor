@@ -1,74 +1,73 @@
 <div style="margin: 15px;" fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="20px" fxLayoutAlign="space-around">
-  <div fxFlex="80%">
-    <table mat-table [dataSource]="plates" multiTemplateDataRows class="mat-elevation-z8">
-      <ng-container matColumnDef="{{column.id}}" *ngFor="let column of columnsToDisplay">
-        <th mat-header-cell *matHeaderCellDef> {{column.name}} </th>
-        <td mat-cell *matCellDef="let element"> {{element[column.id]}} </td>
-      </ng-container>
-
-      <ng-container matColumnDef="direction">
-        <th mat-header-cell *matHeaderCellDef> Direction </th>
-        <td mat-cell *matCellDef="let element"><mat-icon [style.transform]="'rotate(' + (element.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon> </td>
-      </ng-container>
-      
-      <ng-container matColumnDef="receivedOn">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element">{{element.receivedOn | date:"medium"}}</td>
-      </ng-container>
-
-      <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
-      <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length + 2">
-          <div class="example-element-detail"
-              [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-            <div class="example-element-description">
-              <img style="cursor: pointer;" [src]="element.imageUrl" (click)="openLightbox(element.imageUrl, element.plateNumber)" width="300"/>
+  <div fxFlex="80">
+    <mat-accordion>
+      <mat-expansion-panel [hideToggle]="true" [disabled]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title style="display:block !important">
+            <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: nowrap;">
+              <span fxFlex="10">Camera Id</span>
+              <span fxFlex="20">Plate Number</span>
+              <span fxFlex="20">Vehicle Description</span>
+              <span fxFlex="20">Vehicle Direction</span>
+              <span fxFlex="30">Date</span>
             </div>
-            <div class="example-element-description">
-              <img [src]="element.cropImageUrl" />
-            </div>
-            <div class="example-element-description">
-              <button mat-raised-button color="primary" (click)="searchPlates(element.plateNumber)">Search for plate</button>
-            </div>
-            <div class="example-element-description">
-              <button mat-raised-button color="primary" [class.spinner]="addingToIgnoreList" [disabled]="element.isIgnore || addingToIgnoreList" (click)="addToIgnoreList(element.plateNumber)">Add to ignore list</button>
-            </div>
-            <div class="example-element-description">
-              <button mat-raised-button color="warn" [class.spinner]="deletingPlate" [disabled]="deletingPlate" (click)="deletePlate(element.id, element.plateNumber)">Delete Plate</button>
-            </div>
-          </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
-      <tr [ngClass]="{'alert': element.isAlert === true, 'ignore': element.isIgnore === true}" mat-row *matRowDef="let element; columns: rowsToDisplay;"
-          class="example-element-row"
-          [class.example-expanded-row]="expandedElement === element"
-          (click)="expandedElement = expandedElement === element ? null : element">
-      </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"  class="example-detail-row"></tr>
-    </table>
-    <mat-paginator
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+        <mat-expansion-panel *ngFor="let plate of plates">
+          <mat-expansion-panel-header [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
+            <mat-panel-title style="display:block !important">
+              <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
+                <span fxFlex="10">{{plate.openAlprCameraId}}</span>
+                <span fxFlex="20">{{plate.plateNumber}}</span>
+                <span fxFlex="20"> {{plate.vehicleDescription}}</span>
+                <span fxFlex="20"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
+                <span fxFlex="30">{{plate.receivedOn | date:"medium"}}</span>
+              </div>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-plate
+                [plate]="plate"
+                (searchPlatesEvent)="searchPlates($event)"></app-plate>
+          </ng-template>
+          <mat-action-row>
+            <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
+            <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
+            <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
+          </mat-action-row>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
+      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center; margin-right:10px;">
+        <mat-progress-spinner 
+          color="primary" 
+          mode="indeterminate"
+          diameter="25">
+        </mat-progress-spinner>
+      </div>
+      <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"
       [length]="totalNumberOfPlates"
       (page)="onPaginatorPage($event)"></mat-paginator>
+    </div>
   </div>
-  <div>
+  <div fxFlex="20">
     <mat-card class="example-card">
       <mat-card-header>
         <mat-card-title>Filters</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" style="width: 80%;">
           <mat-label>Enter a date range</mat-label>
-          <mat-date-range-input [rangePicker]="picker">
+          <mat-date-range-input [rangePicker]="picker" >
             <input matStartDate [(ngModel)]="filterStartOn" placeholder="Start date">
             <input matEndDate [(ngModel)]="filterEndOn" placeholder="End date">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-date-range-picker #picker></mat-date-range-picker>
         </mat-form-field>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" style="width: 80%;">
           <mat-label>Plate Number</mat-label>
           <input matInput
             [(ngModel)]="filterPlateNumber"
@@ -100,7 +99,6 @@
             </li>
           </ul>
         </div>
-
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button

@@ -1,0 +1,50 @@
+<div style="display:flex; margin-top:35px; flex-wrap: wrap; justify-content: space-between;">
+    <div fxFlex="40">
+        <mat-progress-spinner
+            color="primary"
+            mode="indeterminate"
+            diameter="100"
+            [hidden]="!loadingImage">
+        </mat-progress-spinner>
+        <img [src]="plate.imageUrl"
+            style="cursor: pointer; width: 90%;"
+            [hidden]="loadingImage || loadingImageFailed"
+            (load)="imageLoaded()"
+            (error)="imageFailedToLoad()"
+            (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
+            width="300"/>
+        <mat-icon style="font-size: 100px;"
+            *ngIf="!plate.imageUrl || loadingImageFailed"
+            [inline]="true"
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+    </div>
+    <div fxFlex="20">
+        <mat-progress-spinner
+            [hidden]="!loadingPlateImage"
+            color="primary"
+            mode="indeterminate"
+            diameter="100">
+        </mat-progress-spinner>
+        <img [src]="plate.cropImageUrl"
+            style="width: 90%"
+            [hidden]="loadingPlateImage || loadingPlateImageFailed"
+            (load)="plateImageLoaded()"
+            (error)="plateImageFailedToLoad()" />
+        <mat-icon style="font-size: 100px;"
+            *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
+            [inline]="true"
+            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+    </div>
+    <div fxFlex="40">
+        <table>
+            <tr>
+                <td>Processing Time</td>
+                <td>{{plate.openAlprProcessingTimeMs}}ms</td>
+            </tr>
+            <tr>
+                <td>Possible plate numbers</td>
+                <td>{{plate.possiblePlateNumbers}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

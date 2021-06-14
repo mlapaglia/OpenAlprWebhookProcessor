@@ -36,6 +36,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
+using Microsoft.Net.Http.Headers;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -219,6 +220,7 @@ namespace OpenAlprWebhookProcessor
             });
 
             app.UseStaticFiles();
+
             app.UseHangfireDashboard();
 
             if (!env.IsDevelopment())

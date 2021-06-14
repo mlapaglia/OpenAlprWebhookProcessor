@@ -9,11 +9,11 @@ export interface Plate {
 
     plateNumber: string;
 
-    penAlprProcessingTimeMs: number;
+    possiblePlateNumbers: string;
+
+    openAlprProcessingTimeMs: number;
 
     processedPlateConfidence: number;
-
-    licensePlateJpegBase64: number;
 
     isAlert: boolean;
 

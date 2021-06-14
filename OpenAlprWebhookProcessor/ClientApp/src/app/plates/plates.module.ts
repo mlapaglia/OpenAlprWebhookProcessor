@@ -18,11 +18,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PlateComponent } from './plate/plate.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
     PlatesLayoutComponent,
     PlatesComponent,
+    PlateComponent,
   ],
   imports: [
     CommonModule,
@@ -40,6 +44,8 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     MatInputModule,
     MatButtonModule,
     MatFormFieldModule,
+    MatProgressSpinnerModule,
+    MatExpansionModule,
     ReactiveFormsModule,
     FormsModule,
     MatCheckboxModule,

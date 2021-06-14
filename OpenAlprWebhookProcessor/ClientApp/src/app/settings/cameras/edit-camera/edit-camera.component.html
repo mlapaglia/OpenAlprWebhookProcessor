@@ -1,5 +1,6 @@
 <h1 mat-dialog-title>Edit Camera</h1>
-<mat-dialog-content fxLayout="row wrap" fxLayoutGap=20px>
+<mat-dialog-content>
+  <div fxLayout="row wrap" fxLayoutGap=20px>
     <mat-form-field appearance="outline">
       <mat-label>Manufacturer</mat-label>
       <mat-select matInput [(ngModel)]="camera.manufacturer" required>
@@ -24,12 +25,10 @@
       <input matInput [(ngModel)]="camera.cameraPassword" [type]="hidePassword ? 'password' : 'text'" required>
       <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
     </mat-form-field>
-  </mat-dialog-content>
+  </div>
   <h2 mat-dialog-title>OpenALPR Integration<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.openAlprEnabled"></mat-slide-toggle></h2>
   <div *ngIf="camera.openAlprEnabled" [@inOutAnimation]>
-    <mat-dialog-content
-      fxLayout="row wrap"
-      fxLayoutGap=20px>
+    <div fxLayout="row wrap" fxLayoutGap=20px>
       <mat-form-field appearance="outline">
         <mat-label>OpenALPR Name</mat-label>
         <input matInput [(ngModel)]="camera.openAlprName" required>
@@ -38,27 +37,23 @@
         <mat-label>OpenALPR Id</mat-label>
         <input type="number" matInput [(ngModel)]="camera.openAlprCameraId" required>
       </mat-form-field>
-    </mat-dialog-content>
+    </div>
   </div>
   <h2 mat-dialog-title style="padding-top:40px;">Overlays<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.updateOverlayEnabled"></mat-slide-toggle></h2>
   <div *ngIf="camera.updateOverlayEnabled" [@inOutAnimation]>
-    <mat-dialog-content
-      fxLayout="row wrap"
-      fxLayoutGap=20px>
+    <div fxLayout="row wrap" fxLayoutGap=20px>
       <mat-form-field fxFlex="100" appearance="outline">
         <mat-label>Camera Overlay Text Url</mat-label>
         <input matInput [(ngModel)]="camera.updateOverlayTextUrl" required>
       </mat-form-field>
-    </mat-dialog-content>
-    <div>
-      <button mat-raised-button cdkFocusInitial (click)="testOverlay()">Trigger Overlay</button>
+      <div>
+        <button mat-raised-button cdkFocusInitial (click)="testOverlay()">Trigger Overlay</button>
+      </div>
     </div>
   </div>
   <h2 mat-dialog-title style="padding-top:40px;">Day/Night Toggle<mat-slide-toggle style="padding-left:16px;" [(ngModel)]="camera.dayNightModeEnabled"></mat-slide-toggle></h2>
   <div *ngIf="camera.dayNightModeEnabled" [@inOutAnimation]>
-    <mat-dialog-content
-      fxLayout="row wrap"
-      fxLayoutGap=20px>
+    <div fxLayout="row wrap" fxLayoutGap=20px>
       <mat-form-field appearance="outline">
         <mat-label>Latitude</mat-label>
         <input type="number" matInput [(ngModel)]="camera.latitude" placeholder="defaults to agent's GPS if blank">
@@ -107,14 +102,15 @@
         <mat-label>Current Focus</mat-label>
         <input type="number" matInput [(ngModel)]="currentZoomFocus.focus">
       </mat-form-field>
-    </mat-dialog-content>
-    <div mat-dialog-actions align="left">
-      <button mat-raised-button cdkFocusInitial [disabled]="camera.dayNightModeUrl == ''" (click)="triggerNightMode()">Trigger Night Mode</button>
-      <button mat-raised-button cdkFocusInitial [disabled]="camera.dayNightModeUrl == ''" (click)="triggerDayMode()">Trigger Day Mode</button>
-      <button mat-raised-button cdkFocusInitial (click)="getZoomFocus()">Get Zoom/Focus</button>
-      <button mat-raised-button cdkFocusInitial (click)="setZoomFocus()">Set Zoom/Focus</button>
+      <div mat-dialog-actions align="left">
+        <button mat-raised-button cdkFocusInitial style="margin-bottom: 5px;" [disabled]="camera.dayNightModeUrl == ''" (click)="triggerNightMode()">Trigger Night Mode</button>
+        <button mat-raised-button cdkFocusInitial style="margin-bottom: 5px;" [disabled]="camera.dayNightModeUrl == ''" (click)="triggerDayMode()">Trigger Day Mode</button>
+        <button mat-raised-button cdkFocusInitial (click)="getZoomFocus()">Get Zoom/Focus</button>
+        <button mat-raised-button cdkFocusInitial (click)="setZoomFocus()">Set Zoom/Focus</button>
+      </div>
     </div>
   </div>
+</mat-dialog-content>
 <div mat-dialog-actions align="end">
   <button mat-raised-button [mat-dialog-close]="false">Cancel</button>
   <button mat-raised-button [mat-dialog-close]="true" cdkFocusInitial color="primary">Save</button>

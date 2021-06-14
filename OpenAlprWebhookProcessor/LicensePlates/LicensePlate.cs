@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -12,11 +13,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         public string PlateNumber { get; set; }
 
+        public string PossiblePlateNumbers { get; set; }
+
         public double OpenAlprProcessingTimeMs { get; set; }
 
         public double ProcessedPlateConfidence { get; set; }
-
-        public string LicensePlateJpegBase64 { get; set; }
 
         public bool IsAlert { get; set; }
 
