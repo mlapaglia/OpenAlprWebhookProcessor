@@ -9,7 +9,7 @@ export interface Plate {
 
     plateNumber: string;
 
-    possiblePlateNumbers: string[];
+    possiblePlateNumbers: string;
 
     openAlprProcessingTimeMs: number;
 

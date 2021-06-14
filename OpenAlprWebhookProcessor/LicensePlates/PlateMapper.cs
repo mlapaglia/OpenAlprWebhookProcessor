@@ -1,7 +1,6 @@
 ﻿using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -24,7 +23,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,
                 PlateNumber = plate.BestNumber,
-                PossiblePlateNumbers = plate.PossibleNumbers.Split(",").ToList(),
+                PossiblePlateNumbers = plate.PossibleNumbers.Replace(",", " ,"),
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
                 VehicleDescription = plate.VehicleDescription,

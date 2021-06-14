@@ -13,7 +13,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         public string PlateNumber { get; set; }
 
-        public List<string> PossiblePlateNumbers { get; set; }
+        public string PossiblePlateNumbers { get; set; }
 
         public double OpenAlprProcessingTimeMs { get; set; }
 
