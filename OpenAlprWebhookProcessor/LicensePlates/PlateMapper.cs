@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,
                 PlateNumber = plate.BestNumber,
-                PossiblePlateNumbers = plate.PossibleNumbers.Replace(",", ", "),
+                PossiblePlateNumbers = !string.IsNullOrWhiteSpace(plate.PossibleNumbers) ? plate.PossibleNumbers.Replace(",", ", ") : string.Empty,
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
                 VehicleDescription = plate.VehicleDescription,
