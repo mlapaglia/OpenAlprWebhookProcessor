@@ -75,17 +75,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
             }
 
-            int totalCount;
-            try
-            {
-                totalCount = dbRequest.Count();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-            
+            var totalCount = dbRequest.Count();
 
             dbRequest = dbRequest
                 .OrderByDescending(x => x.ReceivedOnEpoch)
