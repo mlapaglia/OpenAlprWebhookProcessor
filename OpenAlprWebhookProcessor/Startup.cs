@@ -37,6 +37,7 @@ using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
 using Microsoft.Net.Http.Headers;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -157,6 +158,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<DeleteLicensePlateGroupRequestHandler>();
             services.AddScoped<GetWebhookForwardsRequestHandler>();
             services.AddScoped<UpsertWebhookForwardsRequestHandler>();
+            services.AddScoped<OpenAlprAgentScraper>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

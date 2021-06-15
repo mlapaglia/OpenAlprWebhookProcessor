@@ -43,9 +43,9 @@ namespace OpenAlprWebhookProcessor.Settings
         }
 
         [HttpGet("agent")]
-        public async Task<Agent> GetAgent()
+        public async Task<Agent> GetAgent(CancellationToken cancellationToken)
         {
-            return await _getAgentRequestHandler.HandleAsync();
+            return await _getAgentRequestHandler.HandleAsync(cancellationToken);
         }
 
         [HttpPost("agent")]

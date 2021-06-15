@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 {
     public class OpenAlprAgentScraper
     {
+        private const int minutesToScrape = 30;
+
         private const string scrapeUrl = "/list?start={0}&end={1}";
 
         private const string metadataUrl = "/meta/{0}";
@@ -40,48 +43,96 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
         {
             var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
-            var currentRequestEndEpoch = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-            var scrapeResults = await _httpClient.GetAsync(
-                agent.EndpointUrl
-                + scrapeUrl
-                    .Replace("{0}", agent.LastSuccessfulScrapeEpoch.ToString())
-                    .Replace("{1}", currentRequestEndEpoch.ToString()),
-                cancellationToken);
-
-            if (!scrapeResults.IsSuccessStatusCode)
+            DateTimeOffset lastSuccessfulScrape;
+            if (agent.LastSuccessfulScrapeEpoch == 0)
             {
-                throw new ArgumentException("no metadata found for given date range");
+                lastSuccessfulScrape = await GetEarliestGroupEpochAsync(agent, cancellationToken);
+            }
+            else
+            {
+                lastSuccessfulScrape = DateTimeOffset.FromUnixTimeMilliseconds(agent.LastSuccessfulScrapeEpoch);
             }
 
-            var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
+            var currentRequestEndEpoch = DateTimeOffset.Now;
+             
 
-            var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
-
-            foreach (var metadata in metaDatasToQuery)
+            while (currentRequestEndEpoch >= lastSuccessfulScrape)
             {
-                var newGroup = await _httpClient.GetAsync(
-                    metadataUrl.Replace("{0}", metadata.Key),
+                var scrapeResults = await _httpClient.GetAsync(
+                    agent.EndpointUrl
+                    + scrapeUrl
+                        .Replace("{0}", lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString())
+                        .Replace("{1}", lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString()),
                     cancellationToken);
 
-                if (!newGroup.IsSuccessStatusCode)
+                if (!scrapeResults.IsSuccessStatusCode)
                 {
-                    _logger.LogError("Unable to parse Group with Id: " + metadata.Key);
-                    continue;
+                    throw new ArgumentException("no metadata found for given date range");
                 }
 
-                var newGroupResult = await newGroup.Content.ReadAsStringAsync(cancellationToken);
+                var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
 
-                await _groupWebhookHandler.HandleWebhookAsync(
-                    new Webhook
+                var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
+
+                _logger.LogInformation("Found " + metaDatasToQuery.Count + " entries for: " + lastSuccessfulScrape.ToString());
+
+                foreach (var metadata in metaDatasToQuery)
+                {
+                    _logger.LogInformation("querying: " + metadata.Key);
+
+                    var newGroup = await _httpClient.GetAsync(
+                        agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
+                        cancellationToken);
+
+                    if (!newGroup.IsSuccessStatusCode)
                     {
-                        Group = JsonSerializer.Deserialize<Group>(newGroupResult)
-                    },
-                    cancellationToken);
+                        _logger.LogError("Unable to parse Group with Id: " + metadata.Key);
+                        continue;
+                    }
+
+                    var newGroupResult = await newGroup.Content.ReadAsStringAsync(cancellationToken);
+
+                    try
+                    {
+                        await _groupWebhookHandler.HandleWebhookAsync(
+                            new Webhook
+                            {
+                                Group = JsonSerializer.Deserialize<Group>(newGroupResult)
+                            },
+                            true,
+                            cancellationToken);
+                    }
+                    catch
+                    {
+                        _logger.LogError("Failed to parse bulk import request.");
+                    }
+                }
+
+                agent.LastSuccessfulScrapeEpoch = lastSuccessfulScrape.ToUnixTimeMilliseconds();
+                await _processorContext.SaveChangesAsync(cancellationToken);
+
+                lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
+            }
+        }
+
+        private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(
+            Agent agent,
+            CancellationToken cancellationToken)
+        {
+            var result = await _httpClient.GetAsync(
+                agent.EndpointUrl,
+                cancellationToken);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("Unable to get earliest group epoch");
             }
 
-            agent.LastSuccessfulScrapeEpoch = currentRequestEndEpoch;
-            await _processorContext.SaveChangesAsync(cancellationToken);
+            var content = await result.Content.ReadAsStringAsync(cancellationToken);
+
+            var firstEpochMs = Regex.Match(content, "Earliest date epoch: ([0-9]+)").Groups[1].Value;
+
+            return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(firstEpochMs));
         }
     }
 }

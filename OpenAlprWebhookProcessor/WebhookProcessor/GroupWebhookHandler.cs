@@ -42,6 +42,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public async Task HandleWebhookAsync(
             Webhook webhook,
+            bool isBulkImport,
             CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras
@@ -50,17 +51,27 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (camera == null)
             {
-                throw new ArgumentException("unknown camera, skipping");
+                _logger.LogError("unknown camera: " + webhook.CameraNumber + ", skipping.");
+                return;
             }
 
             if (!camera.OpenAlprEnabled)
             {
-                throw new ArgumentException("camera has OpenALPR integration disabled, skipping");
+                _logger.LogError("camera has OpenALPR integration disabled, skipping.");
+                return;
             }
 
             if (webhook.Group.IsParked)
             {
                 _logger.LogInformation($"parked car: {webhook.Group.BestPlateNumber}, ignoring.");
+                return;
+            }
+
+            var alreadyProcessed = await _processorContext.PlateGroups.AnyAsync(x => x.OpenAlprUuid == webhook.Group.BestUuid);
+
+            if (alreadyProcessed)
+            {
+                _logger.LogWarning("Duplicate group received, skipping: " + webhook.Group.BestUuid);
                 return;
             }
 
@@ -71,87 +82,89 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 vehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             }
 
-            if (camera.UpdateOverlayEnabled)
+            var plateGroup = new PlateGroup()
             {
-                var updateRequest = new CameraUpdateRequest()
-                {
-                    LicensePlateImageUuid = webhook.Group.BestUuid,
-                    LicensePlate = webhook.Group.BestPlateNumber,
-                    LicensePlateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null,
-                    Id = camera.Id,
-                    OpenAlprProcessingTimeMs = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2) : 0,
-                    ProcessedPlateConfidence = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.Confidence, 2) : 0,
-                    IsAlert = webhook.DataType == "alpr_alert",
-                    IsPreviewGroup = webhook.Group.IsPreview,
-                    AlertDescription = webhook.Description,
-                    VehicleDescription = vehicleDescription,
-                };
+                AlertDescription = webhook.Description,
+                PlateCoordinates = FormatLicensePlateXyCoordinates(webhook.Group.BestPlate.Coordinates),
+                Direction = webhook.Group.TravelDirection,
+                IsAlert = webhook.DataType == "alpr_alert",
+                OpenAlprCameraId = webhook.Group.CameraId,
+                OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
+                OpenAlprUuid = webhook.Group.BestUuid,
+                BestNumber = webhook.Group.BestPlateNumber,
+                PossibleNumbers = string.Join(",", webhook.Group.Candidates.Select(x => x.Plate).ToArray()),
+                Jpeg = webhook.Group.BestPlate.PlateCropJpeg,
+                Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
+                ReceivedOnEpoch = webhook.Group.EpochEnd,
+                VehicleDescription = vehicleDescription,
+            };
 
-                _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
-            }
+            _processorContext.PlateGroups.Add(plateGroup);
 
-            if (!webhook.Group.IsPreview)
+            await _processorContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("plate saved successfully");
+
+            if (!isBulkImport)
             {
-                var plateGroup = new PlateGroup()
+                if (camera.UpdateOverlayEnabled)
                 {
-                    AlertDescription = webhook.Description,
-                    PlateCoordinates = FormatLicensePlateXyCoordinates(webhook.Group.BestPlate.Coordinates),
-                    Direction = webhook.Group.TravelDirection,
-                    IsAlert = webhook.DataType == "alpr_alert",
-                    OpenAlprCameraId = webhook.Group.CameraId,
-                    OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2),
-                    OpenAlprUuid = webhook.Group.BestUuid,
-                    BestNumber = webhook.Group.BestPlateNumber,
-                    PossibleNumbers = string.Join(",", webhook.Group.Candidates.Select(x => x.Plate).ToArray()),
-                    Jpeg = webhook.Group.BestPlate.PlateCropJpeg,
-                    Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2),
-                    ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    VehicleDescription = vehicleDescription,
-                };
-
-                _processorContext.PlateGroups.Add(plateGroup);
-
-                await _processorContext.SaveChangesAsync(cancellationToken);
-
-                _logger.LogInformation("plate saved successfully");
-
-                await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
-
-                var alert = await _processorContext.Alerts
-                    .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber)
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                if (alert != null)
-                {
-                    var alertUpdateRequest = new AlertUpdateRequest()
+                    var updateRequest = new CameraUpdateRequest()
                     {
-                        CameraId = camera.Id,
-                        Description = alert.Description,
-                        LicensePlateId = plateGroup.Id,
-                        IsStrictMatch = alert.IsStrictMatch,
+                        LicensePlateImageUuid = webhook.Group.BestUuid,
+                        LicensePlate = webhook.Group.BestPlateNumber,
+                        LicensePlateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null,
+                        Id = camera.Id,
+                        OpenAlprProcessingTimeMs = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2) : 0,
+                        ProcessedPlateConfidence = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.Confidence, 2) : 0,
+                        IsAlert = webhook.DataType == "alpr_alert",
+                        IsPreviewGroup = webhook.Group.IsPreview,
+                        AlertDescription = webhook.Description,
+                        VehicleDescription = vehicleDescription,
                     };
 
-                    _alertService.AddJob(alertUpdateRequest);
+                    _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
                 }
-            }
 
-            var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
-
-            foreach (var forward in forwards)
-            {
-                if (forward.ForwardGroups || (forward.ForwardGroupPreviews && webhook.Group.IsPreview))
+                if (!webhook.Group.IsPreview)
                 {
-                    try
+                    await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
+
+                    var alert = await _processorContext.Alerts
+                        .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (alert != null)
                     {
-                        await WebhookForwarder.ForwardWebhookAsync(
-                            webhook,
-                            forward.FowardingDestination,
-                            forward.IgnoreSslErrors,
-                            cancellationToken);
+                        var alertUpdateRequest = new AlertUpdateRequest()
+                        {
+                            CameraId = camera.Id,
+                            Description = alert.Description,
+                            LicensePlateId = plateGroup.Id,
+                            IsStrictMatch = alert.IsStrictMatch,
+                        };
+
+                        _alertService.AddJob(alertUpdateRequest);
                     }
-                    catch (Exception ex)
+                }
+
+                var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+
+                foreach (var forward in forwards)
+                {
+                    if (forward.ForwardGroups || (forward.ForwardGroupPreviews && webhook.Group.IsPreview))
                     {
-                        _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                        try
+                        {
+                            await WebhookForwarder.ForwardWebhookAsync(
+                                webhook,
+                                forward.FowardingDestination,
+                                forward.IgnoreSslErrors,
+                                cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                        }
                     }
                 }
             }
