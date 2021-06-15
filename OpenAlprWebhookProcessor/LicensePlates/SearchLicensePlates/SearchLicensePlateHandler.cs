@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,7 +32,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
                 if (request.StrictMatch)
                 {
-                    dbRequest = dbRequest.Where(x => x.BestNumber.Contains(request.PlateNumber));
+                    dbRequest = dbRequest.Where(x => x.BestNumber == request.PlateNumber);
                 }
                 else if (request.RegexSearchEnabled)
                 {
@@ -39,9 +40,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
                 else
                 {
-                    dbRequest = dbRequest.Where(x =>
-                        x.BestNumber.Contains(request.PlateNumber)
-                        || x.PossibleNumbers.Contains(request.PlateNumber));
+                    dbRequest = dbRequest.Where(x => x.PossibleNumbers.Contains(request.PlateNumber));
                 }
             }
 
@@ -76,7 +75,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
             }
 
-            var totalCount = await dbRequest.CountAsync(cancellationToken);
+            var totalCount = dbRequest.Count();
 
             dbRequest = dbRequest
                 .OrderByDescending(x => x.ReceivedOnEpoch)
@@ -106,9 +105,9 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
         private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
         {
-            return (await _processerContext.Alerts.ToListAsync(cancellationToken))
+            return (await _processerContext.Alerts
                 .Select(x => x.PlateNumber)
-                .ToList();
+                .ToListAsync(cancellationToken));
         }
     }
 }
