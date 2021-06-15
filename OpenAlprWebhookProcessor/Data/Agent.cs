@@ -27,5 +27,7 @@ namespace OpenAlprWebhookProcessor.Data
         public int SunsetOffset { get; set; }
 
         public double TimeZoneOffset { get; set; }
+
+        public long LastSuccessfulScrapeEpoch { get; set; }
     }
 }
