@@ -1,6 +1,7 @@
 ﻿using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -26,8 +27,19 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 PossiblePlateNumbers = !string.IsNullOrWhiteSpace(plate.PossibleNumbers) ? plate.PossibleNumbers.Replace(",", ", ") : string.Empty,
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
+                Region = TranslateRegion(plate.Region),
                 VehicleDescription = plate.VehicleDescription,
             };
+        }
+
+        private static string TranslateRegion(string openAlprRegion)
+        {
+            var splitCode = openAlprRegion.Split('-');
+            var countryCode = splitCode[0];
+            var stateCode = splitCode[1];
+
+            var regionInfo = new RegionInfo(countryCode);
+            return regionInfo.DisplayName + " " + stateCode.ToUpper();
         }
     }
 }

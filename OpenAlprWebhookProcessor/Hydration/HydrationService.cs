@@ -155,6 +155,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
                         fields.PlateY4,
                     }),
                 ReceivedOnEpoch = DateTimeOffset.Parse(fields.EpochTimeStart).ToUnixTimeMilliseconds(),
+                Region = fields.Region,
                 VehicleDescription = $"{VehicleUtilities.FormatVehicleDescription(fields.VehicleMakeModel)}",
             };
 

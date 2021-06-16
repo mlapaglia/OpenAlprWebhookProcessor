@@ -20,6 +20,8 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string BestNumber { get; set; }
 
+        public string Region { get; set; }
+
         public string PossibleNumbers { get; set; }
 
         public string Jpeg { get; set; }

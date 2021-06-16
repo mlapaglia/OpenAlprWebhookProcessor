@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public async Task<Agent> HandleAsync(CancellationToken cancellationToken)
         {
-            await _scraper.ScrapeAgentAsync(cancellationToken);
+            //await _scraper.ScrapeAgentAsync(cancellationToken);
             var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null)
