@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 {
     public class OpenAlprAgentScraper
     {
-        private const int minutesToScrape = 30;
+        private const int minutesToScrape = 60 * 24;
 
         private const string scrapeUrl = "/list?start={0}&end={1}";
 
@@ -53,10 +53,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 lastSuccessfulScrape = DateTimeOffset.FromUnixTimeMilliseconds(agent.LastSuccessfulScrapeEpoch);
             }
 
-            var currentRequestEndEpoch = DateTimeOffset.Now;
-             
-
-            while (currentRequestEndEpoch >= lastSuccessfulScrape)
+            var startDate = DateTimeOffset.UtcNow;
+            while (startDate >= lastSuccessfulScrape)
             {
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
@@ -112,6 +110,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 await _processorContext.SaveChangesAsync(cancellationToken);
 
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
+
+                if (lastSuccessfulScrape > DateTimeOffset.UtcNow)
+                {
+                    lastSuccessfulScrape = DateTimeOffset.UtcNow;
+                }
             }
         }
 
