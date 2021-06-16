@@ -54,7 +54,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             }
 
             var startDate = DateTimeOffset.UtcNow;
-            while (startDate >= lastSuccessfulScrape)
+            while (startDate > lastSuccessfulScrape)
             {
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
@@ -106,15 +106,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     }
                 }
 
-                agent.LastSuccessfulScrapeEpoch = lastSuccessfulScrape.ToUnixTimeMilliseconds();
-                await _processorContext.SaveChangesAsync(cancellationToken);
-
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
 
-                if (lastSuccessfulScrape > DateTimeOffset.UtcNow)
+                if (lastSuccessfulScrape > startDate)
                 {
-                    lastSuccessfulScrape = DateTimeOffset.UtcNow;
+                    lastSuccessfulScrape = startDate;
                 }
+
+                agent.LastSuccessfulScrapeEpoch = lastSuccessfulScrape.ToUnixTimeMilliseconds();
+                await _processorContext.SaveChangesAsync(cancellationToken);
             }
         }
 

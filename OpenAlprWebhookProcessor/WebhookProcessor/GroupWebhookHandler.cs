@@ -82,7 +82,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 vehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
             }
 
-            var previewCutoff = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeMilliseconds();
             var previousPreviewGroup = await _processorContext.PlateGroups
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .FirstOrDefaultAsync(cancellationToken);
@@ -90,7 +89,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             PlateGroup plateGroup;
             if (previousPreviewGroup != null)
             {
-                _logger.LogInformation("Previous preview plate exists, overwriting");
+                _logger.LogInformation("Previous preview plate exists: " + previousPreviewGroup.BestNumber + ", overwriting");
                 plateGroup = previousPreviewGroup;
             }
             else

@@ -2,7 +2,6 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate';
@@ -12,6 +11,8 @@ import { SnackbarService } from '@app/snackbar/snackbar.service';
 import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Ignore } from '@app/settings/ignores/ignore/ignore';
 import { SettingsService } from '@app/settings/settings.service';
+import { Alert } from '@app/settings/alerts/alert/alert';
+import { AlertsService } from '@app/settings/alerts/alerts.service';
 
 @Component({
   selector: 'app-plates',
@@ -69,6 +70,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public isDeletingPlate: boolean;
   public isAddingToIgnoreList: boolean;
+  public isAddingToAlertList: boolean;
+
   public isLoading: boolean;
 
   private pageSize: number = 5;
@@ -82,6 +85,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private plateService: PlateService,
     private signalRHub: SignalrService,
     private snackbarService: SnackbarService,
+    private alertsService: AlertsService,
     private settingsService: SettingsService) {
       this.range = new FormGroup({
         start: new FormControl(),
@@ -163,6 +167,21 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.settingsService.addIgnore(ignore).subscribe(() => {
       this.isAddingToIgnoreList = false;
       this.snackbarService.create(`${plateNumber} added to ignore list`, SnackBarType.Saved);
+      this.searchPlates();
+    });
+  }
+
+  public addToAlertList(plateNumber: string = '') {
+    this.isAddingToAlertList = true;
+    var alert = new Alert();
+
+    alert.plateNumber = plateNumber;
+    alert.strictMatch = true;
+    alert.description = 'Added from plate list';
+
+    this.alertsService.addAlert(alert).subscribe(() => {
+      this.isAddingToAlertList = false;
+      this.snackbarService.create(`${plateNumber} added to alert list`, SnackBarType.Saved);
       this.searchPlates();
     });
   }

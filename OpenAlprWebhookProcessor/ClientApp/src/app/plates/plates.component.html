@@ -34,6 +34,7 @@
           <mat-action-row>
             <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
             <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
+            <button mat-button color="primary" [disabled]="plate.isAlert || isAddingToAlertList" [class.spinner]="isAddingToAlertList" (click)="addToAlertList(plate.plateNumber)">Add to alert list</button>
             <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
           </mat-action-row>
         </mat-expansion-panel>

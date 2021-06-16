@@ -260,6 +260,7 @@ namespace OpenAlprWebhookProcessor
             });
 
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.File(
                     "log-.txt",

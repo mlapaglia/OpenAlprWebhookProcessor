@@ -34,6 +34,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private static string TryTranslateRegion(string openAlprRegion)
         {
+            if(openAlprRegion == null)
+            {
+                return string.Empty;
+            }
+
             try
             {
                 var splitCode = openAlprRegion.Split('-');

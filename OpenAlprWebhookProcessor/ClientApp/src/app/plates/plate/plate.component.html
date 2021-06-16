@@ -37,7 +37,7 @@
     </div>
     <div fxFlex="40">
         <table>
-            <tr>
+            <tr *ngIf="plate.region">
                 <td>Region</td>
                 <td>{{plate.region}}</td>
             </tr>
