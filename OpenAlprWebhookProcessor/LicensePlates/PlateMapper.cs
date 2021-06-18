@@ -29,7 +29,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
                 Region = TryTranslateRegion(plate.Region),
-                VehicleDescription = VehicleUtilities.FormatVehicleDescription(plate.VehicleMakeModel),
+                VehicleDescription = VehicleUtilities.FormatVehicleDescription(plate.VehicleYear + " " + plate.VehicleMakeModel),
             };
         }
 
