@@ -13,7 +13,7 @@ import { Ignore } from '@app/settings/ignores/ignore/ignore';
 import { SettingsService } from '@app/settings/settings.service';
 import { Alert } from '@app/settings/alerts/alert/alert';
 import { AlertsService } from '@app/settings/alerts/alerts.service';
-import { VehicleFilters } from './VehicleFilters';
+import { VehicleFilters } from './vehicleFilters';
 
 @Component({
   selector: 'app-plates',
