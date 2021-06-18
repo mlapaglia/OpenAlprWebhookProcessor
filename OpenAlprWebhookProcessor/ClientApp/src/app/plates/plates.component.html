@@ -76,6 +76,34 @@
             (input)="validateSearchPlateNumber()"
             placeholder="LRN2DRV" />
         </mat-form-field>
+        <mat-form-field *ngIf="vehicleFilters" appearance="fill" style="width: 80%;">
+          <mat-label>Vehicle Make</mat-label>
+          <mat-select [(ngModel)]="filterVehicleMake">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let make of vehicleFilters.vehicleMakes" [value]="make">{{make}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field *ngIf="vehicleFilters" appearance="fill" style="width: 80%;">
+          <mat-label>Vehicle Model</mat-label>
+          <mat-select [(ngModel)]="filterVehicleModel">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let model of vehicleFilters.vehicleModels" [value]="model">{{model}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field *ngIf="vehicleFilters" appearance="fill" style="width: 80%;">
+          <mat-label>Vehicle Type</mat-label>
+          <mat-select [(ngModel)]="filterVehicleType">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let type of vehicleFilters.vehicleTypes" [value]="type">{{type}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field *ngIf="vehicleFilters" appearance="fill" style="width: 80%;">
+          <mat-label>Vehicle Color</mat-label>
+          <mat-select [(ngModel)]="filterVehicleColor">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let color of vehicleFilters.vehicleColors" [value]="color">{{color}}</mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-error *ngIf="!filterPlateNumberIsValid && regexSearchEnabled">Invalid regex pattern</mat-error>
         <mat-error *ngIf="!filterPlateNumberIsValid && !regexSearchEnabled">Invalid search term</mat-error>
         <div style="padding-top:10px;">

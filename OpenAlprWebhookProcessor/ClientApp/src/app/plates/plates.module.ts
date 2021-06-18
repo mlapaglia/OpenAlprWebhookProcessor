@@ -21,6 +21,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PlateComponent } from './plate/plate.component';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     FormsModule,
     MatCheckboxModule,
     MatDividerModule,
-    NgxChartsModule
+    NgxChartsModule,
+    MatAutocompleteModule,
   ]
 })
 export class PlatesModule { }

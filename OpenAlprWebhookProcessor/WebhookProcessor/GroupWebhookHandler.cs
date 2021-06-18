@@ -75,13 +75,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 return;
             }
 
-            string vehicleDescription = null;
-
-            if (webhook.Group.Vehicle != null)
-            {
-                vehicleDescription = $"{webhook.Group.Vehicle.Year[0].Name} {VehicleUtilities.FormatVehicleDescription(webhook.Group.Vehicle.MakeModel[0].Name)}";
-            }
-
             var previousPreviewGroup = await _processorContext.PlateGroups
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .FirstOrDefaultAsync(cancellationToken);
@@ -110,7 +103,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.Jpeg = webhook.Group.BestPlate.PlateCropJpeg;
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
-            plateGroup.VehicleDescription = vehicleDescription;
+            plateGroup.VehicleColor = webhook.Group.Vehicle.Colors.First()?.Name;
+            plateGroup.VehicleMake = webhook.Group.Vehicle.Makes.First()?.Name;
+            plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
+            plateGroup.VehicleType = webhook.Group.Vehicle.BodyTypes.First()?.Name;
+            plateGroup.VehicleYear = webhook.Group.Vehicle.Years.First()?.Name;
 
             if (previousPreviewGroup == null)
             {
@@ -135,7 +132,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         IsAlert = webhook.DataType == "alpr_alert",
                         IsPreviewGroup = webhook.Group.IsPreview,
                         AlertDescription = webhook.Description,
-                        VehicleDescription = vehicleDescription,
+                        VehicleDescription = VehicleUtilities.FormatVehicleDescription(plateGroup.VehicleYear + " " + plateGroup.VehicleMakeModel),
                     };
 
                     _cameraUpdateService.ScheduleOverlayRequest(updateRequest);

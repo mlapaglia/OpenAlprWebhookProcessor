@@ -75,6 +75,21 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(request.VehicleMake))
+            {
+                dbRequest = dbRequest.Where(x => x.VehicleMake.Contains(request.VehicleMake.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.VehicleModel))
+            {
+                dbRequest = dbRequest.Where(x => x.VehicleMakeModel.Contains(request.VehicleModel.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.VehicleType))
+            {
+                dbRequest = dbRequest.Where(x => x.VehicleType.Contains(request.VehicleType.ToLower()));
+            }
+
             var totalCount = dbRequest.Count();
 
             dbRequest = dbRequest

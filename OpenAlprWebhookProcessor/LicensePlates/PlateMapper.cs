@@ -1,4 +1,5 @@
 ﻿using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,7 +29,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
                 Region = TryTranslateRegion(plate.Region),
-                VehicleDescription = plate.VehicleDescription,
+                VehicleDescription = VehicleUtilities.FormatVehicleDescription(plate.VehicleMakeModel),
             };
         }
 

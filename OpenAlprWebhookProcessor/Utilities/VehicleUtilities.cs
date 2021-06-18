@@ -10,6 +10,11 @@ namespace OpenAlprWebhookProcessor.Utilities
 
         public static string FormatVehicleDescription(string vehicleMakeModel)
         {
+            if (vehicleMakeModel == null)
+            {
+                return string.Empty;
+            }
+
             return _textInfo
                 .ToTitleCase(vehicleMakeModel.Replace('_', ' '));
         }

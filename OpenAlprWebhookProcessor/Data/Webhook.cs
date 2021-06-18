@@ -28,7 +28,15 @@ namespace OpenAlprWebhookProcessor.Data
 
         public double Confidence { get; set; }
 
-        public string VehicleDescription { get; set; }
+        public string VehicleColor { get; set; }
+
+        public string VehicleMake { get; set; }
+
+        public string VehicleMakeModel { get; set; }
+
+        public string VehicleType { get; set; }
+
+        public string VehicleYear { get; set; }
 
         public double Direction { get; set; }
 

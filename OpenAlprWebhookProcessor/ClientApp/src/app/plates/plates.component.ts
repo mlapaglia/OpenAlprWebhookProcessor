@@ -3,7 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { SignalrService } from '@app/signalr/signalr.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
@@ -13,6 +13,8 @@ import { Ignore } from '@app/settings/ignores/ignore/ignore';
 import { SettingsService } from '@app/settings/settings.service';
 import { Alert } from '@app/settings/alerts/alert/alert';
 import { AlertsService } from '@app/settings/alerts/alerts.service';
+import { VehicleFilters } from './VehicleFilters';
+import { stringify } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-plates',
@@ -67,6 +69,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlates: boolean;
   public filterIgnoredPlatesEnabled: boolean = true;
   public regexSearchEnabled: boolean;
+  public filterVehicleMake: string;
+  public filterVehicleModel: string;
+  public filterVehicleType: string;
+  public filterVehicleColor: string;
+  
+  public vehicleFilters: VehicleFilters;
 
   public isDeletingPlate: boolean;
   public isAddingToIgnoreList: boolean;
@@ -95,6 +103,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     
   ngOnInit(): void {
     this.searchPlates();
+    this.populateFilters();
   }
 
   ngOnDestroy(): void {
@@ -118,6 +127,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchPlates();
   }
 
+  public populateFilters() {
+    this.plateService.getFilters().subscribe(result => {
+      this.vehicleFilters = result;
+    });
+  }
+
   public searchPlates(plateNumber: string = '') {
     var request = new PlateRequest();
 
@@ -137,6 +152,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.strictMatch = this.filterStrictMatch;
     request.filterIgnoredPlates = this.filterIgnoredPlates;
     request.regexSearchEnabled = this.regexSearchEnabled;
+    request.vehicleMake = this.filterVehicleMake;
+    request.vehicleModel = this.filterVehicleModel;
+    request.vehicleType = this.filterVehicleType;
 
     this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
@@ -196,7 +214,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterIgnoredPlates = false;
     this.filterIgnoredPlatesEnabled = true;
     this.regexSearchEnabled = false;
-
+    this.filterVehicleMake = '';
+    this.filterVehicleModel = '';
+    this.filterVehicleType = '';
+    this.filterVehicleColor = '';
+    
     this.searchPlates();
   }
 
