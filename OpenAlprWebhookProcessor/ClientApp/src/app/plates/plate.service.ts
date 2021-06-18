@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Stream } from "stream";
 import { PlateResponse } from "./plateResponse";
-import { VehicleFilters } from "./VehicleFilters";
+import { VehicleFilters } from "./vehicleFilters";
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
