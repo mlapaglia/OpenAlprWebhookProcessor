@@ -3,7 +3,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { SignalrService } from '@app/signalr/signalr.service';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Plate } from './plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
@@ -14,7 +14,6 @@ import { SettingsService } from '@app/settings/settings.service';
 import { Alert } from '@app/settings/alerts/alert/alert';
 import { AlertsService } from '@app/settings/alerts/alerts.service';
 import { VehicleFilters } from './VehicleFilters';
-import { stringify } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-plates',
