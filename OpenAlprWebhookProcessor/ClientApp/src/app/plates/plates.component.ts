@@ -73,7 +73,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterVehicleType: string;
   public filterVehicleColor: string;
   
-  public vehicleFilters: VehicleFilters;
+  public vehicleFilters: VehicleFilters = {} as VehicleFilters;
 
   public isDeletingPlate: boolean;
   public isAddingToIgnoreList: boolean;
