@@ -27,7 +27,7 @@
             diameter="100">
         </mat-progress-spinner>
         <img [src]="plate.cropImageUrl"
-            
+            width=300
             [hidden]="loadingPlateImage || loadingPlateImageFailed"
             (load)="plateImageLoaded()"
             (error)="plateImageFailedToLoad()" />
