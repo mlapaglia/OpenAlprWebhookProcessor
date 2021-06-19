@@ -3,44 +3,44 @@
     <mat-accordion>
       <mat-expansion-panel [hideToggle]="true" [disabled]="true">
         <mat-expansion-panel-header>
-          <mat-panel-title style="display:block !important">
-            <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: nowrap;">
-              <span fxFlex="10">Camera Id</span>
-              <span fxFlex="20">Plate Number</span>
-              <span fxFlex="20">Vehicle Description</span>
-              <span fxFlex="20">Vehicle Direction</span>
-              <span fxFlex="30">Date</span>
+          <mat-panel-title style="display:block">
+            <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
+              <div class="hide-mobile" fxFlex="10">Camera Id</div>
+              <div fxFlex="20">Plate Number</div>
+              <div fxFlex="20">Vehicle Description</div>
+              <div class="hide-mobile" fxFlex="20">Vehicle Direction</div>
+              <div fxFlex="30">Date</div>
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
       </mat-expansion-panel>
-        <mat-expansion-panel *ngFor="let plate of plates">
-          <mat-expansion-panel-header [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
-            <mat-panel-title style="display:block !important">
-              <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
-                <span fxFlex="10">{{plate.openAlprCameraId}}</span>
-                <span fxFlex="20">{{plate.plateNumber}}</span>
-                <span fxFlex="20"> {{plate.vehicleDescription}}</span>
-                <span fxFlex="20"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
-                <span fxFlex="30">{{plate.receivedOn | date:"medium"}}</span>
-              </div>
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <app-plate
-                [plate]="plate"
-                (searchPlatesEvent)="searchPlates($event)"></app-plate>
-          </ng-template>
-          <mat-action-row>
-            <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
-            <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
-            <button mat-button color="primary" [disabled]="plate.isAlert || isAddingToAlertList" [class.spinner]="isAddingToAlertList" (click)="addToAlertList(plate.plateNumber)">Add to alert list</button>
-            <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
-          </mat-action-row>
-        </mat-expansion-panel>
+      <mat-expansion-panel *ngFor="let plate of plates">
+        <mat-expansion-panel-header [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
+          <mat-panel-title style="display:block">
+            <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
+              <span class="hide-mobile" fxFlex="10">{{plate.openAlprCameraId}}</span>
+              <span fxFlex="20">{{plate.plateNumber}}</span>
+              <span fxFlex="20"> {{plate.vehicleDescription}}</span>
+              <span class="hide-mobile" fxFlex="20"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
+              <span fxFlex="30">{{plate.receivedOn | date:"medium"}}</span>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <app-plate
+              [plate]="plate"
+              (searchPlatesEvent)="searchPlates($event)"></app-plate>
+        </ng-template>
+        <mat-action-row style="display:flexbox; flex-wrap: wrap;">
+          <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
+          <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
+          <button mat-button color="primary" [disabled]="plate.isAlert || isAddingToAlertList" [class.spinner]="isAddingToAlertList" (click)="addToAlertList(plate.plateNumber)">Add to alert list</button>
+          <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
+        </mat-action-row>
+      </mat-expansion-panel>
     </mat-accordion>
     <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
-      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center; margin-right:10px;">
+      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center;">
         <mat-progress-spinner 
           color="primary" 
           mode="indeterminate"

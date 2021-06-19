@@ -4,7 +4,7 @@ import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/for
 import { MatPaginator } from '@angular/material/paginator';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
-import { Plate } from './plate';
+import { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { SnackbarService } from '@app/snackbar/snackbar.service';
@@ -18,7 +18,7 @@ import { VehicleFilters } from './vehicleFilters';
 @Component({
   selector: 'app-plates',
   templateUrl: './plates.component.html',
-  styleUrls: ['./plates.component.css'],
+  styleUrls: ['./plates.component.less'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),

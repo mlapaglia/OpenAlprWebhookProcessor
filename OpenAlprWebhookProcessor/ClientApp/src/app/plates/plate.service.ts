@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Stream } from "stream";
-import { PlateResponse } from "./plateResponse";
+import { PlateResponse } from "./plate/plateResponse";
 import { VehicleFilters } from "./vehicleFilters";
 
 @Injectable({ providedIn: 'root' })
