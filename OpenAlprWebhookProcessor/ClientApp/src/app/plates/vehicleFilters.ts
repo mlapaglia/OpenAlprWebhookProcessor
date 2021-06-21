@@ -8,4 +8,6 @@ export interface VehicleFilters {
     vehicleYears: string[];
 
     vehicleColors: string[];
+
+    vehicleRegions: string[];
 }

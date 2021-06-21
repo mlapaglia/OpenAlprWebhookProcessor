@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 PossiblePlateNumbers = !string.IsNullOrWhiteSpace(plate.PossibleNumbers) ? plate.PossibleNumbers.Replace(",", ", ") : string.Empty,
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
-                Region = TryTranslateRegion(plate.Region),
+                Region = TryTranslateRegion(plate.VehicleRegion),
                 VehicleDescription = VehicleUtilities.FormatVehicleDescription(plate.VehicleYear + " " + plate.VehicleMakeModel),
             };
         }

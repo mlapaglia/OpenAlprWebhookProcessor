@@ -99,15 +99,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.OpenAlprUuid = webhook.Group.BestUuid;
             plateGroup.BestNumber = webhook.Group.BestPlateNumber;
             plateGroup.PossibleNumbers = string.Join(",", webhook.Group.Candidates.Select(x => x.Plate).ToArray());
-            plateGroup.Region = webhook.Group.BestRegion;
             plateGroup.Jpeg = webhook.Group.BestPlate.PlateCropJpeg;
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
-            plateGroup.VehicleColor = webhook.Group.Vehicle.Colors.First()?.Name;
-            plateGroup.VehicleMake = webhook.Group.Vehicle.Makes.First()?.Name;
-            plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
-            plateGroup.VehicleType = webhook.Group.Vehicle.BodyTypes.First()?.Name;
-            plateGroup.VehicleYear = webhook.Group.Vehicle.Years.First()?.Name;
+
+            MapVehicle(plateGroup, webhook);
 
             if (previousPreviewGroup == null)
             {
@@ -180,6 +176,46 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
                     }
                 }
+            }
+        }
+
+        private static void MapVehicle(
+            PlateGroup plateGroup,
+            Webhook webhook)
+        {
+            if (webhook.Group.Vehicle.Colors.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleColor = webhook.Group.Vehicle.Colors.First()?.Name;
+            }
+
+            if (webhook.Group.Vehicle.Makes.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleMake = webhook.Group.Vehicle.Makes.First()?.Name;
+            }
+
+            if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
+            }
+
+            if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
+            }
+
+            if (webhook.Group.Vehicle.BodyTypes.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleType = webhook.Group.Vehicle.BodyTypes.First()?.Name;
+            }
+
+            if (webhook.Group.Vehicle.Years.First()?.Confidence > 50)
+            {
+                plateGroup.VehicleYear = webhook.Group.Vehicle.Years.First()?.Name;
+            }
+            
+            if(webhook.Group.BestPlate.RegionConfidence > 50)
+            {
+                plateGroup.VehicleRegion = webhook.Group.BestPlate.Region;
             }
         }
 

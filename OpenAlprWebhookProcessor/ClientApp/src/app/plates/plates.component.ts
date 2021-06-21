@@ -72,7 +72,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterVehicleModel: string;
   public filterVehicleType: string;
   public filterVehicleColor: string;
-  
+  public filterVehicleRegion: string;
+
   public vehicleFilters: VehicleFilters = {} as VehicleFilters;
 
   public isDeletingPlate: boolean;
@@ -224,6 +225,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterVehicleModel = '';
     this.filterVehicleType = '';
     this.filterVehicleColor = '';
+    this.filterVehicleRegion = '';
     
     this.searchPlates();
   }

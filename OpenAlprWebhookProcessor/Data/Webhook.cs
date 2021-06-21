@@ -20,8 +20,6 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string BestNumber { get; set; }
 
-        public string Region { get; set; }
-
         public string PossibleNumbers { get; set; }
 
         public string Jpeg { get; set; }
@@ -37,6 +35,8 @@ namespace OpenAlprWebhookProcessor.Data
         public string VehicleType { get; set; }
 
         public string VehicleYear { get; set; }
+
+        public string VehicleRegion { get; set; }
 
         public double Direction { get; set; }
 

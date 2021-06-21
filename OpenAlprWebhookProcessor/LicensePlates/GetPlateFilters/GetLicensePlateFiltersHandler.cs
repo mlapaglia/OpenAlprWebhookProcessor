@@ -52,6 +52,12 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
                     .Distinct()
                     .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
+                VehicleRegions = await _processerContext.PlateGroups
+                    .Where(x => !string.IsNullOrWhiteSpace(x.VehicleRegion))
+                    .Select(x => x.VehicleRegion)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToListAsync(cancellationToken),
             };
 
             response.VehicleMakes = response.VehicleMakes

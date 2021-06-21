@@ -107,6 +107,13 @@
             <mat-option *ngFor="let color of vehicleFilters.vehicleColors" [value]="color">{{color}}</mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 80%;">
+          <mat-label>Vehicle Region</mat-label>
+          <mat-select [disabled]="vehicleFilters.vehicleRegions?.length === 0" [(ngModel)]="filterVehicleRegion">
+            <mat-option [value]=""></mat-option>
+            <mat-option *ngFor="let region of vehicleFilters.vehicleRegions" [value]="region">{{region}}</mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-error *ngIf="!filterPlateNumberIsValid && regexSearchEnabled">Invalid regex pattern</mat-error>
         <mat-error *ngIf="!filterPlateNumberIsValid && !regexSearchEnabled">Invalid search term</mat-error>
         <div style="padding-top:10px;">

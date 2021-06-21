@@ -13,5 +13,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
         public List<string> VehicleYears { get; set; }
 
         public List<string> VehicleColors { get; set; }
+
+        public List<string> VehicleRegions { get; set; }
     }
 }
