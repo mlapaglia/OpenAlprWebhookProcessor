@@ -14,6 +14,8 @@ export class SignalrService {
   public licensePlateReceived = new Subject<string>();
   public licensePlateAlerted = new Subject<string>();
   public processInformationLogged = new Subject<string>();
+  public isConnected: boolean;
+  public connectionStatusChanged: Subject<boolean> = new Subject<boolean>();
 
   constructor(
     private snackbarService: SnackbarService
@@ -31,6 +33,7 @@ export class SignalrService {
         console.log('Connection started');
         this.snackbarService.create(`Connected to server!`, SnackBarType.Connected);
         this.connectionEstablished.next(true);
+        this.triggerConnectionStatusChange(true);
       })
       .catch(err => {
         console.log('Error while starting connection: ' + err)
@@ -52,16 +55,19 @@ export class SignalrService {
       this.hubConnection.onreconnected(() => {
         console.log("Connection reconnected");
         this.snackbarService.create(`Reconnected to server!`, SnackBarType.Connected);
+        this.triggerConnectionStatusChange(true);
       });
 
       this.hubConnection.onreconnecting(() => {
         console.log("Connection reconnecting");
         this.snackbarService.create(`Reconnecting to server...`, SnackBarType.Disconnected);
+        this.triggerConnectionStatusChange(false);
       })
 
       this.hubConnection.onclose(() => {
         console.log("Connection ended");
         this.snackbarService.create(`Connection lost`, SnackBarType.Disconnected);
+        this.triggerConnectionStatusChange(false);
       });
   }
 
@@ -70,6 +76,12 @@ export class SignalrService {
       .stop()
       .then(() => {
         this.snackbarService.create(`Connection closed`, SnackBarType.Disconnected);
+        this.triggerConnectionStatusChange(false);
       });
+  }
+
+  public triggerConnectionStatusChange(isConencted: boolean) {
+    this.isConnected = isConencted;
+    this.connectionStatusChanged.next(this.isConnected);
   }
 }

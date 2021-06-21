@@ -40,12 +40,15 @@
       </mat-expansion-panel>
     </mat-accordion>
     <div fxLayout="row" fxLayoutAlign="end" fxPerpendicularAlign="end" style="margin-top: 15px;">
-      <div *ngIf="isLoading" style="display: flex; align-items: center; justify-content: center;">
-        <mat-progress-spinner 
+      <div  style="display: flex; align-items: center; justify-content: center;">
+        <mat-progress-spinner
+          *ngIf="isLoading" 
+          style="margin-right: 15px;"
           color="primary" 
           mode="indeterminate"
           diameter="25">
         </mat-progress-spinner>
+        <span *ngIf="isSignalrConnected" class="pulse"></span>
       </div>
       <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"

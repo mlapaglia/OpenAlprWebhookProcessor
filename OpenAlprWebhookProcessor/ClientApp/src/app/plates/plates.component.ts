@@ -80,6 +80,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public isAddingToAlertList: boolean;
 
   public isLoading: boolean;
+  public isSignalrConnected: boolean;
 
   private pageSize: number = 5;
   private pageNumber: number = 0;
@@ -114,7 +115,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
+    this.subscriptions.add(this.signalRHub.connectionStatusChanged.subscribe(status => {
+      this.isSignalrConnected = status;
+    }));
+
+    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
         this.searchPlates();
     }));
   }
@@ -159,6 +164,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = result.plates;
+      this.isLoading = false;
+    }, error => {
       this.isLoading = false;
     });
   }
