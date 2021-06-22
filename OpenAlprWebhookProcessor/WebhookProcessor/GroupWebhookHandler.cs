@@ -43,6 +43,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public async Task HandleWebhookAsync(
             Webhook webhook,
             bool isBulkImport,
+            List<string> previouslyProcessedGroups,
             CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras
@@ -67,7 +68,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 return;
             }
 
-            var alreadyProcessed = await _processorContext.PlateGroups.AnyAsync(x => x.OpenAlprUuid == webhook.Group.BestUuid);
+            var alreadyProcessed = false;
+
+            if (previouslyProcessedGroups != null)
+            {
+                alreadyProcessed = previouslyProcessedGroups
+                    .Intersect(webhook.Group.Uuids)
+                    .Any();
+
+                if (!alreadyProcessed)
+                {
+                    previouslyProcessedGroups.AddRange(webhook.Group.Uuids);
+                }
+            }
+            else
+            {
+                alreadyProcessed = await _processorContext.PlateGroups.Select(x => x.OpenAlprUuid)
+                    .Intersect(webhook.Group.Uuids)
+                    .AnyAsync(cancellationToken);
+            }
 
             if (alreadyProcessed)
             {

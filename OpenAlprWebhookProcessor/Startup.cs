@@ -198,6 +198,8 @@ namespace OpenAlprWebhookProcessor
             {
                 options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
             });
+
+            services.AddMemoryCache();
         }
 
         public void Configure(

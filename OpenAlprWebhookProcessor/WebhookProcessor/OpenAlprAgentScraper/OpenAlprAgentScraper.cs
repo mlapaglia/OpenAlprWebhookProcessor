@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -76,11 +77,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 foreach (var metadata in metaDatasToQuery)
                 {
-                    _logger.LogInformation("querying: " + metadata.Key);
-
                     var newGroup = await _httpClient.GetAsync(
                         agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
                         cancellationToken);
+
+                    var group = await JsonSerializer.DeserializeAsync<Group>(
+                                    await newGroup.Content.ReadAsStreamAsync(cancellationToken),
+                                    cancellationToken: cancellationToken);
+
+                    _logger.LogInformation("date: " + DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString() + " querying: " + metadata.Key);
 
                     if (!newGroup.IsSuccessStatusCode)
                     {
@@ -88,22 +93,27 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         continue;
                     }
 
-                    var newGroupResult = await newGroup.Content.ReadAsStringAsync(cancellationToken);
-
+                    var previouslyProcessedGroups = await _processorContext.PlateGroups
+                        .Select(x => x.OpenAlprUuid)
+                        .ToListAsync(cancellationToken);
                     try
                     {
                         await _groupWebhookHandler.HandleWebhookAsync(
                             new Webhook
                             {
-                                Group = JsonSerializer.Deserialize<Group>(newGroupResult)
+                                Group = group, 
                             },
                             true,
+                            previouslyProcessedGroups,
                             cancellationToken);
                     }
                     catch
                     {
                         _logger.LogError("Failed to parse bulk import request.");
                     }
+
+                    agent.LastSuccessfulScrapeEpoch = group.EpochStart;
+                    await _processorContext.SaveChangesAsync(cancellationToken);
                 }
 
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
@@ -112,10 +122,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 {
                     lastSuccessfulScrape = startDate;
                 }
-
-                agent.LastSuccessfulScrapeEpoch = lastSuccessfulScrape.ToUnixTimeMilliseconds();
-                await _processorContext.SaveChangesAsync(cancellationToken);
             }
+
+            _logger.LogInformation("Finished OpenALPR Agent scrape.");
         }
 
         private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(

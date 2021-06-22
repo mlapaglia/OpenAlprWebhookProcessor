@@ -66,8 +66,6 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 }
 
                 await _processorHub.Clients.All.ScrapeFinished();
-
-                _logger.LogInformation("Finished OpenALPR Agent scrape.");
             }
         }
     }
