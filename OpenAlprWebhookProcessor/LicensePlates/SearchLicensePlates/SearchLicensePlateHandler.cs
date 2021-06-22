@@ -40,7 +40,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
                 else
                 {
-                    dbRequest = dbRequest.Where(x => x.PossibleNumbers.Contains(request.PlateNumber));
+                    dbRequest = dbRequest.Where(x => x.PossibleNumbers.Contains(request.PlateNumber) || request.PlateNumber == x.BestNumber);
                 }
             }
 
@@ -56,23 +56,13 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.ReceivedOnEpoch <= endEpochMilliseconds);
             }
 
-            var platesToIgnore = await _processerContext.Ignores.ToListAsync(cancellationToken);
+            var platesToIgnore = (await _processerContext.Ignores
+                .Select(x => x.PlateNumber)
+                .ToListAsync(cancellationToken));
 
             if (!request.FilterIgnoredPlates)
             {
-                foreach (var plateToIgnore in platesToIgnore)
-                {
-                    if (plateToIgnore.IsStrictMatch)
-                    {
-                        dbRequest = dbRequest.Where(x => plateToIgnore.PlateNumber != x.BestNumber);
-                    }
-                    else
-                    {
-                        dbRequest = dbRequest.Where(x =>
-                            plateToIgnore.PlateNumber != x.BestNumber
-                            || !x.PossibleNumbers.Contains(plateToIgnore.PlateNumber));
-                    }
-                }
+                dbRequest = dbRequest.Where(x => !platesToIgnore.Contains(x.PossibleNumbers) && !platesToIgnore.Contains(x.BestNumber));
             }
 
             if (!string.IsNullOrWhiteSpace(request.VehicleMake))
@@ -112,7 +102,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             {
                 licensePlates.Add(PlateMapper.MapPlate(
                     plate,
-                    platesToIgnore.Select(x => x.PlateNumber).ToList(),
+                    platesToIgnore,
                     platesToAlert));
             }
 
