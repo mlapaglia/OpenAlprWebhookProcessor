@@ -48,7 +48,7 @@
           mode="indeterminate"
           diameter="25">
         </mat-progress-spinner>
-        <span *ngIf="isSignalrConnected" class="pulse"></span>
+        <span *ngIf="isSignalrConnected" title="live plate updates are enabled" class="pulse"></span>
       </div>
       <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"

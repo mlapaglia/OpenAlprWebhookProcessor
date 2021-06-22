@@ -103,6 +103,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
+    this.isSignalrConnected = this.signalRHub.isConnected;
     this.searchPlates();
     this.populateFilters();
   }
@@ -161,7 +162,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.vehicleModel = this.filterVehicleModel;
     request.vehicleType = this.filterVehicleType;
     request.vehicleRegion = this.filterVehicleRegion;
-    
+
     this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
