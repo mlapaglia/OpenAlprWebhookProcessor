@@ -160,7 +160,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.vehicleMake = this.filterVehicleMake;
     request.vehicleModel = this.filterVehicleModel;
     request.vehicleType = this.filterVehicleType;
-
+    request.vehicleRegion = this.filterVehicleRegion;
+    
     this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;

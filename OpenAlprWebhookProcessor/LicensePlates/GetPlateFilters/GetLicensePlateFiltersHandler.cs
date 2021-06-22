@@ -29,7 +29,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
                     .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleModels = await _processerContext.PlateGroups
-                    .Where(x => !string.IsNullOrWhiteSpace(x.VehicleMake))
+                    .Where(x => !string.IsNullOrWhiteSpace(x.VehicleMakeModel))
                     .Select(x => x.VehicleMakeModel)
                     .Distinct()
                     .OrderBy(x => x)
@@ -61,19 +61,19 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
             };
 
             response.VehicleMakes = response.VehicleMakes
-                .Select(x => _textInfo.ToTitleCase(x))
+                .Select(x => _textInfo?.ToTitleCase(x))
                 .ToList();
 
             response.VehicleModels = response.VehicleModels
-                .Select(x => _textInfo.ToTitleCase(x.Split('_')[1]))
+                .Select(x => _textInfo?.ToTitleCase(x.Split('_')[1]))
                 .ToList();
 
             response.VehicleColors = response.VehicleColors
-                .Select(x => _textInfo.ToTitleCase(x))
+                .Select(x => _textInfo?.ToTitleCase(x))
                 .ToList();
 
             response.VehicleTypes = response.VehicleTypes
-                .Select(x => _textInfo.ToTitleCase(x))
+                .Select(x => _textInfo?.ToTitleCase(x))
                 .ToList();
 
             return response;

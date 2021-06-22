@@ -49,4 +49,5 @@ export class PlateRequest {
     vehicleModel: string;
     vehicleColor: string;
     vehicleType: string;
+    vehicleRegion: string;
 }

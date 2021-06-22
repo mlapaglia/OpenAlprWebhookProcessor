@@ -90,6 +90,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.VehicleType.Contains(request.VehicleType.ToLower()));
             }
 
+            if (!string.IsNullOrWhiteSpace(request.VehicleRegion))
+            {
+                dbRequest = dbRequest.Where(x => x.VehicleRegion.Contains(request.VehicleRegion.ToLower()));
+            }
+
             var totalCount = dbRequest.Count();
 
             dbRequest = dbRequest
