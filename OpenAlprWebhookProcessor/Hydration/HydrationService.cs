@@ -1,41 +1,44 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Hydrator.OpenAlprSearch;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
+﻿using Microsoft.Extensions.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Utilities;
-using System.Net;
+using System.Collections.Concurrent;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using OpenAlprWebhookProcessor.Alerts;
+using OpenAlprWebhookProcessor.ProcessorHub;
+using Microsoft.AspNetCore.SignalR;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
     public class HydrationService : IHostedService
     {
+        private readonly BlockingCollection<string> _hydrationRequestToProcess;
+
         private readonly CancellationTokenSource _cancellationTokenSource;
-
-        private Uri _openAlprServerUrl;
-
-        private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly ILogger _logger;
 
+        private readonly IServiceProvider _serviceProvider;
+
+        private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
+
         public HydrationService(
-            IServiceScopeFactory scopeFactory,
-            ILogger<HydrationService> logger)
+            IServiceProvider serviceProvider,
+            ILogger<HydrationService> logger,
+            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub)
         {
             _cancellationTokenSource = new CancellationTokenSource();
-            _scopeFactory = scopeFactory;
+            _serviceProvider = serviceProvider;
             _logger = logger;
+            _processorHub = processorHub;
+            _hydrationRequestToProcess = new BlockingCollection<string>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            Task.Run(() => StartHydrationAsync(), cancellationToken);
             return Task.CompletedTask;
         }
 
@@ -45,202 +48,26 @@ namespace OpenAlprWebhookProcessor.Hydrator
             return Task.CompletedTask;
         }
 
-        public void StartHydration()
+        public void StartHydration(string request)
         {
-            Task.Run(() => StartHydrationAsync());
+            _hydrationRequestToProcess.Add(request);
         }
 
         private async Task StartHydrationAsync()
         {
-            var httpClient = new HttpClient();
-
-            var startDate = new DateTimeOffset(2019, 5, 5, 0, 0, 0, TimeSpan.Zero);
-
-            var stopDate = DateTimeOffset.UtcNow;
-
-            var firstRecordDate = await FindEarliestPlateGroupAsync(
-                startDate,
-                httpClient);
-
-            if (firstRecordDate == null)
+            foreach (var _ in _hydrationRequestToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                return;
-            }
+                _logger.LogInformation("Starting OpenALPR Agent scrape.");
 
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                var agent = await processorContext.Agents.FirstOrDefaultAsync();
-
-                _openAlprServerUrl = new Uri(
-                    Flurl.Url.Combine(
-                        agent.OpenAlprWebServerUrl.ToString(),
-                        "/api/search/plate",
-                        $"?api_key={agent.OpenAlprWebServerApiKey}"));
-            }
-
-            try
-            {
-                var responses = new List<Response>();
-
-                while (firstRecordDate <= stopDate)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    var apiResults = await GetOpenAlprPlateGroupsFromApiAsync(
-                        httpClient,
-                        firstRecordDate.Value,
-                        firstRecordDate.Value.AddDays(1));
-
-                    responses.AddRange(apiResults);
-
-                    _logger.LogInformation($"pulling plates from: {firstRecordDate.Value:s} to {firstRecordDate.Value.AddDays(1):s}, found {apiResults.Count} plates");
-
-                    firstRecordDate = firstRecordDate.Value.AddDays(1);
+                    var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
+                    await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
                 }
 
-                var plateGroups = new List<PlateGroup>();
+                await _processorHub.Clients.All.ScrapeFinished();
 
-                foreach (var response in responses)
-                {
-                    plateGroups.Add(MapResponseToPlate(response));
-                }
-
-                using (var scope = _scopeFactory.CreateScope())
-                {
-                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                    _logger.LogInformation($"truncating plates table");
-
-                    await processorContext.Database.ExecuteSqlRawAsync("DELETE FROM PlateGroups;");
-
-                    _logger.LogInformation($"populating plates table");
-
-                    processorContext.AddRange(plateGroups);
-                    await processorContext.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unable to map hydration results");
-                throw;
-            }
-        }
-
-        private static PlateGroup MapResponseToPlate(Response apiResponse)
-        {
-            var fields = apiResponse.Fields;
-
-            var plateGroup = new PlateGroup()
-            {
-                Confidence = double.Parse(fields.BestConfidence),
-                Direction = fields.DirectionOfTravelDegrees,
-                IsAlert = false,
-                BestNumber = fields.BestPlate,
-                OpenAlprCameraId = fields.CameraId,
-                OpenAlprProcessingTimeMs = double.Parse(fields.ProcessingTimeMs),
-                OpenAlprUuid = fields.BestUuid,
-                PlateCoordinates = VehicleUtilities.FormatLicensePlateImageCoordinates(
-                    new List<int>()
-                    {
-                        fields.PlateX1,
-                        fields.PlateX2,
-                        fields.PlateX3,
-                        fields.PlateX4,
-                    },
-                    new List<int>()
-                    {
-                        fields.PlateY1,
-                        fields.PlateY2,
-                        fields.PlateY3,
-                        fields.PlateY4,
-                    }),
-                ReceivedOnEpoch = DateTimeOffset.Parse(fields.EpochTimeStart).ToUnixTimeMilliseconds(),
-                VehicleRegion = fields.Region,
-                VehicleColor = fields.VehicleColor,
-                VehicleMake = fields.VehicleMake,
-                VehicleMakeModel = fields.VehicleMakeModel,
-                VehicleType = fields.VehicleBodyType,
-            };
-
-            return plateGroup;
-        }
-
-        private async Task<List<Response>> GetOpenAlprPlateGroupsFromApiAsync(
-            HttpClient httpClient,
-            DateTimeOffset dateRangeStart,
-            DateTimeOffset dateRangeEnd)
-        {
-            var requestUrl = Flurl.Url.Combine(
-                _openAlprServerUrl.ToString(),
-                $"start={dateRangeStart.ToString("s", System.Globalization.CultureInfo.InvariantCulture)}",
-                $"end={dateRangeEnd.ToString("s", System.Globalization.CultureInfo.InvariantCulture)}");
-
-            var result = await httpClient.GetAsync(requestUrl);
-            var response = await result.Content.ReadAsStringAsync();
-
-            if (!result.IsSuccessStatusCode)
-            {
-                _logger.LogError(
-                    "failed to get plate data, request: {0}, response: {1}",
-                    result.RequestMessage,
-                    response);
-            }
-
-            return JsonSerializer.Deserialize<List<Response>>(response);
-        }
-
-        private async Task<DateTimeOffset?> FindEarliestPlateGroupAsync(
-            DateTimeOffset dateRangeStart,
-            HttpClient httpClient)
-        {
-            var numberOfResults = 0;
-            var currentRequestDate = dateRangeStart;
-
-            _logger.LogInformation("searching for first license plate");
-
-            try
-            {
-                while (numberOfResults == 0)
-                {
-                    _logger.LogInformation($"searching from: {currentRequestDate:s} to {currentRequestDate.AddDays(1):s}");
-
-                    var requestUrl = Flurl.Url.Combine(
-                        _openAlprServerUrl.ToString(),
-                        $"start={currentRequestDate.ToString("s", System.Globalization.CultureInfo.InvariantCulture)}",
-                        $"end={currentRequestDate.AddDays(1).ToString("s", System.Globalization.CultureInfo.InvariantCulture)}");
-
-                    var result = await httpClient.GetAsync(requestUrl);
-                    var response = await result.Content.ReadAsStringAsync();
-
-                    if (!result.IsSuccessStatusCode)
-                    {
-                        if(result.StatusCode == HttpStatusCode.Unauthorized)
-                        {
-                            _logger.LogError("unauthorized API call, do you have a commercial account?");
-                        }
-                        else
-                        {
-                            _logger.LogError(
-                                "failed to get earliest plate date request: {0} response: {1}",
-                                result.RequestMessage,
-                                response);
-                        }
-
-                        break;
-                    }
-
-                    numberOfResults = JsonSerializer.Deserialize<List<Response>>(response).Count;
-
-                    currentRequestDate = currentRequestDate.AddDays(1);
-                }
-
-                return currentRequestDate;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "failed to get earliest plate date");
-
-                throw;
+                _logger.LogInformation("Finished OpenALPR Agent scrape.");
             }
         }
     }

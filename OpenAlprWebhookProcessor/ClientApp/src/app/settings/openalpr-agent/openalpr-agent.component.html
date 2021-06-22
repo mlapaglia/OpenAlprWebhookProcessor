@@ -67,5 +67,8 @@
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
       </mat-form-field>
-    <button mat-raised-button color="primary" fxFlex="80" [disabled]="isSaving" (click)="saveAgent()">Save</button>
 </div>
+<div>
+    <button mat-raised-button color="primary" [disabled]="isSaving" style="margin: 15px;" (click)="saveAgent()">Save</button>
+    <button mat-raised-button color="primary" [disabled]="isHydrating" (click)="scrapeAgent()">Start Scrape</button>
+  </div>

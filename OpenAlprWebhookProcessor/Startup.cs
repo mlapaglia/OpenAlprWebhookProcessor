@@ -39,6 +39,7 @@ using System.IO;
 using Microsoft.Net.Http.Headers;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
+using OpenAlprWebhookProcessor.Settings.AgentHydration;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -161,6 +162,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertWebhookForwardsRequestHandler>();
             services.AddScoped<OpenAlprAgentScraper>();
             services.AddScoped<GetLicensePlateFiltersHandler>();
+            services.AddScoped<AgentScrapeRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

@@ -69,6 +69,11 @@ export class SignalrService {
         this.snackbarService.create(`Connection lost`, SnackBarType.Disconnected);
         this.triggerConnectionStatusChange(false);
       });
+
+      this.hubConnection.on('ScrapeFinished', _ => {
+        console.log("Scrape finished");
+        this.snackbarService.create(`Scrape finished!`, SnackBarType.Info);
+      });
   }
 
   public stopConnection() {

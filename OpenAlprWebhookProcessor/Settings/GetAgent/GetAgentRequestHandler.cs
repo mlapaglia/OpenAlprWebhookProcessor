@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,19 +8,13 @@ namespace OpenAlprWebhookProcessor.Settings
     public class GetAgentRequestHandler
     {
         private readonly ProcessorContext _processorContext;
-
-        private readonly OpenAlprAgentScraper _scraper;
-        public GetAgentRequestHandler(
-            ProcessorContext processorContext,
-            OpenAlprAgentScraper scraper)
+        public GetAgentRequestHandler(ProcessorContext processorContext)
         {
             _processorContext = processorContext;
-            _scraper = scraper;
         }
 
         public async Task<Agent> HandleAsync(CancellationToken cancellationToken)
         {
-            await _scraper.ScrapeAgentAsync(cancellationToken);
             var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null)

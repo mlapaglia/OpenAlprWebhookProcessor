@@ -33,6 +33,10 @@ export class SettingsService {
     return this.http.get<Agent>(`/settings/agent`);
   }
 
+  startAgentScrape(): Observable<any> {
+    return this.http.post(`/settings/agent/scrape`, null);
+  }
+
   getIgnores(): Observable<Ignore[]> {
     return this.http.get<Ignore[]>(`/settings/ignores`);
   }
