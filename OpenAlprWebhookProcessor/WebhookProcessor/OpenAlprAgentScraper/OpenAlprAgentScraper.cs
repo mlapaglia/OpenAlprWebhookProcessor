@@ -93,9 +93,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         continue;
                     }
 
-                    var previouslyProcessedGroups = await _processorContext.PlateGroups
-                        .Select(x => x.OpenAlprUuid)
-                        .ToListAsync(cancellationToken);
                     try
                     {
                         await _groupWebhookHandler.HandleWebhookAsync(
@@ -104,7 +101,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                                 Group = group, 
                             },
                             true,
-                            previouslyProcessedGroups,
                             cancellationToken);
                     }
                     catch

@@ -43,7 +43,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public async Task HandleWebhookAsync(
             Webhook webhook,
             bool isBulkImport,
-            List<string> previouslyProcessedGroups,
             CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras
@@ -68,41 +67,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 return;
             }
 
-            var alreadyProcessed = false;
-
-            if (previouslyProcessedGroups != null)
-            {
-                alreadyProcessed = previouslyProcessedGroups
-                    .Intersect(webhook.Group.Uuids)
-                    .Any();
-
-                if (!alreadyProcessed)
-                {
-                    previouslyProcessedGroups.AddRange(webhook.Group.Uuids);
-                }
-            }
-            else
-            {
-                alreadyProcessed = await _processorContext.PlateGroups.Select(x => x.OpenAlprUuid)
-                    .Intersect(webhook.Group.Uuids)
-                    .AnyAsync(cancellationToken);
-            }
-
-            if (alreadyProcessed)
-            {
-                _logger.LogWarning("Duplicate group received, skipping: " + webhook.Group.BestUuid);
-                return;
-            }
-
-            var previousPreviewGroup = await _processorContext.PlateGroups
+            var previousPreviewGroups = await _processorContext.PlateGroups
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
-                .FirstOrDefaultAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
 
             PlateGroup plateGroup;
-            if (previousPreviewGroup != null)
+            if (previousPreviewGroups.Count > 0)
             {
-                _logger.LogInformation("Previous preview plate exists: " + previousPreviewGroup.BestNumber + ", overwriting");
-                plateGroup = previousPreviewGroup;
+                plateGroup = previousPreviewGroups[0];
+                _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
+
+                _logger.LogInformation("Previous preview plate exists: " + plateGroup.BestNumber + ", overwriting");
+                
             }
             else
             {
@@ -124,7 +100,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             MapVehicle(plateGroup, webhook);
 
-            if (previousPreviewGroup == null)
+            if (previousPreviewGroups.Count == 0)
             {
                 _processorContext.PlateGroups.Add(plateGroup);
             }
