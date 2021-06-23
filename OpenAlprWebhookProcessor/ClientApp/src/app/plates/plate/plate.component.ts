@@ -18,6 +18,8 @@ export class PlateComponent implements OnInit {
   public loadingImageFailed: boolean;
   public loadingPlateImage: boolean;
   public loadingPlateImageFailed: boolean;
+  public loadingStatistics: boolean;
+  public loadingStatisticsFailed: boolean;
 
   public plateStatistics: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
@@ -35,7 +37,9 @@ export class PlateComponent implements OnInit {
   }
 
   private getPlateStatistics() {
+    this.loadingStatistics = true;
     this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe(result => {
+      this.loadingStatistics = false;
       this.plateStatistics.push({
         key: "Confidence",
         value: this.plate.processedPlateConfidence + "%",
@@ -70,6 +74,10 @@ export class PlateComponent implements OnInit {
         key: "Region",
         value: this.plate.region,
       });
+    },
+    error => {
+      this.loadingStatistics = false;
+      this.loadingStatisticsFailed = true;
     });
   }
 

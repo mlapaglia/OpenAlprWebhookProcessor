@@ -43,6 +43,15 @@
             <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
+            <mat-progress-spinner
+                color="primary"
+                mode="indeterminate"
+                diameter="100"
+                [hidden]="!loadingStatistics"></mat-progress-spinner>
+            <mat-icon style="font-size: 100px;"
+                *ngIf="loadingStatisticsFailed"
+                [inline]="true"
+                matTooltip="Unable to retrieve statistics from server">help_center</mat-icon>
             <table *ngIf="plateStatistics.length > 0" mat-table [dataSource]="plateStatistics" class="mat-elevation-z8" style="width:500px;">
                 <ng-container matColumnDef="key">
                     <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
