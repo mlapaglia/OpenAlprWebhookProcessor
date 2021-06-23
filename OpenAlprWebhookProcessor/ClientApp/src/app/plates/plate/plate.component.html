@@ -16,7 +16,7 @@
                 (load)="imageLoaded()"
                 (error)="imageFailedToLoad()"
                 (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
-            <mat-icon style="font-size: 100px;"
+            <mat-icon style="font-size: 100px; margin-top:100px;"
                 *ngIf="!plate.imageUrl || loadingImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
@@ -31,7 +31,7 @@
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />
-            <mat-icon style="font-size: 100px;"
+            <mat-icon style="font-size: 100px; margin-top:100px;"
                 *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
@@ -42,17 +42,21 @@
             <mat-card-title>Statistics</mat-card-title>
             <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content>
+        <mat-card-content style="width:500px;">
             <mat-progress-spinner
                 color="primary"
                 mode="indeterminate"
                 diameter="100"
+                style="margin: auto;"
                 [hidden]="!loadingStatistics"></mat-progress-spinner>
             <mat-icon style="font-size: 100px;"
                 *ngIf="loadingStatisticsFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve statistics from server">help_center</mat-icon>
-            <table *ngIf="plateStatistics.length > 0" mat-table [dataSource]="plateStatistics" class="mat-elevation-z8" style="width:500px;">
+            <table *ngIf="plateStatistics.length > 0"
+                mat-table [dataSource]="plateStatistics"
+                class="mat-elevation-z8"
+                style="width: 100%">
                 <ng-container matColumnDef="key">
                     <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
                 </ng-container>

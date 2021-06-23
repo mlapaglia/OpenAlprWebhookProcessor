@@ -56,11 +56,6 @@ export class PlateComponent implements OnInit {
       });
 
       this.plateStatistics.push({
-        key: "Seen past 90 days",
-        value: result.last90Days.toString(),
-      });
-
-      this.plateStatistics.push({
         key: "Processing time",
         value: this.plate.openAlprProcessingTimeMs.toString() + "ms",
       });
