@@ -178,31 +178,31 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             PlateGroup plateGroup,
             Webhook webhook)
         {
-            if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 50)
+            if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 30)
             {
                 plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
 
-                if (webhook.Group.Vehicle.Colors.First()?.Confidence > 50)
+                if (webhook.Group.Vehicle.Colors.First()?.Confidence > 30)
                 {
                     plateGroup.VehicleColor = webhook.Group.Vehicle.Colors.First()?.Name;
                 }
 
-                if (webhook.Group.Vehicle.Makes.First()?.Confidence > 50)
+                if (webhook.Group.Vehicle.Makes.First()?.Confidence > 30)
                 {
                     plateGroup.VehicleMake = webhook.Group.Vehicle.Makes.First()?.Name;
                 }
 
-                if (webhook.Group.Vehicle.BodyTypes.First()?.Confidence > 50)
+                if (webhook.Group.Vehicle.BodyTypes.First()?.Confidence > 30)
                 {
                     plateGroup.VehicleType = webhook.Group.Vehicle.BodyTypes.First()?.Name;
                 }
 
-                if (webhook.Group.Vehicle.Years.First()?.Confidence > 50)
+                if (webhook.Group.Vehicle.Years.First()?.Confidence > 30)
                 {
                     plateGroup.VehicleYear = webhook.Group.Vehicle.Years.First()?.Name;
                 }
 
-                if (webhook.Group.BestPlate.RegionConfidence > 50)
+                if (webhook.Group.BestPlate.RegionConfidence > 30)
                 {
                     plateGroup.VehicleRegion = webhook.Group.BestPlate.Region;
                 }
