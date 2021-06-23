@@ -47,6 +47,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                     await _groupWebhookHandler.HandleWebhookAsync(
                     alertGroupResult,
+                    false,
                     cancellationToken);
                 }
                 else if (rawWebhook.Contains("alpr_group"))
@@ -59,6 +60,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                     await _groupWebhookHandler.HandleWebhookAsync(
                         groupResult,
+                        false,
                         cancellationToken);
                 }
                 else if (rawWebhook.Contains("alpr_results"))

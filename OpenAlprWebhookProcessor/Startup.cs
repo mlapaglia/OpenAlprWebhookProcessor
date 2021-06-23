@@ -37,6 +37,9 @@ using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
 using Microsoft.Net.Http.Headers;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
+using OpenAlprWebhookProcessor.Settings.AgentHydration;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -157,6 +160,9 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<DeleteLicensePlateGroupRequestHandler>();
             services.AddScoped<GetWebhookForwardsRequestHandler>();
             services.AddScoped<UpsertWebhookForwardsRequestHandler>();
+            services.AddScoped<OpenAlprAgentScraper>();
+            services.AddScoped<GetLicensePlateFiltersHandler>();
+            services.AddScoped<AgentScrapeRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -192,6 +198,8 @@ namespace OpenAlprWebhookProcessor
             {
                 options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
             });
+
+            services.AddMemoryCache();
         }
 
         public void Configure(
@@ -258,6 +266,7 @@ namespace OpenAlprWebhookProcessor
             });
 
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.File(
                     "log-.txt",

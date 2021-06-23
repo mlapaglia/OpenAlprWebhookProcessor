@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -7,15 +8,14 @@ namespace OpenAlprWebhookProcessor.Settings
     public class GetAgentRequestHandler
     {
         private readonly ProcessorContext _processorContext;
-
         public GetAgentRequestHandler(ProcessorContext processorContext)
         {
             _processorContext = processorContext;
         }
 
-        public async Task<Agent> HandleAsync()
+        public async Task<Agent> HandleAsync(CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync();
+            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null)
             {

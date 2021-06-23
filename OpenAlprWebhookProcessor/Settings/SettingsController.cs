@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
@@ -26,13 +27,16 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly UpsertWebhookForwardsRequestHandler _upsertWebhookForwardsRequestHandler;
 
+        private readonly AgentScrapeRequestHandler _agentHydrationRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
             GetIgnoresRequestHandler getIgnoresRequestHandler,
             UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
             GetWebhookForwardsRequestHandler getWebhookForwardsRequestHandler,
-            UpsertWebhookForwardsRequestHandler upsertWebhookForwardsRequestHandler)
+            UpsertWebhookForwardsRequestHandler upsertWebhookForwardsRequestHandler,
+            AgentScrapeRequestHandler agentHydrationRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -40,18 +44,28 @@ namespace OpenAlprWebhookProcessor.Settings
             _upsertIgnoresRequestHandler = upsertIgnoresRequestHandler;
             _getWebhookForwardsRequestHandler = getWebhookForwardsRequestHandler;
             _upsertWebhookForwardsRequestHandler = upsertWebhookForwardsRequestHandler;
+            _agentHydrationRequestHandler = agentHydrationRequestHandler;
         }
 
         [HttpGet("agent")]
-        public async Task<Agent> GetAgent()
+        public async Task<Agent> GetAgent(CancellationToken cancellationToken)
         {
-            return await _getAgentRequestHandler.HandleAsync();
+            return await _getAgentRequestHandler.HandleAsync(cancellationToken);
         }
 
         [HttpPost("agent")]
         public async Task UpsertAgent([FromBody] Agent agent)
         {
             await _upsertAgentRequestHandler.HandleAsync(agent);
+        }
+
+
+        [HttpPost("agent/scrape")]
+        public IActionResult StartScrape()
+        {
+            _agentHydrationRequestHandler.Handle();
+
+            return StatusCode(202);
         }
 
         [HttpPost("ignores/add")]

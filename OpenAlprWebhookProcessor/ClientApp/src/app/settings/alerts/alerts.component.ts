@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Alert } from '@app/_models';
+import { Alert } from './alert/alert';
 import { AlertsService } from './alerts.service';
 
 @Component({

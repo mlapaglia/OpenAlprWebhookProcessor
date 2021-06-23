@@ -2,21 +2,23 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
 import { SignalrService } from '@app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
-import { Plate } from './plate';
+import { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { SnackbarService } from '@app/snackbar/snackbar.service';
 import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Ignore } from '@app/settings/ignores/ignore/ignore';
 import { SettingsService } from '@app/settings/settings.service';
+import { Alert } from '@app/settings/alerts/alert/alert';
+import { AlertsService } from '@app/settings/alerts/alerts.service';
+import { VehicleFilters } from './vehicleFilters';
 
 @Component({
   selector: 'app-plates',
   templateUrl: './plates.component.html',
-  styleUrls: ['./plates.component.css'],
+  styleUrls: ['./plates.component.less'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({height: '0px', minHeight: '0'})),
@@ -66,10 +68,20 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlates: boolean;
   public filterIgnoredPlatesEnabled: boolean = true;
   public regexSearchEnabled: boolean;
+  public filterVehicleMake: string;
+  public filterVehicleModel: string;
+  public filterVehicleType: string;
+  public filterVehicleColor: string;
+  public filterVehicleRegion: string;
+
+  public vehicleFilters: VehicleFilters = {} as VehicleFilters;
 
   public isDeletingPlate: boolean;
   public isAddingToIgnoreList: boolean;
+  public isAddingToAlertList: boolean;
+
   public isLoading: boolean;
+  public isSignalrConnected: boolean;
 
   private pageSize: number = 5;
   private pageNumber: number = 0;
@@ -82,6 +94,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private plateService: PlateService,
     private signalRHub: SignalrService,
     private snackbarService: SnackbarService,
+    private alertsService: AlertsService,
     private settingsService: SettingsService) {
       this.range = new FormGroup({
         start: new FormControl(),
@@ -90,7 +103,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
+    this.isSignalrConnected = this.signalRHub.isConnected;
     this.searchPlates();
+    this.populateFilters();
   }
 
   ngOnDestroy(): void {
@@ -102,7 +117,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(result => {
+    this.subscriptions.add(this.signalRHub.connectionStatusChanged.subscribe(status => {
+      this.isSignalrConnected = status;
+    }));
+
+    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
         this.searchPlates();
     }));
   }
@@ -112,6 +131,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.pageNumber = $event.pageIndex;
 
     this.searchPlates();
+  }
+
+  public populateFilters() {
+    this.plateService.getFilters().subscribe(result => {
+      this.vehicleFilters = result;
+    });
   }
 
   public searchPlates(plateNumber: string = '') {
@@ -133,11 +158,17 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.strictMatch = this.filterStrictMatch;
     request.filterIgnoredPlates = this.filterIgnoredPlates;
     request.regexSearchEnabled = this.regexSearchEnabled;
+    request.vehicleMake = this.filterVehicleMake;
+    request.vehicleModel = this.filterVehicleModel;
+    request.vehicleType = this.filterVehicleType;
+    request.vehicleRegion = this.filterVehicleRegion;
 
     this.isLoading = true;
     this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = result.plates;
+      this.isLoading = false;
+    }, error => {
       this.isLoading = false;
     });
   }
@@ -167,6 +198,21 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  public addToAlertList(plateNumber: string = '') {
+    this.isAddingToAlertList = true;
+    var alert = new Alert();
+
+    alert.plateNumber = plateNumber;
+    alert.strictMatch = true;
+    alert.description = 'Added from plate list';
+
+    this.alertsService.addAlert(alert).subscribe(() => {
+      this.isAddingToAlertList = false;
+      this.snackbarService.create(`${plateNumber} added to alert list`, SnackBarType.Saved);
+      this.searchPlates();
+    });
+  }
+
   public clearFilters() {
     this.filterEndOn = null;
     this.filterStartOn = null;
@@ -177,7 +223,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterIgnoredPlates = false;
     this.filterIgnoredPlatesEnabled = true;
     this.regexSearchEnabled = false;
-
+    this.filterVehicleMake = '';
+    this.filterVehicleModel = '';
+    this.filterVehicleType = '';
+    this.filterVehicleColor = '';
+    this.filterVehicleRegion = '';
+    
     this.searchPlates();
   }
 

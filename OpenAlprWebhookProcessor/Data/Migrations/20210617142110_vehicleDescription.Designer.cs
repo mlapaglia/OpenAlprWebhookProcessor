@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210617142110_vehicleDescription")]
+    partial class vehicleDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,6 +233,9 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<long>("ReceivedOnEpoch")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Region")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("VehicleColor")
                         .HasColumnType("TEXT");
 
@@ -238,9 +243,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VehicleMakeModel")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("VehicleRegion")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VehicleType")

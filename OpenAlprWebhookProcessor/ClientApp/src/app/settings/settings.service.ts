@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Alert } from '@app/_models';
 import { Observable } from 'rxjs';
+import { Alert } from './alerts/alert/alert';
 import { Camera } from './cameras/camera';
 import { Ignore } from './ignores/ignore/ignore';
 import { Agent } from './openalpr-agent/agent'
@@ -33,6 +33,10 @@ export class SettingsService {
     return this.http.get<Agent>(`/settings/agent`);
   }
 
+  startAgentScrape(): Observable<any> {
+    return this.http.post(`/settings/agent/scrape`, null);
+  }
+
   getIgnores(): Observable<Ignore[]> {
     return this.http.get<Ignore[]>(`/settings/ignores`);
   }
@@ -47,5 +51,9 @@ export class SettingsService {
 
   addIgnore(ignore: Ignore) {
     return this.http.post(`/settings/ignores/add`, ignore);
+  }
+
+  addAlert(alert: Alert) {
+    return this.http.post(`/settings/alerts/add`, alert);
   }
 }

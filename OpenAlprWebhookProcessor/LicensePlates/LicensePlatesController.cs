@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using System;
 using System.Threading;
@@ -20,14 +21,18 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly DeleteLicensePlateGroupRequestHandler _deleteLicensePlateGroupHandler;
 
+        private readonly GetLicensePlateFiltersHandler _getLicensePlateFiltersHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
-            DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler)
+            DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler,
+            GetLicensePlateFiltersHandler getLicensePlateFiltersHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
             _deleteLicensePlateGroupHandler = deleteLicensePlateGroupHandler;
+            _getLicensePlateFiltersHandler = getLicensePlateFiltersHandler;
         }
 
         [HttpPost("search")]
@@ -58,6 +63,12 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             return await _getLicensePlateCountsHandler.HandleAsync(
                 request,
                 cancellationToken);
+        }
+
+        [HttpGet("filters")]
+        public async Task<GetLicensePlateFiltersResponse> GetLicensePlateFilters(CancellationToken cancellationToken)
+        {
+            return await _getLicensePlateFiltersHandler.HandleAsync(cancellationToken);
         }
     }
 }

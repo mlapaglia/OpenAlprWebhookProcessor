@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
 import { Agent } from './agent';
 
@@ -10,8 +12,10 @@ import { Agent } from './agent';
 export class OpenalprAgentComponent implements OnInit {
   public agent: Agent;
   public isSaving: boolean = false;
-
-  constructor(private settingsService: SettingsService) { }
+  public isHydrating: boolean = false;
+  constructor(
+    private settingsService: SettingsService,
+    private snackBarService: SnackbarService) { }
 
   ngOnInit(): void {
     this.getAgent();
@@ -23,6 +27,15 @@ export class OpenalprAgentComponent implements OnInit {
     this.settingsService.upsertAgent(this.agent).subscribe(result => {
       this.isSaving = false;
       this.getAgent();
+    });
+  }
+
+  public scrapeAgent() {
+    this.isHydrating = true;
+
+    this.settingsService.startAgentScrape().subscribe(_ => {
+      this.isHydrating = false;
+      this.snackBarService.create("Agent Scraping has begun, check system logs for progress", SnackBarType.Info);
     });
   }
 

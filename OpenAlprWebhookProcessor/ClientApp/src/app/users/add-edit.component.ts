@@ -10,6 +10,7 @@ export class AddEditComponent implements OnInit {
     form: FormGroup;
     id: string;
     isAddMode: boolean;
+    isAddingFirstUserMode: boolean;
     loading = false;
     submitted = false;
 
@@ -23,6 +24,7 @@ export class AddEditComponent implements OnInit {
 
     ngOnInit() {
         this.id = this.route.snapshot.params['id'];
+        this.isAddingFirstUserMode = this.route.snapshot.routeConfig.path !== 'add/more';
         this.isAddMode = !this.id;
         
         // password not required in edit mode
@@ -60,11 +62,29 @@ export class AddEditComponent implements OnInit {
         }
 
         this.loading = true;
-        if (this.isAddMode) {
+        if (!this.isAddingFirstUserMode) {
+            this.addUser();
+        }
+        else if (this.isAddMode) {
             this.createUser();
         } else {
             this.updateUser();
         }
+    }
+
+    private addUser() {
+        this.accountService.add(this.form.value)
+            .pipe(first())
+            .subscribe({
+                next: () => {
+                    this.alertService.success('User added successfully', { keepAfterRouteChange: true });
+                    this.loading = false;
+                },
+                error: error => {
+                    this.alertService.error(error);
+                    this.loading = false;
+                }
+            });
     }
 
     private createUser() {

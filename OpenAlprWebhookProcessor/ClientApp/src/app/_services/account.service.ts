@@ -54,6 +54,10 @@ export class AccountService {
     return this.http.get<boolean>(`/users/canregister`);
   }
 
+  add(user: User) {
+    return this.http.post(`/users/add`, user);
+  }
+  
   register(user: User) {
     return this.http.post(`/users/register`, user);
   }

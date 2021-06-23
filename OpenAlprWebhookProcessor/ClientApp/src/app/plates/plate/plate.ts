@@ -9,6 +9,8 @@ export interface Plate {
 
     plateNumber: string;
 
+    region: string;
+    
     possiblePlateNumbers: string;
 
     openAlprProcessingTimeMs: number;

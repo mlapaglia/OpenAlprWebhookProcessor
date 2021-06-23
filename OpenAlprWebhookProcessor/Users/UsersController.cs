@@ -101,6 +101,23 @@ namespace OpenAlprWebhookProcessor.Users
             return currentUsers.Count == 0;
         }
 
+        [HttpPost("add")]
+        public async Task<IActionResult> AddUser([FromBody] RegisterModel model,
+            CancellationToken cancellationToken)
+        {
+            var user = _mapper.Map<User>(model);
+
+            try
+            {
+                await _userService.CreateAsync(user, model.Password);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register(
@@ -143,6 +160,14 @@ namespace OpenAlprWebhookProcessor.Users
             if (user == null) return NotFound();
 
             return Ok(user);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteById(int id)
+        {
+            await _userService.DeleteAsync(id);
+
+            return Ok();
         }
 
         [HttpPost("{id}")]

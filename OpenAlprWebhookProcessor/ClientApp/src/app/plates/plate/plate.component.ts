@@ -1,12 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Lightbox } from 'ngx-lightbox';
 import { Url } from 'url';
-import { Plate } from '../plate';
+import { Plate } from './plate';
 
 @Component({
   selector: 'app-plate',
   templateUrl: './plate.component.html',
-  styleUrls: ['./plate.component.less', '../plates.component.css']
+  styleUrls: ['./plate.component.less']
 })
 export class PlateComponent implements OnInit {
   @Input() plate: Plate;

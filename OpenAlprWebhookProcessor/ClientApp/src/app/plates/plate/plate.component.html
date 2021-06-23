@@ -1,5 +1,6 @@
-<div style="display:flex; margin-top:35px; flex-wrap: wrap; justify-content: space-between;">
-    <div fxFlex="40">
+
+<div class="container">
+    <div class="item">
         <mat-progress-spinner
             color="primary"
             mode="indeterminate"
@@ -7,7 +8,7 @@
             [hidden]="!loadingImage">
         </mat-progress-spinner>
         <img [src]="plate.imageUrl"
-            style="cursor: pointer; width: 90%;"
+            style="cursor: pointer;"
             [hidden]="loadingImage || loadingImageFailed"
             (load)="imageLoaded()"
             (error)="imageFailedToLoad()"
@@ -18,7 +19,7 @@
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
-    <div fxFlex="20">
+    <div class="item">
         <mat-progress-spinner
             [hidden]="!loadingPlateImage"
             color="primary"
@@ -26,7 +27,7 @@
             diameter="100">
         </mat-progress-spinner>
         <img [src]="plate.cropImageUrl"
-            style="width: 90%"
+            width=300
             [hidden]="loadingPlateImage || loadingPlateImageFailed"
             (load)="plateImageLoaded()"
             (error)="plateImageFailedToLoad()" />
@@ -35,8 +36,12 @@
             [inline]="true"
             matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
     </div>
-    <div fxFlex="40">
+    <div class="item">
         <table>
+            <tr *ngIf="plate.region">
+                <td>Region</td>
+                <td>{{plate.region}}</td>
+            </tr>
             <tr>
                 <td>Processing Time</td>
                 <td>{{plate.openAlprProcessingTimeMs}}ms</td>
