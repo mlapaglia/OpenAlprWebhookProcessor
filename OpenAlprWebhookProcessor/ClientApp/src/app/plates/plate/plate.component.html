@@ -1,55 +1,70 @@
-
-<div class="container">
-    <div class="item">
-        <mat-progress-spinner
-            color="primary"
-            mode="indeterminate"
-            diameter="100"
-            [hidden]="!loadingImage">
-        </mat-progress-spinner>
-        <img [src]="plate.imageUrl"
-            style="cursor: pointer;"
-            [hidden]="loadingImage || loadingImageFailed"
-            (load)="imageLoaded()"
-            (error)="imageFailedToLoad()"
-            (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
-            width="300"/>
-        <mat-icon style="font-size: 100px;"
-            *ngIf="!plate.imageUrl || loadingImageFailed"
-            [inline]="true"
-            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-    </div>
-    <div class="item">
-        <mat-progress-spinner
-            [hidden]="!loadingPlateImage"
-            color="primary"
-            mode="indeterminate"
-            diameter="100">
-        </mat-progress-spinner>
-        <img [src]="plate.cropImageUrl"
-            width=300
-            [hidden]="loadingPlateImage || loadingPlateImageFailed"
-            (load)="plateImageLoaded()"
-            (error)="plateImageFailedToLoad()" />
-        <mat-icon style="font-size: 100px;"
-            *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
-            [inline]="true"
-            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-    </div>
-    <div class="item">
-        <table>
-            <tr *ngIf="plate.region">
-                <td>Region</td>
-                <td>{{plate.region}}</td>
-            </tr>
-            <tr>
-                <td>Processing Time</td>
-                <td>{{plate.openAlprProcessingTimeMs}}ms</td>
-            </tr>
-            <tr>
-                <td>Possible plate numbers</td>
-                <td>{{plate.possiblePlateNumbers}}</td>
-            </tr>
-        </table>
-    </div>
+<div fxLayout="row wrap" fxLayoutGap="grid">
+    <mat-card class="example-card">
+        <mat-card-header>
+            <mat-card-title>Images</mat-card-title>
+            <mat-card-subtitle>Plate and Vehicle</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-progress-spinner
+                color="primary"
+                mode="indeterminate"
+                diameter="100"
+                [hidden]="!loadingImage"></mat-progress-spinner>
+            <img [src]="plate.imageUrl"
+                style="cursor: pointer; padding:10px; max-height: 300px; max-width:500px;"
+                [hidden]="loadingImage || loadingImageFailed"
+                (load)="imageLoaded()"
+                (error)="imageFailedToLoad()"
+                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
+            <mat-icon style="font-size: 100px; margin-top:100px;"
+                *ngIf="!plate.imageUrl || loadingImageFailed"
+                [inline]="true"
+                matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+            <mat-progress-spinner
+                [hidden]="!loadingPlateImage"
+                color="primary"
+                mode="indeterminate"
+                diameter="100">
+            </mat-progress-spinner>
+            <img [src]="plate.cropImageUrl"
+                style="padding:10px; max-height: 300px; max-width:500px;"
+                [hidden]="loadingPlateImage || loadingPlateImageFailed"
+                (load)="plateImageLoaded()"
+                (error)="plateImageFailedToLoad()" />
+            <mat-icon style="font-size: 100px; margin-top:100px;"
+                *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
+                [inline]="true"
+                matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
+        </mat-card-content>
+    </mat-card>
+    <mat-card class="example-card">
+        <mat-card-header>
+            <mat-card-title>Statistics</mat-card-title>
+            <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content style="width:500px;">
+            <mat-progress-spinner
+                color="primary"
+                mode="indeterminate"
+                diameter="100"
+                style="margin: auto;"
+                [hidden]="!loadingStatistics"></mat-progress-spinner>
+            <mat-icon style="font-size: 100px;"
+                *ngIf="loadingStatisticsFailed"
+                [inline]="true"
+                matTooltip="Unable to retrieve statistics from server">help_center</mat-icon>
+            <table *ngIf="plateStatistics.length > 0"
+                mat-table [dataSource]="plateStatistics"
+                class="mat-elevation-z8"
+                style="width: 100%">
+                <ng-container matColumnDef="key">
+                    <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                    <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+                </ng-container>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </mat-card-content>
+    </mat-card>
 </div>

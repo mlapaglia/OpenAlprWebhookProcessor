@@ -1,7 +1,10 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { Lightbox } from 'ngx-lightbox';
 import { Url } from 'url';
+import { PlateService } from '../plate.service';
 import { Plate } from './plate';
+import { PlateStatisticsData } from './plateStatistics';
 
 @Component({
   selector: 'app-plate',
@@ -15,14 +18,67 @@ export class PlateComponent implements OnInit {
   public loadingImageFailed: boolean;
   public loadingPlateImage: boolean;
   public loadingPlateImageFailed: boolean;
+  public loadingStatistics: boolean;
+  public loadingStatisticsFailed: boolean;
+
+  public plateStatistics: PlateStatisticsData[] = [];
+  public displayedColumns: string[] = ['key', 'value'];
 
   constructor(
-    private lightbox: Lightbox
+    private lightbox: Lightbox,
+    private plateService: PlateService,
+    private datePipe: DatePipe,
   ) { }
 
   ngOnInit(): void {
     this.loadingImage = true;
     this.loadingPlateImage = true;
+    this.getPlateStatistics();
+  }
+
+  private getPlateStatistics() {
+    this.loadingStatistics = true;
+    this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe(result => {
+      this.loadingStatistics = false;
+      this.plateStatistics.push({
+        key: "Confidence",
+        value: this.plate.processedPlateConfidence + "%",
+      });
+
+      this.plateStatistics.push({
+        key: "Seen past 90 days",
+        value: result.last90Days.toString(),
+      });
+
+      this.plateStatistics.push({
+        key: "First seen",
+        value: this.datePipe.transform(result.firstSeen, 'medium'),
+      });
+
+      this.plateStatistics.push({
+        key: "Last seen",
+        value: this.datePipe.transform(result.lastSeen, 'medium'),
+      });
+
+      this.plateStatistics.push({
+        key: "Processing time",
+        value: this.plate.openAlprProcessingTimeMs.toString() + "ms",
+      });
+
+      this.plateStatistics.push({
+        key: "Possible plates",
+        value: this.plate.possiblePlateNumbers,
+      });
+
+      this.plateStatistics.push({
+        key: "Region",
+        value: this.plate.region,
+      });
+    },
+    error => {
+      this.loadingStatistics = false;
+      this.loadingStatisticsFailed = true;
+    });
   }
 
   public openLightbox(url: Url, plateNumber: string) {

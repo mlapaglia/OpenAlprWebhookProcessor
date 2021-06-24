@@ -85,7 +85,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.VehicleRegion.Contains(request.VehicleRegion.ToLower()));
             }
 
-            var totalCount = dbRequest.Count();
+            var totalCount = await dbRequest.CountAsync(cancellationToken);
 
             dbRequest = dbRequest
                 .OrderByDescending(x => x.ReceivedOnEpoch)

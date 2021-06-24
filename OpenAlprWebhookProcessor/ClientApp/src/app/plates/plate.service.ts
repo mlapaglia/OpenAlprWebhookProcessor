@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Stream } from "stream";
 import { PlateResponse } from "./plate/plateResponse";
+import { PlateStatistics } from "./plate/plateStatistics";
 import { VehicleFilters } from "./vehicleFilters";
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,7 @@ export class PlateService {
     private deletePlateUrl = 'licenseplates';
     private hydrateDatabaseUrl = "hydration/start";
     private getFiltersUrl = 'licenseplates/filters';
+    private getStatistics = 'licenseplates/statistics';
 
     constructor(private http: HttpClient) { }
 
@@ -33,6 +35,10 @@ export class PlateService {
 
     getFilters(): Observable<VehicleFilters> {
         return this.http.get<VehicleFilters>(`/${this.getFiltersUrl}`);
+    }
+
+    getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {
+        return this.http.get<PlateStatistics>(`/${this.getStatistics}/${plateNumber}`)
     }
 }
 

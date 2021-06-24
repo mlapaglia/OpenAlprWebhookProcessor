@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
+using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
 using System;
 using System.Threading;
@@ -23,16 +24,20 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly GetLicensePlateFiltersHandler _getLicensePlateFiltersHandler;
 
+        private readonly GetStatisticsHandler _getStatisticsHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
             DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler,
-            GetLicensePlateFiltersHandler getLicensePlateFiltersHandler)
+            GetLicensePlateFiltersHandler getLicensePlateFiltersHandler,
+            GetStatisticsHandler getStatisticsHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
             _deleteLicensePlateGroupHandler = deleteLicensePlateGroupHandler;
             _getLicensePlateFiltersHandler = getLicensePlateFiltersHandler;
+            _getStatisticsHandler = getStatisticsHandler;
         }
 
         [HttpPost("search")]
@@ -69,6 +74,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         public async Task<GetLicensePlateFiltersResponse> GetLicensePlateFilters(CancellationToken cancellationToken)
         {
             return await _getLicensePlateFiltersHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpGet("statistics/{plateNumber}")]
+        public async Task<PlateStatistics> GetPlateStatistics(
+            string plateNumber,
+            CancellationToken cancellationToken)
+        {
+            return await _getStatisticsHandler.HandleAsync(
+                plateNumber,
+                cancellationToken);
         }
     }
 }
