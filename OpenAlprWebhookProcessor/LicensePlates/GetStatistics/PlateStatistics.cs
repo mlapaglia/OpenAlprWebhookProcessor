@@ -7,5 +7,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
         public int Last90Days { get; set; }
 
         public DateTimeOffset FirstSeen { get; set; }
+
+        public DateTimeOffset LastSeen { get; set; }
     }
 }

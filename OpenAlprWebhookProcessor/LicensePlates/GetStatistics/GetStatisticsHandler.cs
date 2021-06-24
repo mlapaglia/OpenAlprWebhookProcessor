@@ -37,9 +37,21 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
                 .Select(x => x.ReceivedOnEpoch)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (firstSeenEpoch != default)
+            if (firstSeenEpoch != 0)
             {
                 plateStatistics.FirstSeen = DateTimeOffset.FromUnixTimeMilliseconds(firstSeenEpoch);
+            }
+
+            var lastSeenEpoch = await _processorContext.PlateGroups
+                .Where(x => x.ReceivedOnEpoch > endingEpoch)
+                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
+                .OrderByDescending(x => x.ReceivedOnEpoch)
+                .Select(x => x.ReceivedOnEpoch)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (lastSeenEpoch != 0)
+            {
+                plateStatistics.LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(lastSeenEpoch);
             }
 
             return plateStatistics;

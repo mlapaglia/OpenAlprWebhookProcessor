@@ -56,6 +56,11 @@ export class PlateComponent implements OnInit {
       });
 
       this.plateStatistics.push({
+        key: "Last seen",
+        value: this.datePipe.transform(result.lastSeen, 'medium'),
+      });
+
+      this.plateStatistics.push({
         key: "Processing time",
         value: this.plate.openAlprProcessingTimeMs.toString() + "ms",
       });

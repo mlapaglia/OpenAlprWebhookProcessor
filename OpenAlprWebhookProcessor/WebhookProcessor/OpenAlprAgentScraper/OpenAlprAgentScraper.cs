@@ -4,7 +4,6 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -82,8 +81,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         cancellationToken);
 
                     var group = await JsonSerializer.DeserializeAsync<Group>(
-                                    await newGroup.Content.ReadAsStreamAsync(cancellationToken),
-                                    cancellationToken: cancellationToken);
+                        await newGroup.Content.ReadAsStreamAsync(cancellationToken),
+                        cancellationToken: cancellationToken);
 
                     _logger.LogInformation("date: " + DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString() + " querying: " + metadata.Key);
 
@@ -98,7 +97,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         await _groupWebhookHandler.HandleWebhookAsync(
                             new Webhook
                             {
-                                Group = group, 
+                                Group = group,
                             },
                             true,
                             cancellationToken);
