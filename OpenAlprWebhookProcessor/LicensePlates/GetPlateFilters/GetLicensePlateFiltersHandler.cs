@@ -61,7 +61,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
             };
 
             response.VehicleMakes = response.VehicleMakes
-                .Select(x => _textInfo?.ToTitleCase(x))
+                .Select(x => _textInfo?.ToTitleCase(x.Split('_')[0]))
                 .ToList();
 
             response.VehicleModels = response.VehicleModels

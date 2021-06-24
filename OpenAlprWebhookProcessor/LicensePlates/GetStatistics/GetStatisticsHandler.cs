@@ -32,7 +32,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             plateStatistics.Last90Days = recentRecords;
 
             var firstSeenEpoch = await _processorContext.PlateGroups
-                .Where(x => x.ReceivedOnEpoch > endingEpoch)
                 .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
                 .Select(x => x.ReceivedOnEpoch)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -43,7 +42,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             }
 
             var lastSeenEpoch = await _processorContext.PlateGroups
-                .Where(x => x.ReceivedOnEpoch > endingEpoch)
                 .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
                 .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Select(x => x.ReceivedOnEpoch)
