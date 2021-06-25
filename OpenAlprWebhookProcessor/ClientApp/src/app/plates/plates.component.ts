@@ -14,6 +14,8 @@ import { SettingsService } from '@app/settings/settings.service';
 import { Alert } from '@app/settings/alerts/alert/alert';
 import { AlertsService } from '@app/settings/alerts/alerts.service';
 import { VehicleFilters } from './vehicleFilters';
+import { MatDialog } from '@angular/material/dialog';
+import { EditPlateComponent } from './edit-plate/edit-plate.component';
 
 @Component({
   selector: 'app-plates',
@@ -95,7 +97,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private signalRHub: SignalrService,
     private snackbarService: SnackbarService,
     private alertsService: AlertsService,
-    private settingsService: SettingsService) {
+    private settingsService: SettingsService,
+    public dialog: MatDialog) {
       this.range = new FormGroup({
         start: new FormControl(),
         end: new FormControl()
@@ -114,6 +117,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.subscribeForUpdates();
+  }
+
+  public editPlate(plateNumber: string) {
+    this.openEditDialog(plateNumber);
   }
 
   public subscribeForUpdates() {
@@ -263,6 +270,24 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filterIgnoredPlatesEnabled = true;
     }
     this.validateSearchPlateNumber();
+  }
+
+  openEditDialog(plateId: string): void {
+    var plateToEdit = this.plates.find(x => x.id == plateId);
+
+    const dialogRef = this.dialog.open(EditPlateComponent, {
+      data: { 'plate': plateToEdit }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        var plateToSave = this.plates.find(x => x.id == plateId);
+
+        this.plateService.upsertPlate(plateToSave).subscribe(_ => {
+          this.searchPlates();
+        });
+      }
+    });
   }
 }
 

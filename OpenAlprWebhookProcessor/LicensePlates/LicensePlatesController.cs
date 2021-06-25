@@ -5,6 +5,7 @@ using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
+using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,18 +27,22 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly GetStatisticsHandler _getStatisticsHandler;
 
+        private readonly UpsertPlateRequestHandler _upsertPlateRequestHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
             DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler,
             GetLicensePlateFiltersHandler getLicensePlateFiltersHandler,
-            GetStatisticsHandler getStatisticsHandler)
+            GetStatisticsHandler getStatisticsHandler,
+            UpsertPlateRequestHandler upsertPlateRequestHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
             _deleteLicensePlateGroupHandler = deleteLicensePlateGroupHandler;
             _getLicensePlateFiltersHandler = getLicensePlateFiltersHandler;
             _getStatisticsHandler = getStatisticsHandler;
+            _upsertPlateRequestHandler = upsertPlateRequestHandler;
         }
 
         [HttpPost("search")]
@@ -47,6 +52,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         {
             return await _searchLicensePlateHandler.HandleAsync(
                 request,
+                cancellationToken);
+        }
+
+        [HttpPost("edit")]
+        public async Task UpsertPlate(
+            [FromBody] LicensePlate licensePlate,
+            CancellationToken cancellationToken)
+        {
+            await _upsertPlateRequestHandler.HandleAsync(
+                licensePlate,
                 cancellationToken);
         }
 

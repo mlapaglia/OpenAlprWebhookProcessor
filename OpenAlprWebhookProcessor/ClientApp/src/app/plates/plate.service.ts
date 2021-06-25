@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Stream } from "stream";
+import { Plate } from "./plate/plate";
 import { PlateResponse } from "./plate/plateResponse";
 import { PlateStatistics } from "./plate/plateStatistics";
 import { VehicleFilters } from "./vehicleFilters";
@@ -10,6 +11,7 @@ import { VehicleFilters } from "./vehicleFilters";
 export class PlateService {
     private getRelayImageUrl = 'images';
     private searchPlatesUrl = 'licenseplates/search';
+    private editPlateUrl = 'licenseplates/edit';
     private deletePlateUrl = 'licenseplates';
     private hydrateDatabaseUrl = "hydration/start";
     private getFiltersUrl = 'licenseplates/filters';
@@ -19,6 +21,10 @@ export class PlateService {
 
     searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
         return this.http.post<PlateResponse>(`/${this.searchPlatesUrl}`, plateRequest);
+    }
+
+    upsertPlate(plate: Plate): Observable<any> {
+        return this.http.post<any>(`/${this.editPlateUrl}`, plate);
     }
 
     deletePlate(plateId: string): Observable<any> {
