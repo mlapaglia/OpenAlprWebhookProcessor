@@ -41,6 +41,7 @@ using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
+using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -165,6 +166,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetLicensePlateFiltersHandler>();
             services.AddScoped<AgentScrapeRequestHandler>();
             services.AddScoped<GetStatisticsHandler>();
+            services.AddScoped<UpsertPlateRequestHandler>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

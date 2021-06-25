@@ -22,12 +22,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PlateComponent } from './plate/plate.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { EditPlateComponent } from './edit-plate/edit-plate.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     PlatesLayoutComponent,
     PlatesComponent,
     PlateComponent,
+    EditPlateComponent,
   ],
   imports: [
     CommonModule,
@@ -53,6 +56,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatDividerModule,
     NgxChartsModule,
     MatAutocompleteModule,
+    MatDialogModule,
   ]
 })
 export class PlatesModule { }
