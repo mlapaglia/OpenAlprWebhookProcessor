@@ -27,7 +27,7 @@
                 diameter="100">
             </mat-progress-spinner>
             <img [src]="plate.cropImageUrl"
-                style="padding:10px; max-height: 300px; max-width:500px;"
+                style="padding:10px; width: 500px;"
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />
@@ -42,7 +42,7 @@
             <mat-card-title>Statistics</mat-card-title>
             <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content style="width:500px;">
+        <mat-card-content>
             <mat-progress-spinner
                 color="primary"
                 mode="indeterminate"
