@@ -24,30 +24,28 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
 
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
-            plateStatistics.Last90Days = await _processorContext.PlateGroups
-                .Where(x => x.ReceivedOnEpoch > endingEpoch)
-                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
-                .CountAsync(cancellationToken);
-
-            plateStatistics.TotalSeen = await _processorContext.PlateGroups
-                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
-                .CountAsync(cancellationToken);
-
-            var firstSeenEpoch = await _processorContext.PlateGroups
+            var seenPlates = await _processorContext.PlateGroups
                 .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
                 .Select(x => x.ReceivedOnEpoch)
-                .FirstOrDefaultAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
+
+            plateStatistics.TotalSeen = seenPlates.Count;
+
+            plateStatistics.Last90Days = seenPlates
+                .Count(x => x > endingEpoch);
+
+            var firstSeenEpoch = seenPlates
+                .FirstOrDefault();
 
             if (firstSeenEpoch != 0)
             {
                 plateStatistics.FirstSeen = DateTimeOffset.FromUnixTimeMilliseconds(firstSeenEpoch);
             }
 
-            var lastSeenEpoch = await _processorContext.PlateGroups
-                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
-                .OrderByDescending(x => x.ReceivedOnEpoch)
-                .Select(x => x.ReceivedOnEpoch)
-                .FirstOrDefaultAsync(cancellationToken);
+            var lastSeenEpoch = seenPlates
+                .OrderByDescending(x => x)
+                .Select(x => x)
+                .FirstOrDefault();
 
             if (lastSeenEpoch != 0)
             {
