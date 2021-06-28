@@ -7,7 +7,7 @@
             <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
               <div class="hide-mobile" fxFlex="10">Camera Id</div>
               <div fxFlex="20">Plate Number</div>
-              <div fxFlex="20">Vehicle Description</div>
+              <div class="hide-mobile" fxFlex="20">Vehicle Description</div>
               <div class="hide-mobile" fxFlex="20">Vehicle Direction</div>
               <div fxFlex="30">Date</div>
             </div>
@@ -20,7 +20,7 @@
             <div style="display:flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap;">
               <span class="hide-mobile" fxFlex="10">{{plate.openAlprCameraId}}</span>
               <span fxFlex="20">{{plate.plateNumber}}</span>
-              <span fxFlex="20"> {{plate.vehicleDescription}}</span>
+              <span class="hide-mobile" fxFlex="20"> {{plate.vehicleDescription}}</span>
               <span class="hide-mobile" fxFlex="20"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
               <span fxFlex="30">{{plate.receivedOn | date:"medium"}}</span>
             </div>

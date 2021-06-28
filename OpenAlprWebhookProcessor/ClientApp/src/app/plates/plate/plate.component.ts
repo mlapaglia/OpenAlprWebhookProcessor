@@ -51,6 +51,11 @@ export class PlateComponent implements OnInit {
       });
 
       this.plateStatistics.push({
+        key: "Total Seen",
+        value: result.totalSeen.toString(),
+      });
+
+      this.plateStatistics.push({
         key: "First seen",
         value: this.datePipe.transform(result.firstSeen, 'medium'),
       });

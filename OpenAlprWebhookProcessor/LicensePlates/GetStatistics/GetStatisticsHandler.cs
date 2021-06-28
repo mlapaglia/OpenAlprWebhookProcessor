@@ -24,12 +24,14 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
 
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
-            var recentRecords = await _processorContext.PlateGroups
+            plateStatistics.Last90Days = await _processorContext.PlateGroups
                 .Where(x => x.ReceivedOnEpoch > endingEpoch)
                 .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
                 .CountAsync(cancellationToken);
 
-            plateStatistics.Last90Days = recentRecords;
+            plateStatistics.TotalSeen = await _processorContext.PlateGroups
+                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
+                .CountAsync(cancellationToken);
 
             var firstSeenEpoch = await _processorContext.PlateGroups
                 .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Contains(plateNumber))
