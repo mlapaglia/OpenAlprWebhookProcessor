@@ -1,0 +1,31 @@
+<div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
+    <mat-card>
+        <mat-card-header style="justify-content: space-between;">
+            <mat-card-title>Pushover</mat-card-title>
+            <mat-card-subtitle>https://pushover.net/</mat-card-subtitle>
+            <mat-slide-toggle
+                style="padding-top: 10px;"
+                [(ngModel)]="isEnabled"></mat-slide-toggle>
+        </mat-card-header>
+        <mat-card-content *ngIf="isEnabled" [@inOutAnimation]>
+            <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
+                <mat-form-field fxFlex="80">
+                    <mat-label>User Key</mat-label>
+                    <input matInput [(ngModel)]="userKey">
+                    <mat-icon matTooltip="The pushover user key, found on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+                </mat-form-field>
+                <mat-form-field fxFlex="80">
+                    <mat-label>API Token</mat-label>
+                    <input matInput [(ngModel)]="apiToken">
+                    <mat-icon matTooltip="The pushover api token, found under 'Your Applications' on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+                </mat-form-field>
+                <div>
+                    <mat-checkbox [(ngModel)]="sendPlatePreviewEnabled">Send Plate Preview Image</mat-checkbox>
+                </div>
+            </div>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="isEnabled" [@inOutAnimation]>
+            <button mat-button>Save</button>
+          </mat-card-actions>
+    </mat-card>
+</div>
