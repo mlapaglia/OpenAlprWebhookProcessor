@@ -5,7 +5,8 @@
             <mat-card-subtitle>https://pushover.net/</mat-card-subtitle>
             <mat-slide-toggle
                 style="padding-top: 10px;"
-                [(ngModel)]="client.isEnabled"></mat-slide-toggle>
+                [(ngModel)]="client.isEnabled"
+                (change)="onPushoverToggle($event)"></mat-slide-toggle>
         </mat-card-header>
         <mat-card-content *ngIf="client.isEnabled" [@inOutAnimation]>
             <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
@@ -25,8 +26,14 @@
             </div>
         </mat-card-content>
         <mat-card-actions align="end" *ngIf="client.isEnabled" [@inOutAnimation]>
-            <button mat-button (click)="testClient();" [disabled]="isTesting">Test</button>
-            <button mat-button (click)="saveClient();" [disabled]="isSaving">Save</button>
+            <button mat-raised-button (click)="testClient();" [disabled]="isTesting">
+                <span *ngIf="isTesting" class="spinner-border spinner-border-sm mr-1"></span>
+                Test
+            </button>
+            <button mat-raised-button color="primary" (click)="saveClient();" [disabled]="isSaving" btn-primary>
+                <span *ngIf="isSaving" class="spinner-border spinner-border-sm mr-1"></span>
+                Save
+            </button>
           </mat-card-actions>
     </mat-card>
 </div>

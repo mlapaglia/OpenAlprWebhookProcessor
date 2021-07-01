@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { SnackbarService } from '@app/snackbar/snackbar.service';
 import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Pushover } from './pushover';
@@ -58,5 +59,15 @@ export class PushoverComponent implements OnInit {
       this.snackbarService.create("Pushover client test failed.", SnackBarType.Error);
       this.isTesting = false;
     });
+  }
+
+  public onPushoverToggle(event: MatSlideToggleChange) {
+    if (!event.checked) {
+      this.client.isEnabled = event.checked;
+      this.isSaving = true;
+      this.pushoverService.upsertPushover(this.client).subscribe(_ => {
+        this.isSaving = false;
+      });
+    }
   }
 }
