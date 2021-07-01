@@ -103,7 +103,6 @@ namespace OpenAlprWebhookProcessor.Alerts
                         {
                             _logger.LogError(ex, $"failed to send alert to {nameof(_alertClient)}");
                         }
-                        
                     }
                 }
             }
