@@ -81,20 +81,29 @@ namespace OpenAlprWebhookProcessor.Alerts
                         plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId);
                     }
 
-                    var result = await plateGroups.FirstOrDefaultAsync();
+                    var result = await plateGroups.FirstOrDefaultAsync(_cancellationTokenSource.Token);
 
                     if (result != null)
                     {
                         _logger.LogInformation($"alerting for: {result.Id}");
                         await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
-                        await _alertClient.SendAlertAsync(new Alert()
+
+                        try
                         {
-                            Description = result.AlertDescription.ToString(),
-                            Id = result.Id,
-                            PlateNumber = result.BestNumber.ToString(),
-                        },
-                        result.Jpeg,
-                        _cancellationTokenSource.Token);
+                            await _alertClient.SendAlertAsync(new Alert()
+                            {
+                                Description = result.AlertDescription.ToString(),
+                                Id = result.Id,
+                                PlateNumber = result.BestNumber.ToString(),
+                            },
+                            result.Jpeg,
+                            _cancellationTokenSource.Token);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"failed to send alert to {nameof(_alertClient)}");
+                        }
+                        
                     }
                 }
             }

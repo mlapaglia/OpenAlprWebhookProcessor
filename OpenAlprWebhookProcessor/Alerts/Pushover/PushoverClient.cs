@@ -4,7 +4,6 @@ using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,7 +44,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     content.Add(new StringContent(alert.PlateNumber + " " + alert.Description), "message");
                     content.Add(new StringContent("openalpr alert"), "title");
 
-                    if(clientSettings.SendPlatePreview)
+                    if (clientSettings.SendPlatePreview)
                     {
                         content.Add(new ByteArrayContent(Convert.FromBase64String(base64PreviewJpeg)), "attachment", "attachment.jpg");
                     }
