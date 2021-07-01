@@ -36,12 +36,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
-using Microsoft.Net.Http.Headers;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
+using OpenAlprWebhookProcessor.Alerts.Pushover;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -167,6 +167,11 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<AgentScrapeRequestHandler>();
             services.AddScoped<GetStatisticsHandler>();
             services.AddScoped<UpsertPlateRequestHandler>();
+            services.AddScoped<UpsertPushoverClientRequestHandler>();
+            services.AddScoped<GetPushoverClientRequestHandler>();
+            services.AddScoped<TestPushoverClientRequestHandler>();
+
+            services.AddSingleton<IAlertClient, PushoverClient>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

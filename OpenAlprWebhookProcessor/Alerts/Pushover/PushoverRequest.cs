@@ -1,6 +1,6 @@
 ﻿namespace OpenAlprWebhookProcessor.Alerts.Pushover
 {
-    public class UpsertPushoverRequest
+    public class PushoverRequest
     {
         public bool IsEnabled { get; set; }
 
@@ -8,6 +8,6 @@
 
         public string ApiToken { get; set; }
 
-        public bool SendPlatePreview { get; set; }
+        public bool SendPlatePreviewEnabled { get; set; }
     }
 }

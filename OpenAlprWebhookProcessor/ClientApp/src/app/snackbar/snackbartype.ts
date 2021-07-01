@@ -4,5 +4,7 @@ export enum SnackBarType {
     Connected,
     Disconnected,
     Saved,
-    Deleted
+    Deleted,
+    Successful,
+    Error,
 }

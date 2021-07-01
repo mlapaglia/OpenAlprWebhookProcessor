@@ -2,7 +2,7 @@ export class Pushover {
     apiToken: string;
     userKey: string;
     isEnabled: boolean;
-    sendPlatePreview: boolean;
+    sendPlatePreviewEnabled: boolean;
     
     constructor(init?:Partial<Pushover>) {
         Object.assign(this, init);

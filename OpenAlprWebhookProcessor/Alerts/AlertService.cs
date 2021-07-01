@@ -24,16 +24,20 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
+        private readonly IAlertClient _alertClient;
+
         public AlertService(
             IServiceProvider serviceProvider,
             ILogger<AlertService> logger,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+            IAlertClient alertClient)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
             _processorHub = processorHub;
+            _alertClient = alertClient;
         }
 
         public void AddJob(AlertUpdateRequest request)
@@ -83,6 +87,14 @@ namespace OpenAlprWebhookProcessor.Alerts
                     {
                         _logger.LogInformation($"alerting for: {result.Id}");
                         await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
+                        await _alertClient.SendAlertAsync(new Alert()
+                        {
+                            Description = result.AlertDescription.ToString(),
+                            Id = result.Id,
+                            PlateNumber = result.BestNumber.ToString(),
+                        },
+                        result.Jpeg,
+                        _cancellationTokenSource.Token);
                     }
                 }
             }

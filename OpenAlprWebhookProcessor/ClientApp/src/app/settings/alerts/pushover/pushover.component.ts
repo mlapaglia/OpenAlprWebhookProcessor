@@ -1,5 +1,9 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
+import { Pushover } from './pushover';
+import { PushoverService } from './pushover.service';
 
 @Component({
   selector: 'app-pushover',
@@ -22,14 +26,37 @@ import { Component, OnInit } from '@angular/core';
       ])]
 })
 export class PushoverComponent implements OnInit {
-  public isEnabled: string;
-  public userKey: string;
-  public apiToken: string;
-  public sendPlatePreviewEnabled: boolean;
+  public client: Pushover;
+  public isSaving: boolean;
+  public isTesting: boolean;
 
-  constructor() { }
+  constructor(
+    private pushoverService: PushoverService,
+    private snackbarService: SnackbarService) { }
 
   ngOnInit(): void {
+    this.pushoverService.getPushover().subscribe(result => {
+      this.client = result;
+    })
   }
 
+  public saveClient() {
+    this.isSaving = true;
+    this.pushoverService.upsertPushover(this.client).subscribe(_ => {
+      this.snackbarService.create("Pushover client saved.", SnackBarType.Saved);
+      this.isSaving = false;
+    });
+  }
+
+  public testClient() {
+    this.isTesting = true;
+    this.pushoverService.testPushover().subscribe(_ => {
+      this.snackbarService.create("Pushover client test successful.", SnackBarType.Successful);
+      this.isTesting = false;
+    },
+    _ => {
+      this.snackbarService.create("Pushover client test failed.", SnackBarType.Error);
+      this.isTesting = false;
+    });
+  }
 }

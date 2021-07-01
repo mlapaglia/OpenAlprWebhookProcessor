@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts.Pushover
 {
-    public class UpsertPushoverRequestHandler
+    public class UpsertPushoverClientRequestHandler
     {
         private readonly ProcessorContext _processorContext;
 
-        public UpsertPushoverRequestHandler(ProcessorContext processorContext)
+        public UpsertPushoverClientRequestHandler(ProcessorContext processorContext)
         {
             _processorContext = processorContext;
         }
 
-        public async Task HandleAsync(UpsertPushoverRequest request)
+        public async Task HandleAsync(PushoverRequest request)
         {
             var pushoverClient = await _processorContext.PushoverAlertClients.FirstOrDefaultAsync();
 
@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 {
                     ApiToken = request.ApiToken,
                     IsEnabled = request.IsEnabled,
-                    SendPlatePreview = request.SendPlatePreview,
+                    SendPlatePreview = request.SendPlatePreviewEnabled,
                     UserKey = request.UserKey,
                 };
             }
@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
             {
                 pushoverClient.ApiToken = request.ApiToken;
                 pushoverClient.IsEnabled = request.IsEnabled;
-                pushoverClient.SendPlatePreview = request.SendPlatePreview;
+                pushoverClient.SendPlatePreview = request.SendPlatePreviewEnabled;
                 pushoverClient.UserKey = request.UserKey;
             }
 

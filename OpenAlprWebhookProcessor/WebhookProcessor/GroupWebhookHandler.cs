@@ -142,7 +142,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         var alertUpdateRequest = new AlertUpdateRequest()
                         {
                             CameraId = camera.Id,
-                            Description = alert.Description,
+                            Description = alert.PlateNumber + " " + alert.Description + " was seen on " + DateTimeOffset.Now.ToString("g"),
                             LicensePlateId = plateGroup.Id,
                             IsStrictMatch = alert.IsStrictMatch,
                         };
