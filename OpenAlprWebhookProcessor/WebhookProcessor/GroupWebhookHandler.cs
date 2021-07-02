@@ -134,7 +134,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
 
                     var alert = await _processorContext.Alerts
-                        .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber)
+                        .Where(x => x.PlateNumber == webhook.Group.BestPlateNumber || plateGroup.PossibleNumbers.Contains(x.PlateNumber))
                         .FirstOrDefaultAsync(cancellationToken);
 
                     if (alert != null)
@@ -142,7 +142,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         var alertUpdateRequest = new AlertUpdateRequest()
                         {
                             CameraId = camera.Id,
-                            Description = alert.Description,
+                            Description = alert.PlateNumber + " " + alert.Description + " was seen on " + DateTimeOffset.Now.ToString("g"),
                             LicensePlateId = plateGroup.Id,
                             IsStrictMatch = alert.IsStrictMatch,
                         };

@@ -32,6 +32,7 @@ import { ForwardsComponent } from './forwards/forwards.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SystemLogsComponent } from './systemLogs/systemLogs.component';
 import { HighlightModule } from 'ngx-highlightjs';
+import { PushoverComponent } from './alerts/pushover/pushover.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { HighlightModule } from 'ngx-highlightjs';
     IgnoreComponent,
     ForwardsComponent,
     SystemLogsComponent,
+    PushoverComponent,
   ],
   imports: [
     CommonModule,

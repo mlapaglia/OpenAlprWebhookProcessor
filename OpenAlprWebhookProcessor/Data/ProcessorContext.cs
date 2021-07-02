@@ -20,5 +20,7 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<Alert> Alerts { get; set; }
 
         public DbSet<WebhookForward> WebhookForwards { get; set; }
+
+        public DbSet<Pushover> PushoverAlertClients { get; set; }
     }
 }

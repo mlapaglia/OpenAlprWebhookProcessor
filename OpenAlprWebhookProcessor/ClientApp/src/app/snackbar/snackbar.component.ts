@@ -26,6 +26,10 @@ export class SnackbarComponent implements OnInit {
         return 'saved';
       case SnackBarType.Deleted:
         return 'delete';
+      case SnackBarType.Successful:
+        return 'check';
+      case SnackBarType.Error:
+        return 'error';
     }
   }
 }

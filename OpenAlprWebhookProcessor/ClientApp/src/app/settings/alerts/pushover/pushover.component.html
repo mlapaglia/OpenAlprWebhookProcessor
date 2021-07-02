@@ -1,0 +1,39 @@
+<div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px *ngIf="client">
+    <mat-card>
+        <mat-card-header style="justify-content: space-between;">
+            <mat-card-title>Pushover</mat-card-title>
+            <mat-card-subtitle>https://pushover.net/</mat-card-subtitle>
+            <mat-slide-toggle
+                style="padding-top: 10px;"
+                [(ngModel)]="client.isEnabled"
+                (change)="onPushoverToggle($event)"></mat-slide-toggle>
+        </mat-card-header>
+        <mat-card-content *ngIf="client.isEnabled" [@inOutAnimation]>
+            <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
+                <mat-form-field fxFlex="80">
+                    <mat-label>User Key</mat-label>
+                    <input matInput [(ngModel)]="client.userKey">
+                    <mat-icon matTooltip="The pushover user key, found on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+                </mat-form-field>
+                <mat-form-field fxFlex="80">
+                    <mat-label>API Token</mat-label>
+                    <input matInput [(ngModel)]="client.apiToken">
+                    <mat-icon matTooltip="The pushover api token, found under 'Your Applications' on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+                </mat-form-field>
+                <div>
+                    <mat-checkbox [(ngModel)]="client.sendPlatePreviewEnabled">Send Plate Preview Image</mat-checkbox>
+                </div>
+            </div>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="client.isEnabled" [@inOutAnimation]>
+            <button mat-raised-button (click)="testClient();" [disabled]="isTesting">
+                <span *ngIf="isTesting" class="spinner-border spinner-border-sm mr-1"></span>
+                Test
+            </button>
+            <button mat-raised-button color="primary" (click)="saveClient();" [disabled]="isSaving" btn-primary>
+                <span *ngIf="isSaving" class="spinner-border spinner-border-sm mr-1"></span>
+                Save
+            </button>
+          </mat-card-actions>
+    </mat-card>
+</div>

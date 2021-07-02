@@ -24,16 +24,20 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
+        private readonly IAlertClient _alertClient;
+
         public AlertService(
             IServiceProvider serviceProvider,
             ILogger<AlertService> logger,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+            IAlertClient alertClient)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
             _processorHub = processorHub;
+            _alertClient = alertClient;
         }
 
         public void AddJob(AlertUpdateRequest request)
@@ -77,12 +81,28 @@ namespace OpenAlprWebhookProcessor.Alerts
                         plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId);
                     }
 
-                    var result = await plateGroups.FirstOrDefaultAsync();
+                    var result = await plateGroups.FirstOrDefaultAsync(_cancellationTokenSource.Token);
 
                     if (result != null)
                     {
                         _logger.LogInformation($"alerting for: {result.Id}");
                         await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
+
+                        try
+                        {
+                            await _alertClient.SendAlertAsync(new Alert()
+                            {
+                                Description = result.AlertDescription,
+                                Id = result.Id,
+                                PlateNumber = result.BestNumber,
+                            },
+                            result.Jpeg,
+                            _cancellationTokenSource.Token);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"failed to send alert to {nameof(_alertClient)}");
+                        }
                     }
                 }
             }
