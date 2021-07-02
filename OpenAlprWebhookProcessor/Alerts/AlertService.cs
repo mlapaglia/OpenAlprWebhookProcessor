@@ -92,9 +92,9 @@ namespace OpenAlprWebhookProcessor.Alerts
                         {
                             await _alertClient.SendAlertAsync(new Alert()
                             {
-                                Description = result.AlertDescription.ToString(),
+                                Description = result.AlertDescription,
                                 Id = result.Id,
-                                PlateNumber = result.BestNumber.ToString(),
+                                PlateNumber = result.BestNumber,
                             },
                             result.Jpeg,
                             _cancellationTokenSource.Token);
