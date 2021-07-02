@@ -16,6 +16,7 @@ import { AlertsService } from '@app/settings/alerts/alerts.service';
 import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
+import { LocalStorageService } from '@app/_services/local-storage.service';
 
 @Component({
   selector: 'app-plates',
@@ -85,7 +86,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public isLoading: boolean;
   public isSignalrConnected: boolean;
 
-  private pageSize: number = 5;
+  public pageSize: number = 10;
+  private pageSizeCacheKey: string = "platePageSize";
   private pageNumber: number = 0;
 
   private subscriptions = new Subscription();
@@ -98,6 +100,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private snackbarService: SnackbarService,
     private alertsService: AlertsService,
     private settingsService: SettingsService,
+    private localStorageService: LocalStorageService,
     public dialog: MatDialog) {
       this.range = new FormGroup({
         start: new FormControl(),
@@ -107,6 +110,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     
   ngOnInit(): void {
     this.isSignalrConnected = this.signalRHub.isConnected;
+    var pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
+    this.pageSize = pageSize != null ? parseInt(pageSize) : 25;
     this.searchPlates();
     this.populateFilters();
   }
@@ -135,6 +140,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public onPaginatorPage($event) {
     this.pageSize = $event.pageSize;
+    this.localStorageService.setData(this.pageSizeCacheKey, this.pageSize);
+
     this.pageNumber = $event.pageIndex;
 
     this.searchPlates();
