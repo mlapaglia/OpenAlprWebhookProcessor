@@ -52,9 +52,10 @@
         <span *ngIf="isSignalrConnected" title="live plate updates are enabled" class="pulse"></span>
       </div>
       <mat-paginator
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      [length]="totalNumberOfPlates"
-      (page)="onPaginatorPage($event)"></mat-paginator>
+        [pageSizeOptions]="[10, 25, 75, 100]"
+        [pageSize]="pageSize"
+        [length]="totalNumberOfPlates"
+        (page)="onPaginatorPage($event)"></mat-paginator>
     </div>
   </div>
   <div fxFlex="20">
