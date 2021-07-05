@@ -59,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Alerts
 
                 alertToUpdate.Description = updatedAlert.Description;
                 alertToUpdate.IsStrictMatch = updatedAlert.StrictMatch;
-                alertToUpdate.PlateNumber = updatedAlert.PlateNumber;
+                alertToUpdate.PlateNumber = updatedAlert.PlateNumber.ToUpper();
             }
 
             var alertsToAdd = alerts.Where(x => !dbAlerts.Any(p2 => p2.Id == x.Id));
@@ -70,8 +70,8 @@ namespace OpenAlprWebhookProcessor.Alerts
                 {
                     Description = alertToAdd.Description,
                     IsStrictMatch = alertToAdd.StrictMatch,
-                    PlateNumber = alertToAdd.PlateNumber,
-                };
+                    PlateNumber = alertToAdd.PlateNumber.ToUpper(),
+            };
 
                 _processorContext.Alerts.Add(addedAlert);
             }
