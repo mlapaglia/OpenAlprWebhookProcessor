@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Alerts
         public async Task AddAlertAsync(Alert alert)
         {
             var dbIgnores = await _processorContext.Alerts
-                .Where(x => x.PlateNumber == alert.PlateNumber)
+                .Where(x => x.PlateNumber == alert.PlateNumber.ToUpper())
                 .ToListAsync();
 
             if (dbIgnores != null)
@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.Alerts
                 {
                     Description = alert.Description,
                     IsStrictMatch = alert.StrictMatch,
-                    PlateNumber = alert.PlateNumber,
+                    PlateNumber = alert.PlateNumber.ToUpper(),
                 };
 
                 _processorContext.Alerts.Add(addedAlert);
@@ -37,7 +37,7 @@ namespace OpenAlprWebhookProcessor.Alerts
             }
             else
             {
-                throw new ArgumentException("ignore already exists");
+                throw new ArgumentException("alert already exists");
             }
         }
 
