@@ -1,5 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
 import { Url } from 'url';
 import { PlateService } from '../plate.service';
@@ -20,6 +22,7 @@ export class PlateComponent implements OnInit {
   public loadingPlateImageFailed: boolean;
   public loadingStatistics: boolean;
   public loadingStatisticsFailed: boolean;
+  public isSavingNotes: boolean;
 
   public plateStatistics: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
@@ -28,6 +31,7 @@ export class PlateComponent implements OnInit {
     private lightbox: Lightbox,
     private plateService: PlateService,
     private datePipe: DatePipe,
+    private snackbarService: SnackbarService,
   ) { }
 
   ngOnInit(): void {
@@ -112,5 +116,17 @@ export class PlateComponent implements OnInit {
   public plateImageFailedToLoad() {
     this.loadingPlateImage = false;
     this.loadingPlateImageFailed = true;
+  }
+
+  public saveNotes() {
+    this.isSavingNotes = true;
+    this.plateService.upsertPlate(this.plate).subscribe(_ => {
+      this.isSavingNotes = false;
+      this.snackbarService.create(`Notes saved for: ${this.plate.plateNumber}`, SnackBarType.Saved);
+    });
+  }
+
+  public clearNotes() {
+    this.plate.notes = '';
   }
 }

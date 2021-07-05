@@ -1,4 +1,4 @@
-<div fxLayout="row wrap" fxLayoutGap="grid">
+<div fxLayout="row wrap" fxLayoutGap="grid" fxLayoutAlign="start start">
     <mat-card class="example-card">
         <mat-card-header>
             <mat-card-title>Images</mat-card-title>
@@ -66,5 +66,24 @@
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
         </mat-card-content>
+    </mat-card>
+    <mat-card class="example-card">
+        <mat-card-header>
+            <mat-card-title>Notes</mat-card-title>
+            <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content >
+            <mat-form-field style="width: 100%;" appearance="fill">
+                <textarea [matTextareaAutosize]="true" matInput [(ngModel)]="plate.notes"></textarea>
+            </mat-form-field>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <button mat-raised-button
+              color="primary"
+              [disabled]="isSavingNotes"
+              (click)="saveNotes()"
+              [class.spinner]="isSavingNotes">Save</button>
+            <button mat-raised-button color="warn" (click)="clearNotes()">Clear</button>
+          </mat-card-actions>
     </mat-card>
 </div>

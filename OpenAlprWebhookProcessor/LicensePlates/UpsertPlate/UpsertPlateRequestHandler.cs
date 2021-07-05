@@ -31,6 +31,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.UpsertPlate
             }
 
             plateToEdit.BestNumber = plate.PlateNumber;
+            plateToEdit.Notes = plate.Notes;
 
             await _processorContext.SaveChangesAsync(cancellationToken);
         }

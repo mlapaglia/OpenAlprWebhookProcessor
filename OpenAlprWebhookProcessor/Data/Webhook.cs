@@ -41,5 +41,7 @@ namespace OpenAlprWebhookProcessor.Data
         public double Direction { get; set; }
 
         public string PlateCoordinates { get; set; }
+
+        public string Notes { get; set; }
     }
 }

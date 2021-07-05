@@ -30,4 +30,6 @@ export interface Plate {
     imageUrl: Url;
 
     cropImageUrl: Url;
+
+    notes: string;
 }

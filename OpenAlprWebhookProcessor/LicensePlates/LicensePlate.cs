@@ -34,5 +34,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         public Uri ImageUrl { get; set; }
 
         public Uri CropImageUrl { get; set; }
+
+        public string Notes { get; set; }
     }
 }
