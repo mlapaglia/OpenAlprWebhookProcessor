@@ -1,6 +1,6 @@
 # OpenALPR Webhook Processor
 
-This service accepts license plate webhooks from the OpenALPR web server. The webhook data (license plate number, make/model, year) is then set as text on the configured IP camera video overlay.
+This service accepts license plate webhooks from the OpenALPR web server. The webhook data (license plate number, make/model, year) is then set as text on the configured IP camera video overlay. The plate is also saved to a database for later retrieval. Simple statistics about the plate are also calculated. The tool can also control day/night triggering as well as focus during scheduled sunrise/sunset times.
 
 ## Screenshots
 ### Plates view
