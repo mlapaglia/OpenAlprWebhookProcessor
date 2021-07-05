@@ -115,9 +115,9 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
         private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
         {
-            return (await _processerContext.Alerts
+            return await _processerContext.Alerts
                 .Select(x => x.PlateNumber)
-                .ToListAsync(cancellationToken));
+                .ToListAsync(cancellationToken);
         }
     }
 }
