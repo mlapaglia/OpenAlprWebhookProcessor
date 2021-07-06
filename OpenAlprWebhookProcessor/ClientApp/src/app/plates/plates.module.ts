@@ -24,6 +24,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     NgxChartsModule,
     MatAutocompleteModule,
     MatDialogModule,
+    MatChipsModule,
   ]
 })
 export class PlatesModule { }

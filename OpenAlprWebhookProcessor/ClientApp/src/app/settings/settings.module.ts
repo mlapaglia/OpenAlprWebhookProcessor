@@ -33,6 +33,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SystemLogsComponent } from './systemLogs/systemLogs.component';
 import { HighlightModule } from 'ngx-highlightjs';
 import { PushoverComponent } from './alerts/pushover/pushover.component';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -74,6 +75,7 @@ import { PushoverComponent } from './alerts/pushover/pushover.component';
     MatSlideToggleModule,
     MatCheckboxModule,
     HighlightModule,
+    MatChipsModule,
   ]
 })
 export class SettingsModule { }

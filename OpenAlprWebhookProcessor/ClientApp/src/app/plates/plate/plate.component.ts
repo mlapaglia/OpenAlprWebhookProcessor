@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { SnackbarService } from '@app/snackbar/snackbar.service';
 import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
@@ -7,6 +8,11 @@ import { Url } from 'url';
 import { PlateService } from '../plate.service';
 import { Plate } from './plate';
 import { PlateStatisticsData } from './plateStatistics';
+import { Observable } from 'rxjs';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-plate',
@@ -27,12 +33,23 @@ export class PlateComponent implements OnInit {
   public plateStatistics: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
 
+  public tags: string[] = ['Family'];
+  public allTags: string[] = ['Family', 'Neighbor', 'Friend', 'Enemy'];
+  public tagSeparatorKeysCodes: number[] = [ENTER, COMMA];
+  public filteredTags: Observable<string[]>;
+  @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
+  public tagCtrl = new FormControl();
+  
   constructor(
     private lightbox: Lightbox,
     private plateService: PlateService,
     private datePipe: DatePipe,
     private snackbarService: SnackbarService,
-  ) { }
+  ) {
+    this.filteredTags = this.tagCtrl.valueChanges.pipe(
+      startWith(null),
+      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allTags.slice()));
+  }
 
   ngOnInit(): void {
     this.loadingImage = true;
@@ -116,6 +133,40 @@ export class PlateComponent implements OnInit {
   public plateImageFailedToLoad() {
     this.loadingPlateImage = false;
     this.loadingPlateImageFailed = true;
+  }
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add our fruit
+    if (value) {
+      this.tags.push(value);
+    }
+
+    // Clear the input value
+    // event.input!.clear();
+
+    this.tagCtrl.setValue(null);
+  }
+
+  remove(fruit: string): void {
+    const index = this.tags.indexOf(fruit);
+
+    if (index >= 0) {
+      this.tags.splice(index, 1);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.tags.push(event.option.viewValue);
+    this.tagInput.nativeElement.value = '';
+    this.tagCtrl.setValue(null);
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allTags.filter(fruit => fruit.toLowerCase().includes(filterValue));
   }
 
   public saveNotes() {

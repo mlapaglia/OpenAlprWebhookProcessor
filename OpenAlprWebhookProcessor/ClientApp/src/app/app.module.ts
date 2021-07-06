@@ -28,6 +28,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';;
 import { SnackbarComponent } from './snackbar/snackbar.component'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { DatePipe } from '@angular/common';
@@ -56,6 +57,7 @@ import { DatePipe } from '@angular/common';
         MatSnackBarModule,
         MatProgressSpinnerModule,
         MatExpansionModule,
+        MatChipsModule,
         NgxChartsModule,
         HighlightModule,
     ],
