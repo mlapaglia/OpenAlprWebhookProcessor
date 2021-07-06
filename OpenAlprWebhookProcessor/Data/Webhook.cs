@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Data
 {
@@ -43,5 +44,7 @@ namespace OpenAlprWebhookProcessor.Data
         public string PlateCoordinates { get; set; }
 
         public string Notes { get; set; }
+
+        public List<Tag> Tags { get; set; }
     }
 }

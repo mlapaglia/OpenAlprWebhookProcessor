@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
+using OpenAlprWebhookProcessor.Settings.Tags;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
 using System.Collections.Generic;
@@ -29,6 +30,10 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly AgentScrapeRequestHandler _agentHydrationRequestHandler;
 
+        private readonly GetTagsRequestHandler _getTagsRequestHandler;
+
+        private readonly UpsertTagsRequestHandler _upsertTagsRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -36,7 +41,9 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertIgnoresRequestHandler upsertIgnoresRequestHandler,
             GetWebhookForwardsRequestHandler getWebhookForwardsRequestHandler,
             UpsertWebhookForwardsRequestHandler upsertWebhookForwardsRequestHandler,
-            AgentScrapeRequestHandler agentHydrationRequestHandler)
+            AgentScrapeRequestHandler agentHydrationRequestHandler,
+            GetTagsRequestHandler getTagsRequestHandler,
+            UpsertTagsRequestHandler upsertTagsRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -45,6 +52,8 @@ namespace OpenAlprWebhookProcessor.Settings
             _getWebhookForwardsRequestHandler = getWebhookForwardsRequestHandler;
             _upsertWebhookForwardsRequestHandler = upsertWebhookForwardsRequestHandler;
             _agentHydrationRequestHandler = agentHydrationRequestHandler;
+            _getTagsRequestHandler = getTagsRequestHandler;
+            _upsertTagsRequestHandler = upsertTagsRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -96,6 +105,18 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task UpsertForwards([FromBody] List<WebhookForward> ignores)
         {
             await _upsertWebhookForwardsRequestHandler.HandleAsync(ignores);
+        }
+
+        [HttpGet("tags")]
+        public async Task<List<Tag>> GetTags(CancellationToken cancellationToken)
+        {
+            return await _getTagsRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpPost("tags")]
+        public async Task UpsertTags([FromBody] List<Tag> tags)
+        {
+            await _upsertTagsRequestHandler.HandleAsync(tags);
         }
     }
 }
