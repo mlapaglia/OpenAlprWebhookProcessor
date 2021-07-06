@@ -34,6 +34,7 @@ import { SystemLogsComponent } from './systemLogs/systemLogs.component';
 import { HighlightModule } from 'ngx-highlightjs';
 import { PushoverComponent } from './alerts/pushover/pushover.component';
 import { MatChipsModule } from '@angular/material/chips';
+import { TagsComponent } from './tags/tags.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { MatChipsModule } from '@angular/material/chips';
     ForwardsComponent,
     SystemLogsComponent,
     PushoverComponent,
+    TagsComponent,
   ],
   imports: [
     CommonModule,

@@ -42,6 +42,7 @@ using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
+using OpenAlprWebhookProcessor.Settings.Tags;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -170,6 +171,8 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertPushoverClientRequestHandler>();
             services.AddScoped<GetPushoverClientRequestHandler>();
             services.AddScoped<TestPushoverClientRequestHandler>();
+            services.AddScoped<GetTagsRequestHandler>();
+            services.AddScoped<UpsertTagsRequestHandler>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
 
