@@ -73,7 +73,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, "Failed to send alert via Pushover.");
+                        logger.LogError(ex, "Failed to send alert via Pushover: " + ex.Message);
                         throw new InvalidOperationException("failed");
                     }
                 }
