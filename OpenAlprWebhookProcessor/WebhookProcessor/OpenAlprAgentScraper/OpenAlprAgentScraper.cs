@@ -71,7 +71,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 if (!scrapeResults.IsSuccessStatusCode)
                 {
                     var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
-                    throw new ArgumentException("no metadata found for given date range: " + error);
+                    _logger.LogError("no metadata found for given date range: {error}", error);
+                    lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
+                    continue;
                 }
 
                 var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
