@@ -56,6 +56,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             var startDate = DateTimeOffset.UtcNow;
             while (startDate > lastSuccessfulScrape)
             {
+                _logger.LogInformation("Scraping between " 
+                   + lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString()
+                   + " and "
+                   + lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
+
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
                     + scrapeUrl

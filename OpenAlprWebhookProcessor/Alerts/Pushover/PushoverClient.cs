@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Net.Http;
@@ -30,6 +31,10 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
         {
             using (var scope = _serviceProvider.CreateScope())
             {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+
+                logger.LogInformation("Sending Alert via Pushover.");
+
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                 var clientSettings = await processorContext.PushoverAlertClients.FirstOrDefaultAsync(cancellationToken);
@@ -58,11 +63,15 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                         if (!response.IsSuccessStatusCode)
                         {
+                            logger.LogError("Failed to send alert via Pushover.");
                             throw new InvalidOperationException("failed");
                         }
+
+                        logger.LogInformation("Alert sent via Pushover.");
                     }
                     catch (Exception ex)
                     {
+                        logger.LogError(ex, "Failed to send alert via Pushover.");
                         throw new InvalidOperationException("failed");
                     }
                 }
