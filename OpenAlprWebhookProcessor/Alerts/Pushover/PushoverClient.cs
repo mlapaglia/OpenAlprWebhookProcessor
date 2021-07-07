@@ -63,7 +63,9 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                         if (!response.IsSuccessStatusCode)
                         {
-                            logger.LogError("Failed to send alert via Pushover.");
+                            var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                            logger.LogError("Failed to send alert via Pushover: " + result);
                             throw new InvalidOperationException("failed");
                         }
 
