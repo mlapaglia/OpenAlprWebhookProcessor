@@ -9,5 +9,8 @@ namespace OpenAlprWebhookProcessor.Alerts
             Alert alert,
             string base64PreviewJpeg,
             CancellationToken cancellationToken);
+
+        Task VerifyCredentialsAsync(
+            CancellationToken cancellationToken);
     }
 }

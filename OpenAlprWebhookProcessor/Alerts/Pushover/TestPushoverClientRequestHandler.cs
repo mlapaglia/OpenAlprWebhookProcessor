@@ -26,6 +26,8 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 .Where(x => x.Jpeg != null)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            await _alertClient.VerifyCredentialsAsync(cancellationToken);
+
             await _alertClient.SendAlertAsync(new Alert()
             {
                 Description = "was seen on " + DateTimeOffset.Now.ToString("g"),
