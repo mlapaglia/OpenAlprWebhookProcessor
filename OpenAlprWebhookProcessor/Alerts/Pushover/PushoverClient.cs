@@ -14,6 +14,8 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
     {
         private const string PushOverApiUrl = "https://api.pushover.net/1/messages.json";
 
+        private const string VerifyCredentialsUrl = "https://api.pushover.net/1/users/validate.json?token={0}&user={1}";
+
         private readonly HttpClient _httpClient;
 
         private readonly IServiceProvider _serviceProvider;
@@ -76,6 +78,41 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         logger.LogError(ex, "Failed to send alert via Pushover: " + ex.Message);
                         throw new InvalidOperationException("failed");
                     }
+                }
+            }
+        }
+
+        public async Task VerifyCredentialsAsync(CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+
+                logger.LogInformation("Testing credentials via Pushover.");
+
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var clientSettings = await processorContext.PushoverAlertClients.FirstOrDefaultAsync(cancellationToken);
+
+                try
+                {
+                    var result = await _httpClient.PostAsync(VerifyCredentialsUrl
+                            .Replace("{0}", clientSettings.ApiToken)
+                            .Replace("{1}", clientSettings.UserKey),
+                        null,
+                        cancellationToken);
+
+                    if (!result.IsSuccessStatusCode)
+                    {
+                        var message = await result.Content.ReadAsStringAsync(cancellationToken);
+                        logger.LogError("Pushover credential check failed: " + message);
+                        throw new InvalidOperationException("Validation failed.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Pushover credential check failed: " + ex.Message);
+                    throw;
                 }
             }
         }
