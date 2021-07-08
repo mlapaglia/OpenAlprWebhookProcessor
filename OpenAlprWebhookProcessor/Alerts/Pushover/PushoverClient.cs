@@ -106,13 +106,13 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     {
                         var message = await result.Content.ReadAsStringAsync(cancellationToken);
                         logger.LogError("Pushover credential check failed: " + message);
-                        throw new InvalidOperationException("Validation failed.");
                     }
+
+                    logger.LogInformation("Pushover credentials are valid.");
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Pushover credential check failed: " + ex.Message);
-                    throw;
                 }
             }
         }
