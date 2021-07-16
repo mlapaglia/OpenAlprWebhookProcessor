@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using Microsoft.AspNetCore.SignalR;
 
@@ -18,20 +17,16 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly ILogger _logger;
-
         private readonly IServiceProvider _serviceProvider;
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
 
         public HydrationService(
             IServiceProvider serviceProvider,
-            ILogger<HydrationService> logger,
             IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub)
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _serviceProvider = serviceProvider;
-            _logger = logger;
             _processorHub = processorHub;
             _hydrationRequestToProcess = new BlockingCollection<string>();
         }
@@ -57,15 +52,23 @@ namespace OpenAlprWebhookProcessor.Hydrator
         {
             foreach (var _ in _hydrationRequestToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                _logger.LogInformation("Starting OpenALPR Agent scrape.");
-
                 using (var scope = _serviceProvider.CreateScope())
                 {
-                    var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
-                    await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
-                }
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                    logger.LogInformation("Starting OpenALPR Agent scrape.");
 
-                await _processorHub.Clients.All.ScrapeFinished();
+                    try
+                    {
+                        var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
+                        await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
+
+                        await _processorHub.Clients.All.ScrapeFinished();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Failed to scrape Agent.");
+                    }
+                }
             }
         }
     }

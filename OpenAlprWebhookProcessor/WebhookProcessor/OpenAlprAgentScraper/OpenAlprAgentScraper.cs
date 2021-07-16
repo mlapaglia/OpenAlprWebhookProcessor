@@ -56,6 +56,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             var startDate = DateTimeOffset.UtcNow;
             while (startDate > lastSuccessfulScrape)
             {
+                _logger.LogInformation("Scraping between " 
+                   + lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString()
+                   + " and "
+                   + lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
+
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
                     + scrapeUrl
@@ -65,7 +70,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 if (!scrapeResults.IsSuccessStatusCode)
                 {
-                    throw new ArgumentException("no metadata found for given date range");
+                    var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
+                    _logger.LogError("no metadata found for given date range: {error}", error);
+                    lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
+                    continue;
                 }
 
                 var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
