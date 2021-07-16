@@ -8,11 +8,10 @@ import { Url } from 'url';
 import { PlateService } from '../plate.service';
 import { Plate } from './plate';
 import { PlateStatisticsData } from './plateStatistics';
-import { Observable } from 'rxjs';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { map, startWith } from 'rxjs/operators';
+import { TagsService } from '@app/settings/tags/tags.service';
 
 @Component({
   selector: 'app-plate',
@@ -33,10 +32,9 @@ export class PlateComponent implements OnInit {
   public plateStatistics: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
 
-  public tags: string[] = ['Family'];
-  public allTags: string[] = ['Family', 'Neighbor', 'Friend', 'Enemy'];
+  public tags: string[] = [];
+  public allTags: string[] = [];
   public tagSeparatorKeysCodes: number[] = [ENTER, COMMA];
-  public filteredTags: Observable<string[]>;
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
   public tagCtrl = new FormControl();
   
@@ -45,16 +43,21 @@ export class PlateComponent implements OnInit {
     private plateService: PlateService,
     private datePipe: DatePipe,
     private snackbarService: SnackbarService,
+    private tagService: TagsService,
   ) {
-    this.filteredTags = this.tagCtrl.valueChanges.pipe(
-      startWith(null),
-      map((tag: string | null) => tag ? this._filter(tag) : this.allTags.slice()));
   }
 
   ngOnInit(): void {
     this.loadingImage = true;
     this.loadingPlateImage = true;
     this.getPlateStatistics();
+    this.getTags();
+  }
+
+  private getTags() {
+    this.tagService.getTags().subscribe(result => {
+      this.allTags = result.map(function(a) { return a.name; });
+    });
   }
 
   private getPlateStatistics() {
@@ -135,20 +138,17 @@ export class PlateComponent implements OnInit {
     this.loadingPlateImageFailed = true;
   }
 
-  add(event: MatChipInputEvent): void {
+  public add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
 
-    if (value) {
+    if (value && this.tags.indexOf(event.value) == -1) {
       this.tags.push(value);
     }
-
-    // Clear the input value
-    // event.input!.clear();
 
     this.tagCtrl.setValue(null);
   }
 
-  remove(tag: string): void {
+  public remove(tag: string): void {
     const index = this.tags.indexOf(tag);
 
     if (index >= 0) {
@@ -156,16 +156,13 @@ export class PlateComponent implements OnInit {
     }
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
-    this.tags.push(event.option.viewValue);
+  public selected(event: MatAutocompleteSelectedEvent): void {
+    if (this.tags.indexOf(event.option.viewValue) == -1) {
+      this.tags.push(event.option.viewValue);
+    }
+    
     this.tagInput.nativeElement.value = '';
     this.tagCtrl.setValue(null);
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allTags.filter(tag => tag.toLowerCase().includes(filterValue));
   }
 
   public saveNotes() {

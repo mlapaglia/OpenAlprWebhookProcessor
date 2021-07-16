@@ -1,1 +1,30 @@
-<div *ngFor="let tag of tags">{{tag}}</div>
+<div style="margin: 15px;">
+    <table mat-table [dataSource]="tags" multiTemplateDataRows class="mat-elevation-z8" style="width:50%">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Tag</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-form-field>
+            <input matInput [(ngModel)]="element.name" required>
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="warn" (click)="deleteTag(element)">Delete</button>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
+      <tr mat-row *matRowDef="let element; columns: rowsToDisplay;"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElement === element"
+          (click)="expandedElement = expandedElement === element ? null : element">
+      </tr>
+    </table>
+  </div>
+  <div style="margin: 15px;">
+    <button mat-raised-button color="primary" (click)="addTag()" style="margin: 15px;">Add</button>
+    <button mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveTags()">Save</button>
+  </div>
