@@ -18,7 +18,7 @@ export class EnrichersService {
     return this.http.post("/settings/enrichers", enricher);
   }
 
-  public testEnricher(enricherId: string): Observable<any> {
-    return this.http.post(`/settings/enrichers/${enricherId}/test`, null)
+  public testEnricher(enricherId: string): Observable<boolean> {
+    return this.http.post<boolean>(`/settings/enrichers/${enricherId}/test`, null)
   }
 }

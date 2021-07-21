@@ -49,9 +49,15 @@ export class EnrichersComponent implements OnInit {
   public testEnricher() {
     this.isTesting = true;
 
-    this.enricherService.testEnricher(this.enricher.id).subscribe(_ => {
+    this.enricherService.testEnricher(this.enricher.id).subscribe(result => {
       this.isTesting = false;
-      this.snackbarService.create("Enricher test succeeded.", SnackBarType.Saved);
+
+      if (result) {
+        this.snackbarService.create("Enricher test succeeded.", SnackBarType.Saved);
+      }
+      else {
+        this.snackbarService.create("Enricher test failed, check the logs.", SnackBarType.Error);
+      }
     }, _ => {
       this.isSaving = false;
       this.snackbarService.create("Enricher test failed, check the logs.", SnackBarType.Error);
