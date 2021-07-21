@@ -1,0 +1,40 @@
+<div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px *ngIf="enricher">
+    <mat-card>
+        <mat-card-header style="justify-content: space-between;">
+            <mat-card-title>LicensePlateData API</mat-card-title>
+            <mat-card-subtitle>https://licenseplatedata.com/</mat-card-subtitle>
+            <mat-slide-toggle
+                style="padding-top: 10px;"
+                [(ngModel)]="enricher.isEnabled"
+                (change)="onPushoverToggle($event)"></mat-slide-toggle>
+        </mat-card-header>
+        <mat-card-content *ngIf="enricher.isEnabled" [@inOutAnimation]>
+            <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
+                <mat-form-field fxFlex="80">
+                    <mat-label>API Key</mat-label>
+                    <input matInput [(ngModel)]="enricher.apiKey">
+                    <mat-icon matTooltip="The LicensePlateData API key, provided via email from provider." style="cursor:default" matSuffix>help_center</mat-icon>
+                </mat-form-field>
+                <div>
+                    <mat-checkbox [(ngModel)]="enricher.enrichAlways">Enrich every plate</mat-checkbox>
+                </div>
+                <div>
+                    <mat-checkbox [(ngModel)]="enricher.enrichInNightMode">Enrich plates during night mode</mat-checkbox>
+                </div>
+                <div>
+                    <mat-checkbox [(ngModel)]="enricher.enrichManually">Only enrich manually</mat-checkbox>
+                </div>
+            </div>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="enricher.isEnabled" [@inOutAnimation]>
+            <button mat-raised-button (click)="testEnricher();" [disabled]="isTesting">
+                <span *ngIf="isTesting" class="spinner-border spinner-border-sm mr-1"></span>
+                Test
+            </button>
+            <button mat-raised-button color="primary" (click)="saveEnricher();" [disabled]="isSaving" btn-primary>
+                <span *ngIf="isSaving" class="spinner-border spinner-border-sm mr-1"></span>
+                Save
+            </button>
+          </mat-card-actions>
+    </mat-card>
+</div>
