@@ -18,5 +18,4 @@ export class EditPlateComponent implements OnInit {
   ngOnInit(): void {
     this.plate = this.data.plate;
   }
-
 }

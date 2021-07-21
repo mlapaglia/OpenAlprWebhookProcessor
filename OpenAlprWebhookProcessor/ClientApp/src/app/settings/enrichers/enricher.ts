@@ -1,10 +1,10 @@
+import { EnrichmentType } from "./enrichmentType";
+
 export class Enricher {
     id: string;
     isEnabled: boolean;
     apiKey: string;
-    enrichAlways: boolean;
-    enrichInNightMode: boolean;
-    enrichManually: boolean;
+    enrichmentType: EnrichmentType;
     
     constructor(init?:Partial<Enricher>) {
         Object.assign(this, init);

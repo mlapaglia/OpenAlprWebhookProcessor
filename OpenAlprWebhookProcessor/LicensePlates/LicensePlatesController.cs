@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
@@ -29,13 +30,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly UpsertPlateRequestHandler _upsertPlateRequestHandler;
 
+        private readonly EnrichLicensePlateRequestHandler _enrichLicensePlateRequestHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
             DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler,
             GetLicensePlateFiltersHandler getLicensePlateFiltersHandler,
             GetStatisticsHandler getStatisticsHandler,
-            UpsertPlateRequestHandler upsertPlateRequestHandler)
+            UpsertPlateRequestHandler upsertPlateRequestHandler,
+            EnrichLicensePlateRequestHandler enrichLicensePlateRequestHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
@@ -43,6 +47,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             _getLicensePlateFiltersHandler = getLicensePlateFiltersHandler;
             _getStatisticsHandler = getStatisticsHandler;
             _upsertPlateRequestHandler = upsertPlateRequestHandler;
+            _enrichLicensePlateRequestHandler = enrichLicensePlateRequestHandler;
         }
 
         [HttpPost("search")]
@@ -99,6 +104,12 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             return await _getStatisticsHandler.HandleAsync(
                 plateNumber,
                 cancellationToken);
+        }
+
+        [HttpPost("enrich/{plateId}")]
+        public async Task EnrichPlate(Guid plateId)
+        {
+            await _enrichLicensePlateRequestHandler.HandleAsync(plateId);
         }
     }
 }

@@ -37,8 +37,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData
             string state,
             CancellationToken cancellationToken)
         {
-            
-
             var response = await _httpClient.GetAsync(
                 LicensePlateDataApiUrl
                     .Replace("$key", await GetApiKeyAsync(cancellationToken))
@@ -88,7 +86,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("An error occurred while enriching with LicensePlateData API: " + await response.Content.ReadAsStringAsync(cancellationToken));
+                _logger.LogError("An error occurred while testing LicensePlateData API: " + await response.Content.ReadAsStringAsync(cancellationToken));
                 return false;
             }
 
@@ -98,7 +96,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData
 
             if (parsed.Error)
             {
-                _logger.LogError("An error occurred while testing: " + parsed.Message);
+                _logger.LogError("An error occurred while testing LicensePlateData API: " + parsed.Message);
                 return false;
             }
 

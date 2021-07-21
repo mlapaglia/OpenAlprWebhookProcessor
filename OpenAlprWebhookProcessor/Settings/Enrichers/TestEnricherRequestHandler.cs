@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using System;
+﻿using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,12 +8,8 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
     {
         private readonly ILicensePlateEnricherClient _licensePlateEnricherClient;
 
-        private readonly ProcessorContext _processorContext;
-        public TestEnricherRequestHandler(
-            ProcessorContext processorContext,
-            ILicensePlateEnricherClient licensePlateEnricherClient)
+        public TestEnricherRequestHandler(ILicensePlateEnricherClient licensePlateEnricherClient)
         {
-            _processorContext = processorContext;
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 

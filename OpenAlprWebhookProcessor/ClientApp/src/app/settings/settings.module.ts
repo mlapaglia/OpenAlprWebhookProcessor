@@ -34,6 +34,7 @@ import { SystemLogsComponent } from './systemLogs/systemLogs.component';
 import { HighlightModule } from 'ngx-highlightjs';
 import { PushoverComponent } from './alerts/pushover/pushover.component';
 import { EnrichersComponent } from './enrichers/enrichers.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { EnrichersComponent } from './enrichers/enrichers.component';
     FlexLayoutModule,
     MatSlideToggleModule,
     MatCheckboxModule,
+    MatRadioModule,
     HighlightModule,
   ]
 })

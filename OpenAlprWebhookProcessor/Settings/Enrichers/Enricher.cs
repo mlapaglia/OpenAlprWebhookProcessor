@@ -1,5 +1,6 @@
 ﻿using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using System;
+using System.Text.Json.Serialization;
 
 namespace OpenAlprWebhookProcessor.Settings.Enrichers
 {
@@ -13,10 +14,6 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
 
         public string ApiKey { get; set; }
 
-        public bool RunAlways { get; set; }
-
-        public bool RunAtNight { get; set; }
-
-        public bool RunManually { get; set; }
+        public EnrichmentType EnrichmentType { get; set; }
     }
 }

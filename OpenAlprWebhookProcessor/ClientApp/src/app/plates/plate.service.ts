@@ -16,6 +16,7 @@ export class PlateService {
     private hydrateDatabaseUrl = "hydration/start";
     private getFiltersUrl = 'licenseplates/filters';
     private getStatistics = 'licenseplates/statistics';
+    private enrichPlateUrl = 'licenseplates/enrich';
 
     constructor(private http: HttpClient) { }
 
@@ -45,6 +46,10 @@ export class PlateService {
 
     getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {
         return this.http.get<PlateStatistics>(`/${this.getStatistics}/${plateNumber}`)
+    }
+
+    enrichPlate(plateId: string): Observable<any> {
+        return this.http.post(`/${this.enrichPlateUrl}/${plateId}`, null);
     }
 }
 
