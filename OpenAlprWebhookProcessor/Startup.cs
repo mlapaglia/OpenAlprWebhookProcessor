@@ -43,6 +43,8 @@ using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Settings.Enrichers;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -173,6 +175,9 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<TestPushoverClientRequestHandler>();
             services.AddScoped<GetEnrichersRequestHandler>();
             services.AddScoped<UpsertEnricherRequestHandler>();
+            services.AddScoped<TestEnricherRequestHandler>();
+
+            services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
 

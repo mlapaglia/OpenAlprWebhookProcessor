@@ -1,4 +1,5 @@
 export class Enricher {
+    id: string;
     isEnabled: boolean;
     apiKey: string;
     enrichAlways: boolean;

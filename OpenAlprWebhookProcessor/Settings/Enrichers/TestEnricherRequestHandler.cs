@@ -20,24 +20,9 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 
-        public async Task HandleAsync(
-            Guid plateId,
-            CancellationToken cancellationToken)
+        public async Task<bool> HandleAsync(CancellationToken cancellationToken)
         {
-            var plateToEnrich = await _processorContext.PlateGroups.FirstOrDefaultAsync(x => x.Id == plateId);
-
-            var result = await _licensePlateEnricherClient.GetLicenseInformationAsync(
-                plateToEnrich.BestNumber,
-                plateToEnrich.VehicleRegion,
-                cancellationToken);
-
-            plateToEnrich.VehicleMake = result.Make;
-            plateToEnrich.VehicleMakeModel = result.Make + " " + result.Model;
-            plateToEnrich.VehicleType = result.Style;
-            plateToEnrich.VehicleYear = result.Year;
-            //plateToEnrich.VehicleColor = ??
-
-            await _processorContext.SaveChangesAsync(cancellationToken);
+            return await _licensePlateEnricherClient.TestAsync(cancellationToken);
         }
     }
 }

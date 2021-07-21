@@ -9,5 +9,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
             string plateNumber,
             string state,
             CancellationToken cancellationToken);
+
+        Task<bool> TestAsync(CancellationToken cancellationToken);
     }
 }

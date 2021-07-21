@@ -5,6 +5,7 @@ using OpenAlprWebhookProcessor.Settings.Enrichers;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,9 +31,11 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly AgentScrapeRequestHandler _agentHydrationRequestHandler;
 
-        private GetEnrichersRequestHandler _getEnrichersRequestHandler;
+        private readonly GetEnrichersRequestHandler _getEnrichersRequestHandler;
 
-        private UpsertEnricherRequestHandler _upsertEnricherRequestHandler;
+        private readonly UpsertEnricherRequestHandler _upsertEnricherRequestHandler;
+
+        private readonly TestEnricherRequestHandler _testEnricherRequestHandler;
 
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
@@ -43,7 +46,8 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertWebhookForwardsRequestHandler upsertWebhookForwardsRequestHandler,
             AgentScrapeRequestHandler agentHydrationRequestHandler,
             GetEnrichersRequestHandler getEnrichersRequestHandler,
-            UpsertEnricherRequestHandler upsertEnricherRequestHandler)
+            UpsertEnricherRequestHandler upsertEnricherRequestHandler,
+            TestEnricherRequestHandler testEnricherRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -54,6 +58,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _agentHydrationRequestHandler = agentHydrationRequestHandler;
             _getEnrichersRequestHandler = getEnrichersRequestHandler;
             _upsertEnricherRequestHandler = upsertEnricherRequestHandler;
+            _testEnricherRequestHandler = testEnricherRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -117,6 +122,12 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task UpsertEnrichers([FromBody] Enricher enricher)
         {
             await _upsertEnricherRequestHandler.HandleAsync(enricher);
+        }
+
+        [HttpPost("enrichers/{enricherId}/test")]
+        public async Task<bool> TestEnrichers(CancellationToken cancellationToken)
+        {
+            return await _testEnricherRequestHandler.HandleAsync(cancellationToken);
         }
     }
 }

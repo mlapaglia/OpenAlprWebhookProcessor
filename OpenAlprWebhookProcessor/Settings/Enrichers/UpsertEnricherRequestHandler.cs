@@ -26,6 +26,7 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
                 {
                     ApiKey = enricher.ApiKey,
                     EnricherType = enricher.EnricherType,
+                    IsEnabled = enricher.IsEnabled,
                     RunAlways = enricher.RunAlways,
                     RunAtNight = enricher.RunAtNight,
                     RunManually = enricher.RunManually,
@@ -37,6 +38,7 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
             {
                 dbEnricher.ApiKey = enricher.ApiKey;
                 dbEnricher.EnricherType = enricher.EnricherType;
+                dbEnricher.IsEnabled = enricher.IsEnabled;
                 dbEnricher.RunAlways = enricher.RunAlways;
                 dbEnricher.RunAtNight = enricher.RunAtNight;
                 dbEnricher.RunManually = enricher.RunManually;

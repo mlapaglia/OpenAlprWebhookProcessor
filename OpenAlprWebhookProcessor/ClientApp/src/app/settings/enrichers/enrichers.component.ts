@@ -1,5 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Enricher } from './enricher';
 import { EnrichersService } from './enrichers.service';
 
@@ -29,19 +32,53 @@ export class EnrichersComponent implements OnInit {
 
   public enricher: Enricher;
   
-  constructor(private enricherService: EnrichersService) { }
+  constructor(
+    private enricherService: EnrichersService,
+    private snackbarService: SnackbarService) { }
 
   ngOnInit(): void {
+    this.getEnricher();
+  }
+
+  private getEnricher() {
     this.enricherService.getEnricher().subscribe(result => {
       this.enricher = result;
     })
   }
 
   public testEnricher() {
+    this.isTesting = true;
 
+    this.enricherService.testEnricher(this.enricher.id).subscribe(_ => {
+      this.isTesting = false;
+      this.snackbarService.create("Enricher test succeeded.", SnackBarType.Saved);
+    }, _ => {
+      this.isSaving = false;
+      this.snackbarService.create("Enricher test failed, check the logs.", SnackBarType.Error);
+    });
   }
 
   public saveEnricher() {
+    this.isSaving = true;
 
+    this.enricherService.upsertEnricher(this.enricher).subscribe(_ => {
+      this.isSaving = false;
+      this.snackbarService.create("Enricher client saved.", SnackBarType.Successful);
+      this.getEnricher();
+    },
+    _ => {
+      this.isSaving = false;
+      this.snackbarService.create("Enricher client test failed, check the logs.", SnackBarType.Error);
+    });
+  }
+
+  public onEnricherToggle(event: MatSlideToggleChange) {
+    if (!event.checked) {
+      this.enricher.isEnabled = event.checked;
+      this.isSaving = true;
+      this.enricherService.upsertEnricher(this.enricher).subscribe(_ => {
+        this.isSaving = false;
+      });
+    }
   }
 }

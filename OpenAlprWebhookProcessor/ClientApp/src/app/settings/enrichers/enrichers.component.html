@@ -6,7 +6,7 @@
             <mat-slide-toggle
                 style="padding-top: 10px;"
                 [(ngModel)]="enricher.isEnabled"
-                (change)="onPushoverToggle($event)"></mat-slide-toggle>
+                (change)="onEnricherToggle($event)"></mat-slide-toggle>
         </mat-card-header>
         <mat-card-content *ngIf="enricher.isEnabled" [@inOutAnimation]>
             <div style="margin:16px;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
@@ -15,14 +15,14 @@
                     <input matInput [(ngModel)]="enricher.apiKey">
                     <mat-icon matTooltip="The LicensePlateData API key, provided via email from provider." style="cursor:default" matSuffix>help_center</mat-icon>
                 </mat-form-field>
-                <div>
-                    <mat-checkbox [(ngModel)]="enricher.enrichAlways">Enrich every plate</mat-checkbox>
+                <div fxFlex="80">
+                    <mat-checkbox [(ngModel)]="enricher.runAlways">Enrich every plate</mat-checkbox>
                 </div>
-                <div>
-                    <mat-checkbox [(ngModel)]="enricher.enrichInNightMode">Enrich plates during night mode</mat-checkbox>
+                <div fxFlex="80">
+                    <mat-checkbox [(ngModel)]="enricher.runAtNight">Enrich plates during night mode</mat-checkbox>
                 </div>
-                <div>
-                    <mat-checkbox [(ngModel)]="enricher.enrichManually">Only enrich manually</mat-checkbox>
+                <div fxFlex="80">
+                    <mat-checkbox [(ngModel)]="enricher.runManually">Only enrich manually</mat-checkbox>
                 </div>
             </div>
         </mat-card-content>

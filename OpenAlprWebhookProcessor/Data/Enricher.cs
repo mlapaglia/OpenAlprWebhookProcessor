@@ -7,6 +7,8 @@ namespace OpenAlprWebhookProcessor.Data
     {
         public Guid Id { get; set; }
 
+        public bool IsEnabled { get; set; }
+
         public EnricherType EnricherType { get; set; }
 
         public string ApiKey { get; set; }
