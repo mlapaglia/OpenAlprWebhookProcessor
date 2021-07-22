@@ -8,6 +8,7 @@ namespace OpenAlprWebhookProcessor.Settings
     public class GetAgentRequestHandler
     {
         private readonly ProcessorContext _processorContext;
+
         public GetAgentRequestHandler(ProcessorContext processorContext)
         {
             _processorContext = processorContext;

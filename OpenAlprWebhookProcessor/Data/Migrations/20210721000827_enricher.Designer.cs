@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210721000827_enricher")]
+    partial class enricher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,10 +183,13 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<int>("EnricherType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("EnrichmentType")
+                    b.Property<bool>("RunAlways")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsEnabled")
+                    b.Property<bool>("RunAtNight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RunManually")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -231,9 +236,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<bool>("IsAlert")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsEnriched")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Jpeg")

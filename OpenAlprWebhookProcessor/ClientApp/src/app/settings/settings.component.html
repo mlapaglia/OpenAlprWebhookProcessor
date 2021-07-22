@@ -28,6 +28,10 @@
 				<span class="mobile-shrink">System Logs</span>
 				<mat-icon mat-list-icon>library_books</mat-icon>
 			</mat-list-item>
+			<mat-list-item (click)="openSettings('enrichers')">
+				<span class="mobile-shrink">Enrichers</span>
+				<mat-icon mat-list-icon>merge_type</mat-icon>
+			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
 
@@ -39,6 +43,7 @@
 		<app-alerts *ngIf="visibleSetting == 'alert'"></app-alerts>
 		<app-forwards *ngIf="visibleSetting == 'forwards'"></app-forwards>
 		<app-logs *ngIf="visibleSetting == 'logs'"></app-logs>
+		<app-enrichers *ngIf="visibleSetting == 'enrichers'"></app-enrichers>
 	</mat-sidenav-content>
 
 </mat-sidenav-container>

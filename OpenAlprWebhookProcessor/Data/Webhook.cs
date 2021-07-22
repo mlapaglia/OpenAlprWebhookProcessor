@@ -43,5 +43,7 @@ namespace OpenAlprWebhookProcessor.Data
         public string PlateCoordinates { get; set; }
 
         public string Notes { get; set; }
+
+        public bool IsEnriched { get; set; }
     }
 }

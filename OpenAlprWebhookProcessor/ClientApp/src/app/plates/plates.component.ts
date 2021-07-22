@@ -17,6 +17,7 @@ import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from '@app/_services/local-storage.service';
+import { EnrichersService } from '@app/settings/enrichers/enrichers.service';
 
 @Component({
   selector: 'app-plates',
@@ -80,6 +81,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public vehicleFilters: VehicleFilters = {} as VehicleFilters;
 
   public isDeletingPlate: boolean;
+  public isEnrichingPlate: boolean;
+
   public isAddingToIgnoreList: boolean;
   public isAddingToAlertList: boolean;
 
@@ -95,6 +98,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
+    private enricherService: EnrichersService,
     private plateService: PlateService,
     private signalRHub: SignalrService,
     private snackbarService: SnackbarService,
@@ -279,7 +283,19 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.validateSearchPlateNumber();
   }
 
-  openEditDialog(plateId: string): void {
+  public enrichPlate(plateId: string) {
+    this.isEnrichingPlate = true;
+    this.plateService.enrichPlate(plateId).subscribe(_ => {
+      this.isEnrichingPlate = false;
+      this.snackbarService.create("Plate successfully enriched.", SnackBarType.Saved);
+    },
+    _ => {
+      this.isEnrichingPlate = false;
+      this.snackbarService.create("Failed to enrich plate, check the logs.", SnackBarType.Error);
+    })
+  }
+
+  public openEditDialog(plateId: string): void {
     var plateToEdit = this.plates.find(x => x.id == plateId);
 
     const dialogRef = this.dialog.open(EditPlateComponent, {

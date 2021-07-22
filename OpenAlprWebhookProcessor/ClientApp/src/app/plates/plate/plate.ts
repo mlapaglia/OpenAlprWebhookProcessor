@@ -32,4 +32,6 @@ export interface Plate {
     cropImageUrl: Url;
 
     notes: string;
+
+    canBeEnriched: boolean;
 }

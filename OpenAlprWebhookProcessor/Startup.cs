@@ -42,6 +42,10 @@ using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
+using OpenAlprWebhookProcessor.Settings.Enrichers;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
+using System.Text.Json.Serialization;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -63,7 +67,13 @@ namespace OpenAlprWebhookProcessor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddControllersWithViews();
+            services
+                .AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
             services.AddSignalR();
 
             var processorOptionsBuilder = new DbContextOptionsBuilder<ProcessorContext>();
@@ -170,6 +180,12 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertPushoverClientRequestHandler>();
             services.AddScoped<GetPushoverClientRequestHandler>();
             services.AddScoped<TestPushoverClientRequestHandler>();
+            services.AddScoped<GetEnrichersRequestHandler>();
+            services.AddScoped<UpsertEnricherRequestHandler>();
+            services.AddScoped<TestEnricherRequestHandler>();
+            services.AddScoped<EnrichLicensePlateRequestHandler>();
+
+            services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
 

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20210722135647_enriched")]
+    partial class enriched
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
