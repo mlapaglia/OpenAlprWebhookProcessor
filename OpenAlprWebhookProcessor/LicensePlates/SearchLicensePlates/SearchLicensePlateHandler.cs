@@ -106,6 +106,13 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                     platesToAlert));
             }
 
+            var enricherEnabled = (await _processerContext.Enrichers.FirstOrDefaultAsync(cancellationToken)).IsEnabled;
+
+            if (!enricherEnabled)
+            {
+                licensePlates.ForEach(x => x.CanBeEnriched = false);
+            }
+
             return new SearchLicensePlateResponse()
             {
                 Plates = licensePlates,

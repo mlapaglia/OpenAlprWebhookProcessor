@@ -36,6 +36,11 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
                 throw new ArgumentException("Plate must be United States region.");
             }
 
+            if (plateGroup.IsEnriched)
+            {
+                throw new ArgumentException("Plate has already been enriched.");
+            }
+
             var enrichResult = await _licensePlateEnricherClient.GetLicenseInformationAsync(
                 plateGroup.BestNumber,
                 plateGroup.VehicleRegion.Replace("us-", "").ToUpper(),
@@ -45,6 +50,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
             plateGroup.VehicleMake = enrichResult.Make;
             plateGroup.VehicleMakeModel = enrichResult.Make + " " + enrichResult.Model;
             plateGroup.VehicleYear = enrichResult.Year;
+            plateGroup.IsEnriched = true;
 
             await _processorContext.SaveChangesAsync();
         }
