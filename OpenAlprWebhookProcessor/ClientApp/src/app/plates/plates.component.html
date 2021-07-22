@@ -32,7 +32,7 @@
               (searchPlatesEvent)="searchPlates($event)"></app-plate>
         </ng-template>
         <mat-action-row style="display:flexbox; flex-wrap: wrap;">
-          <button mat-button color="primary" [disabled]="!plate.canBeEnriched" (click)="enrichPlate(plate.id)">Enrich plate</button>
+          <button mat-button color="primary" [disabled]="!plate.canBeEnriched" [class.spinner]="isEnrichingPlate" (click)="enrichPlate(plate.id)">Enrich plate</button>
           <button mat-button color="primary" (click)="editPlate(plate.id)">Edit plate</button>
           <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
           <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
