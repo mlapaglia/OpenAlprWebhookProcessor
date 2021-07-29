@@ -94,7 +94,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.OpenAlprUuid = webhook.Group.BestUuid;
             plateGroup.BestNumber = webhook.Group.BestPlateNumber;
             plateGroup.PossibleNumbers = string.Join(",", webhook.Group.Candidates.Select(x => x.Plate).ToArray());
-            plateGroup.Jpeg = webhook.Group.BestPlate.PlateCropJpeg;
+            plateGroup.PlatePreviewJpeg = webhook.Group.BestPlate.PlateCropJpeg;
+            plateGroup.VehiclePreviewJpeg = webhook.Group.VehicleCropJpeg;
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
 

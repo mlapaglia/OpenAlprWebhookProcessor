@@ -22,7 +22,9 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string PossibleNumbers { get; set; }
 
-        public string Jpeg { get; set; }
+        public string PlatePreviewJpeg { get; set; }
+
+        public string VehiclePreviewJpeg { get; set; }
 
         public double Confidence { get; set; }
 
