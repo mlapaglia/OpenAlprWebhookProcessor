@@ -168,6 +168,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filterPlateNumber = plateNumber;
     }
 
+    this.filterEndOn.setUTCHours(0,0,0,0);
+    this.filterStartOn.setUTCHours(23,59,59,999);
+
     request.pageNumber = this.pageNumber;
     request.pageSize = this.pageSize;
     request.endSearchOn = this.filterEndOn;
