@@ -56,7 +56,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             var startDate = DateTimeOffset.UtcNow;
             while (startDate > lastSuccessfulScrape)
             {
-                _logger.LogInformation("Scraping between " 
+                _logger.LogInformation("Scraping between "
                    + lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString()
                    + " and "
                    + lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
@@ -88,17 +88,27 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
                         cancellationToken);
 
-                    var group = await JsonSerializer.DeserializeAsync<Group>(
-                        await newGroup.Content.ReadAsStreamAsync(cancellationToken),
-                        cancellationToken: cancellationToken);
-
-                    _logger.LogInformation("date: " + DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString() + " querying: " + metadata.Key);
-
                     if (!newGroup.IsSuccessStatusCode)
                     {
-                        _logger.LogError("Unable to parse Group with Id: " + metadata.Key);
+                        _logger.LogError($"Bad response received from Agent: {newGroup.StatusCode} {newGroup.ReasonPhrase}");
                         continue;
                     }
+
+                    Group group;
+
+                    try
+                    {
+                        group = await JsonSerializer.DeserializeAsync<Group>(
+                            await newGroup.Content.ReadAsStreamAsync(cancellationToken),
+                            cancellationToken: cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Unable to deserialize response from Agent for meta id: {metadatakey}", metadata.Key);
+                        continue;
+                    }
+
+                    _logger.LogInformation("date: " + DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString() + " querying: " + metadata.Key);
 
                     try
                     {
