@@ -9,8 +9,8 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    [Migration("20211014162930_debugpaylods")]
-    partial class debugpaylods
+    [Migration("20211014201523_rawplates")]
+    partial class rawplates
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -262,9 +262,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<string>("PossibleNumbers")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("RawPlateGroupId")
-                        .HasColumnType("TEXT");
-
                     b.Property<long>("ReceivedOnEpoch")
                         .HasColumnType("INTEGER");
 
@@ -300,16 +297,19 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PlateGroupId")
+                    b.Property<string>("PlateGroupId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RawPlateGroup")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.Property<long>("ReceivedOnEpoch")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("PlateGroupId")
-                        .IsUnique();
+                    b.Property<bool>("WasProcessedCorrectly")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("RawPlateGroups");
                 });
@@ -361,22 +361,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WebhookForwards");
-                });
-
-            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateGroupRaw", b =>
-                {
-                    b.HasOne("OpenAlprWebhookProcessor.Data.PlateGroup", "PlateGroup")
-                        .WithOne("RawPlateGroup")
-                        .HasForeignKey("OpenAlprWebhookProcessor.Data.PlateGroupRaw", "PlateGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PlateGroup");
-                });
-
-            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateGroup", b =>
-                {
-                    b.Navigation("RawPlateGroup");
                 });
 #pragma warning restore 612, 618
         }
