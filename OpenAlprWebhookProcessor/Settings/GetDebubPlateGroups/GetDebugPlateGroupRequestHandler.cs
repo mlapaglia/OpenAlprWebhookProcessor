@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -22,6 +23,8 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups
             CancellationToken cancellationToken)
         {
             var query = _processorContext.RawPlateGroups.AsQueryable();
+
+            query = query.Where(x => x.PlateGroup.ReceivedOnEpoch > DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds());
 
             if (onlyFailedPlateGroups)
             {
