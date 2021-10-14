@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -41,10 +42,24 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         public async Task HandleWebhookAsync(
-            Webhook webhook,
+            OpenAlprWebhook.Webhook webhook,
             bool isBulkImport,
             CancellationToken cancellationToken)
         {
+            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            PlateGroupRaw rawDebugPlateGroup = null;
+
+            if (agent.IsDebugEnabled)
+            {
+                rawDebugPlateGroup = new PlateGroupRaw
+                {
+                    RawPlateGroup = JsonSerializer.Serialize(webhook)
+                };
+
+                _processorContext.RawPlateGroups.Add(rawDebugPlateGroup);
+                await _processorContext.SaveChangesAsync(cancellationToken);
+            }
+
             var camera = await _processorContext.Cameras
                 .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -71,18 +86,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .ToListAsync(cancellationToken);
 
-            PlateGroup plateGroup;
+            Data.PlateGroup plateGroup;
             if (previousPreviewGroups.Count > 0)
             {
                 plateGroup = previousPreviewGroups[0];
                 _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
 
                 _logger.LogInformation("Previous preview plate exists: " + plateGroup.BestNumber + ", overwriting");
-                
+
             }
             else
             {
-                plateGroup = new PlateGroup();
+                plateGroup = new Data.PlateGroup();
             }
 
             plateGroup.AlertDescription = webhook.Description;
@@ -106,7 +121,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _processorContext.PlateGroups.Add(plateGroup);
             }
 
+            if (rawDebugPlateGroup != null)
+            {
+                plateGroup.RawPlateGroup = rawDebugPlateGroup;
+            }
+
             await _processorContext.SaveChangesAsync(cancellationToken);
+
             _logger.LogInformation("plate saved successfully");
 
             if (!isBulkImport)
@@ -176,8 +197,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         private static void MapVehicle(
-            PlateGroup plateGroup,
-            Webhook webhook)
+            Data.PlateGroup plateGroup,
+            OpenAlprWebhook.Webhook webhook)
         {
             if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 30)
             {

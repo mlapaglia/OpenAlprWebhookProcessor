@@ -23,5 +23,7 @@
         public int SunsetOffset { get; set; }
 
         public double TimezoneOffset { get; set; }
+
+        public bool IsDebugEnabled { get; set; }
     }
 }
