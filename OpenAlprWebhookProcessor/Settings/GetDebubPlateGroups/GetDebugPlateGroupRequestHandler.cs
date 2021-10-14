@@ -24,11 +24,11 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups
         {
             var query = _processorContext.RawPlateGroups.AsQueryable();
 
-            query = query.Where(x => x.PlateGroup.ReceivedOnEpoch > DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds());
+            query = query.Where(x => x.ReceivedOnEpoch > DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds());
 
             if (onlyFailedPlateGroups)
             {
-                query = query.Where(x => x.PlateGroup == null);
+                query = query.Where(x => !x.WasProcessedCorrectly);
             }
 
             var results = await query

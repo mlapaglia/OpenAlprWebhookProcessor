@@ -53,7 +53,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             {
                 rawDebugPlateGroup = new PlateGroupRaw
                 {
-                    RawPlateGroup = JsonSerializer.Serialize(webhook)
+                    PlateGroupId = webhook.Group.BestUuid,
+                    ReceivedOnEpoch = webhook.Group.EpochStart,
+                    RawPlateGroup = JsonSerializer.Serialize(webhook),
+                    WasProcessedCorrectly = false,
                 };
 
                 _processorContext.RawPlateGroups.Add(rawDebugPlateGroup);
@@ -123,8 +126,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (rawDebugPlateGroup != null)
             {
-                plateGroup.RawPlateGroup = rawDebugPlateGroup;
-                plateGroup.RawPlateGroupId = rawDebugPlateGroup.Id;
+                rawDebugPlateGroup.WasProcessedCorrectly = true;
             }
 
             await _processorContext.SaveChangesAsync(cancellationToken);

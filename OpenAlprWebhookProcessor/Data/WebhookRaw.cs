@@ -6,10 +6,12 @@ namespace OpenAlprWebhookProcessor.Data
     {
         public Guid Id { get; set; }
 
-        public Guid? PlateGroupId { get; set; }
+        public string PlateGroupId { get; set; }
 
-        public virtual PlateGroup? PlateGroup { get; set; }
+        public long ReceivedOnEpoch { get; set; }
 
         public string RawPlateGroup { get; set; }
+
+        public bool WasProcessedCorrectly { get; set; }
     }
 }

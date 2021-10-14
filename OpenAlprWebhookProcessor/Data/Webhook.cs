@@ -7,10 +7,6 @@ namespace OpenAlprWebhookProcessor.Data
     {
         public Guid Id { get; set; }
 
-        public virtual PlateGroupRaw RawPlateGroup { get; set; }
-
-        public Guid RawPlateGroupId { get; set; }
-
         public string OpenAlprUuid { get; set; }
 
         public int OpenAlprCameraId { get; set; }
@@ -52,13 +48,5 @@ namespace OpenAlprWebhookProcessor.Data
         public string Notes { get; set; }
 
         public bool IsEnriched { get; set; }
-
-        public static void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<PlateGroup>()
-                .HasOne(a => a.RawPlateGroup)
-                .WithOne(a => a.PlateGroup)
-                .HasForeignKey<PlateGroupRaw>(c => c.PlateGroupId);
-        }
     }
 }
