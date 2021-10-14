@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.Settings.Enrichers;
+using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
@@ -37,6 +38,8 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly TestEnricherRequestHandler _testEnricherRequestHandler;
 
+        private readonly GetDebugPlateGroupRequestHandler _getDebugPlateGroupHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -47,7 +50,8 @@ namespace OpenAlprWebhookProcessor.Settings
             AgentScrapeRequestHandler agentHydrationRequestHandler,
             GetEnrichersRequestHandler getEnrichersRequestHandler,
             UpsertEnricherRequestHandler upsertEnricherRequestHandler,
-            TestEnricherRequestHandler testEnricherRequestHandler)
+            TestEnricherRequestHandler testEnricherRequestHandler,
+            GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -59,6 +63,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _getEnrichersRequestHandler = getEnrichersRequestHandler;
             _upsertEnricherRequestHandler = upsertEnricherRequestHandler;
             _testEnricherRequestHandler = testEnricherRequestHandler;
+            _getDebugPlateGroupHandler = getDebugPlateGroupHandler;
         }
 
         [HttpGet("agent")]
@@ -128,6 +133,16 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task<bool> TestEnrichers(CancellationToken cancellationToken)
         {
             return await _testEnricherRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpGet("debug/plates")]
+        public async Task<ContentResult> GetDebugPlates(
+            bool onlyFailedPlateGroups,
+            CancellationToken cancellationToken)
+        {
+            var results = await _getDebugPlateGroupHandler.HandleAsync(onlyFailedPlateGroups, cancellationToken);
+
+            return Content(results, "application/json");
         }
     }
 }

@@ -67,6 +67,14 @@
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
       </mat-form-field>
+      <div fxFlex="80">
+        <mat-label style="padding-right: 15px;">Debug Mode</mat-label>
+        <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isDebugEnabled"></mat-checkbox>
+        <mat-icon 
+            matTooltip="Logs all incoming webhooks, use only for troubleshooting"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        
+      </div>
 </div>
 <div>
     <button mat-raised-button color="primary" [disabled]="isSaving" style="margin: 15px;" (click)="saveAgent()">Save</button>
