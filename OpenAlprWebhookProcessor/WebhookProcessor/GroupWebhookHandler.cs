@@ -124,6 +124,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             if (rawDebugPlateGroup != null)
             {
                 plateGroup.RawPlateGroup = rawDebugPlateGroup;
+                plateGroup.RawPlateGroupId = rawDebugPlateGroup.Id;
             }
 
             await _processorContext.SaveChangesAsync(cancellationToken);
