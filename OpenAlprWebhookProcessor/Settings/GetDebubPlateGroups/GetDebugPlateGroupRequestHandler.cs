@@ -24,7 +24,9 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups
         {
             var query = _processorContext.RawPlateGroups.AsQueryable();
 
-            query = query.Where(x => x.ReceivedOnEpoch > DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds());
+            var stopEpoch = DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds();
+
+            query = query.Where(x => x.ReceivedOnEpoch > stopEpoch);
 
             if (onlyFailedPlateGroups)
             {
@@ -35,7 +37,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups
                 .Select(x => x.RawPlateGroup)
                 .ToListAsync(cancellationToken);
 
-            return JsonSerializer.Serialize(results);
+            return "[" + String.Join(",", results.Take(10).ToList()) + "]";
         }
     }
 }
