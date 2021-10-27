@@ -51,10 +51,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 else if (rawWebhook.Contains("alpr_group"))
                 {
                     _logger.LogInformation("parsing plate group webhook");
-                    var groupResult = new Webhook
-                    {
-                        Group = JsonSerializer.Deserialize<Group>(rawWebhook)
-                    };
+                    var groupResult = JsonSerializer.Deserialize<Webhook>(rawWebhook);
 
                     await _groupWebhookHandler.HandleWebhookAsync(
                         groupResult,
