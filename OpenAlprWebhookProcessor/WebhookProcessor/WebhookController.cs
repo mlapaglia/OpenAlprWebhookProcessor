@@ -53,12 +53,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     _logger.LogInformation("parsing plate group webhook");
                     Webhook parsedWebhook = new();
 
-                    try
-                    {
-                        parsedWebhook.Group = JsonSerializer.Deserialize<Group>(rawWebhook);
-                    } catch
+                    if (rawWebhook.Contains("\"data_type\":null"))
                     {
                         parsedWebhook = JsonSerializer.Deserialize<Webhook>(rawWebhook);
+                    }
+                    else
+                    {
+                        parsedWebhook.Group = JsonSerializer.Deserialize<Group>(rawWebhook);
                     }
 
                     await _groupWebhookHandler.HandleWebhookAsync(
