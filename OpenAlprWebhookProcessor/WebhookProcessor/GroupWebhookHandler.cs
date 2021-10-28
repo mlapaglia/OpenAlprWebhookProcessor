@@ -117,7 +117,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
 
-            MapVehicle(plateGroup, webhook);
+            if (webhook.Group.VehicleDetected)
+            {
+                MapVehicle(plateGroup, webhook);
+            }
 
             if (previousPreviewGroups.Count == 0)
             {

@@ -109,5 +109,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         [JsonPropertyName("direction_of_travel_id")]
         public int DirectionOfTravelId { get; set; }
+
+        [JsonPropertyName("vehicle_detected")]
+        public bool VehicleDetected { get; set; }
     }
 }
