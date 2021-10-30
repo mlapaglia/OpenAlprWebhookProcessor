@@ -29,5 +29,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
         public string VehicleYear { get; set; }
 
         public string VehicleRegion { get; set; }
+
+        public int? FilterPlatesSeenLessThan { get; set; } = 0;
     }
 }

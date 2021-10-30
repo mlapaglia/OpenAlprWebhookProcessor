@@ -59,6 +59,7 @@ export class PlateRequest {
     endSearchOn: Date;
     strictMatch: boolean;
     filterIgnoredPlates: boolean;
+    filterPlatesSeenLessThan: number;
     regexSearchEnabled: boolean
     pageNumber: number;
     pageSize: number;
