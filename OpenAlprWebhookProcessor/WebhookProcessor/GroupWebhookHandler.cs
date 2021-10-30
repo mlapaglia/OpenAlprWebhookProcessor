@@ -117,10 +117,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
 
-            if (webhook.Group.VehicleDetected)
-            {
-                MapVehicle(plateGroup, webhook);
-            }
+            MapVehicle(plateGroup, webhook);
 
             if (previousPreviewGroups.Count == 0)
             {
@@ -206,7 +203,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             Data.PlateGroup plateGroup,
             OpenAlprWebhook.Webhook webhook)
         {
-            if (webhook.Group.Vehicle.MakeModels.First()?.Confidence > 30)
+            if (webhook.Group.Vehicle?.MakeModels.First()?.Confidence > 30)
             {
                 plateGroup.VehicleMakeModel = webhook.Group.Vehicle.MakeModels.First()?.Name;
 

@@ -73,7 +73,9 @@
         <mat-icon 
             matTooltip="Logs all incoming webhooks, use only for troubleshooting"
             style="cursor:default" matSuffix>help_center</mat-icon>
-        
+        <mat-form-field fxFlex="40">
+            <button mat-raised-button color="primary" [disabled]="isSaving" style="margin: 15px;" (click)="purgeDebugData()">Purge Debug Data</button>
+        </mat-form-field>
       </div>
 </div>
 <div>

@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { SignalrService } from '@app/signalr/signalr.service';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Subscription } from 'rxjs';
 import { SystemLogsService } from './systemLogs.service';
 
@@ -15,7 +17,8 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private signalRHub: SignalrService,
-    private systemLogsService: SystemLogsService) { }
+    private systemLogsService: SystemLogsService,
+    private snackBarService: SnackbarService) { }
 
   ngOnInit(): void {
   }
@@ -38,6 +41,12 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.systemLogsService.getPlateGroups(this.onlyFailedPlateGroups).subscribe(blob => {
       var objectUrl = URL.createObjectURL(blob);
       window.open(objectUrl);
+    });
+  }
+
+  public deletePlates() {
+    this.systemLogsService.deletePlates().subscribe(_ => {
+      this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted)
     });
   }
 }

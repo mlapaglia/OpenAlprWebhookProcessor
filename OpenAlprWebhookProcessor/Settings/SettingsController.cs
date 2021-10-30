@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Settings.AgentHydration;
 using OpenAlprWebhookProcessor.Settings.Enrichers;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
+using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetIgnores;
 using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
 using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
@@ -40,6 +41,8 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly GetDebugPlateGroupRequestHandler _getDebugPlateGroupHandler;
 
+        private readonly DeleteDebugPlateGroupRequestHandler _deleteDebugPlateGroupRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -51,7 +54,8 @@ namespace OpenAlprWebhookProcessor.Settings
             GetEnrichersRequestHandler getEnrichersRequestHandler,
             UpsertEnricherRequestHandler upsertEnricherRequestHandler,
             TestEnricherRequestHandler testEnricherRequestHandler,
-            GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler)
+            GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler,
+            DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -64,6 +68,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _upsertEnricherRequestHandler = upsertEnricherRequestHandler;
             _testEnricherRequestHandler = testEnricherRequestHandler;
             _getDebugPlateGroupHandler = getDebugPlateGroupHandler;
+            _deleteDebugPlateGroupRequestHandler = deleteDebugPlateGroupRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -143,6 +148,12 @@ namespace OpenAlprWebhookProcessor.Settings
             var results = await _getDebugPlateGroupHandler.HandleAsync(onlyFailedPlateGroups, cancellationToken);
 
             return Content(results, "application/json");
+        }
+
+        [HttpDelete("debug/plates")]
+        public async Task DeleteDebugPlates(CancellationToken cancellationToken)
+        {
+            await _deleteDebugPlateGroupRequestHandler.HandleAsync(cancellationToken);
         }
     }
 }

@@ -6,6 +6,10 @@
     <mat-checkbox 
         color="primary"
         [(ngModel)]="onlyFailedPlateGroups">Include ONLY failed plate groups</mat-checkbox>
+        <button
+            mat-button
+            color="warn"
+            (click)="deletePlates()">Delete debug plates</button>
     <pre>
         <code [highlight]="logMessages"></code>
     </pre>

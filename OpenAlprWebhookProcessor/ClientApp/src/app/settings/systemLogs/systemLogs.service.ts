@@ -12,4 +12,8 @@ export class SystemLogsService {
   getPlateGroups(onlyFailedPlateGroups: Boolean): Observable<Blob> {
     return this.http.get<Blob>(`/settings/debug/plates?onlyFailedPlateGroups=${onlyFailedPlateGroups}`, { responseType: 'blob' as 'json' });
   }
+
+  deletePlates() {
+    return this.http.delete('/settings/debug/plates');
+  }
 }
