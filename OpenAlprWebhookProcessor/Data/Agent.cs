@@ -29,5 +29,7 @@ namespace OpenAlprWebhookProcessor.Data
         public double TimeZoneOffset { get; set; }
 
         public long LastSuccessfulScrapeEpoch { get; set; }
+
+        public bool IsDebugEnabled { get; set; }
     }
 }

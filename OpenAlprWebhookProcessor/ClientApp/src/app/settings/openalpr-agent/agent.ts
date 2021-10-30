@@ -1,6 +1,7 @@
 export class Agent {
     endpointUrl: string;
     hostname: string;
+    isDebugEnabled: boolean;
     latitude: number;
     longitude: number;
     uid: string;

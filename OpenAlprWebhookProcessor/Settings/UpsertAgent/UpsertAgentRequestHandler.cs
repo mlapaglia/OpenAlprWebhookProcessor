@@ -23,6 +23,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 {
                     EndpointUrl = agent.EndpointUrl,
                     Hostname = agent.Hostname,
+                    IsDebugEnabled = agent.IsDebugEnabled,
                     Latitude = agent.Latitude,
                     Longitude = agent.Longitude,
                     OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,
@@ -40,6 +41,7 @@ namespace OpenAlprWebhookProcessor.Settings
             {
                 dbAgent.EndpointUrl = agent.EndpointUrl;
                 dbAgent.Hostname = agent.Hostname;
+                dbAgent.IsDebugEnabled = agent.IsDebugEnabled;
                 dbAgent.Latitude = agent.Latitude;
                 dbAgent.Longitude = agent.Longitude;
                 dbAgent.OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey;

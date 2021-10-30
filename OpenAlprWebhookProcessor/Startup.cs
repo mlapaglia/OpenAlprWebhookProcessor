@@ -46,6 +46,8 @@ using OpenAlprWebhookProcessor.Settings.Enrichers;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using System.Text.Json.Serialization;
+using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
+using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -184,6 +186,8 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<UpsertEnricherRequestHandler>();
             services.AddScoped<TestEnricherRequestHandler>();
             services.AddScoped<EnrichLicensePlateRequestHandler>();
+            services.AddScoped<GetDebugPlateGroupRequestHandler>();
+            services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
 
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 

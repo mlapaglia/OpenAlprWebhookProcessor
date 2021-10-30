@@ -1,4 +1,15 @@
 <div>
+    <button
+        mat-button 
+        color="primary"
+        (click)="downloadPlates()">Download past 24 hours plates</button>
+    <mat-checkbox 
+        color="primary"
+        [(ngModel)]="onlyFailedPlateGroups">Include ONLY failed plate groups</mat-checkbox>
+        <button
+            mat-button
+            color="warn"
+            (click)="deletePlates()">Delete debug plates</button>
     <pre>
         <code [highlight]="logMessages"></code>
     </pre>

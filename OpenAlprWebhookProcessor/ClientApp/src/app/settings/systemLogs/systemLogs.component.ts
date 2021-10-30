@@ -1,6 +1,9 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { SignalrService } from '@app/signalr/signalr.service';
+import { SnackbarService } from '@app/snackbar/snackbar.service';
+import { SnackBarType } from '@app/snackbar/snackbartype';
 import { Subscription } from 'rxjs';
+import { SystemLogsService } from './systemLogs.service';
 
 @Component({
   selector: 'app-logs',
@@ -9,9 +12,13 @@ import { Subscription } from 'rxjs';
 })
 export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   public logMessages: string = '';
+  public onlyFailedPlateGroups: boolean = false;
   private subscriptions = new Subscription();
 
-  constructor(private signalRHub: SignalrService) { }
+  constructor(
+    private signalRHub: SignalrService,
+    private systemLogsService: SystemLogsService,
+    private snackBarService: SnackbarService) { }
 
   ngOnInit(): void {
   }
@@ -28,5 +35,18 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
         this.logMessages = logInformation + "\r\n" + this.logMessages;
     }));
+  }
+
+  public downloadPlates() {
+    this.systemLogsService.getPlateGroups(this.onlyFailedPlateGroups).subscribe(blob => {
+      var objectUrl = URL.createObjectURL(blob);
+      window.open(objectUrl);
+    });
+  }
+
+  public deletePlates() {
+    this.systemLogsService.deletePlates().subscribe(_ => {
+      this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted)
+    });
   }
 }
