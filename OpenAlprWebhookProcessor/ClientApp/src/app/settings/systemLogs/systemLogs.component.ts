@@ -13,6 +13,8 @@ import { SystemLogsService } from './systemLogs.service';
 export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   public logMessages: string = '';
   public onlyFailedPlateGroups: boolean = false;
+  public isPurging: boolean = false;
+
   private subscriptions = new Subscription();
 
   constructor(
@@ -45,8 +47,13 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public deletePlates() {
+    this.isPurging = true;
     this.systemLogsService.deletePlates().subscribe(_ => {
-      this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted)
+      this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted);
+      this.isPurging = false;
+    },
+    _ => {
+      this.isPurging = false;
     });
   }
 }

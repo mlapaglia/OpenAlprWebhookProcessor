@@ -9,7 +9,8 @@
         <button
             mat-button
             color="warn"
-            (click)="deletePlates()">Delete debug plates</button>
+            (click)="deletePlates()"
+            [class.spinner]="isPurging">Delete debug plates</button>
     <pre>
         <code [highlight]="logMessages"></code>
     </pre>
