@@ -39,15 +39,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         [HttpGet("crop/{imageId}")]
         public async Task<Stream> GetCropImage(
             string imageId,
-            string x1,
-            string x2,
-            string y1,
-            string y2,
             CancellationToken cancellationToken)
         {
             return await GetImageHandler.GetCropImageFromLocalAsync(
                 _processorContext,
-                $"{imageId}?x1={x1}&x2={x2}&y1={y1}&y2={y2}",
+                imageId,
                 cancellationToken);
         }
 

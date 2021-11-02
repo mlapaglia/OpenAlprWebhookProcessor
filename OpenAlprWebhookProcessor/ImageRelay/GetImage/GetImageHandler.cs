@@ -2,6 +2,7 @@
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,16 +16,17 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(
-                x => x.OpenAlprUuid == imageId,
-                cancellationToken);
+            var vehicleJpeg = await processorContext.PlateGroups
+                .Where(x => x.OpenAlprUuid == imageId)
+                .Select(x => x.VehicleJpeg)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (plateGroup == null)
+            if (vehicleJpeg == null)
             {
                 throw new ArgumentException("No image found with that id.");
             }
 
-            return new MemoryStream(plateGroup.VehicleJpeg);
+            return new MemoryStream(vehicleJpeg);
         }
 
         public async static Task<Stream> GetCropImageFromLocalAsync(
@@ -32,16 +34,17 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(
-                x => x.OpenAlprUuid == imageId,
-                cancellationToken);
+            var plateJpeg = await processorContext.PlateGroups
+                .Where(x => x.OpenAlprUuid == imageId)
+                .Select(x => x.PlateJpeg)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (plateGroup == null)
+            if (plateJpeg == null)
             {
                 throw new ArgumentException("No image found with that id.");
             }
 
-            return new MemoryStream(plateGroup.PlateJpeg);
+            return new MemoryStream(plateJpeg);
         }
 
         public async static Task<byte[]> GetImageFromAgentAsync(
