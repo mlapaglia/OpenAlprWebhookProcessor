@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -84,9 +85,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 foreach (var metadata in metaDatasToQuery)
                 {
+                    var timer = new Stopwatch();
+                    timer.Start();
+
                     var newGroup = await _httpClient.GetAsync(
                         agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
                         cancellationToken);
+
+                    timer.Stop();
+                    _logger.LogInformation("Took {seconds} to query", timer.Elapsed.TotalSeconds);
 
                     if (!newGroup.IsSuccessStatusCode)
                     {
@@ -98,9 +105,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                     try
                     {
+                        timer.Reset();
+                        timer.Start();
                         group = await JsonSerializer.DeserializeAsync<Group>(
                             await newGroup.Content.ReadAsStreamAsync(cancellationToken),
                             cancellationToken: cancellationToken);
+                        timer.Stop();
+                        _logger.LogInformation("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
                     }
                     catch (Exception ex)
                     {
@@ -112,6 +123,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                     try
                     {
+                        timer.Reset();
+                        timer.Start();
                         await _groupWebhookHandler.HandleWebhookAsync(
                             new Webhook
                             {
@@ -119,14 +132,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                             },
                             true,
                             cancellationToken);
+                        timer.Stop();
+                        _logger.LogInformation("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
                     }
                     catch
                     {
                         _logger.LogError("Failed to parse bulk import request.");
                     }
 
+                    timer.Reset();
+                    timer.Start();
                     agent.LastSuccessfulScrapeEpoch = group.EpochStart;
                     await _processorContext.SaveChangesAsync(cancellationToken);
+                    _logger.LogInformation("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
                 }
 
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);

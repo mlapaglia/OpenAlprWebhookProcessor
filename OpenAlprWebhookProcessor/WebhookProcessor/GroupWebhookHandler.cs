@@ -73,7 +73,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (camera == null)
             {
-                _logger.LogError("unknown camera: " + webhook.Group.CameraId + ", skipping.");
+                _logger.LogError("unknown camera: {cameraId}, skipping.", webhook.Group.CameraId);
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (webhook.Group.IsParked)
             {
-                _logger.LogInformation($"parked car: {webhook.Group.BestPlateNumber}, ignoring.");
+                _logger.LogInformation("parked car: {plateNumber}, ignoring.", webhook.Group.BestPlateNumber);
                 return;
             }
 
@@ -99,7 +99,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 plateGroup = previousPreviewGroups[0];
                 _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
 
-                _logger.LogInformation("Previous preview plate exists: " + plateGroup.BestNumber + ", overwriting");
+                _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
 
             }
             else
