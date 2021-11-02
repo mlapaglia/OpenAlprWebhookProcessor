@@ -53,6 +53,7 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isPurging = false;
     },
     _ => {
+      this.snackBarService.create("Failed to delete plates, check the logs.", SnackBarType.Error);
       this.isPurging = false;
     });
   }

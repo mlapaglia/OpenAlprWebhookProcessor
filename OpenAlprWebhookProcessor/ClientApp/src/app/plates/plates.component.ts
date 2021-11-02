@@ -72,7 +72,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterIgnoredPlates: boolean;
   public filterIgnoredPlatesEnabled: boolean = true;
   public filterPlatesSeenLessThan: boolean;
-  public filterPlatesSeenLessThanEnabled: boolean = true;
   public regexSearchEnabled: boolean;
   public filterVehicleMake: string;
   public filterVehicleModel: string;
@@ -282,13 +281,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filterStrictMatchEnabled = false;
       this.filterIgnoredPlates = false;
       this.filterIgnoredPlatesEnabled = false;
-      this.filterPlatesSeenLessThan = false;
-      this.filterPlatesSeenLessThanEnabled = false;
     }
     else {
       this.filterStrictMatchEnabled = true;
       this.filterIgnoredPlatesEnabled = true;
-      this.filterPlatesSeenLessThanEnabled = true;
     }
     this.validateSearchPlateNumber();
   }
