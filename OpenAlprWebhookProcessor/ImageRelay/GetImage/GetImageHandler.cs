@@ -8,20 +8,48 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.ImageRelay
 {
-    public class GetImageHandler
+    public static class GetImageHandler
     {
-        private readonly ProcessorContext _processorContext;
-
-        public GetImageHandler(ProcessorContext processorContext)
-        {
-            _processorContext = processorContext;
-        }
-
-        public async Task<Stream> GetImageFromAgentAsync(
+        public async static Task<Stream> GetImageFromLocalAsync(
+            ProcessorContext processorContext,
             string imageId,
             CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(
+                x => x.OpenAlprUuid == imageId,
+                cancellationToken);
+
+            if (plateGroup == null)
+            {
+                throw new ArgumentException("No image found with that id.");
+            }
+
+            return new MemoryStream(plateGroup.VehicleJpeg);
+        }
+
+        public async static Task<Stream> GetCropImageFromLocalAsync(
+            ProcessorContext processorContext,
+            string imageId,
+            CancellationToken cancellationToken)
+        {
+            var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(
+                x => x.OpenAlprUuid == imageId,
+                cancellationToken);
+
+            if (plateGroup == null)
+            {
+                throw new ArgumentException("No image found with that id.");
+            }
+
+            return new MemoryStream(plateGroup.PlateJpeg);
+        }
+
+        public async static Task<byte[]> GetImageFromAgentAsync(
+            ProcessorContext processorContext,
+            string imageId,
+            CancellationToken cancellationToken)
+        {
+            var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -37,14 +65,15 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     imageId),
                 cancellationToken);
 
-            return await result.Content.ReadAsStreamAsync(cancellationToken);
+            return await result.Content.ReadAsByteArrayAsync(cancellationToken);
         }
 
-        public async Task<Stream> GetCropImageFromAgentAsync(
+        public async static Task<byte[]> GetCropImageFromAgentAsync(
+            ProcessorContext processorContext,
             string imageId,
             CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -60,7 +89,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     imageId),
                 cancellationToken);
 
-            return await result.Content.ReadAsStreamAsync(cancellationToken);
+            return await result.Content.ReadAsByteArrayAsync(cancellationToken);
         }
     }
 }

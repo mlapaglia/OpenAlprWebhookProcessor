@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.Data;
 using System;
 using System.IO;
 using System.Threading;
@@ -12,15 +13,15 @@ namespace OpenAlprWebhookProcessor.ImageRelay
     [Route("images")]
     public class ImageRelayController : Controller
     {
-        private readonly GetImageHandler _getImageHandler;
-
         private readonly GetSnapshotHandler _getSnapshotHandler;
 
+        private readonly ProcessorContext _processorContext;
+
         public ImageRelayController(
-            GetImageHandler getImageHandler,
+            ProcessorContext processorContext,
             GetSnapshotHandler getSnapshotHandler)
         {
-            _getImageHandler = getImageHandler;
+            _processorContext = processorContext;
             _getSnapshotHandler = getSnapshotHandler;
         }
 
@@ -29,7 +30,10 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            return await _getImageHandler.GetImageFromAgentAsync(imageId, cancellationToken);
+            return await GetImageHandler.GetImageFromLocalAsync(
+                _processorContext,
+                imageId,
+                cancellationToken);
         }
 
         [HttpGet("crop/{imageId}")]
@@ -41,7 +45,10 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string y2,
             CancellationToken cancellationToken)
         {
-            return await _getImageHandler.GetCropImageFromAgentAsync($"{imageId}?x1={x1}&x2={x2}&y1={y1}&y2={y2}", cancellationToken);
+            return await GetImageHandler.GetCropImageFromLocalAsync(
+                _processorContext,
+                $"{imageId}?x1={x1}&x2={x2}&y1={y1}&y2={y2}",
+                cancellationToken);
         }
 
 

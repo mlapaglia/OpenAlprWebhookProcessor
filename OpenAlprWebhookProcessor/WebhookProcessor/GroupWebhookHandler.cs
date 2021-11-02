@@ -27,18 +27,22 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly AlertService _alertService;
 
+        private readonly ImageRetrieverService _imageRetrieverService;
+
         public GroupWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            AlertService alertService)
+            AlertService alertService,
+            ImageRetrieverService imageRetrieverService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
             _processorHub = processorHub;
             _alertService = alertService;
+            _imageRetrieverService = imageRetrieverService;
         }
 
         public async Task HandleWebhookAsync(
@@ -132,6 +136,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             await _processorContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("plate saved successfully");
+
+            _imageRetrieverService.AddJob(plateGroup.OpenAlprUuid);
 
             if (!isBulkImport)
             {
