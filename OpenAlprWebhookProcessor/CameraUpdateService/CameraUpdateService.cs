@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                _logger.LogInformation($"setting {sunriseSunset} for {cameraId}");
+                _logger.LogInformation("setting {sunriseSunset} for {cameraId}", sunriseSunset, cameraId);
 
                 try
                 {
@@ -100,7 +100,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     if (cameraToUpdate == null)
                     {
-                        _logger.LogError($"Unable to find camera with OpenAlprId: {cameraId}, check your configuration.");
+                        _logger.LogError("Unable to find camera with OpenAlprId: {cameraId}, check your configuration.", cameraId);
                         return;
                     }
 
@@ -116,7 +116,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     if (scheduleNextJob)
                     {
-                        _logger.LogInformation($"Scheduling next job for {cameraId}");
+                        _logger.LogInformation("Scheduling next job for {cameraId}", cameraId);
 
                         var agent = await processorContext.Agents.FirstOrDefaultAsync();
 
@@ -190,7 +190,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                _logger.LogInformation("processing job for plate: " + cameraUpdateRequest.LicensePlate);
+                _logger.LogInformation("processing job for plate: {plateNumber}", cameraUpdateRequest.LicensePlate);
 
                 try
                 {
@@ -198,13 +198,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     if (cameraToUpdate == null)
                     {
-                        _logger.LogError($"Unable to find camera with OpenAlprId: {cameraUpdateRequest.Id}, check your configuration.");
+                        _logger.LogError("Unable to find camera with OpenAlprId: {cameraId}, check your configuration.", cameraUpdateRequest.Id);
                         throw new ArgumentException($"unknown camera Id: {cameraUpdateRequest.Id}");
                     }
 
                     if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextClearOverlayScheduleId))
                     {
-                        _logger.LogInformation($"cancelling redundant clear overlay job: {cameraToUpdate.NextClearOverlayScheduleId}");
+                        _logger.LogInformation("cancelling redundant clear overlay job: {jobId}", cameraToUpdate.NextClearOverlayScheduleId);
                         _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
                     }
 
@@ -243,7 +243,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
 
-                _logger.LogInformation("clearing expired overlay for: " + cameraToUpdate.OpenAlprCameraId);
+                _logger.LogInformation("clearing expired overlay for: {cameraID}", cameraToUpdate.OpenAlprCameraId);
 
                 var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
@@ -268,7 +268,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     x => x.Id == cameraId,
                     cancellationToken);
 
-                var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+                var camera = CameraFactory.Create(
+                    dbCamera.Manufacturer,
+                    dbCamera);
 
                 return await camera.GetZoomAndFocusAsync(cancellationToken);
             }
@@ -305,7 +307,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 foreach (var cameraToUpdate in await processorContext.Cameras.ToListAsync())
                 {
-                    _logger.LogInformation("force clearing overlay for: " + cameraToUpdate.OpenAlprCameraId);
+                    _logger.LogInformation("force clearing overlay for: {cameraId}", cameraToUpdate.OpenAlprCameraId);
 
                     var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
@@ -319,14 +321,16 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        private async Task TriggerZoomAndFocusAsync(
+        private static async Task TriggerZoomAndFocusAsync(
             SunriseSunset sunriseSunset,
             Data.Camera cameraToUpdate,
             ICamera camera)
         {
             ZoomFocus zoomFocus = null;
 
-            if (sunriseSunset == SunriseSunset.Sunrise && cameraToUpdate.DayFocus.HasValue && cameraToUpdate.DayZoom.HasValue)
+            if (sunriseSunset == SunriseSunset.Sunrise
+                && cameraToUpdate.DayFocus.HasValue
+                && cameraToUpdate.DayZoom.HasValue)
             {
                 zoomFocus = new ZoomFocus()
                 {
@@ -334,7 +338,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     Zoom = cameraToUpdate.DayZoom.Value,
                 };
             }
-            else if (sunriseSunset == SunriseSunset.Sunset && cameraToUpdate.NightFocus.HasValue && cameraToUpdate.NightZoom.HasValue)
+            else if (sunriseSunset == SunriseSunset.Sunset
+                && cameraToUpdate.NightFocus.HasValue
+                && cameraToUpdate.NightZoom.HasValue)
             {
                 zoomFocus = new ZoomFocus()
                 {

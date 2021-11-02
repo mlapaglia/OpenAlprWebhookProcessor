@@ -13,6 +13,7 @@ export class OpenalprAgentComponent implements OnInit {
   public agent: Agent;
   public isSaving: boolean = false;
   public isHydrating: boolean = false;
+
   constructor(
     private settingsService: SettingsService,
     private snackBarService: SnackbarService) { }

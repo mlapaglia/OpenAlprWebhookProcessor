@@ -48,5 +48,14 @@ namespace OpenAlprWebhookProcessor.Data
         public string Notes { get; set; }
 
         public bool IsEnriched { get; set; }
+
+        public static void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => new { x.BestNumber, x.ReceivedOnEpoch });
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.ReceivedOnEpoch);
+        }
     }
 }

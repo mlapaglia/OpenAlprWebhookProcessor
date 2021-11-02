@@ -71,13 +71,14 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterStrictMatchEnabled: boolean = true;
   public filterIgnoredPlates: boolean;
   public filterIgnoredPlatesEnabled: boolean = true;
+  public filterPlatesSeenLessThan: boolean;
   public regexSearchEnabled: boolean;
   public filterVehicleMake: string;
   public filterVehicleModel: string;
   public filterVehicleType: string;
   public filterVehicleColor: string;
   public filterVehicleRegion: string;
-
+  
   public vehicleFilters: VehicleFilters = {} as VehicleFilters;
 
   public isDeletingPlate: boolean;
@@ -178,6 +179,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.plateNumber = this.filterPlateNumber;
     request.strictMatch = this.filterStrictMatch;
     request.filterIgnoredPlates = this.filterIgnoredPlates;
+    request.filterPlatesSeenLessThan = this.filterPlatesSeenLessThan ? 10 : 0;
     request.regexSearchEnabled = this.regexSearchEnabled;
     request.vehicleMake = this.filterVehicleMake;
     request.vehicleModel = this.filterVehicleModel;
@@ -249,7 +251,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterVehicleType = '';
     this.filterVehicleColor = '';
     this.filterVehicleRegion = '';
-    
+    this.filterPlatesSeenLessThan = false;
+
     this.searchPlates();
   }
 

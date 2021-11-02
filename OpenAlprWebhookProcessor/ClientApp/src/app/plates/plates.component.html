@@ -139,6 +139,11 @@
                 [(ngModel)]="filterStrictMatch"
                 [disabled]="!filterStrictMatchEnabled">Lenient Matches</mat-checkbox>
             </li>
+            <li>
+              <mat-checkbox
+                color="primary"
+                [(ngModel)]="filterPlatesSeenLessThan">Plates Seen Less Than 10 Times</mat-checkbox>
+            </li>
           </ul>
         </div>
       </mat-card-content>

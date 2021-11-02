@@ -85,6 +85,17 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.VehicleRegion.Contains(request.VehicleRegion.ToLower()));
             }
 
+            if (request.FilterPlatesSeenLessThan > 0)
+            {
+                var platesSeen = await _processerContext.PlateGroups
+                    .GroupBy(x => x.BestNumber)
+                    .Where(x => x.Count() > request.FilterPlatesSeenLessThan)
+                    .Select(x => x.Key)
+                    .ToListAsync(cancellationToken);
+
+                dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber)); 
+            }
+
             var totalCount = await dbRequest.CountAsync(cancellationToken);
 
             dbRequest = dbRequest
