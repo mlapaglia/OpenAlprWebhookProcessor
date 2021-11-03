@@ -19,15 +19,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly ILogger _logger;
-
-        public ImageRetrieverService(
-            IServiceProvider serviceProvider,
-            ILogger<ImageRetrieverService> logger)
+        public ImageRetrieverService(IServiceProvider serviceProvider)
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _serviceProvider = serviceProvider;
-            _logger = logger;
             _imageRequestsToProcess = new BlockingCollection<string>();
         }
 
@@ -48,25 +43,31 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public void AddJob(string openAlprImageId)
         {
-            _logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
-            _imageRequestsToProcess.Add(openAlprImageId);
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
+
+                logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
+                _imageRequestsToProcess.Add(openAlprImageId);
+            }
         }
 
         private async Task ProcessImageRequestsAsync()
         {
             foreach (var job in _imageRequestsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                _logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
-
                 using (var scope = _serviceProvider.CreateScope())
                 {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
+                    logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
+
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                     var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(x => x.OpenAlprUuid == job);
 
                     if (plateGroup == null)
                     {
-                        _logger.LogError("Unable to find openalpr group id: {groupId}", job);
+                        logger.LogError("Unable to find openalpr group id: {groupId}", job);
                         continue;
                     }
 
@@ -86,11 +87,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         plateGroup.VehicleJpeg = image;
 
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
-                        _logger.LogInformation("finished job for image: {imageId}", job);
+                        logger.LogInformation("finished job for image: {imageId}", job);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
+                        logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
                     }
                 }
             }
