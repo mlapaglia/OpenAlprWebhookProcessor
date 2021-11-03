@@ -85,6 +85,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                         plateGroup.PlateJpeg = cropImage;
                         plateGroup.VehicleJpeg = image;
+                        plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
                         logger.LogInformation("finished job for image: {imageId}", job);
