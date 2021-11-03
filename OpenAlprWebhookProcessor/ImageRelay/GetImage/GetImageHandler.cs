@@ -56,7 +56,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             {
                 plateGroup.PlateJpeg = await GetCropImageFromAgentAsync(
                     processorContext,
-                    imageId,
+                    imageId + "?" + plateGroup.PlateCoordinates,
                     cancellationToken);
 
                 await processorContext.SaveChangesAsync(cancellationToken);
