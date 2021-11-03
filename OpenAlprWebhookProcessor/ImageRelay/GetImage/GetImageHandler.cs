@@ -62,7 +62,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 await processorContext.SaveChangesAsync(cancellationToken);
             }
 
-            return new MemoryStream(plateGroup.VehicleJpeg);
+            return new MemoryStream(plateGroup.PlateJpeg);
         }
 
         public async static Task<byte[]> GetImageFromAgentAsync(

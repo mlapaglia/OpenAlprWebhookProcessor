@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 Direction = plate.Direction,
                 ImageUrl = new Uri($"/images/{plate.OpenAlprUuid}", UriKind.Relative),
                 CanBeEnriched = !plate.IsEnriched,
-                CropImageUrl = new Uri($"/crop/{plate.OpenAlprUuid}", UriKind.Relative),
+                CropImageUrl = new Uri($"/images/crop/{plate.OpenAlprUuid}", UriKind.Relative),
                 Id = plate.Id,
                 IsAlert = platesToAlert.Contains(plate.BestNumber),
                 IsIgnore = platesToIgnore.Contains(plate.BestNumber),
