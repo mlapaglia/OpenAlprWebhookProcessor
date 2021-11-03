@@ -222,7 +222,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("AgentImageScrapeOccurredOn")
+                    b.Property<double?>("AgentImageScrapeOccurredOn")
                         .HasColumnType("REAL");
 
                     b.Property<string>("AlertDescription")

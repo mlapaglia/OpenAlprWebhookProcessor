@@ -4,7 +4,7 @@
 
 namespace OpenAlprWebhookProcessor.Migrations
 {
-    public partial class onlygetone : Migration
+    public partial class nullable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,8 +12,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                 name: "AgentImageScrapeOccurredOn",
                 table: "PlateGroups",
                 type: "REAL",
-                nullable: true,
-                defaultValue: null);
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

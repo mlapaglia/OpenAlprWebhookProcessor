@@ -11,8 +11,8 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    [Migration("20211103151014_onlygetone")]
-    partial class onlygetone
+    [Migration("20211103170831_nullable")]
+    partial class nullable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -224,7 +224,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("AgentImageScrapeOccurredOn")
+                    b.Property<double?>("AgentImageScrapeOccurredOn")
                         .HasColumnType("REAL");
 
                     b.Property<string>("AlertDescription")
