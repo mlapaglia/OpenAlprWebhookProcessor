@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.ImageRelay;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,36 +64,41 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                    var plateGroup = await processorContext.PlateGroups.FirstOrDefaultAsync(x => x.OpenAlprUuid == job);
+                    var plateGroups = await processorContext.PlateGroups
+                        .Where(x => x.OpenAlprUuid == job)
+                        .ToListAsync(_cancellationTokenSource.Token);
 
-                    if (plateGroup == null)
+                    foreach (var plateGroup in plateGroups)
                     {
-                        logger.LogError("Unable to find openalpr group id: {groupId}", job);
-                        continue;
+                        if (plateGroup == null)
+                        {
+                            logger.LogError("Unable to find openalpr group id: {groupId}", job);
+                            continue;
+                        }
+
+                        try
+                        {
+                            var image = await GetImageHandler.GetImageFromAgentAsync(
+                                processorContext,
+                                job,
+                                _cancellationTokenSource.Token);
+
+                            var cropImage = await GetImageHandler.GetCropImageFromAgentAsync(
+                                processorContext,
+                                job + "?" + plateGroup.PlateCoordinates,
+                                _cancellationTokenSource.Token);
+
+                            plateGroup.PlateJpeg = cropImage;
+                            plateGroup.VehicleJpeg = image;
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
+                        }
+
+                        plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
                     }
-
-                    try
-                    {
-                        var image = await GetImageHandler.GetImageFromAgentAsync(
-                            processorContext,
-                            job,
-                            _cancellationTokenSource.Token);
-
-                        var cropImage = await GetImageHandler.GetCropImageFromAgentAsync(
-                            processorContext,
-                            job + "?" + plateGroup.PlateCoordinates,
-                            _cancellationTokenSource.Token);
-
-                        plateGroup.PlateJpeg = cropImage;
-                        plateGroup.VehicleJpeg = image;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
-                    }
-
-                    plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
 
                     logger.LogInformation("finished job for image: {imageId}", job);
                 }
