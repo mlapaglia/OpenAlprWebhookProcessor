@@ -1,14 +1,11 @@
-﻿using Hangfire;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.ImageRelay;
-using OpenAlprWebhookProcessor.ImageRelay.GetImage;
 using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,6 +56,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             foreach (var job in _imageRequestsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
+                _logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
+
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();

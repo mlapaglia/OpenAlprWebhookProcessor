@@ -16,17 +16,26 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var vehicleJpeg = await processorContext.PlateGroups
+            var plateGroup = await processorContext.PlateGroups
                 .Where(x => x.OpenAlprUuid == imageId)
-                .Select(x => x.VehicleJpeg)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (vehicleJpeg == null)
+            if (plateGroup == null)
             {
                 throw new ArgumentException("No image found with that id.");
             }
 
-            return new MemoryStream(vehicleJpeg);
+            if (plateGroup.VehicleJpeg == null)
+            {
+                plateGroup.VehicleJpeg = await GetImageFromAgentAsync(
+                    processorContext,
+                    imageId,
+                    cancellationToken);
+
+                await processorContext.SaveChangesAsync(cancellationToken);
+            }
+
+            return new MemoryStream(plateGroup.VehicleJpeg);
         }
 
         public async static Task<Stream> GetCropImageFromLocalAsync(
@@ -34,17 +43,26 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var plateJpeg = await processorContext.PlateGroups
+            var plateGroup = await processorContext.PlateGroups
                 .Where(x => x.OpenAlprUuid == imageId)
-                .Select(x => x.PlateJpeg)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (plateJpeg == null)
+            if (plateGroup == null)
             {
                 throw new ArgumentException("No image found with that id.");
             }
 
-            return new MemoryStream(plateJpeg);
+            if (plateGroup.PlateJpeg == null)
+            {
+                plateGroup.PlateJpeg = await GetCropImageFromAgentAsync(
+                    processorContext,
+                    imageId,
+                    cancellationToken);
+
+                await processorContext.SaveChangesAsync(cancellationToken);
+            }
+
+            return new MemoryStream(plateGroup.VehicleJpeg);
         }
 
         public async static Task<byte[]> GetImageFromAgentAsync(
