@@ -31,7 +31,7 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string VehiclePreviewJpeg { get; set; }
 
-        public double AgentImageScrapeOccurredOn { get; set; }
+        public double? AgentImageScrapeOccurredOn { get; set; }
 
         public double Confidence { get; set; }
 
