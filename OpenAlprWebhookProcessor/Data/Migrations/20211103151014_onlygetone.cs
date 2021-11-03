@@ -12,7 +12,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                 name: "AgentImageScrapeOccurredOn",
                 table: "PlateGroups",
                 type: "REAL",
-                nullable: false,
+                nullable: true,
                 defaultValue: 0.0);
         }
 

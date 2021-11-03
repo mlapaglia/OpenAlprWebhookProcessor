@@ -167,6 +167,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
         public async Task ScrapeAgentImagesAsync(CancellationToken cancellationToken)
         {
             var plateGroupIds = await _processorContext.PlateGroups
+                .Where(x => x.AgentImageScrapeOccurredOn == null)
                 .Where(x => x.VehicleJpeg == null || x.PlateJpeg == null)
                 .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Select(x => x.OpenAlprUuid)
