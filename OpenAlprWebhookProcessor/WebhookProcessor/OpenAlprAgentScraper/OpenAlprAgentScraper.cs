@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -29,15 +31,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private readonly ILogger<OpenAlprAgentScraper> _logger;
 
+        private readonly ImageRetrieverService _imageRetriever;
+
         public OpenAlprAgentScraper(
             GroupWebhookHandler groupWebhookHandler,
             ProcessorContext processorContext,
-            ILogger<OpenAlprAgentScraper> logger)
+            ILogger<OpenAlprAgentScraper> logger,
+            ImageRetrieverService imageRetriever)
         {
             _groupWebhookHandler = groupWebhookHandler;
             _processorContext = processorContext;
             _logger = logger;
             _httpClient = new HttpClient();
+            _imageRetriever = imageRetriever;
         }
 
         public async Task ScrapeAgentAsync(CancellationToken cancellationToken)
@@ -93,7 +99,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         cancellationToken);
 
                     timer.Stop();
-                    _logger.LogInformation("Took {seconds} to query", timer.Elapsed.TotalSeconds);
+                    _logger.LogDebug("Took {seconds} to query", timer.Elapsed.TotalSeconds);
 
                     if (!newGroup.IsSuccessStatusCode)
                     {
@@ -111,7 +117,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                             await newGroup.Content.ReadAsStreamAsync(cancellationToken),
                             cancellationToken: cancellationToken);
                         timer.Stop();
-                        _logger.LogInformation("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
+                        _logger.LogDebug("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
                     }
                     catch (Exception ex)
                     {
@@ -133,7 +139,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                             true,
                             cancellationToken);
                         timer.Stop();
-                        _logger.LogInformation("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
+                        _logger.LogDebug("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
                     }
                     catch
                     {
@@ -144,7 +150,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     timer.Start();
                     agent.LastSuccessfulScrapeEpoch = group.EpochStart;
                     await _processorContext.SaveChangesAsync(cancellationToken);
-                    _logger.LogInformation("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
+                    _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
                 }
 
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
@@ -156,6 +162,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             }
 
             _logger.LogInformation("Finished OpenALPR Agent scrape.");
+        }
+
+        public async Task ScrapeAgentImagesAsync(CancellationToken cancellationToken)
+        {
+            var plateGroupIds = await _processorContext.PlateGroups
+                .Where(x => x.VehicleJpeg == null || x.PlateJpeg == null)
+                .OrderByDescending(x => x.ReceivedOnEpoch)
+                .Select(x => x.OpenAlprUuid)
+                .ToListAsync(cancellationToken);
+
+            foreach (var plateGroupId in plateGroupIds)
+            {
+                _imageRetriever.AddJob(plateGroupId);
+            }
         }
 
         private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(

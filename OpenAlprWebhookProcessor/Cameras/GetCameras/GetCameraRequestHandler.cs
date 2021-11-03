@@ -84,7 +84,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     return null;
                 }
 
-                return Flurl.Url.Combine($"/images/{camera.LatestProcessedPlateUuid}.jpg");
+                return Flurl.Url.Combine($"/images/{camera.LatestProcessedPlateUuid}");
             }
             else
             {

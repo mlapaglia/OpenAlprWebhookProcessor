@@ -68,6 +68,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     imageId),
                 cancellationToken);
 
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("Image not found for that id.");
+            }
+
             return await result.Content.ReadAsByteArrayAsync(cancellationToken);
         }
 
@@ -91,6 +96,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     "/crop/",
                     imageId),
                 cancellationToken);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new ArgumentException("Image not found for that id.");
+            }
 
             return await result.Content.ReadAsByteArrayAsync(cancellationToken);
         }

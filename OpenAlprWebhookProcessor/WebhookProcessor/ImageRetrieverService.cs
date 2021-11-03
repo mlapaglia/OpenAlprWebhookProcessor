@@ -92,7 +92,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
-                        continue;
                     }
                 }
             }
