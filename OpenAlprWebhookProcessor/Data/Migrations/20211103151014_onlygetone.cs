@@ -13,7 +13,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                 table: "PlateGroups",
                 type: "REAL",
                 nullable: true,
-                defaultValue: 0.0);
+                defaultValue: null);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
