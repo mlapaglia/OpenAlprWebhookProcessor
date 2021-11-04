@@ -11,7 +11,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
     [Authorize]
     [ApiController]
     [Route("images")]
-    public class ImageRelayController : Controller
+    public class ImageRelayController : ControllerBase
     {
         private readonly GetSnapshotHandler _getSnapshotHandler;
 
@@ -47,8 +47,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 cancellationToken);
         }
 
-
-        [HttpGet("{cameraId}/snapshot.jpg")]
+        [HttpGet("{cameraId}/snapshot")]
         public async Task<Stream> GetSnapshot(
             Guid cameraId,
             CancellationToken cancellationToken)
