@@ -27,18 +27,22 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly AlertService _alertService;
 
+        private readonly ImageRetrieverService _imageRetrieverService;
+
         public GroupWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            AlertService alertService)
+            AlertService alertService,
+            ImageRetrieverService imageRetrieverService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
             _processorContext = processorContext;
             _processorHub = processorHub;
             _alertService = alertService;
+            _imageRetrieverService = imageRetrieverService;
         }
 
         public async Task HandleWebhookAsync(
@@ -69,7 +73,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (camera == null)
             {
-                _logger.LogError("unknown camera: " + webhook.Group.CameraId + ", skipping.");
+                _logger.LogError("unknown camera: {cameraId}, skipping.", webhook.Group.CameraId);
                 return;
             }
 
@@ -81,7 +85,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (webhook.Group.IsParked)
             {
-                _logger.LogInformation($"parked car: {webhook.Group.BestPlateNumber}, ignoring.");
+                _logger.LogInformation("parked car: {plateNumber}, ignoring.", webhook.Group.BestPlateNumber);
                 return;
             }
 
@@ -95,7 +99,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 plateGroup = previousPreviewGroups[0];
                 _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
 
-                _logger.LogInformation("Previous preview plate exists: " + plateGroup.BestNumber + ", overwriting");
+                _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
 
             }
             else
@@ -132,6 +136,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             await _processorContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("plate saved successfully");
+
+            _imageRetrieverService.AddJob(plateGroup.OpenAlprUuid);
 
             if (!isBulkImport)
             {

@@ -354,3 +354,5 @@ MigrationBackup/
 dist/
 
 **/log*.txt
+*db-shm
+*db-wal

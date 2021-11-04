@@ -23,9 +23,15 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string PossibleNumbers { get; set; }
 
+        public byte[] PlateJpeg { get; set; }
+
         public string PlatePreviewJpeg { get; set; }
 
+        public byte[] VehicleJpeg { get; set; }
+
         public string VehiclePreviewJpeg { get; set; }
+
+        public double? AgentImageScrapeOccurredOn { get; set; }
 
         public double Confidence { get; set; }
 
@@ -56,6 +62,9 @@ namespace OpenAlprWebhookProcessor.Data
 
             builder.Entity<PlateGroup>()
                 .HasIndex(x => x.ReceivedOnEpoch);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.OpenAlprUuid);
         }
     }
 }

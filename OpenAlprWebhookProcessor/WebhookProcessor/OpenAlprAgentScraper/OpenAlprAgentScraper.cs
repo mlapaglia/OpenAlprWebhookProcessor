@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -28,15 +31,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private readonly ILogger<OpenAlprAgentScraper> _logger;
 
+        private readonly ImageRetrieverService _imageRetriever;
+
         public OpenAlprAgentScraper(
             GroupWebhookHandler groupWebhookHandler,
             ProcessorContext processorContext,
-            ILogger<OpenAlprAgentScraper> logger)
+            ILogger<OpenAlprAgentScraper> logger,
+            ImageRetrieverService imageRetriever)
         {
             _groupWebhookHandler = groupWebhookHandler;
             _processorContext = processorContext;
             _logger = logger;
             _httpClient = new HttpClient();
+            _imageRetriever = imageRetriever;
         }
 
         public async Task ScrapeAgentAsync(CancellationToken cancellationToken)
@@ -84,9 +91,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 foreach (var metadata in metaDatasToQuery)
                 {
+                    var timer = new Stopwatch();
+                    timer.Start();
+
                     var newGroup = await _httpClient.GetAsync(
                         agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
                         cancellationToken);
+
+                    timer.Stop();
+                    _logger.LogDebug("Took {seconds} to query", timer.Elapsed.TotalSeconds);
 
                     if (!newGroup.IsSuccessStatusCode)
                     {
@@ -98,9 +111,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                     try
                     {
+                        timer.Reset();
+                        timer.Start();
                         group = await JsonSerializer.DeserializeAsync<Group>(
                             await newGroup.Content.ReadAsStreamAsync(cancellationToken),
                             cancellationToken: cancellationToken);
+                        timer.Stop();
+                        _logger.LogDebug("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
                     }
                     catch (Exception ex)
                     {
@@ -112,6 +129,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                     try
                     {
+                        timer.Reset();
+                        timer.Start();
                         await _groupWebhookHandler.HandleWebhookAsync(
                             new Webhook
                             {
@@ -119,14 +138,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                             },
                             true,
                             cancellationToken);
+                        timer.Stop();
+                        _logger.LogDebug("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
                     }
                     catch
                     {
                         _logger.LogError("Failed to parse bulk import request.");
                     }
 
+                    timer.Reset();
+                    timer.Start();
                     agent.LastSuccessfulScrapeEpoch = group.EpochStart;
                     await _processorContext.SaveChangesAsync(cancellationToken);
+                    _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
                 }
 
                 lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
@@ -138,6 +162,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             }
 
             _logger.LogInformation("Finished OpenALPR Agent scrape.");
+        }
+
+        public async Task ScrapeAgentImagesAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Searching for plates with missings images");
+
+            var plateGroupIds = await _processorContext.PlateGroups
+                .Where(x => x.AgentImageScrapeOccurredOn == null)
+                .Select(x => x.OpenAlprUuid)
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Found {count} plates to query the Agent for.", plateGroupIds.Count);
+
+            foreach (var plateGroupId in plateGroupIds)
+            {
+                _imageRetriever.AddJob(plateGroupId);
+            }
+
+            _logger.LogInformation("Jobs added successfully.");
         }
 
         private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(

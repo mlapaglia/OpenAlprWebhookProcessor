@@ -85,7 +85,7 @@ namespace OpenAlprWebhookProcessor.Alerts
 
                     if (result != null)
                     {
-                        _logger.LogInformation($"alerting for: {result.Id}");
+                        _logger.LogInformation("alerting for: {alertId}", result.Id);
                         await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
 
                         try

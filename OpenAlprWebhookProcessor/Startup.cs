@@ -48,6 +48,7 @@ using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using System.Text.Json.Serialization;
 using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
+using OpenAlprWebhookProcessor.ImageRelay.GetImage;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -167,7 +168,6 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetIgnoresRequestHandler>();
             services.AddScoped<UpsertCameraHandler>();
             services.AddScoped<SearchLicensePlateHandler>();
-            services.AddScoped<GetImageHandler>();
             services.AddScoped<UpsertAlertsRequestHandler>();
             services.AddScoped<GetSnapshotHandler>();
             services.AddScoped<GetLicensePlateCountsHandler>();
@@ -201,6 +201,10 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<AlertService>();
             services.AddSingleton<IHostedService>(p => p.GetService<AlertService>());
+
+            services.AddSingleton<ImageRetrieverService>();
+            services.AddSingleton<IHostedService>(p => p.GetService<ImageRetrieverService>());
+            
 
             services.AddSwaggerGen(c =>
             {
