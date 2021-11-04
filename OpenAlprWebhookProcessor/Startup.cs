@@ -303,7 +303,10 @@ namespace OpenAlprWebhookProcessor
                 .Enrich.FromLogContext()
                 .WriteTo.File(
                     "log-.txt",
-                    rollingInterval: RollingInterval.Day)
+                    rollingInterval: RollingInterval.Day,
+                    shared: true,
+                    flushToDiskInterval: TimeSpan.FromSeconds(5),
+                    retainedFileCountLimit: 3)
                 .WriteTo.Console()
                 .WriteTo.Signalr(app.ApplicationServices.GetService<IHubContext<ProcessorHub.ProcessorHub, IProcessorHub>>())
                 .CreateLogger();

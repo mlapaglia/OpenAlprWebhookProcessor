@@ -26,13 +26,19 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.subscribeForLogs();
+    this.populateLogs();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
+  public populateLogs() {
+    this.systemLogsService.getLogs().subscribe(result => {
+      this.logMessages = result.join("\r\n");
+      this.subscribeForLogs();
+    })
+  }
   public subscribeForLogs() {
     this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
         this.logMessages = logInformation + "\r\n" + this.logMessages;

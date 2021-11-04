@@ -9,6 +9,10 @@ export class SystemLogsService {
 
   constructor(private http: HttpClient) { }
 
+  getLogs(): Observable<string[]> {
+    return this.http.get<string[]>(`/logs`);
+  }
+
   getPlateGroups(onlyFailedPlateGroups: Boolean): Observable<Blob> {
     return this.http.get<Blob>(`/settings/debug/plates?onlyFailedPlateGroups=${onlyFailedPlateGroups}`, { responseType: 'blob' as 'json' });
   }
