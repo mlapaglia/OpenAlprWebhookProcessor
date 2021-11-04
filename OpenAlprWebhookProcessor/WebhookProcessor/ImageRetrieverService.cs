@@ -47,8 +47,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             using (var scope = _serviceProvider.CreateScope())
             {
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
-
                 logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
+
                 _imageRequestsToProcess.Add(openAlprImageId);
             }
         }

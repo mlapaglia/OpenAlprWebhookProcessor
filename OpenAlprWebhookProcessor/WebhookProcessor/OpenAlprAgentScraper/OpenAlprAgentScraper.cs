@@ -166,15 +166,21 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         public async Task ScrapeAgentImagesAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Searching for plates with missings images");
+
             var plateGroupIds = await _processorContext.PlateGroups
                 .Where(x => x.AgentImageScrapeOccurredOn == null)
                 .Select(x => x.OpenAlprUuid)
                 .ToListAsync(cancellationToken);
 
+            _logger.LogInformation("Found {count} plates to query the Agent for.", plateGroupIds.Count);
+
             foreach (var plateGroupId in plateGroupIds)
             {
                 _imageRetriever.AddJob(plateGroupId);
             }
+
+            _logger.LogInformation("Jobs added successfully.");
         }
 
         private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(
