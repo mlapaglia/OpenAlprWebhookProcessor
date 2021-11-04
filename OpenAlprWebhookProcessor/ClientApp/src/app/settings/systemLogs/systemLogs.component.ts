@@ -11,7 +11,8 @@ import { SystemLogsService } from './systemLogs.service';
   styleUrls: ['./systemLogs.component.less']
 })
 export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
-  public logMessages: string = '';
+  public logMessages: string[];
+  public logMessagesDisplay: string = '';
   public onlyFailedPlateGroups: boolean = false;
   public isPurging: boolean = false;
 
@@ -26,16 +27,24 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.subscribeForLogs();
+    this.populateLogs();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
+  public populateLogs() {
+    this.systemLogsService.getLogs().subscribe(result => {
+      this.logMessages = result;
+      this.formatLogs();
+      this.subscribeForLogs();
+    })
+  }
   public subscribeForLogs() {
     this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
-        this.logMessages = logInformation + "\r\n" + this.logMessages;
+      this.logMessages.unshift(logInformation);
+      this.formatLogs();
     }));
   }
 
@@ -56,5 +65,10 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.snackBarService.create("Failed to delete plates, check the logs.", SnackBarType.Error);
       this.isPurging = false;
     });
+  }
+
+  private formatLogs() {
+    this.logMessages = this.logMessages.slice(0, 500);
+    this.logMessagesDisplay = this.logMessages.join("\r\n");
   }
 }

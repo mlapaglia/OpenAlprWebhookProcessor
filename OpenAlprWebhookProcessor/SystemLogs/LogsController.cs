@@ -1,25 +1,51 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.SystemLogs
 {
     [Authorize]
     [ApiController]
-    [Route("licensePlates")]
+    [Route("logs")]
     public class LogsController : ControllerBase
     {
-        private readonly ILogger _logger;
-        public LogsController(ILogger logger)
+        public LogsController()
         {
-            _logger = logger;
         }
 
         [HttpGet]
-        public async Task GetLogs()
+        public async Task<List<string>> GetLogs()
         {
-            await Task.FromResult(true);
+            var currentLogFile = Directory.GetFiles(".")
+                .LastOrDefault(x => x.Contains("log-"));
+
+            using (var stream = System.IO.File.Open(
+                currentLogFile,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite))
+            {
+                using (var sr = new StreamReader(stream, Encoding.UTF8))
+                {
+                    var logs = new List<string>();
+
+                    while (!sr.EndOfStream)
+                    {
+                        logs.Add(await sr.ReadLineAsync());
+                    }
+
+                    logs.Reverse();
+
+                    return logs.Take(500).ToList();
+                }
+            }
         }
     }
 }
