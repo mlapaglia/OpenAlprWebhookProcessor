@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Alerts
                         {
                             await _alertClient.SendAlertAsync(new Alert()
                             {
-                                Description = result.AlertDescription,
+                                Description = job.Description,
                                 Id = result.Id,
                                 PlateNumber = result.BestNumber,
                             },
