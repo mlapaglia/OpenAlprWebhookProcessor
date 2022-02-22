@@ -115,7 +115,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.OpenAlprProcessingTimeMs = Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2);
             plateGroup.OpenAlprUuid = webhook.Group.BestUuid;
             plateGroup.BestNumber = webhook.Group.BestPlateNumber;
-            plateGroup.PossibleNumbers = webhook.Group.Candidates.Select(x => x.Plate).ToList();
+            plateGroup.PossibleNumbers = webhook.Group.Candidates.Select(x => new PlateGroupPossibleNumbers() { Number = x.Plate }).ToList();
             plateGroup.PlatePreviewJpeg = webhook.Group.BestPlate.PlateCropJpeg;
             plateGroup.VehiclePreviewJpeg = webhook.Group.VehicleCropJpeg;
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
@@ -165,7 +165,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
 
                     var alert = await _processorContext.Alerts
-                        .Where(x => x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber || plateGroup.PossibleNumbers.Contains(x.PlateNumber.ToUpper()))
+                        .Where(x => x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber || plateGroup.PossibleNumbers.Any(y => y.Number == x.PlateNumber.ToUpper()))
                         .FirstOrDefaultAsync(cancellationToken);
 
                     if (alert != null)

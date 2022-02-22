@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string BestNumber { get; set; }
 
-        public List<string> PossibleNumbers { get; set; }
+        public List<PlateGroupPossibleNumbers> PossibleNumbers { get; set; }
 
         public byte[] PlateJpeg { get; set; }
 
@@ -66,6 +66,10 @@ namespace OpenAlprWebhookProcessor.Data
 
             builder.Entity<PlateGroup>()
                 .HasIndex(x => x.OpenAlprUuid);
+
+            builder.Entity<PlateGroup>()
+                .HasMany(x => x.PossibleNumbers)
+                .WithOne(x => x.PlateGroup);
         }
     }
 }

@@ -74,7 +74,7 @@ namespace OpenAlprWebhookProcessor.Alerts
 
                     if (job.IsStrictMatch)
                     {
-                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId || x.PossibleNumbers.Contains(job.LicensePlateId.ToString()));
+                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId || x.PossibleNumbers.Any(x => x.Number == job.LicensePlateId.ToString()));
                     }
                     else
                     {

@@ -14,6 +14,8 @@ namespace OpenAlprWebhookProcessor.Data
 
         public DbSet<PlateGroupRaw> RawPlateGroups { get; set; }
 
+        public DbSet<PlateGroupPossibleNumbers> PlateGroupPossibleNumbers { get; set; }
+
         public DbSet<Camera> Cameras { get; set; }
 
         public DbSet<Agent> Agents { get; set; }

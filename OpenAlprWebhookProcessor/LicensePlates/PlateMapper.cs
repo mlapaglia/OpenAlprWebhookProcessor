@@ -3,6 +3,7 @@ using OpenAlprWebhookProcessor.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace OpenAlprWebhookProcessor.LicensePlates
 {
@@ -27,7 +28,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,
                 PlateNumber = plate.BestNumber,
-                PossiblePlateNumbers = plate.PossibleNumbers,
+                PossiblePlateNumbers = plate.PossibleNumbers.Select(x => x.Number).ToList(),
                 ProcessedPlateConfidence = plate.Confidence,
                 ReceivedOn = DateTimeOffset.FromUnixTimeMilliseconds(plate.ReceivedOnEpoch),
                 Region = TryTranslateRegion(plate.VehicleRegion),

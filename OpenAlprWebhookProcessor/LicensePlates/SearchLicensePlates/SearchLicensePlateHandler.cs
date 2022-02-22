@@ -40,7 +40,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 }
                 else
                 {
-                    dbRequest = dbRequest.Where(x => x.PossibleNumbers.Contains(request.PlateNumber) || request.PlateNumber == x.BestNumber);
+                    dbRequest = dbRequest.Where(x => x.PossibleNumbers.Any(x => x.Number == request.PlateNumber) || request.PlateNumber == x.BestNumber);
                 }
             }
 
@@ -56,13 +56,13 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => x.ReceivedOnEpoch <= endEpochMilliseconds);
             }
 
-            var platesToIgnore = (await _processerContext.Ignores
+            var platesToIgnore = await _processerContext.Ignores
                 .Select(x => x.PlateNumber)
-                .ToListAsync(cancellationToken));
+                .ToListAsync(cancellationToken);
 
             if (!request.FilterIgnoredPlates)
             {
-                dbRequest = dbRequest.Where(x => !platesToIgnore.Intersect(x.PossibleNumbers).Any() && !platesToIgnore.Contains(x.BestNumber));
+                dbRequest = dbRequest.Where(x => !platesToIgnore.Intersect(x.PossibleNumbers.Select(y => y.Number).ToList()).Any() && !platesToIgnore.Contains(x.BestNumber));
             }
 
             if (!string.IsNullOrWhiteSpace(request.VehicleMake))
