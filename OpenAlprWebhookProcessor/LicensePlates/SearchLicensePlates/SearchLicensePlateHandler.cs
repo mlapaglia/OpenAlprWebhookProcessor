@@ -93,38 +93,12 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                     .Select(x => x.Key)
                     .ToListAsync(cancellationToken);
 
-                dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber));
+                dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber)); 
             }
 
             var totalCount = await dbRequest.CountAsync(cancellationToken);
 
             dbRequest = dbRequest
-                .Select(x => new PlateGroup()
-                {
-                    AgentImageScrapeOccurredOn = x.AgentImageScrapeOccurredOn,
-                    AlertDescription = x.AlertDescription,
-                    BestNumber = x.BestNumber,
-                    Confidence = x.Confidence,
-                    Direction = x.Direction,
-                    Id = x.Id,
-                    IsAlert = x.IsAlert,
-                    IsEnriched = x.IsEnriched,
-                    Notes = x.Notes,
-                    OpenAlprCameraId = x.OpenAlprCameraId,
-                    OpenAlprProcessingTimeMs = x.OpenAlprProcessingTimeMs,
-                    OpenAlprUuid = x.OpenAlprUuid,
-                    PlateCoordinates = x.PlateCoordinates,
-                    PlateJpeg = x.PlateJpeg,
-                    PlatePreviewJpeg = x.PlatePreviewJpeg,
-                    PossibleNumbers = x.PossibleNumbers,
-                    ReceivedOnEpoch = x.ReceivedOnEpoch,
-                    VehicleColor = x.VehicleColor,
-                    VehicleMake = x.VehicleMake,
-                    VehicleMakeModel = x.VehicleMakeModel,
-                    VehicleRegion = x.VehicleRegion,
-                    VehicleType = x.VehicleType,
-                    VehicleYear = x.VehicleYear,
-                })
                 .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Skip(request.PageNumber * request.PageSize)
                 .Take(request.PageSize);
