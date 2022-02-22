@@ -62,7 +62,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
             if (!request.FilterIgnoredPlates)
             {
-                dbRequest = dbRequest.Where(x => !platesToIgnore.Contains(x.PossibleNumbers) && !platesToIgnore.Contains(x.BestNumber));
+                dbRequest = dbRequest.Where(x => !platesToIgnore.Intersect(x.PossibleNumbers).Any() && !platesToIgnore.Contains(x.BestNumber));
             }
 
             if (!string.IsNullOrWhiteSpace(request.VehicleMake))

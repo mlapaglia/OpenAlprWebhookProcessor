@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Data
 {
@@ -21,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Data
 
         public string BestNumber { get; set; }
 
-        public string PossibleNumbers { get; set; }
+        public List<string> PossibleNumbers { get; set; }
 
         public byte[] PlateJpeg { get; set; }
 

@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         public string Region { get; set; }
 
-        public string PossiblePlateNumbers { get; set; }
+        public List<string> PossiblePlateNumbers { get; set; }
 
         public double OpenAlprProcessingTimeMs { get; set; }
 
