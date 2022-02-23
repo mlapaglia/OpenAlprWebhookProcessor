@@ -66,10 +66,6 @@ namespace OpenAlprWebhookProcessor.Data
 
             builder.Entity<PlateGroup>()
                 .HasIndex(x => x.OpenAlprUuid);
-
-            builder.Entity<PlateGroup>()
-                .HasMany(x => x.PossibleNumbers)
-                .WithOne(x => x.PlateGroup);
         }
     }
 }

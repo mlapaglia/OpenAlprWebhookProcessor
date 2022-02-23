@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Reflection;
 
 namespace OpenAlprWebhookProcessor.Data

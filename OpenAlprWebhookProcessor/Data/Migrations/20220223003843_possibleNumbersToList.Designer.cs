@@ -11,7 +11,7 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    [Migration("20220222062954_possibleNumbersToList")]
+    [Migration("20220223003843_possibleNumbersToList")]
     partial class possibleNumbersToList
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
