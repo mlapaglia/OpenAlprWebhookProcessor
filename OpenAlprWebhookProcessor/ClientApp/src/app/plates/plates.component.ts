@@ -139,7 +139,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }));
 
     this.eventSubscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
-        this.searchPlates();
+        if (!this.isLoading) {
+          this.searchPlates();
+        }
     }));
   }
 
@@ -171,7 +173,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterEndOn?.setUTCHours(23,59,59,999);
 
     var request = new PlateRequest();
-    
+
     request.pageNumber = this.pageNumber;
     request.pageSize = this.pageSize;
     request.endSearchOn = this.filterEndOn;
