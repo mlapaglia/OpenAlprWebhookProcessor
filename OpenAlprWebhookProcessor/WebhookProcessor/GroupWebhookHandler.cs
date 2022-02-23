@@ -164,9 +164,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
 
-                    var alert = await _processorContext.Alerts
-                        .Where(x => x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber || plateGroup.PossibleNumbers.Any(y => y.Number == x.PlateNumber.ToUpper()))
-                        .FirstOrDefaultAsync(cancellationToken);
+                    var alerts = await _processorContext.Alerts.ToListAsync(cancellationToken);
+
+                    var alert = alerts.FirstOrDefault(x =>
+                        x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber
+                        || plateGroup.PossibleNumbers.Any(y => y.Number == x.PlateNumber.ToUpper()));
 
                     if (alert != null)
                     {
