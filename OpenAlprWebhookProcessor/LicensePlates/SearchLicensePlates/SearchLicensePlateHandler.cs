@@ -22,7 +22,9 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             SearchLicensePlateRequest request,
             CancellationToken cancellationToken)
         {
-            var dbRequest = _processerContext.PlateGroups.AsQueryable().AsNoTracking();
+            var dbRequest = _processerContext.PlateGroups
+                .AsQueryable()
+                .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(request.PlateNumber))
             {
