@@ -98,8 +98,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber)); 
             }
 
-            // var totalCount = await dbRequest.CountAsync(cancellationToken);
-            var totalCount = 100;
+            var totalCount = await dbRequest.CountAsync(cancellationToken);
 
             dbRequest = dbRequest
                 .Include(x => x.PossibleNumbers)

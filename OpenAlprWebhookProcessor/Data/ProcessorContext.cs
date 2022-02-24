@@ -42,8 +42,5 @@ namespace OpenAlprWebhookProcessor.Data
                 method?.Invoke(null, new object[] { modelBuilder });
             }
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Debug);
     }
 }
