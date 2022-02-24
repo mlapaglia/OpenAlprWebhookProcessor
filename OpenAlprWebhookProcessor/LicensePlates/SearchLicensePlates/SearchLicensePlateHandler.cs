@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             SearchLicensePlateRequest request,
             CancellationToken cancellationToken)
         {
-            var dbRequest = _processerContext.PlateGroups.AsQueryable();
+            var dbRequest = _processerContext.PlateGroups.AsQueryable().AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(request.PlateNumber))
             {
@@ -96,6 +96,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                 dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber)); 
             }
 
+            // var totalCount = await dbRequest.CountAsync(cancellationToken);
             var totalCount = 100;
 
             dbRequest = dbRequest
