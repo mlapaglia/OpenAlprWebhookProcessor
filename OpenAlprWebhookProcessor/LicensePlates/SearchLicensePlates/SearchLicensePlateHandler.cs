@@ -88,41 +88,15 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             if (request.FilterPlatesSeenLessThan > 0)
             {
                 var platesSeen = await _processerContext.PlateGroups
-                    .Select(x => new PlateGroup()
-                    {
-                        AgentImageScrapeOccurredOn = x.AgentImageScrapeOccurredOn,
-                        AlertDescription = x.AlertDescription,
-                        BestNumber = x.BestNumber,
-                        Confidence = x.Confidence,
-                        Direction = x.Direction,
-                        Id = x.Id,
-                        IsAlert = x.IsAlert,
-                        IsEnriched = x.IsEnriched,
-                        Notes = x.Notes,
-                        OpenAlprCameraId = x.OpenAlprCameraId,
-                        OpenAlprProcessingTimeMs = x.OpenAlprProcessingTimeMs,
-                        OpenAlprUuid = x.OpenAlprUuid,
-                        PlateCoordinates = x.PlateCoordinates,
-                        PlateJpeg = x.PlateJpeg,
-                        PlatePreviewJpeg = x.PlatePreviewJpeg,
-                        PossibleNumbers = x.PossibleNumbers,
-                        ReceivedOnEpoch = x.ReceivedOnEpoch,
-                        VehicleColor = x.VehicleColor,
-                        VehicleMake = x.VehicleMake,
-                        VehicleMakeModel = x.VehicleMakeModel,
-                        VehicleRegion = x.VehicleRegion,
-                        VehicleType = x.VehicleType,
-                        VehicleYear = x.VehicleYear,
-                    })
                     .GroupBy(x => x.BestNumber)
                     .Where(x => x.Count() > request.FilterPlatesSeenLessThan)
                     .Select(x => x.Key)
                     .ToListAsync(cancellationToken);
 
-                dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber));
+                dbRequest = dbRequest.Where(x => !platesSeen.Contains(x.BestNumber)); 
             }
 
-            var totalCount = await dbRequest.CountAsync(cancellationToken);
+            var totalCount = 100;
 
             dbRequest = dbRequest
                 .Include(x => x.PossibleNumbers)
