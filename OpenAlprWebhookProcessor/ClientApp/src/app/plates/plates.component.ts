@@ -61,7 +61,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public range: FormGroup;
   public plates: Plate[] = [];
   public totalNumberOfPlates: number;
-
+  public todaysDate = new Date();
+  
   public filterPlateNumber: string;
   public filterPlateNumberIsValid: boolean = true;
   public filterStartOn: Date;
