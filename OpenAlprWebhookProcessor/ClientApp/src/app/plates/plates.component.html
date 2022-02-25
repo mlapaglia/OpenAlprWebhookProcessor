@@ -67,7 +67,7 @@
       <mat-card-content>
         <mat-form-field appearance="fill" style="width: 80%;">
           <mat-label>Enter a date range</mat-label>
-          <mat-date-range-input [rangePicker]="picker" >
+          <mat-date-range-input [rangePicker]="picker" [max]="todaysDate">
             <input matStartDate [(ngModel)]="filterStartOn" placeholder="Start date">
             <input matEndDate [(ngModel)]="filterEndOn" placeholder="End date">
           </mat-date-range-input>
