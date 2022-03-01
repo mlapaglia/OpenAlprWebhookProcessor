@@ -17,6 +17,7 @@ import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from '@app/_services/local-storage.service';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'app-plates',
@@ -62,11 +63,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public plates: Plate[] = [];
   public totalNumberOfPlates: number;
   public todaysDate = new Date();
-  
+
   public filterPlateNumber: string;
   public filterPlateNumberIsValid: boolean = true;
-  public filterStartOn: Date;
-  public filterEndOn: Date;
+  public filterStartOn = new Date();
+  public filterEndOn = new Date();
   public filterStrictMatch: boolean;
   public filterStrictMatchEnabled: boolean = true;
   public filterIgnoredPlates: boolean;
@@ -111,6 +112,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
         start: new FormControl(),
         end: new FormControl()
       });
+      this.filterStartOn.setDate(new Date().getDate() - 15);
+      this.filterEndOn = this.todaysDate;
     }
     
   ngOnInit(): void {
