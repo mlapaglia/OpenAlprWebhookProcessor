@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Reflection;
 
 namespace OpenAlprWebhookProcessor.Data
@@ -13,6 +14,8 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<PlateGroup> PlateGroups { get; set; }
 
         public DbSet<PlateGroupRaw> RawPlateGroups { get; set; }
+
+        public DbSet<PlateGroupPossibleNumbers> PlateGroupPossibleNumbers { get; set; }
 
         public DbSet<Camera> Cameras { get; set; }
 

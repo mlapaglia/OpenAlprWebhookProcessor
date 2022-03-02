@@ -17,7 +17,7 @@ import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from '@app/_services/local-storage.service';
-import { EnrichersService } from '@app/settings/enrichers/enrichers.service';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'app-plates',
@@ -62,6 +62,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public range: FormGroup;
   public plates: Plate[] = [];
   public totalNumberOfPlates: number;
+  public todaysDate: Date;
 
   public filterPlateNumber: string;
   public filterPlateNumberIsValid: boolean = true;
@@ -94,12 +95,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   private pageSizeCacheKey: string = "platePageSize";
   private pageNumber: number = 0;
 
-  private subscriptions = new Subscription();
-  
+  private eventSubscriptions = new Subscription();
+  private searchSubscription = new Subscription();
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
-    private enricherService: EnrichersService,
     private plateService: PlateService,
     private signalRHub: SignalrService,
     private snackbarService: SnackbarService,
@@ -119,14 +120,25 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.pageSize = pageSize != null ? parseInt(pageSize) : 25;
     this.searchPlates();
     this.populateFilters();
+    this.setInitialDateFilter();
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
+    this.eventSubscriptions.unsubscribe();
+    this.searchSubscription.unsubscribe();
   }
 
   ngAfterViewInit(): void {
     this.subscribeForUpdates();
+  }
+
+  public setInitialDateFilter() {
+    this.todaysDate = new Date();
+    this.filterStartOn = new Date();
+    this.filterEndOn = new Date();
+    
+    this.filterStartOn.setDate(new Date().getDate() - 15);
+    this.filterEndOn = this.todaysDate;
   }
 
   public editPlate(plateNumber: string) {
@@ -134,12 +146,14 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.subscriptions.add(this.signalRHub.connectionStatusChanged.subscribe(status => {
+    this.eventSubscriptions.add(this.signalRHub.connectionStatusChanged.subscribe(status => {
       this.isSignalrConnected = status;
     }));
 
-    this.subscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
-        this.searchPlates();
+    this.eventSubscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
+        if (!this.isLoading) {
+          this.searchPlates();
+        }
     }));
   }
 
@@ -159,8 +173,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public searchPlates(plateNumber: string = '') {
-    var request = new PlateRequest();
-
     if (!this.filterPlateNumberIsValid) {
       return;
     }
@@ -171,6 +183,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.filterStartOn?.setUTCHours(0,0,0,0);
     this.filterEndOn?.setUTCHours(23,59,59,999);
+
+    var request = new PlateRequest();
 
     request.pageNumber = this.pageNumber;
     request.pageSize = this.pageSize;
@@ -186,13 +200,18 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.vehicleType = this.filterVehicleType;
     request.vehicleRegion = this.filterVehicleRegion;
 
+    if (this.isLoading) {
+      this.searchSubscription.unsubscribe();
+    }
+
     this.isLoading = true;
-    this.plateService.searchPlates(request).subscribe(result => {
+    this.searchSubscription = this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = result.plates;
       this.isLoading = false;
     }, error => {
       this.isLoading = false;
+      this.snackbarService.create(`Error searching for plates, check the logs`, SnackBarType.Error)
     });
   }
 
@@ -237,8 +256,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public clearFilters() {
-    this.filterEndOn = null;
-    this.filterStartOn = null;
+    this.setInitialDateFilter();
+
     this.filterPlateNumber = '';
     this.filterPlateNumberIsValid = true;
     this.filterStrictMatch = false;
