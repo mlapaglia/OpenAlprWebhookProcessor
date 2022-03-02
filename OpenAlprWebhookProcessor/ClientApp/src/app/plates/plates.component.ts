@@ -112,8 +112,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
         start: new FormControl(),
         end: new FormControl()
       });
-      this.filterStartOn.setDate(new Date().getDate() - 15);
-      this.filterEndOn = this.todaysDate;
     }
     
   ngOnInit(): void {
@@ -122,6 +120,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.pageSize = pageSize != null ? parseInt(pageSize) : 25;
     this.searchPlates();
     this.populateFilters();
+    this.setInitialDateFilter();
   }
 
   ngOnDestroy(): void {
@@ -131,6 +130,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.subscribeForUpdates();
+  }
+
+  public setInitialDateFilter() {
+    this.filterStartOn.setDate(new Date().getDate() - 15);
+    this.filterEndOn = this.todaysDate;
   }
 
   public editPlate(plateNumber: string) {
@@ -247,8 +251,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public clearFilters() {
-    this.filterEndOn = null;
-    this.filterStartOn = null;
+    this.setInitialDateFilter();
+    
     this.filterPlateNumber = '';
     this.filterPlateNumberIsValid = true;
     this.filterStrictMatch = false;
