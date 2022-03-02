@@ -62,12 +62,12 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public range: FormGroup;
   public plates: Plate[] = [];
   public totalNumberOfPlates: number;
-  public todaysDate = new Date();
+  public todaysDate: Date;
 
   public filterPlateNumber: string;
   public filterPlateNumberIsValid: boolean = true;
-  public filterStartOn = new Date();
-  public filterEndOn = new Date();
+  public filterStartOn: Date;
+  public filterEndOn: Date;
   public filterStrictMatch: boolean;
   public filterStrictMatchEnabled: boolean = true;
   public filterIgnoredPlates: boolean;
@@ -133,6 +133,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public setInitialDateFilter() {
+    this.todaysDate = new Date();
+    this.filterStartOn = new Date();
+    this.filterEndOn = new Date();
+    
     this.filterStartOn.setDate(new Date().getDate() - 15);
     this.filterEndOn = this.todaysDate;
   }
@@ -207,6 +211,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.isLoading = false;
     }, error => {
       this.isLoading = false;
+      this.snackbarService.create(`Error searching for plates, check the logs`, SnackBarType.Error)
     });
   }
 
@@ -252,7 +257,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public clearFilters() {
     this.setInitialDateFilter();
-    
+
     this.filterPlateNumber = '';
     this.filterPlateNumberIsValid = true;
     this.filterStrictMatch = false;
