@@ -23,10 +23,10 @@ namespace OpenAlprWebhookProcessor.Cameras
         {
             var camera = await _processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
 
+            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
+
             _processorContext.Remove(camera);
             await _processorContext.SaveChangesAsync();
-
-            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
         }
     }
 }
