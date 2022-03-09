@@ -48,11 +48,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 foreach (var camera in camerasToUpdate)
                 {
+                    var latitude = camera.Latitude ?? agent.Latitude;
+                    var longitude = camera.Longitude ?? agent.Longitude;
+
                     _backgroundJobClient.Enqueue(() => ProcessSunriseSunsetJobAsync(
                         camera.Id,
                         CameraScheduling.IsSunUp(
-                            agent.Latitude,
-                            agent.Longitude) ? SunriseSunset.Sunrise : SunriseSunset.Sunset,
+                            latitude.Value,
+                            longitude.Value) ? SunriseSunset.Sunrise : SunriseSunset.Sunset,
                         false));
                 }
             }
