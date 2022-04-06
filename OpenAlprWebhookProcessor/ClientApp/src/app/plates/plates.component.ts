@@ -118,9 +118,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isSignalrConnected = this.signalRHub.isConnected;
     var pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
     this.pageSize = pageSize != null ? parseInt(pageSize) : 25;
+    this.setInitialDateFilter();
     this.searchPlates();
     this.populateFilters();
-    this.setInitialDateFilter();
   }
 
   ngOnDestroy(): void {
