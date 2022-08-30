@@ -20,6 +20,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
         public int PageSize { get; set; }
 
+        public string VehicleColor { get; set; }
+
         public string VehicleMake { get; set; }
 
         public string VehicleModel { get; set; }
