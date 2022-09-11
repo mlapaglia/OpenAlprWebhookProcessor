@@ -69,7 +69,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
 
             if (!string.IsNullOrWhiteSpace(request.VehicleColor))
             {
-                dbRequest = dbRequest.Where(x => x.VehicleColor.Contains(request.VehicleMake.ToLower()));
+                dbRequest = dbRequest.Where(x => x.VehicleColor.Contains(request.VehicleColor.ToLower()));
             }
 
             if (!string.IsNullOrWhiteSpace(request.VehicleMake))
