@@ -195,6 +195,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     request.filterIgnoredPlates = this.filterIgnoredPlates;
     request.filterPlatesSeenLessThan = this.filterPlatesSeenLessThan ? 10 : 0;
     request.regexSearchEnabled = this.regexSearchEnabled;
+    request.vehicleColor = this.filterVehicleColor;
     request.vehicleMake = this.filterVehicleMake;
     request.vehicleModel = this.filterVehicleModel;
     request.vehicleType = this.filterVehicleType;

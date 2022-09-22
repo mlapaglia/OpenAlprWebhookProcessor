@@ -17,27 +17,27 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="10.1.1" />
-		<PackageReference Include="Bogus" Version="33.1.1" />
-		<PackageReference Include="CoordinateSharp" Version="2.12.1.1" />
-		<PackageReference Include="Flurl" Version="3.0.2" />
-		<PackageReference Include="Hangfire" Version="1.7.26" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.26" />
+		<PackageReference Include="AutoMapper" Version="11.0.1" />
+		<PackageReference Include="Bogus" Version="34.0.2" />
+		<PackageReference Include="CoordinateSharp" Version="2.13.1.1" />
+		<PackageReference Include="Flurl" Version="3.0.6" />
+		<PackageReference Include="Hangfire" Version="1.7.31" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
 		<PackageReference Include="Hangfire.InMemory" Version="0.3.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0-rc.2.21480.5">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
-		<PackageReference Include="NUnit" Version="3.13.2" />
-		<PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.14.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.1" />
 	</ItemGroup>
 
 	<ItemGroup>
