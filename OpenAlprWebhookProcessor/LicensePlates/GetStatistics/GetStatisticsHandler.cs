@@ -25,8 +25,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
             var seenPlates = await _processorContext.PlateGroups
-                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Any(x => x.Number == plateNumber))
                 .AsNoTracking()
+                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Any(x => x.Number == plateNumber))
                 .Select(x => x.ReceivedOnEpoch)
                 .ToListAsync(cancellationToken);
 

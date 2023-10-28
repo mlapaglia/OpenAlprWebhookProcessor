@@ -25,8 +25,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             _processerContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
             var dbRequest = _processerContext.PlateGroups
-                .AsQueryable()
-                .AsNoTracking();
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(request.PlateNumber))
             {
@@ -97,7 +96,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             if (request.FilterPlatesSeenLessThan > 0)
             {
                 var platesSeen = await _processerContext.PlateGroups
-                    .AsNoTracking()
                     .GroupBy(x => x.BestNumber)
                     .Where(x => x.Count() > request.FilterPlatesSeenLessThan)
                     .Select(x => x.Key)
@@ -129,7 +127,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             }
 
             var enricher = await _processerContext.Enrichers
-                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (enricher == null || !enricher.IsEnabled)
@@ -147,7 +144,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
         private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
         {
             return await _processerContext.Alerts
-                .AsNoTracking()
                 .Select(x => x.PlateNumber)
                 .ToListAsync(cancellationToken);
         }
