@@ -16,7 +16,9 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public async Task<Agent> HandleAsync(CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await _processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null)
             {

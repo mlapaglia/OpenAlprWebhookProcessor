@@ -20,6 +20,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
 
         public async Task<GetLicensePlateFiltersResponse> HandleAsync(CancellationToken cancellationToken)
         {
+            _processerContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
             var response = new GetLicensePlateFiltersResponse
             {
                 VehicleMakes = await _processerContext.PlateGroups

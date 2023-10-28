@@ -21,9 +21,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             Guid cameraId,
             CancellationToken cancellationToken)
         {
-            var dbCamera = await _processorContext.Cameras.FirstOrDefaultAsync(x =>
-                x.Id == cameraId,
-                cancellationToken);
+            var dbCamera = await _processorContext.Cameras
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Id == cameraId,
+                    cancellationToken);
 
             var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
 
