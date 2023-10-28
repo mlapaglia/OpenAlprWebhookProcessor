@@ -70,7 +70,9 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -99,7 +101,9 @@ namespace OpenAlprWebhookProcessor.ImageRelay
             string imageId,
             CancellationToken cancellationToken)
         {
-            var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {

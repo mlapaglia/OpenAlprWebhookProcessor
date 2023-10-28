@@ -16,7 +16,9 @@ namespace OpenAlprWebhookProcessor.Settings.Enrichers
 
         public async Task<Enricher> HandleAsync(CancellationToken cancellationToken)
         {
-            var enricher = await _processorContext.Enrichers.FirstOrDefaultAsync(cancellationToken);
+            var enricher = await _processorContext.Enrichers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (enricher == null)
             {

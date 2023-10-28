@@ -17,7 +17,9 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public async Task<List<WebhookForward>> HandleAsync(CancellationToken cancellationToken)
         {
-            var webhookForwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+            var webhookForwards = await _processorContext.WebhookForwards
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
             var forwards = new List<WebhookForward>();
 

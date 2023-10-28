@@ -86,7 +86,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 }
                 else
                 {
-                    _logger.LogInformation("Unknown payload received, ignoring: " + rawWebhook);
+                    _logger.LogInformation("Unknown payload received, ignoring: {rawWebhook}", rawWebhook);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         [HttpGet]
         public ActionResult Get()
         {
-            _logger.LogInformation("test succeeded from: " + Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("test succeeded from: {remoteIpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
             return Ok("Webhook Processor");
         }
     }

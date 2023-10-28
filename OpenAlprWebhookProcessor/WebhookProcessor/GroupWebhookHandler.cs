@@ -50,7 +50,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             bool isBulkImport,
             CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await _processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
             PlateGroupRaw rawDebugPlateGroup = null;
 
             if (agent.IsDebugEnabled)
@@ -68,6 +71,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             }
 
             var camera = await _processorContext.Cameras
+                .AsNoTracking()
                 .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -184,7 +188,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     }
                 }
 
-                var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+                var forwards = await _processorContext.WebhookForwards
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
 
                 foreach (var forward in forwards)
                 {

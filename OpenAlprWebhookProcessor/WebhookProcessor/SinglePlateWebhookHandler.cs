@@ -33,6 +33,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras
+                .AsNoTracking()
                 .Where(x => x.OpenAlprCameraId == webhook.CameraId)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -63,7 +64,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
             }
 
-            var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+            var forwards = await _processorContext.WebhookForwards
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
             foreach (var forward in forwards)
             {
