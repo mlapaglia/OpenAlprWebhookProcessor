@@ -26,7 +26,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ForwardsComponent } from './forwards/forwards.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -73,7 +72,6 @@ import { MatRadioModule } from '@angular/material/radio';
     MatProgressSpinnerModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    FlexLayoutModule,
     MatSlideToggleModule,
     MatCheckboxModule,
     MatRadioModule,

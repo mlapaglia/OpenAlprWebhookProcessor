@@ -4,30 +4,30 @@
       <mat-card-title>{{camera.ipAddress}}</mat-card-title>
       <mat-card-subtitle>{{camera.manufacturer}} {{camera.modelNumber}}</mat-card-subtitle>
     </mat-card-header>
+    <img
+        mat-card-image
+        class="sample-image"
+        src="{{camera.sampleImageUrl}}"
+        *ngIf="camera.sampleImageUrl"
+        [hidden]="isLoadingImage || isLoadingFailed"
+        (load)="imageLoaded()"
+        (error)="imageFailedToLoad()"
+        alt="last capture from camera">
     <mat-card-content>
-        <div style="height:200px;" fxLayoutAlign="center">
-            <div [hidden]="!isLoadingImage">
-                <mat-progress-spinner
-                    style="margin-top: 50%;"
-                    color="primary"
-                    mode="indeterminate">
-                </mat-progress-spinner>
-            </div>
-            <img
-                mat-card-image
-                class="sample-image"
-                src="{{camera.sampleImageUrl}}"
-                *ngIf="camera.sampleImageUrl"
-                [hidden]="isLoadingImage || isLoadingFailed"
-                (load)="imageLoaded()"
-                (error)="imageFailedToLoad()"
-                alt="last capture from camera">
-            <div *ngIf="!camera.sampleImageUrl || isLoadingFailed" class="sample-image">
-                <mat-icon
-                    style="font-size: 100px;"
-                    [inline]="true"
-                    matTooltip="Image will display after first plate capture">help_center</mat-icon>
-            </div>
+        <div [hidden]="!isLoadingImage"
+            style="height:200px; display: flex; justify-content: center; align-items: center;">
+            <mat-progress-spinner
+                color="primary"
+                mode="indeterminate">
+            </mat-progress-spinner>
+        </div>
+        <div *ngIf="!camera.sampleImageUrl || isLoadingFailed"
+            class="sample-image"
+            style="height:200px; display: flex; justify-content: center; align-items: center;">
+            <mat-icon
+                style="font-size: 100px;"
+                [inline]="true"
+                matTooltip="Image will display after first plate capture">help_center</mat-icon>
         </div>
         <div>
             <b>Camera Manufacturer: </b> {{camera.manufacturer}}
@@ -55,16 +55,17 @@
     </mat-card-actions>
 </mat-card>
 <mat-card class="example-card" *ngIf="!camera.id">
-    <mat-card-header fxLayoutAlign="center">
+    <mat-card-header>
         <mat-card-title>Add new camera</mat-card-title>
     </mat-card-header>
-    <mat-card-content fxLayoutAlign="center">
-        <div style="height:200px;" fxLayoutAlign="center">
+    <mat-card-content>
+        <div class="sample-image"
+            style="height:200px; display: flex; justify-content: center; align-items: center;">
             <mat-icon
-                (click)="addCamera()"
-                color="primary"
-                style="font-size: 100px; cursor: pointer; margin: 50%;"
-                [inline]="true">add_box</mat-icon>
+            style="font-size: 100px;"
+            (click)="addCamera()"
+            inline="true"
+            color="primary">add_box</mat-icon>
         </div>
     </mat-card-content>
 </mat-card>

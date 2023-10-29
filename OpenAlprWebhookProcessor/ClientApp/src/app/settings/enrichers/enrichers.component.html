@@ -15,7 +15,7 @@
                     <input matInput [(ngModel)]="enricher.apiKey">
                     <mat-icon matTooltip="The LicensePlateData API key, provided via email from provider." style="cursor:default" matSuffix>help_center</mat-icon>
                 </mat-form-field>
-                <mat-radio-group [(ngModel)]="enricher.enrichmentType" aria-label="Enrichment type" fxFlex="80" style="display: flex; flex-direction: column;">
+                <mat-radio-group [(ngModel)]="enricher.enrichmentType" aria-label="Enrichment type" style="display: flex; flex-direction: column;">
                     <mat-radio-button value="Always">Enrich every plate</mat-radio-button>
                     <mat-radio-button value="OnlyAtNight">Enrich plates during night mode</mat-radio-button>
                     <mat-radio-button value="Manually">Only enrich manually</mat-radio-button>

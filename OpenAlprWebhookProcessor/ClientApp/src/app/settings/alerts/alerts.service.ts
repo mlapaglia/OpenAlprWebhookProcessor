@@ -15,7 +15,7 @@ export class AlertsService {
     }
 
     deleteAlert(alertId: string) {
-        return this.http.delete(`/alerts/${alertId}`, null);
+        return this.http.delete(`/alerts/${alertId}`);
     }
 
     upsertAlerts(alerts: Alert[]) {

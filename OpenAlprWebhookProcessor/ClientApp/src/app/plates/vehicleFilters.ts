@@ -1,13 +1,13 @@
 export interface VehicleFilters {
-    vehicleMakes: string[];
+    vehicleMakes?: string[];
 
-    vehicleModels: string[];
+    vehicleModels?: string[];
 
-    vehicleTypes: string[];
+    vehicleTypes?: string[];
 
-    vehicleYears: string[];
+    vehicleYears?: string[];
 
-    vehicleColors: string[];
+    vehicleColors?: string[];
 
-    vehicleRegions: string[];
+    vehicleRegions?: string[];
 }

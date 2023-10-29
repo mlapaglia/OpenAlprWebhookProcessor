@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
 import { Url } from 'url';
 import { PlateService } from '../plate.service';
@@ -61,12 +61,12 @@ export class PlateComponent implements OnInit {
 
       this.plateStatistics.push({
         key: "First seen",
-        value: this.datePipe.transform(result.firstSeen, 'medium'),
+        value: this.datePipe.transform(result.firstSeen, 'medium') || "",
       });
 
       this.plateStatistics.push({
         key: "Last seen",
-        value: this.datePipe.transform(result.lastSeen, 'medium'),
+        value: this.datePipe.transform(result.lastSeen , 'medium') || "",
       });
 
       this.plateStatistics.push({

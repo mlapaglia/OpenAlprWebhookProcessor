@@ -42,7 +42,7 @@ export class SettingsService {
   }
 
   deleteIgnore(ignoreId: string) {
-    return this.http.delete(`/settings/ignores/${ignoreId}`, null);
+    return this.http.delete(`/settings/ignores/${ignoreId}`);
   }
 
   upsertIgnores(ignores: Ignore[]) {

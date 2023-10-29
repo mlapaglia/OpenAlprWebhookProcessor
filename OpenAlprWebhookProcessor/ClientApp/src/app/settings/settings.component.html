@@ -5,39 +5,37 @@
 	[fixedBottomGap]="0">
 		<mat-nav-list>
 			<mat-list-item (click)="openSettings('camera')">
+				<mat-icon matListItemIcon>videocam</mat-icon>
 				<span class="mobile-shrink">Cameras</span>
-				<mat-icon mat-list-icon>videocam</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('agent')">
+				<mat-icon matListItemIcon>api</mat-icon>
 				<span class="mobile-shrink">OpenALPR Watchman Agent</span>
-				<mat-icon mat-list-icon>api</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('alert')">
+				<mat-icon matListItemIcon>notifications_active</mat-icon>
 				<span class="mobile-shrink">Alerts</span>
-				<mat-icon mat-list-icon>notifications_active</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('ignore')">
+				<mat-icon matListItemIcon>alarm_off</mat-icon>
 				<span class="mobile-shrink">Ignores</span>
-				<mat-icon mat-list-icon>alarm_off</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('forwards')">
+				<mat-icon matListItemIcon>forward_to_inbox</mat-icon>
 				<span class="mobile-shrink">Webhook Forwards</span>
-				<mat-icon mat-list-icon>forward_to_inbox</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('logs')">
+				<mat-icon matListItemIcon>library_books</mat-icon>
 				<span class="mobile-shrink">System Logs</span>
-				<mat-icon mat-list-icon>library_books</mat-icon>
 			</mat-list-item>
 			<mat-list-item (click)="openSettings('enrichers')">
+				<mat-icon matListItemIcon>merge_type</mat-icon>
 				<span class="mobile-shrink">Enrichers</span>
-				<mat-icon mat-list-icon>merge_type</mat-icon>
 			</mat-list-item>
 		</mat-nav-list>
 	</mat-sidenav>
-
 	<mat-sidenav-content fullscreen>
         <app-cameras *ngIf="visibleSetting == 'camera'"></app-cameras>
-        <app-openalpr-webserver *ngIf="visibleSetting == 'webserver'"></app-openalpr-webserver>
 		<app-openalpr-agent *ngIf="visibleSetting == 'agent'"></app-openalpr-agent>
 		<app-ignores *ngIf="visibleSetting == 'ignore'"></app-ignores>
 		<app-alerts *ngIf="visibleSetting == 'alert'"></app-alerts>
@@ -45,5 +43,4 @@
 		<app-logs *ngIf="visibleSetting == 'logs'"></app-logs>
 		<app-enrichers *ngIf="visibleSetting == 'enrichers'"></app-enrichers>
 	</mat-sidenav-content>
-
 </mat-sidenav-container>

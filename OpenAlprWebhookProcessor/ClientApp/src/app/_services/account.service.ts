@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { User } from '@app/_models';
+import { User } from 'app/_models';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
@@ -14,7 +14,7 @@ export class AccountService {
     private router: Router,
     private http: HttpClient
   ) {
-    this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
+    this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user') || "{}") ?? new User);
     this.user = this.userSubject.asObservable();
   }
 
@@ -37,7 +37,6 @@ export class AccountService {
     this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe();
     this.stopRefreshTokenTimer();
     localStorage.removeItem('user');
-    this.userSubject.next(null);
     this.router.navigate(['/account/login']);
   }
 

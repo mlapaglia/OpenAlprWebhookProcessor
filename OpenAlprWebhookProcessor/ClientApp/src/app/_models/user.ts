@@ -1,4 +1,5 @@
 ﻿export class User {
+    isDeleting: boolean;
     id: string;
     username: string;
     password: string;

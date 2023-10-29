@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { SignalrService } from '@app/signalr/signalr.service';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
+import { SignalrService } from 'app/signalr/signalr.service';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Subscription } from 'rxjs';
 import { SystemLogsService } from './systemLogs.service';
 

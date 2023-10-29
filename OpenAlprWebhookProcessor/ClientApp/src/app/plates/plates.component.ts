@@ -2,22 +2,21 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { SignalrService } from '@app/signalr/signalr.service';
+import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
-import { Ignore } from '@app/settings/ignores/ignore/ignore';
-import { SettingsService } from '@app/settings/settings.service';
-import { Alert } from '@app/settings/alerts/alert/alert';
-import { AlertsService } from '@app/settings/alerts/alerts.service';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import { Ignore } from 'app/settings/ignores/ignore/ignore';
+import { SettingsService } from 'app/settings/settings.service';
+import { Alert } from 'app/settings/alerts/alert/alert';
+import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
-import { LocalStorageService } from '@app/_services/local-storage.service';
-import { timeStamp } from 'console';
+import { LocalStorageService } from 'app/_services/local-storage.service';
 
 @Component({
   selector: 'app-plates',
@@ -332,9 +331,11 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       if (result) {
         var plateToSave = this.plates.find(x => x.id == plateId);
 
-        this.plateService.upsertPlate(plateToSave).subscribe(_ => {
-          this.searchPlates();
-        });
+        if(plateToSave !== undefined) {
+          this.plateService.upsertPlate(plateToSave).subscribe(_ => {
+            this.searchPlates();
+          });
+        }
       }
     });
   }

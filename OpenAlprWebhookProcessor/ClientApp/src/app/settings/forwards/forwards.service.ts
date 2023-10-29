@@ -14,7 +14,7 @@ export class ForwardsService {
   }
 
   deleteForward(forwardsId: string) {
-    return this.http.delete(`/settings/forwards/${forwardsId}`, null);
+    return this.http.delete(`/settings/forwards/${forwardsId}`);
   }
 
   upsertForwards(forwards: Forward[]) {

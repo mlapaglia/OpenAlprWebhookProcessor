@@ -1,8 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Camera } from '../camera';
 import { EditCameraService } from './edit-camera.service';
 import { ZoomFocus } from './zoomfocus';

@@ -54,7 +54,7 @@ export class CamerasComponent implements OnInit {
   }
 
   public addCamera() {
-    this.openEditDialog(null);
+    this.openEditDialog("");
   }
 
   public deleteCamera($event: string) {

@@ -25,7 +25,7 @@ export class CameraComponent implements OnInit {
   }
 
   public addCamera() {
-    this.add.emit(null);
+    this.add.emit(undefined);
   }
 
   public editCamera() {

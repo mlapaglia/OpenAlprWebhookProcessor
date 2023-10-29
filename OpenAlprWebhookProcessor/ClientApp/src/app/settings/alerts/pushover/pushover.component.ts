@@ -1,8 +1,8 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Pushover } from './pushover';
 import { PushoverService } from './pushover.service';
 

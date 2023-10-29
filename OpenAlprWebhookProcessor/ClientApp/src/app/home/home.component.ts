@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { User } from '@app/_models';
-import { AccountService } from '@app/_services';
+import { User } from 'app/_models';
+import { AccountService } from 'app/_services';
 import { HomeService } from './home.service';
 import { DayCount } from './plateCountResponse';
 
@@ -9,7 +9,7 @@ export class HomeComponent implements OnInit {
     user: User;
     public plateCounts: any[];
 
-    view: any[] = [700, 400];
+    view: [number, number] = [700, 400];
     constructor(
         private accountService: AccountService,
         private homeService: HomeService) {

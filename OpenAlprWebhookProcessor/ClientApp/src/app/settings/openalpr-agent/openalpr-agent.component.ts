@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { SnackbarService } from '@app/snackbar/snackbar.service';
-import { SnackBarType } from '@app/snackbar/snackbartype';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
 import { Agent } from './agent';
 

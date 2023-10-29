@@ -7,7 +7,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -38,7 +37,6 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatPaginatorModule,
     MatTableModule,
     MatIconModule,
-    FlexLayoutModule,
     MatCardModule,
     MatDatepickerModule,
     MatNativeDateModule,
