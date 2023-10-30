@@ -153,7 +153,7 @@ namespace OpenAlprWebhookProcessor.Users
                 user.PasswordHash,
                 user.PasswordSalt))
             {
-                return null; 
+                return null;
             }
 
             var jwtToken = await GenerateJwtTokenAsync(user);
@@ -175,7 +175,7 @@ namespace OpenAlprWebhookProcessor.Users
             string ipAddress,
             CancellationToken cancellationToken)
         {
-            var user = await _usersContext.Users.SingleOrDefaultAsync(u => 
+            var user = await _usersContext.Users.SingleOrDefaultAsync(u =>
                 u.RefreshTokens.Any(t => t.Token == token),
                 cancellationToken);
 
@@ -285,16 +285,8 @@ namespace OpenAlprWebhookProcessor.Users
                     SecurityAlgorithms.HmacSha256Signature)
             };
 
-            try
-            {
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
-            }
-            catch (Exception ex)
-            {
-                Console.Write("something wrong");
-                throw ex;
-            }
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         private static RefreshToken GenerateRefreshToken(string ipAddress)
