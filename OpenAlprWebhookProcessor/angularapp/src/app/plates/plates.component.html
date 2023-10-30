@@ -13,8 +13,8 @@
         </mat-expansion-panel-header>
       </mat-expansion-panel>
       <mat-expansion-panel *ngFor="let plate of plates">
-        <mat-expansion-panel-header [ngClass]="{'alert': plate.isAlert === true, 'ignore': plate.isIgnore === true}">
-          <mat-panel-title style="display: flex; align-content: flex-start;">
+        <mat-expansion-panel-header [ngClass]="{'alertPlate': plate.isAlert === true, 'ignorePlate': plate.isIgnore === true}">
+          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlateText': plate.isIgnore === true}">
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">{{plate.openAlprCameraId}}</span>
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;">{{plate.plateNumber}}</span>
             <span style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile"> {{plate.vehicleDescription}}</span>
@@ -146,7 +146,8 @@
       <button mat-raised-button
         style="margin: 8px 8px 8px 0;"
         color="primary"
-        [disabled]="!this.filterPlateNumberIsValid">Apply</button>
+        [disabled]="!this.filterPlateNumberIsValid"
+        (click)="searchPlates()">Apply</button>
       <button mat-raised-button
         color="warn"
         (click)="clearFilters()">Clear</button>
