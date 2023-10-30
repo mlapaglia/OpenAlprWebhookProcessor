@@ -252,10 +252,15 @@ namespace OpenAlprWebhookProcessor.Users
             {
                 jwtKey = new JwtKey
                 {
-                    Key = GenerateJwtSecretKey(30)
+                    Key = GenerateJwtSecretKey(128)
                 };
 
                 _usersContext.Add(jwtKey);
+                await _usersContext.SaveChangesAsync();
+            }
+            else if (jwtKey.Key.Length < 128)
+            {
+                jwtKey.Key = GenerateJwtSecretKey(128);
                 await _usersContext.SaveChangesAsync();
             }
 
@@ -280,16 +285,24 @@ namespace OpenAlprWebhookProcessor.Users
                     SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            try
+            {
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                Console.Write("something wrong");
+                throw ex;
+            }
         }
 
         private static RefreshToken GenerateRefreshToken(string ipAddress)
         {
-            using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
+            using (var rng = RandomNumberGenerator.Create())
             {
-                var randomBytes = new byte[64];
-                rngCryptoServiceProvider.GetBytes(randomBytes);
+                var randomBytes = new byte[128];
+                rng.GetBytes(randomBytes);
                 return new RefreshToken
                 {
                     Token = Convert.ToBase64String(randomBytes),
@@ -361,10 +374,12 @@ namespace OpenAlprWebhookProcessor.Users
 
         private static string GenerateJwtSecretKey(int keyLength)
         {
-            RNGCryptoServiceProvider rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            byte[] randomBytes = new byte[keyLength];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
-            return Convert.ToBase64String(randomBytes);
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                byte[] randomBytes = new byte[keyLength];
+                rng.GetBytes(randomBytes);
+                return Convert.ToBase64String(randomBytes);
+            }
         }
     }
 }

@@ -34,10 +34,12 @@ export class AccountService {
   }
 
   logout() {
-    this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe();
-    this.stopRefreshTokenTimer();
-    localStorage.removeItem('user');
-    this.router.navigate(['/account/login']);
+    this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe(() => {
+      this.stopRefreshTokenTimer();
+      this.userValue.jwtToken = '';
+      localStorage.removeItem('user');
+      this.router.navigate(['/account/login']);
+    });
   }
 
   refreshToken() {
