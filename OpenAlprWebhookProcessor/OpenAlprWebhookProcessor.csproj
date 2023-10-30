@@ -48,6 +48,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="angularapp\angular.json" />
+	  <Content Include="angularapp\e2e\tsconfig.json" />
+	  <Content Include="angularapp\package-lock.json" />
+	  <Content Include="angularapp\package.json" />
+	  <Content Include="angularapp\tsconfig.app.json" />
+	  <Content Include="angularapp\tsconfig.json" />
+	  <Content Include="angularapp\tsconfig.spec.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Folder Include="config\" />
 	</ItemGroup>
 
