@@ -137,7 +137,7 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                configuration.RootPath = "angularapp/dist";
             });
 
             services.AddScoped<IUserService, UserService>();
@@ -290,7 +290,7 @@ namespace OpenAlprWebhookProcessor
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "angularapp";
 
                 if (env.IsDevelopment())
                 {
