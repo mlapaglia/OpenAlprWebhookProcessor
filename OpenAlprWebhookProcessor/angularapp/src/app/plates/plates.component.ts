@@ -96,7 +96,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private eventSubscriptions = new Subscription();
   private searchSubscription = new Subscription();
-
+  private filterSubscription = new Subscription();
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
   constructor(
@@ -125,6 +126,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.eventSubscriptions.unsubscribe();
     this.searchSubscription.unsubscribe();
+    this.filterSubscription.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -166,7 +168,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public populateFilters() {
-    this.plateService.getFilters().subscribe(result => {
+    this.filterSubscription = this.plateService.getFilters().subscribe(result => {
       this.vehicleFilters = result;
     });
   }

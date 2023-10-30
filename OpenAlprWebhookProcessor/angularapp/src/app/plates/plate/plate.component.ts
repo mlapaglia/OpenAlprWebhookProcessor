@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
@@ -7,13 +7,14 @@ import { Url } from 'url';
 import { PlateService } from '../plate.service';
 import { Plate } from './plate';
 import { PlateStatisticsData } from './plateStatistics';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-plate',
   templateUrl: './plate.component.html',
   styleUrls: ['./plate.component.less']
 })
-export class PlateComponent implements OnInit {
+export class PlateComponent implements OnInit, OnDestroy {
   @Input() plate: Plate;
 
   public loadingImage: boolean;
@@ -26,6 +27,8 @@ export class PlateComponent implements OnInit {
 
   public plateStatistics: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
+
+  private statisticsSubscription = new Subscription();
 
   constructor(
     private lightbox: Lightbox,
@@ -40,9 +43,13 @@ export class PlateComponent implements OnInit {
     this.getPlateStatistics();
   }
 
+  ngOnDestroy(): void {
+    this.statisticsSubscription.unsubscribe();
+  }
+
   private getPlateStatistics() {
     this.loadingStatistics = true;
-    this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe(result => {
+    this.statisticsSubscription = this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe(result => {
       this.loadingStatistics = false;
       this.plateStatistics.push({
         key: "Confidence",

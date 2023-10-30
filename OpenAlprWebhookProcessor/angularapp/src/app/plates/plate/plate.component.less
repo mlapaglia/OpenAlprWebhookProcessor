@@ -24,10 +24,19 @@
   .resize-mobile {
       max-width:100%;
   }
+
+  .mobilePlateContainer {
+    flex-direction: column;
+  }
 }
+
 @media only screen and (min-width: 1027px) {
   .resize-mobile {
     max-height: 300px; 
     max-width: 500px;
+  }
+
+  .mobilePlateContainer {
+    flex-direction: row;
   }
 }
