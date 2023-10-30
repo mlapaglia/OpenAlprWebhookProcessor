@@ -22,7 +22,7 @@ export class AccountService {
     return this.userSubject.value;
   }
 
-  login(username, password) {
+  login(username: string, password: string) {
     return this.http.post<User>(`/users/authenticate`, { username, password })
       .pipe(map(user => {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
@@ -34,12 +34,20 @@ export class AccountService {
   }
 
   logout() {
+    this.stopRefreshTokenTimer();
+
     this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe(() => {
-      this.stopRefreshTokenTimer();
-      this.userValue.jwtToken = '';
-      localStorage.removeItem('user');
-      this.router.navigate(['/account/login']);
+      this.finalizeLogout();
+    },
+    (error) => {
+      this.finalizeLogout();
     });
+  }
+
+  finalizeLogout() {
+    this.userValue.jwtToken = '';
+    localStorage.removeItem('user');
+    this.router.navigate(['/account/login']);
   }
 
   refreshToken() {
