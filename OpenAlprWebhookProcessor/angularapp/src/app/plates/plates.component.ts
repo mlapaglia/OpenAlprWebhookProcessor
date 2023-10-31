@@ -60,6 +60,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   panelOpenState = false;
   public range: FormGroup;
   public plates: Plate[] = [];
+  public visiblePlateIds: string[] = [];
   public totalNumberOfPlates: number;
   public todaysDate: Date;
 
@@ -158,6 +159,18 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }));
   }
 
+  public plateOpened(plateId: string) {
+    this.visiblePlateIds.push(plateId);
+  }
+
+  public plateClosed(plateIdToRemove: string) {
+    this.visiblePlateIds.forEach((plateId, index) => {
+      if(plateId === plateIdToRemove) {
+        this.visiblePlateIds.splice(index, 1);
+      }
+    })
+  }
+
   public onPaginatorPage($event) {
     this.pageSize = $event.pageSize;
     this.localStorageService.setData(this.pageSizeCacheKey, this.pageSize);
@@ -168,9 +181,9 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public populateFilters() {
-    this.filterSubscription = this.plateService.getFilters().subscribe(result => {
+    this.filterSubscription.add(this.plateService.getFilters().subscribe(result => {
       this.vehicleFilters = result;
-    });
+    }));
   }
 
   public searchPlates(plateNumber: string = '') {
@@ -207,14 +220,14 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this.isLoading = true;
-    this.searchSubscription = this.plateService.searchPlates(request).subscribe(result => {
+    this.searchSubscription.add(this.plateService.searchPlates(request).subscribe(result => {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = result.plates;
       this.isLoading = false;
     }, error => {
       this.isLoading = false;
       this.snackbarService.create(`Error searching for plates, check the logs`, SnackBarType.Error)
-    });
+    }));
   }
 
   public deletePlate(plateId: string = '', plateNumber: string = '') {

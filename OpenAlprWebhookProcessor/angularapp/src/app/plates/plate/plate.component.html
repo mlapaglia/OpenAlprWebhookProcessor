@@ -10,7 +10,7 @@
                 mode="indeterminate"
                 diameter="100"
                 [hidden]="!loadingImage"></mat-progress-spinner>
-            <img [src]="plate.imageUrl"
+            <img [src]="this.imageUrl"
                 class="resize-mobile"
                 style="cursor: pointer;"
                 [hidden]="loadingImage || loadingImageFailed"
@@ -18,7 +18,7 @@
                 (error)="imageFailedToLoad()"
                 (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
             <mat-icon style="font-size: 100px; margin-top:100px;"
-                *ngIf="!plate.imageUrl || loadingImageFailed"
+                *ngIf="!this.imageUrl|| loadingImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
             <mat-progress-spinner
@@ -27,14 +27,14 @@
                 mode="indeterminate"
                 diameter="100">
             </mat-progress-spinner>
-            <img [src]="plate.cropImageUrl"
+            <img [src]="this.plateImageUrl"
                 class="resize-mobile"
                 style="width: 500px;"
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />
             <mat-icon style="font-size: 100px; margin-top:100px;"
-                *ngIf="!plate.cropImageUrl || loadingPlateImageFailed"
+                *ngIf="!this.plateImageUrl || loadingPlateImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
         </mat-card-content>

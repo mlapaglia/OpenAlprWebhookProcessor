@@ -12,9 +12,9 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
       </mat-expansion-panel>
-      <mat-expansion-panel *ngFor="let plate of plates">
+      <mat-expansion-panel *ngFor="let plate of plates" (opened)="plateOpened(plate.id)" (closed)="plateClosed(plate.id)">
         <mat-expansion-panel-header [ngClass]="{'alertPlate': plate.isAlert === true, 'ignorePlate': plate.isIgnore === true}">
-          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlateText': plate.isIgnore === true}">
+          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlate': plate.isIgnore === true}">
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">{{plate.openAlprCameraId}}</span>
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;">{{plate.plateNumber}}</span>
             <span style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile"> {{plate.vehicleDescription}}</span>
@@ -23,7 +23,7 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <app-plate [plate]="plate"></app-plate>
+          <app-plate [isVisible]="visiblePlateIds.includes(plate.id)" [plate]="plate"></app-plate>
         </ng-template>
         <mat-action-row style="display: flex; flex-wrap: wrap;">
           <button mat-button color="primary" [disabled]="!plate.canBeEnriched" [class.spinner]="isEnrichingPlate" (click)="enrichPlate(plate.id)">Enrich plate</button>
