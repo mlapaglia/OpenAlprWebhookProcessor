@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
@@ -14,15 +14,15 @@ import { Subscription } from 'rxjs';
   templateUrl: './plate.component.html',
   styleUrls: ['./plate.component.less']
 })
-export class PlateComponent implements OnInit, OnChanges {
+export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   @Input() plate: Plate;
   @Input() isVisible: boolean;
 
   public isInitialized: boolean;
 
-  public loadingImage: boolean;
-  public imageUrl: string;
-  public loadingImageFailed: boolean;
+  public loadingVehicleImage: boolean;
+  public vehicleImageUrl: string;
+  public loadingVehicleImageFailed: boolean;
 
   public loadingPlateImage: boolean;
   public loadingPlateImageFailed: boolean;
@@ -45,7 +45,7 @@ export class PlateComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit(): void {
-    this.loadingImage = true;
+    this.loadingVehicleImage = true;
     this.loadingPlateImage = true;
     this.getPlateStatistics();
     this.getPlateImages();
@@ -59,8 +59,8 @@ export class PlateComponent implements OnInit, OnChanges {
         this.loadingStatisticsFailed = false;
         this.statisticsSubscription.unsubscribe();
 
-        if(this.loadingImage) {
-          this.imageUrl = '';
+        if(this.loadingVehicleImage) {
+          this.vehicleImageUrl = '';
         }
 
         if(this.loadingPlateImage) {
@@ -75,6 +75,12 @@ export class PlateComponent implements OnInit, OnChanges {
         this.getPlateImages();
       }
     }
+  }
+
+  ngOnDestroy(): void {
+      this.statisticsSubscription.unsubscribe();
+      this.vehicleImageUrl = '';
+      this.plateImageUrl = '';
   }
 
   private getPlateStatistics() {
@@ -131,10 +137,10 @@ export class PlateComponent implements OnInit, OnChanges {
   }
 
   private getPlateImages() {
-    if(!this.imageUrl) {
-      this.loadingImage = true;
-      this.loadingImageFailed = false;
-      this.imageUrl = this.plate.imageUrl.toString();
+    if(!this.vehicleImageUrl) {
+      this.loadingVehicleImage = true;
+      this.loadingVehicleImageFailed = false;
+      this.vehicleImageUrl = this.plate.imageUrl.toString();
     }
     
     if(!this.plateImageUrl) {
@@ -154,13 +160,13 @@ export class PlateComponent implements OnInit, OnChanges {
     this.lightbox.open(albums, 0);
   }
 
-  public imageLoaded() {
-    this.loadingImage = false;
+  public vehicleImageLoaded() {
+    this.loadingVehicleImage = false;
   }
 
-  public imageFailedToLoad() {
-    this.loadingImage = false;
-    this.loadingImageFailed = true;
+  public vehicleImageFailedToLoad() {
+    this.loadingVehicleImage = false;
+    this.loadingVehicleImageFailed = true;
   }
 
   public plateImageLoaded() {

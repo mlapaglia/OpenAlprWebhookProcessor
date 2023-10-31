@@ -9,16 +9,16 @@
                 color="primary"
                 mode="indeterminate"
                 diameter="100"
-                [hidden]="!loadingImage"></mat-progress-spinner>
-            <img [src]="this.imageUrl"
+                [hidden]="!loadingVehicleImage"></mat-progress-spinner>
+            <img [src]="this.vehicleImageUrl"
                 class="resize-mobile"
                 style="cursor: pointer;"
-                [hidden]="loadingImage || loadingImageFailed"
-                (load)="imageLoaded()"
-                (error)="imageFailedToLoad()"
+                [hidden]="loadingVehicleImage || loadingVehicleImageFailed"
+                (load)="vehicleImageLoaded()"
+                (error)="vehicleImageFailedToLoad()"
                 (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
             <mat-icon style="font-size: 100px; margin-top:100px;"
-                *ngIf="!this.imageUrl|| loadingImageFailed"
+                *ngIf="!this.vehicleImageUrl|| loadingVehicleImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
             <mat-progress-spinner
