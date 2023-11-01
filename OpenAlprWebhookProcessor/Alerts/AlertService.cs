@@ -96,7 +96,7 @@ namespace OpenAlprWebhookProcessor.Alerts
                                 Id = result.Id,
                                 PlateNumber = result.BestNumber,
                             },
-                            result.PlatePreviewJpeg,
+                            result.PlateJpeg,
                             _cancellationTokenSource.Token);
                         }
                         catch (Exception ex)

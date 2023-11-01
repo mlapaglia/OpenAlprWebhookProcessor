@@ -2,6 +2,7 @@ export class Agent {
     endpointUrl: string;
     hostname: string;
     isDebugEnabled: boolean;
+    isImageCompressionEnabled: boolean;
     latitude: number;
     longitude: number;
     uid: string;

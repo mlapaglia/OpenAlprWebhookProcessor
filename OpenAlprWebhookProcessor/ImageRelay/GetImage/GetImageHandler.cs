@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ImageMagick;
+using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.IO;
@@ -20,6 +21,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 .Where(x => x.OpenAlprUuid == imageId)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            var isImageCompressionEnabled = await processorContext.Agents
+                .AsNoTracking()
+                .Select(x => x.IsImageCompressionEnabled)
+                .FirstOrDefaultAsync(cancellationToken);
+
             if (plateGroup == null)
             {
                 throw new ArgumentException("No image found with that id.");
@@ -31,6 +37,8 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     processorContext,
                     imageId,
                     cancellationToken);
+
+                plateGroup.isVehicleJpegCompressed = isImageCompressionEnabled;
 
                 await processorContext.SaveChangesAsync(cancellationToken);
             }
@@ -47,6 +55,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 .Where(x => x.OpenAlprUuid == imageId)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            var isImageCompressionEnabled = await processorContext.Agents
+                .AsNoTracking()
+                .Select(x => x.IsImageCompressionEnabled)
+                .FirstOrDefaultAsync();
+
             if (plateGroup == null)
             {
                 throw new ArgumentException("No image found with that id.");
@@ -58,6 +71,8 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                     processorContext,
                     imageId + "?" + plateGroup.PlateCoordinates,
                     cancellationToken);
+
+                plateGroup.isPlateJpegCompressed = isImageCompressionEnabled;
 
                 await processorContext.SaveChangesAsync(cancellationToken);
             }
@@ -93,7 +108,9 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 throw new ArgumentException("Image not found for that id.");
             }
 
-            return await result.Content.ReadAsByteArrayAsync(cancellationToken);
+            var imageBytes = await result.Content.ReadAsByteArrayAsync(cancellationToken);
+
+            return agent.IsImageCompressionEnabled ? CompressImage(imageBytes) : imageBytes;
         }
 
         public async static Task<byte[]> GetCropImageFromAgentAsync(
@@ -124,7 +141,28 @@ namespace OpenAlprWebhookProcessor.ImageRelay
                 throw new ArgumentException("Image not found for that id.");
             }
 
-            return await result.Content.ReadAsByteArrayAsync(cancellationToken);
+            var imageBytes = await result.Content.ReadAsByteArrayAsync(cancellationToken);
+
+            return agent.IsImageCompressionEnabled ? CompressImage(imageBytes) : imageBytes;
+        }
+
+        public static byte[] CompressImage(byte[] rawImage)
+        {
+            var optimizer = new ImageOptimizer();
+
+            try
+            {
+                using (var stream = new MemoryStream(rawImage))
+                {
+                    optimizer.Compress(stream);
+
+                    return stream.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

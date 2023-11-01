@@ -30,6 +30,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 EndpointUrl = agent.EndpointUrl,
                 Hostname = agent.Hostname,
                 IsDebugEnabled = agent.IsDebugEnabled,
+                IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
                 Latitude = agent.Latitude,
                 Longitude = agent.Longitude,
                 OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,

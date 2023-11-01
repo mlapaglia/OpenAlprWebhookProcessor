@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
@@ -10,9 +11,10 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20231101133429_removePreviewJpegs")]
+    partial class removePreviewJpegs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.12");
@@ -30,9 +32,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDebugEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsImageCompressionEnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("LastSuccessfulScrapeEpoch")
@@ -287,12 +286,6 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.Property<string>("VehicleYear")
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("isPlateJpegCompressed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("isVehicleJpegCompressed")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

@@ -26,11 +26,7 @@ namespace OpenAlprWebhookProcessor.Data
 
         public byte[] PlateJpeg { get; set; }
 
-        public string PlatePreviewJpeg { get; set; }
-
         public byte[] VehicleJpeg { get; set; }
-
-        public string VehiclePreviewJpeg { get; set; }
 
         public double? AgentImageScrapeOccurredOn { get; set; }
 
@@ -55,6 +51,11 @@ namespace OpenAlprWebhookProcessor.Data
         public string Notes { get; set; }
 
         public bool IsEnriched { get; set; }
+
+        public bool isPlateJpegCompressed { get; set; }
+
+        public bool isVehicleJpegCompressed { get; set; }
+
 
         public static void OnModelCreating(ModelBuilder builder)
         {

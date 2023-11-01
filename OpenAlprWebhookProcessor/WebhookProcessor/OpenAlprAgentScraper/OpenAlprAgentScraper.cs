@@ -53,7 +53,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             DateTimeOffset lastSuccessfulScrape;
             if (agent.LastSuccessfulScrapeEpoch == 0)
             {
-                lastSuccessfulScrape = await GetEarliestGroupEpochAsync(agent, cancellationToken);
+                lastSuccessfulScrape = await GetEarliestGroupEpochAsync(
+                    agent,
+                    cancellationToken);
             }
             else
             {
@@ -63,10 +65,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             var startDate = DateTimeOffset.UtcNow;
             while (startDate > lastSuccessfulScrape)
             {
-                _logger.LogInformation("Scraping between "
-                   + lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString()
-                   + " and "
-                   + lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
+                _logger.LogInformation("Scraping between {startTime} and {endTime}",
+                    lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString(),
+                    lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
 
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
@@ -87,7 +88,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
 
-                _logger.LogInformation("Found " + metaDatasToQuery.Count + " entries for: " + lastSuccessfulScrape.ToString());
+                _logger.LogInformation("Found {count} entries for: {date}",
+                    metaDatasToQuery.Count,
+                    lastSuccessfulScrape.ToString());
 
                 foreach (var metadata in metaDatasToQuery)
                 {
@@ -103,7 +106,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                     if (!newGroup.IsSuccessStatusCode)
                     {
-                        _logger.LogError($"Bad response received from Agent: {newGroup.StatusCode} {newGroup.ReasonPhrase}");
+                        _logger.LogError("Bad response received from Agent: {statusCode} {reasonPhrase}", newGroup.StatusCode, newGroup.ReasonPhrase);
                         continue;
                     }
 
@@ -125,7 +128,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         continue;
                     }
 
-                    _logger.LogInformation("date: " + DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString() + " querying: " + metadata.Key);
+                    _logger.LogInformation("date: {date} querying: {key}", DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString(), metadata.Key);
 
                     try
                     {
@@ -169,6 +172,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             _logger.LogInformation("Searching for plates with missings images");
 
             var plateGroupIds = await _processorContext.PlateGroups
+                .AsNoTracking()
                 .Where(x => x.AgentImageScrapeOccurredOn == null)
                 .Select(x => x.OpenAlprUuid)
                 .ToListAsync(cancellationToken);
@@ -193,7 +197,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new ArgumentException("Unable to get earliest group epoch");
+                throw new ArgumentException($"Unable to get earliest group epoch: Status code: {result.StatusCode} Reason: {result.ReasonPhrase}");
             }
 
             var content = await result.Content.ReadAsStringAsync(cancellationToken);

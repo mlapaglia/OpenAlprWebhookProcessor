@@ -56,7 +56,7 @@
       <mat-form-field fxFlex="40">
         <mat-label>Sunrise Offset (minutes +/-)</mat-label>
         <mat-icon 
-            matTooltip="Default sunrise offsets to turn camera to day mode after of the actual sunrise (60 is an hour after"
+            matTooltip="Default sunrise offsets to turn camera to day mode after of the actual sunrise (60 is an hour after)"
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.sunriseOffset">
       </mat-form-field>
@@ -68,10 +68,17 @@
         <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
       </mat-form-field>
       <div>
-        <mat-label style="padding-right: 15px;">Debug Mode</mat-label>
         <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isDebugEnabled"></mat-checkbox>
+        <mat-label style="padding-right: 15px;">Debug Mode</mat-label>
         <mat-icon 
             matTooltip="Logs all incoming webhooks, use only for troubleshooting"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+      </div>
+      <div>
+        <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isImageCompressionEnabled"></mat-checkbox>
+        <mat-label style="padding-right: 15px;">Image Compression</mat-label>
+        <mat-icon 
+            matTooltip="Compresses images from the Watchman Agent before saving locally"
             style="cursor:default" matSuffix>help_center</mat-icon>
       </div>
 </div>
