@@ -14,7 +14,7 @@
       </mat-expansion-panel>
       <mat-expansion-panel *ngFor="let plate of plates" (opened)="plateOpened(plate.id)" (closed)="plateClosed(plate.id)">
         <mat-expansion-panel-header [ngClass]="{'alertPlate': plate.isAlert === true, 'ignorePlate': plate.isIgnore === true}">
-          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlate': plate.isIgnore === true}">
+          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlateText': plate.isIgnore === true}">
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">{{plate.openAlprCameraId}}</span>
             <span style="flex: 2; overflow: hidden; word-wrap: break-word;">{{plate.plateNumber}}</span>
             <span style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile"> {{plate.vehicleDescription}}</span>

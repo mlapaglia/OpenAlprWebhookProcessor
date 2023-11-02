@@ -67,6 +67,24 @@ namespace OpenAlprWebhookProcessor.Data
 
             builder.Entity<PlateGroup>()
                 .HasIndex(x => x.OpenAlprUuid);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleMake);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleMakeModel);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleColor);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleType);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleYear);
+
+            builder.Entity<PlateGroup>()
+                .HasIndex(x => x.VehicleRegion);
         }
     }
 }

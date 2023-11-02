@@ -167,7 +167,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                             lastReceivedOnEpoch = plateGroups.First().ReceivedOnEpoch;
                         }
 
-                        logger.LogInformation("Searcing for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, _imageRequestsToProcess.Count);
+                        logger.LogInformation("Searcing for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, plateGroups.Count);
 
                         foreach (var plateGroup in plateGroups)
                         {

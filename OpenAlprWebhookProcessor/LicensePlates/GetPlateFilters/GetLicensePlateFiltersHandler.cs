@@ -28,53 +28,51 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleMake))
                     .Select(x => x.VehicleMake)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleModels = await _processerContext.PlateGroups
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleMakeModel))
                     .Select(x => x.VehicleMakeModel)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleColors = await _processerContext.PlateGroups
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleColor))
                     .Select(x => x.VehicleColor)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleTypes = await _processerContext.PlateGroups
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleType))
                     .Select(x => x.VehicleType)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleYears = await _processerContext.PlateGroups
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleYear))
                     .Select(x => x.VehicleYear)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
                 VehicleRegions = await _processerContext.PlateGroups
                     .Where(x => !string.IsNullOrWhiteSpace(x.VehicleRegion))
                     .Select(x => x.VehicleRegion)
                     .Distinct()
-                    .OrderBy(x => x)
                     .ToListAsync(cancellationToken),
             };
 
             response.VehicleMakes = response.VehicleMakes
+                .OrderBy(x => x)
                 .Select(x => _textInfo?.ToTitleCase(x.Split('_')[0]))
                 .ToList();
 
             response.VehicleModels = response.VehicleModels
+                .OrderBy(x => x)
                 .Select(x => _textInfo?.ToTitleCase(x.Split('_')[1]))
                 .ToList();
 
             response.VehicleColors = response.VehicleColors
+                .OrderBy(x => x)
                 .Select(x => _textInfo?.ToTitleCase(x))
                 .ToList();
 
             response.VehicleTypes = response.VehicleTypes
+                .OrderBy(x => x)
                 .Select(x => _textInfo?.ToTitleCase(x))
                 .ToList();
 

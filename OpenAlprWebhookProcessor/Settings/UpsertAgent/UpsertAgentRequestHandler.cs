@@ -72,7 +72,7 @@ namespace OpenAlprWebhookProcessor.Settings
 
             await _processorContext.SaveChangesAsync();
 
-            if(wasImageCompressionEnabled)
+            if (wasImageCompressionEnabled)
             {
                 _imageRetrieverService.AddImageCompressionJob();
             }

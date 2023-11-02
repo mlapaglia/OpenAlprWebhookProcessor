@@ -304,7 +304,7 @@ namespace OpenAlprWebhookProcessor
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Debug)
                 .Enrich.FromLogContext()
                 .WriteTo.File(
-                    "log-.txt",
+                    "./config/log-.txt",
                     rollingInterval: RollingInterval.Day,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(5),
