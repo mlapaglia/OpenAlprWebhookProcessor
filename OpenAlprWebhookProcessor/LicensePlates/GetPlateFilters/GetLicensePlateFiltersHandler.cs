@@ -1,5 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -11,10 +15,15 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
     {
         private static readonly TextInfo _textInfo = CultureInfo.CurrentCulture.TextInfo;
 
+        private readonly ILogger<GetLicensePlateFiltersHandler> _logger;
+
         private readonly ProcessorContext _processerContext;
 
-        public GetLicensePlateFiltersHandler(ProcessorContext processerContext)
+        public GetLicensePlateFiltersHandler(
+            ILogger<GetLicensePlateFiltersHandler> logger,
+            ProcessorContext processerContext)
         {
+            _logger = logger;
             _processerContext = processerContext;
         }
 

@@ -120,6 +120,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
                     }
 
+
                     logger.LogInformation("finished job for image: {imageId}", job);
                 }
             }

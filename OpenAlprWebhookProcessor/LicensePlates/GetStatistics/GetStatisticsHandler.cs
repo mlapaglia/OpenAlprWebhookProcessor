@@ -20,19 +20,35 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             string plateNumber,
             CancellationToken cancellationToken)
         {
-            var plateStatistics = new PlateStatistics();
-
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
+            var query = _processorContext.PlateGroups
+                .AsNoTracking()
+                .Where(x => x.BestNumber == plateNumber)
+                .Select(x => x.ReceivedOnEpoch)
+                .ToQueryString();
+
             var seenPlates = await _processorContext.PlateGroups
-                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Any(x => x.Number == plateNumber))
+                .AsNoTracking()
+                .Where(x => x.BestNumber == plateNumber)
                 .Select(x => x.ReceivedOnEpoch)
                 .ToListAsync(cancellationToken);
 
-            plateStatistics.TotalSeen = seenPlates.Count;
+            var seenPossiblePlates = await _processorContext.PlateGroupPossibleNumbers
+                .AsNoTracking()
+                .Where(x => x.Number == plateNumber)
+                .Select(x => x.PlateGroup.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
 
-            plateStatistics.Last90Days = seenPlates
-                .Count(x => x > endingEpoch);
+            seenPlates.AddRange(seenPossiblePlates);
+            seenPlates = seenPlates.OrderBy(x => x).ToList();
+
+            var plateStatistics = new PlateStatistics
+            {
+                TotalSeen = seenPlates.Count,
+                Last90Days = seenPlates
+                    .Count(x => x > endingEpoch)
+            };
 
             var firstSeenEpoch = seenPlates
                 .FirstOrDefault();
@@ -43,9 +59,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             }
 
             var lastSeenEpoch = seenPlates
-                .OrderByDescending(x => x)
-                .Select(x => x)
-                .FirstOrDefault();
+                .LastOrDefault();
 
             if (lastSeenEpoch != 0)
             {

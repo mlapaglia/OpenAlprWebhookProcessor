@@ -86,9 +86,12 @@ namespace OpenAlprWebhookProcessor
 
             using (var context = new ProcessorContext(processorOptionsBuilder.Options))
             {
-                Log.Logger.Information("Datbase migration started, this may take a while...");
-                context.Database.Migrate();
-                Log.Logger.Information("Database migration completed.");
+                if (context.Database.GetPendingMigrations().Any())
+                {
+                    Console.WriteLine("Datbase migration started, this may take a while...");
+                    context.Database.Migrate();
+                    Console.WriteLine("Database migration completed.");
+                }
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
@@ -301,7 +304,7 @@ namespace OpenAlprWebhookProcessor
             });
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Debug)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
                 .Enrich.FromLogContext()
                 .WriteTo.File(
                     "./config/log-.txt",

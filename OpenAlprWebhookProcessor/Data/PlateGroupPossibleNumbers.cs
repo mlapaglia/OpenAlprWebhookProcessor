@@ -16,6 +16,9 @@ namespace OpenAlprWebhookProcessor.Data
         public static void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<PlateGroupPossibleNumbers>()
+                .HasIndex(x => x.Number);
+
+            builder.Entity<PlateGroupPossibleNumbers>()
                 .HasIndex(x => new { x.PlateGroupId, x.Number });
         }
     }
