@@ -22,12 +22,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
         {
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
-            var query = _processorContext.PlateGroups
-                .AsNoTracking()
-                .Where(x => x.BestNumber == plateNumber)
-                .Select(x => x.ReceivedOnEpoch)
-                .ToQueryString();
-
             var seenPlates = await _processorContext.PlateGroups
                 .AsNoTracking()
                 .Where(x => x.BestNumber == plateNumber)

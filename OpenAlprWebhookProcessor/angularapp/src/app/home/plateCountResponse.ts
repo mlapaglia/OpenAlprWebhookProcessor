@@ -1,8 +1,9 @@
 export interface DayCounts {
-    counts: DayCount[];
+  counts: DayCount[];
+  weeklyUniqueCounts: DayCount[];
 }
 
 export interface DayCount {
-    date: Date;
-    count: number;
+  date: Date;
+  count: number;
 }

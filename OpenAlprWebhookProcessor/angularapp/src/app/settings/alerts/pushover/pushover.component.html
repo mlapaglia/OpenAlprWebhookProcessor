@@ -8,7 +8,7 @@
             (change)="onPushoverToggle($event)"></mat-slide-toggle>
     </mat-card-header>
     <mat-card-content *ngIf="client.isEnabled" [@inOutAnimation]>
-        <div style="display: flex; flex-direction: column;" fxLayout="row wrap" fxLayout="row wrap" fxLayoutGap=20px>
+        <div style="display: flex; flex-direction: column;">
             <mat-form-field>
                 <mat-label>User Key</mat-label>
                 <input matInput [(ngModel)]="client.userKey">

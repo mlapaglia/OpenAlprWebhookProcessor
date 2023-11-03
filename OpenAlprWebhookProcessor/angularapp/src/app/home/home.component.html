@@ -1,27 +1,25 @@
-﻿<div style="margin-top:15px;" >
-    <div fxLayout="row wrap" fxLayout.lt-lg="column" fxLayoutGap="16px grid" fxLayoutAlign="space-around">
-        <mat-card>
-            <mat-card-header>
-                <mat-card-title>Plates Seen</mat-card-title>
-                <mat-card-subtitle>Last 7 days</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
-                <div fxLayoutAlign="center">
-                    <ngx-charts-bar-vertical
-                    [view]="view"
-                    [results]="plateCounts"
-                    [xAxis]="true"
-                    [yAxis]="true"
-                    [showXAxisLabel]="true"
-                    [showYAxisLabel]="true"
-                    [xAxisLabel]="xAxisLabel"
-                    [yAxisLabel]="yAxisLabel"
-                    [showGridLines]="true"
-                    [showDataLabel]="true"
-                    [legend]="false"
-                    [tooltipDisabled]="true"></ngx-charts-bar-vertical>
-                </div>
-            </mat-card-content>
-        </mat-card>
-    </div>
+<div style="display: flex; flex-direction: row; justify-content: space-around; padding-top: 16px;">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Plates Seen</mat-card-title>
+            <mat-card-subtitle>Last 7 days</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div>
+                <ngx-charts-bar-vertical
+                [view]="view"
+                [results]="plateCounts"
+                [xAxis]="true"
+                [yAxis]="true"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                [xAxisLabel]="xAxisLabel"
+                [yAxisLabel]="yAxisLabel"
+                [showGridLines]="true"
+                [showDataLabel]="true"
+                [legend]="false"
+                [tooltipDisabled]="true"></ngx-charts-bar-vertical>
+            </div>
+        </mat-card-content>
+    </mat-card>
 </div>
