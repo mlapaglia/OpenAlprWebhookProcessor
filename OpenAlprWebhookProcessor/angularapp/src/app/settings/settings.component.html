@@ -1,8 +1,10 @@
 <mat-sidenav-container class="example-container">
-	<mat-sidenav mode="side" opened
-	[fixedInViewport]="false"
-	[fixedTopGap]="0"
-	[fixedBottomGap]="0">
+	<mat-sidenav
+		mode="over"
+		[(opened)]="navBarVisible"
+		[fixedInViewport]="false"
+		[fixedTopGap]="0"
+		[fixedBottomGap]="0">
 		<mat-nav-list>
 			<mat-list-item (click)="openSettings('camera')">
 				<mat-icon matListItemIcon>videocam</mat-icon>

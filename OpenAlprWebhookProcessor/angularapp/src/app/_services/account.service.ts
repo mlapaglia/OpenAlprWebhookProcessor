@@ -48,6 +48,7 @@ export class AccountService {
     this.userValue.jwtToken = '';
     localStorage.removeItem('user');
     this.router.navigate(['/account/login']);
+    this.userSubject.next(new User());
   }
 
   refreshToken() {
