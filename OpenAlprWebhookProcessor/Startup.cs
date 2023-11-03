@@ -86,12 +86,7 @@ namespace OpenAlprWebhookProcessor
 
             using (var context = new ProcessorContext(processorOptionsBuilder.Options))
             {
-                if (context.Database.GetPendingMigrations().Any())
-                {
-                    Console.WriteLine("Datbase migration started, this may take a while...");
-                    context.Database.Migrate();
-                    Console.WriteLine("Database migration completed.");
-                }
+                context.Database.Migrate();
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
