@@ -112,6 +112,8 @@ namespace OpenAlprWebhookProcessor.Migrations
             migrationBuilder.DropColumn(
                 name: "isVehicleJpegCompressed",
                 table: "PlateGroups");
+
+            migrationBuilder.Sql("VACUUM;");
         }
 
         /// <inheritdoc />
