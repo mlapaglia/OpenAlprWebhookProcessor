@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
         public async Task HandleAsync(CancellationToken cancellationToken)
         {
             var testPlateGroup = await _processorContext.PlateGroups
-                .Where(x => x.PlateJpeg != null)
+                .Where(x => x.PlateImage != null)
                 .FirstOrDefaultAsync(cancellationToken);
 
             await _alertClient.VerifyCredentialsAsync(cancellationToken);
@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 PlateNumber = testPlateGroup.BestNumber,
                 StrictMatch = false,
             },
-            testPlateGroup.PlateJpeg,
+            testPlateGroup.PlateImage.Jpeg,
             cancellationToken);
         }
     }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Reflection;
 
 namespace OpenAlprWebhookProcessor.Data
@@ -30,6 +29,10 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<Pushover> PushoverAlertClients { get; set; }
 
         public DbSet<Enricher> Enrichers { get; set; }
+
+        public DbSet<PlateImage> PlateImages { get; set; }
+
+        public DbSet<PlateImage> VehicleImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

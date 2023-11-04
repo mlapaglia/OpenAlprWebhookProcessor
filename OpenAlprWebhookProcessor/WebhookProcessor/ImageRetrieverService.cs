@@ -106,10 +106,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                                 job + "?" + plateGroup.PlateCoordinates,
                                 _cancellationTokenSource.Token);
 
-                            plateGroup.PlateJpeg = cropImage;
-                            plateGroup.VehicleJpeg = image;
-                            plateGroup.isPlateJpegCompressed = isImageCompressionEnabled;
-                            plateGroup.isVehicleJpegCompressed = isImageCompressionEnabled;
+                            plateGroup.PlateImage = new PlateImage()
+                            {
+                                Jpeg = cropImage,
+                                IsCompressed = isImageCompressionEnabled,
+                            };
+
+                            plateGroup.VehicleImage = new VehicleImage()
+                            {
+                                Jpeg = image,
+                                IsCompressed = isImageCompressionEnabled,
+                            };
                         }
                         catch (Exception ex)
                         {
@@ -119,7 +126,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
                     }
-
 
                     logger.LogInformation("finished job for image: {imageId}", job);
                 }
@@ -154,8 +160,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         var plateGroups = await processorContext.PlateGroups
                             .OrderBy(x => x.ReceivedOnEpoch)
                             .Where(x => x.ReceivedOnEpoch > lastReceivedOnEpoch)
-                            .Where(x => !x.isPlateJpegCompressed || !x.isVehicleJpegCompressed)
-                            .Where(x => x.PlateJpeg.Length > 0 || x.VehicleJpeg.Length > 0)
+                            .Where(x => !x.PlateImage.IsCompressed || !x.VehicleImage.IsCompressed)
+                            .Where(x => x.PlateImage.Jpeg.Length > 0 || x.VehicleImage.Jpeg.Length > 0)
                             .Take(25)
                             .ToListAsync(_cancellationTokenSource.Token);
 
@@ -172,16 +178,16 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                         foreach (var plateGroup in plateGroups)
                         {
-                            if (!plateGroup.isVehicleJpegCompressed && plateGroup.VehicleJpeg != null)
+                            if (!plateGroup.VehicleImage.IsCompressed && plateGroup.VehicleImage.Jpeg != null)
                             {
-                                plateGroup.VehicleJpeg = GetImageHandler.CompressImage(plateGroup.VehicleJpeg);
-                                plateGroup.isVehicleJpegCompressed = true;
+                                plateGroup.VehicleImage.Jpeg = GetImageHandler.CompressImage(plateGroup.VehicleImage.Jpeg);
+                                plateGroup.VehicleImage.IsCompressed = true;
                             }
 
-                            if (!plateGroup.isPlateJpegCompressed && plateGroup.PlateJpeg != null)
+                            if (!plateGroup.PlateImage.IsCompressed && plateGroup.PlateImage.Jpeg != null)
                             {
-                                plateGroup.PlateJpeg = GetImageHandler.CompressImage(plateGroup.PlateJpeg);
-                                plateGroup.isPlateJpegCompressed = true;
+                                plateGroup.PlateImage.Jpeg = GetImageHandler.CompressImage(plateGroup.PlateImage.Jpeg);
+                                plateGroup.PlateImage.IsCompressed = true;
                             }
                         }
 

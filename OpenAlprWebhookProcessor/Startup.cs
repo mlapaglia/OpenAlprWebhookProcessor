@@ -9,9 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
@@ -45,10 +43,8 @@ using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Settings.Enrichers;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
-using System.Text.Json.Serialization;
 using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
-using OpenAlprWebhookProcessor.ImageRelay.GetImage;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -70,12 +66,7 @@ namespace OpenAlprWebhookProcessor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services
-                .AddControllersWithViews()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+            services.AddControllersWithViews();
 
             services.AddSignalR();
 
@@ -142,12 +133,6 @@ namespace OpenAlprWebhookProcessor
 
             services.AddScoped<IUserService, UserService>();
 
-            services.AddLogging(config =>
-            {
-                config.AddDebug();
-                config.AddConsole();
-            });
-
             services.AddDbContext<ProcessorContext>(options =>
                 options.UseSqlite(ProcessorContextConnectionString));
 
@@ -204,12 +189,6 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<ImageRetrieverService>();
             services.AddSingleton<IHostedService>(p => p.GetService<ImageRetrieverService>());
-            
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
 
             var mapper = new MapperConfiguration(mc =>
             {
@@ -251,14 +230,6 @@ namespace OpenAlprWebhookProcessor
             }
 
             app.UseSerilogRequestLogging();
-
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenALPR Webhook Processor");
-                c.RoutePrefix = "/swagger";
-            });
 
             app.UseStaticFiles();
 

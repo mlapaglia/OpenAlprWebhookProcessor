@@ -15,8 +15,6 @@ namespace OpenAlprWebhookProcessor.Migrations
             migrationBuilder.DropColumn(
                 name: "VehiclePreviewJpeg",
                 table: "PlateGroups");
-
-            migrationBuilder.Sql("VACUUM;", true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
