@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.SystemLogs
@@ -23,7 +20,7 @@ namespace OpenAlprWebhookProcessor.SystemLogs
         [HttpGet]
         public async Task<List<string>> GetLogs()
         {
-            var currentLogFile = Directory.GetFiles(".")
+            var currentLogFile = Directory.GetFiles("./config/")
                 .LastOrDefault(x => x.Contains("log-"));
 
             using (var stream = System.IO.File.Open(
