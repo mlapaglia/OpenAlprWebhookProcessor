@@ -113,7 +113,7 @@ namespace OpenAlprWebhookProcessor.Migrations
                 name: "isVehicleJpegCompressed",
                 table: "PlateGroups");
 
-            migrationBuilder.Sql("VACUUM;");
+            migrationBuilder.Sql("VACUUM;", true);
         }
 
         /// <inheritdoc />
