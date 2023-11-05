@@ -4,7 +4,8 @@ import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { NavBarService } from './_services/nav-bar.service';
-import { SwUpdate, VersionEvent } from '@angular/service-worker';
+import { SwUpdate, VersionEvent, VersionReadyEvent } from '@angular/service-worker';
+import { PushSubscriberService } from './_services/push-subscriber.service';
 
 @Component({
     selector: 'app',
@@ -22,7 +23,8 @@ export class AppComponent implements OnInit, OnDestroy {
         private accountService: AccountService,
         private navBarService: NavBarService,
         private router: Router,
-        private swUpdate: SwUpdate) {
+        private swUpdate: SwUpdate,
+        private pushSubscriberService: PushSubscriberService) {
             this.accountService.user.subscribe(x => {
                 this.topBarVisible = x.id !== undefined;
             });
@@ -33,18 +35,36 @@ export class AppComponent implements OnInit, OnDestroy {
                 }
             });
 
+            this.swUpdate.unrecoverable.subscribe(event => {
+                confirm('An error occurred, please reload the page.')
+                {
+                    window.location.reload();
+                }
+            });
+
             if (this.swUpdate.isEnabled) {
                 this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
-                    if(event.type === "VERSION_READY")
-                  if(confirm("You're using an old version of the control panel. Want to update?")) {
-                    window.location.reload();
-                  }
+                    switch (event.type) {
+                        case 'VERSION_DETECTED':
+                          console.log(`Downloading new app version: ${event.version.hash}`);
+                          break;
+                        case 'VERSION_READY':
+                          console.log(`Current app version: ${(event as VersionReadyEvent).currentVersion}, New app version: ${(event as VersionReadyEvent).latestVersion}`);
+                          if(confirm("You're using an old version of the control panel. Want to update?")) {
+                            window.location.reload();
+                          }
+                          break;
+                        case 'VERSION_INSTALLATION_FAILED':
+                          console.log(`Failed to install app version '${event.version.hash}': ${event.error}`);
+                          break;
+                      }
                 });
             }
     }
 
     public ngOnInit() {
         this.signalRService.startConnection();
+        this.pushSubscriberService.subscribe();
     }
 
     public ngOnDestroy() {
@@ -53,10 +73,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public logout() {
         this.accountService.logout();
-    }
-
-    public selectedTabChange(event: Event) {
-        console.log(event);
     }
 
     public settingsButtonClicked() {

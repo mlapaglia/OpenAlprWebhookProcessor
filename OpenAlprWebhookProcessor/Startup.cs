@@ -45,6 +45,8 @@ using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
+using OpenAlprWebhookProcessor.PushSubscriptions;
+using Lib.Net.Http.WebPush;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -133,6 +135,8 @@ namespace OpenAlprWebhookProcessor
 
             services.AddScoped<IUserService, UserService>();
 
+            services.Configure<PushNotificationsOptions>(Configuration.GetSection("PushNotifications"));
+
             services.AddDbContext<ProcessorContext>(options =>
                 options.UseSqlite(ProcessorContextConnectionString));
 
@@ -177,6 +181,11 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
+            services.AddSingleton<IPushSubscriptionsService, PushSubscriptionsService>();
+            services.AddHttpClient<PushServiceClient>();
+
+            services.AddSingleton<PushNotificationProducer>();
+            services.AddHostedService<PushNotificationProducer>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

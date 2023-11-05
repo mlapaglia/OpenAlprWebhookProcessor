@@ -34,6 +34,10 @@ namespace OpenAlprWebhookProcessor.Data
 
         public DbSet<PlateImage> VehicleImages { get; set; }
 
+        public DbSet<MobilePushSubscription> PushSubscriptions { get; set; }
+
+        public DbSet<MobilePushSubscriptionKey> PushSubscriptionKeys { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
