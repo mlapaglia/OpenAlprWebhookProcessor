@@ -21,6 +21,7 @@
     "@angular/platform-browser": "^16.2.0",
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
+    "@angular/service-worker": "^16.2.0",
     "@microsoft/signalr": "^7.0.12",
     "@swimlane/ngx-charts": "^20.4.1",
     "jest-editor-support": "*",

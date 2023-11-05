@@ -4,6 +4,7 @@ import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { NavBarService } from './_services/nav-bar.service';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
 
 @Component({
     selector: 'app',
@@ -20,7 +21,8 @@ export class AppComponent implements OnInit, OnDestroy {
         private signalRService: SignalrService,
         private accountService: AccountService,
         private navBarService: NavBarService,
-        private router: Router) {
+        private router: Router,
+        private swUpdate: SwUpdate) {
             this.accountService.user.subscribe(x => {
                 this.topBarVisible = x.id !== undefined;
             });
@@ -30,6 +32,15 @@ export class AppComponent implements OnInit, OnDestroy {
                     this.menuButtonVisible =(routerEvent as NavigationEnd).url == "/settings";
                 }
             });
+
+            if (this.swUpdate.isEnabled) {
+                this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
+                    if(event.type === "VERSION_READY")
+                  if(confirm("You're using an old version of the control panel. Want to update?")) {
+                    window.location.reload();
+                  }
+                });
+            }
     }
 
     public ngOnInit() {
