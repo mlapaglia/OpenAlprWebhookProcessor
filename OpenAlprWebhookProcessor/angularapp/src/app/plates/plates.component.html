@@ -35,26 +35,25 @@
         </mat-action-row>
       </mat-expansion-panel>
     </mat-accordion>
-    <div style="display: flex; justify-content: flex-end;">
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <mat-progress-spinner
-          style="margin-right:15px;"
-          *ngIf="isLoading" 
-          color="primary" 
-          mode="indeterminate"
-          diameter="25">
-        </mat-progress-spinner>
-        <span 
-          *ngIf="isSignalrConnected"
-          title="live plate updates are enabled"
-          class="pulse"></span>
-        <mat-paginator
-          [pageSizeOptions]="[10, 25, 75, 100]"
-          [pageSize]="pageSize"
-          [length]="totalNumberOfPlates"
-          (page)="onPaginatorPage($event)">
-        </mat-paginator>
-      </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
+      <mat-progress-spinner
+        style="margin-right:15px; height: 40px; align-self: center;"
+        *ngIf="isLoading" 
+        color="primary" 
+        mode="indeterminate"
+        diameter="25">
+      </mat-progress-spinner>
+      <span
+      style="display: block; height: 100%; width: 100%;margin:20px; height: 15px; width: 15px;"
+      *ngIf="isSignalrConnected"
+      title="live plate updates are enabled"
+      class="pulse"></span>
+      <mat-paginator
+        [pageSizeOptions]="[10, 25, 75, 100]"
+        [pageSize]="pageSize"
+        [length]="totalNumberOfPlates"
+        (page)="onPaginatorPage($event)">
+      </mat-paginator>
     </div>
   </div>
   <mat-card style="flex: 1; margin-right: 15px;">

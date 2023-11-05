@@ -17,7 +17,7 @@
                 (load)="vehicleImageLoaded()"
                 (error)="vehicleImageFailedToLoad()"
                 (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
-            <mat-icon style="font-size: 100px; margin-top:100px;"
+            <mat-icon style="font-size: 100px; line-height: normal;"
                 *ngIf="!this.vehicleImageUrl|| loadingVehicleImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
@@ -29,11 +29,11 @@
             </mat-progress-spinner>
             <img [src]="this.plateImageUrl"
                 class="resize-mobile"
-                style="width: 500px;"
+                style="width: 500px; padding-top:16px;"
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />
-            <mat-icon style="font-size: 100px; margin-top:100px;"
+            <mat-icon style="font-size: 100px; line-height: normal;"
                 *ngIf="!this.plateImageUrl || loadingPlateImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
