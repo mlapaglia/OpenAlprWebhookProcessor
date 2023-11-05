@@ -78,6 +78,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                     var plateGroups = await processorContext.PlateGroups
+                        .Include(x => x.PlateImage)
+                        .Include(x => x.VehicleImage)
                         .Where(x => x.OpenAlprUuid == job)
                         .ToListAsync(_cancellationTokenSource.Token);
 
@@ -158,6 +160,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
 
                         var plateGroups = await processorContext.PlateGroups
+                            .Include(x => x.PlateImage)
+                            .Include(x => x.VehicleImage)
                             .OrderBy(x => x.ReceivedOnEpoch)
                             .Where(x => x.ReceivedOnEpoch > lastReceivedOnEpoch)
                             .Where(x => !x.PlateImage.IsCompressed || !x.VehicleImage.IsCompressed)

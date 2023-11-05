@@ -23,6 +23,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
         public async Task HandleAsync(CancellationToken cancellationToken)
         {
             var testPlateGroup = await _processorContext.PlateGroups
+                .Include(x => x.PlateImage)
                 .Where(x => x.PlateImage != null)
                 .FirstOrDefaultAsync(cancellationToken);
 

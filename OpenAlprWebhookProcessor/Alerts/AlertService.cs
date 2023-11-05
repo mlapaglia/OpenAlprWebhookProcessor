@@ -81,7 +81,9 @@ namespace OpenAlprWebhookProcessor.Alerts
                         plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId);
                     }
 
-                    var result = await plateGroups.FirstOrDefaultAsync(_cancellationTokenSource.Token);
+                    var result = await plateGroups
+                        .Include(x => x.PlateImage)
+                        .FirstOrDefaultAsync(_cancellationTokenSource.Token);
 
                     if (result != null)
                     {
