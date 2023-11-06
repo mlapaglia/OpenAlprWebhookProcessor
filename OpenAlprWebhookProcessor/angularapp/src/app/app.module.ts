@@ -58,11 +58,10 @@ import { ServiceWorkerModule } from '@angular/service-worker';
         NgxChartsModule,
         HighlightModule,
         ServiceWorkerModule.register('ngsw-worker.js', {
-          enabled: true,
-          // enabled: !isDevMode(),
+          enabled: !isDevMode(),
           // Register the ServiceWorker as soon as the application is stable
           // or after 30 seconds (whichever comes first).
-          registrationStrategy: 'registerImmediately'
+          registrationStrategy: 'registerWhenStable:30'
         }),
     ],
     declarations: [

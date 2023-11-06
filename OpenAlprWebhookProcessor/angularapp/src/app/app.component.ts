@@ -1,4 +1,4 @@
-﻿import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AccountService } from './_services';
 import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
@@ -45,12 +45,8 @@ export class AppComponent implements OnInit, OnDestroy {
             if (this.swUpdate.isEnabled) {
                 this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
                     switch (event.type) {
-                        case 'VERSION_DETECTED':
-                          console.log(`Downloading new app version: ${event.version.hash}`);
-                          break;
                         case 'VERSION_READY':
-                          console.log(`Current app version: ${(event as VersionReadyEvent).currentVersion}, New app version: ${(event as VersionReadyEvent).latestVersion}`);
-                          if(confirm("You're using an old version of the control panel. Want to update?")) {
+                          if (confirm("You're using an old version of the control panel. Want to update?")) {
                             window.location.reload();
                           }
                           break;

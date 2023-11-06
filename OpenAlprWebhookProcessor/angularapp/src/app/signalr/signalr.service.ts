@@ -30,7 +30,6 @@ export class SignalrService {
     this.hubConnection
       .start()
       .then(() => {
-        console.log('Connection started');
         this.snackbarService.create(`Connected to server!`, SnackBarType.Connected);
         this.connectionEstablished.next(true);
         this.triggerConnectionStatusChange(true);

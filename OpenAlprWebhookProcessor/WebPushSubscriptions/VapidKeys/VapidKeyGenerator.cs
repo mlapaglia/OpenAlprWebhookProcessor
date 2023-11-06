@@ -4,7 +4,6 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using System;
 using Org.BouncyCastle.Utilities.Encoders;
-using System.Text;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
 {
