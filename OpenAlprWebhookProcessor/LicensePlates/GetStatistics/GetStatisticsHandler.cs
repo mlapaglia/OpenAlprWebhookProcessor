@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.PushSubscriptions;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using System;
 using System.Linq;
 using System.Threading;
@@ -12,10 +12,10 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
     {
         private readonly ProcessorContext _processorContext;
 
-        private readonly PushNotificationProducer _pushNotificationProducer;
+        private readonly WebPushNotificationProducer _pushNotificationProducer;
 
         public GetStatisticsHandler(ProcessorContext processorContext,
-            PushNotificationProducer pushNotificationProducer)
+            WebPushNotificationProducer pushNotificationProducer)
         {
             _processorContext = processorContext;
             _pushNotificationProducer = pushNotificationProducer;
@@ -25,8 +25,6 @@ namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
             string plateNumber,
             CancellationToken cancellationToken)
         {
-            _pushNotificationProducer.SendNotification(12, cancellationToken);
-
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
 
             var seenPlates = await _processorContext.PlateGroups

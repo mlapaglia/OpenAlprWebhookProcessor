@@ -34,6 +34,7 @@ import { HighlightModule } from 'ngx-highlightjs';
 import { PushoverComponent } from './alerts/pushover/pushover.component';
 import { EnrichersComponent } from './enrichers/enrichers.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { WebpushComponent } from './alerts/webpush/webpush.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { MatRadioModule } from '@angular/material/radio';
     SystemLogsComponent,
     PushoverComponent,
     EnrichersComponent,
+    WebpushComponent,
   ],
   imports: [
     CommonModule,

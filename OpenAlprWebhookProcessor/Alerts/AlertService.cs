@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,20 +25,20 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
-        private readonly IAlertClient _alertClient;
+        private readonly IEnumerable<IAlertClient> _alertClients;
 
         public AlertService(
             IServiceProvider serviceProvider,
             ILogger<AlertService> logger,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            IAlertClient alertClient)
+            IEnumerable<IAlertClient> alertClients)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
             _processorHub = processorHub;
-            _alertClient = alertClient;
+            _alertClients = alertClients;
         }
 
         public void AddJob(AlertUpdateRequest request)
@@ -90,20 +91,23 @@ namespace OpenAlprWebhookProcessor.Alerts
                         _logger.LogInformation("alerting for: {alertId}", result.Id);
                         await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
 
-                        try
+                        foreach (var alertClient in _alertClients)
                         {
-                            await _alertClient.SendAlertAsync(new Alert()
+                            try
                             {
-                                Description = job.Description,
-                                Id = result.Id,
-                                PlateNumber = result.BestNumber,
-                            },
-                            result.PlateImage.Jpeg,
-                            _cancellationTokenSource.Token);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, $"failed to send alert to {nameof(_alertClient)}");
+                                await alertClient.SendAlertAsync(new Alert()
+                                {
+                                    Description = job.Description,
+                                    Id = result.Id,
+                                    PlateNumber = result.BestNumber,
+                                },
+                                result.PlateImage.Jpeg,
+                                _cancellationTokenSource.Token);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, $"failed to send alert to {nameof(alertClient)}");
+                            }
                         }
                     }
                 }

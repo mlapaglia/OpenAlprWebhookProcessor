@@ -7,15 +7,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts.Pushover
+namespace OpenAlprWebhookProcessor.Alerts.WebPush
 {
-    public class TestPushoverClientRequestHandler
+    public class TestWebPushClientRequestHandler
     {
         private readonly ProcessorContext _processorContext;
 
         private readonly IAlertClient _alertClient;
 
-        public TestPushoverClientRequestHandler(ProcessorContext processorContext,
+        public TestWebPushClientRequestHandler(ProcessorContext processorContext,
             IEnumerable<IAlertClient> alertClients)
         {
             _processorContext = processorContext;

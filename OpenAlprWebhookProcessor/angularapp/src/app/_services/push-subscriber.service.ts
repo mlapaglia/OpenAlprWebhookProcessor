@@ -6,7 +6,6 @@ import { SwPush } from '@angular/service-worker';
 export class PushSubscriberService {
     private _subscription: PushSubscription;
     private baseUrl: string = document.getElementsByTagName('base')[0].href;
-    public operationName: string;
 
     readonly httpOptions = {
         headers: new HttpHeaders({
@@ -19,34 +18,48 @@ export class PushSubscriberService {
         private httpClient: HttpClient) {
             swPush.subscription.subscribe((subscription) => {
                 this._subscription = subscription!;
-                this.operationName = (this._subscription === null) ? 'Subscribe' : 'Unsubscribe';
-                console.log(subscription);
               });
-        }
+    }
 
         public subscribe() {
-            
-
-            this.httpClient.get(this.baseUrl + 'api/PublicKey', { responseType: 'text' }).subscribe(publicKey => {
+            this.httpClient.get(this.baseUrl + 'api/WebPushPublicKey', { responseType: 'text' }).subscribe(publicKey => {
               this.swPush.requestSubscription({
                 serverPublicKey: publicKey
               })
-                .then(subscription => this.httpClient.post(this.baseUrl + 'api/PushSubscriptions', subscription, this.httpOptions).subscribe(
+                .then(subscription => this.httpClient.post(this.baseUrl + 'api/WebPushSubscriptions', subscription, this.httpOptions).subscribe(
                   success => {
-                    console.log(success);
+                    console.log("sent subscription to server.");
                 },
                   error => console.error(error)
                 ))
-                .catch(error => console.error(error));
+                .catch(error => {
+                    this.resetSubscription();
+                });
             }, error => console.error(error));
           };
 
         public unsubscribe() {
             this.swPush.unsubscribe()
-                .then(() => this.httpClient.delete(this.baseUrl + 'api/PushSubscriptions/' + encodeURIComponent(this._subscription.endpoint)).subscribe(
+                .then(() => this.httpClient.delete(this.baseUrl + 'api/WebPushSubscriptions/' + encodeURIComponent(this._subscription.endpoint)).subscribe(
                 () => { },
                 error => console.error(error)
                 ))
                 .catch(error => console.error(error));
         }
+
+        public resetSubscription() {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.pushManager.getSubscription()
+                .then(pushSubscription => {
+                    if(pushSubscription){
+                        pushSubscription.unsubscribe().then(successful => {
+                            // You've successfully unsubscribed
+                            this.subscribe();
+                        }).catch(e => {
+                            // Unsubscription failed
+                        })
+                    }
+                });
+        });
+    }
 }

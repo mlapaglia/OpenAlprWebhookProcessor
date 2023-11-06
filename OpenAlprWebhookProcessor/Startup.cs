@@ -45,8 +45,10 @@ using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
-using OpenAlprWebhookProcessor.PushSubscriptions;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Lib.Net.Http.WebPush;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Alerts.WebPush;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -121,7 +123,7 @@ namespace OpenAlprWebhookProcessor
                             {
                                 context.Token = context.Request.Cookies["jwtToken"];
                             }
-                            
+
                             return Task.CompletedTask;
                         }
                     };
@@ -134,8 +136,6 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddScoped<IUserService, UserService>();
-
-            services.Configure<PushNotificationsOptions>(Configuration.GetSection("PushNotifications"));
 
             services.AddDbContext<ProcessorContext>(options =>
                 options.UseSqlite(ProcessorContextConnectionString));
@@ -178,14 +178,20 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetDebugPlateGroupRequestHandler>();
             services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
 
+            services.AddScoped<UpsertWebPushClientRequestHandler>();
+            services.AddScoped<GetWebPushClientRequestHandler>();
+            services.AddScoped<TestWebPushClientRequestHandler>();
+
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
-            services.AddSingleton<IPushSubscriptionsService, PushSubscriptionsService>();
+            services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
+            services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
+
             services.AddHttpClient<PushServiceClient>();
 
-            services.AddSingleton<PushNotificationProducer>();
-            services.AddHostedService<PushNotificationProducer>();
+            services.AddSingleton<WebPushNotificationProducer>();
+            services.AddHostedService<WebPushNotificationProducer>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

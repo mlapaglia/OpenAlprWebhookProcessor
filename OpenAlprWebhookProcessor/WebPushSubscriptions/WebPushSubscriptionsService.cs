@@ -6,42 +6,40 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OpenAlprWebhookProcessor.PushSubscriptions
+namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
-    internal partial class PushSubscriptionsService : IPushSubscriptionsService
+    internal partial class WebPushSubscriptionsService : IWebPushSubscriptionsService
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public PushSubscriptionsService(IServiceProvider serviceProvider)
+        public WebPushSubscriptionsService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public List<PushSubscription> GetAll()
+        public List<Lib.Net.Http.WebPush.PushSubscription> GetAll()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var subscriptions = processorContext.PushSubscriptions
+                var subscriptions = processorContext.WebPushSubscriptions
                     .Include(x => x.Keys)
                     .AsNoTracking()
                     .ToList();
 
-                var pushSubscriptions = new List<PushSubscription>();
+                var pushSubscriptions = new List<Lib.Net.Http.WebPush.PushSubscription>();
 
                 foreach (var subscription in subscriptions.Where(x => x.Keys != null))
                 {
-                    var newPushSubscription = new PushSubscription()
+                    var newPushSubscription = new Lib.Net.Http.WebPush.PushSubscription()
                     {
                         Endpoint = subscription.Endpoint,
                         Keys = new Dictionary<string, string>(),
                     };
 
-                    foreach (var key in subscription.Keys)
-                    {
-                        newPushSubscription.Keys.Add(key.Key, key.Value);
-                    }
+                    newPushSubscription.SetKey(PushEncryptionKeyName.Auth, subscription.Keys.First(x => x.Key == "auth").Value);
+                    newPushSubscription.SetKey(PushEncryptionKeyName.P256DH, subscription.Keys.First(x => x.Key == "p256dh").Value);
 
                     pushSubscriptions.Add(newPushSubscription);
                 }
@@ -50,32 +48,34 @@ namespace OpenAlprWebhookProcessor.PushSubscriptions
             }  
         }
 
-        public void Insert(PushSubscription subscription)
+        public void Insert(Lib.Net.Http.WebPush.PushSubscription subscription)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var existingSubscription = processorContext.PushSubscriptions.FirstOrDefault(x => x.Endpoint == subscription.Endpoint);
+                var existingSubscription = processorContext.WebPushSubscriptions
+                    .Include(x => x.Keys)
+                    .FirstOrDefault(x => x.Endpoint == subscription.Endpoint);
 
                 if (existingSubscription == null)
                 {
-                    var pushSubscription = new MobilePushSubscription
+                    var pushSubscription = new Data.WebPushSubscription
                     {
                         Endpoint = subscription.Endpoint,
-                        Keys = new List<MobilePushSubscriptionKey>(),
+                        Keys = new List<WebPushSubscriptionKey>(),
                     };
 
                     foreach (var key in subscription.Keys)
                     {
-                        pushSubscription.Keys.Add(new MobilePushSubscriptionKey()
+                        pushSubscription.Keys.Add(new WebPushSubscriptionKey()
                         {
                             Key = key.Key,
                             Value = key.Value,
                         });
                     }
 
-                    processorContext.PushSubscriptions.Add(pushSubscription);
+                    processorContext.WebPushSubscriptions.Add(pushSubscription);
                     processorContext.SaveChanges();
                 }
             }
@@ -87,8 +87,8 @@ namespace OpenAlprWebhookProcessor.PushSubscriptions
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var endpointToRemove = processorContext.PushSubscriptions.FirstOrDefault(x => x.Endpoint == endpoint);
-                processorContext.PushSubscriptions.Remove(endpointToRemove);
+                var endpointToRemove = processorContext.WebPushSubscriptions.FirstOrDefault(x => x.Endpoint == endpoint);
+                processorContext.WebPushSubscriptions.Remove(endpointToRemove);
                 processorContext.SaveChanges();
 
             }

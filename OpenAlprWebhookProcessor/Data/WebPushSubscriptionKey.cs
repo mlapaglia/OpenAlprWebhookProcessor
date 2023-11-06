@@ -2,11 +2,11 @@
 
 namespace OpenAlprWebhookProcessor.Data
 {
-    public class MobilePushSubscriptionKey
+    public class WebPushSubscriptionKey
     {
         public Guid Id { get; set; }
 
-        public MobilePushSubscription MobilePushSubscription { get; set; }
+        public WebPushSubscription MobilePushSubscription { get; set; }
 
         public Guid MobilePushSubscriptionId { get; set; }
 

@@ -1,9 +1,9 @@
 ﻿using Lib.Net.Http.WebPush;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.PushSubscriptions
+namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
-    public interface IPushSubscriptionsService
+    public interface IWebPushSubscriptionsService
     {
         List<PushSubscription> GetAll();
 

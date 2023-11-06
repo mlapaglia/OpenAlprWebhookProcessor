@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Data
 {
-    public class MobilePushSubscription
+    public class WebPushSubscription
     {
         public Guid Id { get; set; }
 
         public string Endpoint { get; set; }
 
-        public List<MobilePushSubscriptionKey> Keys { get; set; }
+        public List<WebPushSubscriptionKey> Keys { get; set; }
     }
 }

@@ -34,9 +34,11 @@ namespace OpenAlprWebhookProcessor.Data
 
         public DbSet<PlateImage> VehicleImages { get; set; }
 
-        public DbSet<MobilePushSubscription> PushSubscriptions { get; set; }
+        public DbSet<WebPushSubscription> WebPushSubscriptions { get; set; }
 
-        public DbSet<MobilePushSubscriptionKey> PushSubscriptionKeys { get; set; }
+        public DbSet<WebPushSubscriptionKey> WebPushSubscriptionKeys { get; set; }
+
+        public DbSet<WebPushSettings> WebPushSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,15 +1,15 @@
 ﻿using Lib.Net.Http.WebPush;
 using Microsoft.AspNetCore.Mvc;
 
-namespace OpenAlprWebhookProcessor.PushSubscriptions
+namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PushSubscriptionsController : ControllerBase
+    public class WebPushSubscriptionsController : ControllerBase
     {
-        private readonly IPushSubscriptionsService _pushSubscriptionsService;
+        private readonly IWebPushSubscriptionsService _pushSubscriptionsService;
 
-        public PushSubscriptionsController(IPushSubscriptionsService pushSubscriptionsService)
+        public WebPushSubscriptionsController(IWebPushSubscriptionsService pushSubscriptionsService)
         {
             _pushSubscriptionsService = pushSubscriptionsService;
         }

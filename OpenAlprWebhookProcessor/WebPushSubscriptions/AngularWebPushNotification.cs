@@ -3,9 +3,9 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.PushSubscriptions
+namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
-    public class AngularPushNotification
+    public class AngularWebPushNotification
     {
         private const string WRAPPER_START = "{\"notification\":";
         private const string WRAPPER_END = "}";

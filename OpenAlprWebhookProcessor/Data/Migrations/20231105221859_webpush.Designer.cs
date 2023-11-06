@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OpenAlprWebhookProcessor.Data;
 
@@ -10,9 +11,11 @@ using OpenAlprWebhookProcessor.Data;
 namespace OpenAlprWebhookProcessor.Migrations
 {
     [DbContext(typeof(ProcessorContext))]
-    partial class ProcessorContextModelSnapshot : ModelSnapshot
+    [Migration("20231105221859_webpush")]
+    partial class webpush
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
@@ -425,9 +428,6 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PrivateKey")
                         .HasColumnType("TEXT");
