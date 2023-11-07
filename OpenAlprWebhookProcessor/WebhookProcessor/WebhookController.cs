@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -27,6 +29,32 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _logger = logger;
             _groupWebhookHandler = webhookHandler;
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
+        }
+
+        [HttpPost("/api/accountinfo")]
+        public ActionResult GetAccountInfo()
+        {
+            return Content(JsonSerializer.Serialize(new AccountInfo()
+            {
+                WebsocketsUrl = "wss://localhost:5001/ws",
+            }));
+        }
+
+        [HttpGet("/ws")]
+        public async Task GetWebsocket()
+        {
+            if (HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                _logger.LogInformation("Websocket connection received.");
+
+                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                await OpenAlprWebsocketClient.Echo(webSocket, _logger);
+            }
+            else
+            {
+                _logger.LogInformation("non websocket connection received.");
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
         }
 
         [HttpPost]

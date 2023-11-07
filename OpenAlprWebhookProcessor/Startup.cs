@@ -49,6 +49,7 @@ using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Lib.Net.Http.WebPush;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
+using Microsoft.AspNetCore.Http;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -263,6 +264,13 @@ namespace OpenAlprWebhookProcessor
                 .AllowAnyHeader());
 
             app.UseMiddleware<JwtMiddleware>();
+
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            };
+
+            app.UseWebSockets(webSocketOptions);
 
             app.UseAuthentication();
             app.UseAuthorization();
