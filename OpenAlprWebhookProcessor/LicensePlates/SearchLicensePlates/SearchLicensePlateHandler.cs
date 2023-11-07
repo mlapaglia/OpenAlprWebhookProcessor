@@ -22,9 +22,10 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
             SearchLicensePlateRequest request,
             CancellationToken cancellationToken)
         {
+            _processerContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
             var dbRequest = _processerContext.PlateGroups
-                .AsQueryable()
-                .AsNoTracking();
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(request.PlateNumber))
             {
@@ -125,7 +126,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
                     platesToAlert));
             }
 
-            var enricher = await _processerContext.Enrichers.FirstOrDefaultAsync(cancellationToken);
+            var enricher = await _processerContext.Enrichers
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (enricher == null || !enricher.IsEnabled)
             {

@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
 		<IsPackable>false</IsPackable>
-		<SpaRoot>ClientApp\</SpaRoot>
+		<SpaRoot>angularapp\</SpaRoot>
 		<DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
 
 		<!-- Set this to true if you enable server-side prerendering -->
@@ -17,27 +17,29 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="11.0.1" />
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="Bogus" Version="34.0.2" />
-		<PackageReference Include="CoordinateSharp" Version="2.13.1.1" />
-		<PackageReference Include="Flurl" Version="3.0.6" />
-		<PackageReference Include="Hangfire" Version="1.7.31" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.31" />
-		<PackageReference Include="Hangfire.InMemory" Version="0.3.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
+		<PackageReference Include="CoordinateSharp" Version="2.20.1.1" />
+		<PackageReference Include="Flurl" Version="3.0.7" />
+		<PackageReference Include="Hangfire" Version="1.8.6" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.6" />
+		<PackageReference Include="Hangfire.InMemory" Version="0.6.0" />
+		<PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.1" />
+		<PackageReference Include="Magick.NET-Q8-x64" Version="13.4.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.13" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.13" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.13" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
 		<PackageReference Include="NUnit" Version="3.13.3" />
-		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,6 +47,16 @@
 		<Content Remove="$(SpaRoot)**" />
 		<None Remove="$(SpaRoot)**" />
 		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="angularapp\angular.json" />
+	  <Content Include="angularapp\e2e\tsconfig.json" />
+	  <Content Include="angularapp\package-lock.json" />
+	  <Content Include="angularapp\package.json" />
+	  <Content Include="angularapp\tsconfig.app.json" />
+	  <Content Include="angularapp\tsconfig.json" />
+	  <Content Include="angularapp\tsconfig.spec.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -64,8 +76,8 @@
 	<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
 		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
 		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --prod" />
-		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build -- --configuration production" />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build:ssr -- --configuration production" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
 
 		<!-- Include the newly-built files in the publish output -->
 		<ItemGroup>

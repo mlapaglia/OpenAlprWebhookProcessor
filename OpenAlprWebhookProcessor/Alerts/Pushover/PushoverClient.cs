@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
         public async Task SendAlertAsync(
             Alert alert,
-            string base64PreviewJpeg,
+            byte[] plateJpeg,
             CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -39,7 +39,9 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var clientSettings = await processorContext.PushoverAlertClients.FirstOrDefaultAsync(cancellationToken);
+                var clientSettings = await processorContext.PushoverAlertClients
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 var boundary = Guid.NewGuid().ToString();
                 using (var content = new MultipartFormDataContent(boundary))
@@ -51,9 +53,9 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     content.Add(new StringContent(alert.PlateNumber + " " + alert.Description), "message");
                     content.Add(new StringContent("openalpr alert"), "title");
 
-                    if (clientSettings.SendPlatePreview)
+                    if (clientSettings.SendPlatePreview && plateJpeg != null)
                     {
-                        content.Add(new ByteArrayContent(Convert.FromBase64String(base64PreviewJpeg)), "attachment", "attachment.jpg");
+                        content.Add(new ByteArrayContent(plateJpeg), "attachment", "attachment.jpg");
                     }
 
                     try
@@ -67,7 +69,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         {
                             var result = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                            logger.LogError("Failed to send alert via Pushover: " + result);
+                            logger.LogError("Failed to send alert via Pushover: {result}", result);
                             throw new InvalidOperationException("failed");
                         }
 
@@ -75,7 +77,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, "Failed to send alert via Pushover: " + ex.Message);
+                        logger.LogError(ex, "Failed to send alert via Pushover: {exception}", ex.Message);
                         throw new InvalidOperationException("failed");
                     }
                 }
@@ -92,27 +94,29 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var clientSettings = await processorContext.PushoverAlertClients.FirstOrDefaultAsync(cancellationToken);
+                var clientSettings = await processorContext.PushoverAlertClients
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 try
                 {
                     var result = await _httpClient.PostAsync(VerifyCredentialsUrl
-                            .Replace("{0}", clientSettings.ApiToken)
-                            .Replace("{1}", clientSettings.UserKey),
+                        .Replace("{0}", clientSettings.ApiToken)
+                        .Replace("{1}", clientSettings.UserKey),
                         null,
                         cancellationToken);
 
                     if (!result.IsSuccessStatusCode)
                     {
                         var message = await result.Content.ReadAsStringAsync(cancellationToken);
-                        logger.LogError("Pushover credential check failed: " + message);
+                        logger.LogError("Pushover credential check failed: {message}", message);
                     }
 
                     logger.LogInformation("Pushover credentials are valid.");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Pushover credential check failed: " + ex.Message);
+                    logger.LogError(ex, "Pushover credential check failed: {exception}", ex.Message);
                 }
             }
         }

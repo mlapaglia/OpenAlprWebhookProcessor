@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.WebhookProcessor;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -8,14 +10,27 @@ namespace OpenAlprWebhookProcessor.Settings
     {
         private readonly ProcessorContext _processorContext;
 
-        public UpsertAgentRequestHandler(ProcessorContext processorContext)
+        private readonly ImageRetrieverService _imageRetrieverService;
+
+        public UpsertAgentRequestHandler(
+            ProcessorContext processorContext,
+            ImageRetrieverService imageRetrieverService)
         {
             _processorContext = processorContext;
+            _imageRetrieverService = imageRetrieverService;
         }
 
         public async Task HandleAsync(Agent agent)
         {
-            var dbAgent = await _processorContext.Agents.FirstOrDefaultAsync();
+            var dbAgent = await _processorContext.Agents
+                .FirstOrDefaultAsync();
+
+            var wasImageCompressionEnabled = false;
+
+            if (agent.IsImageCompressionEnabled && !dbAgent.IsImageCompressionEnabled)
+            {
+                wasImageCompressionEnabled = true;
+            }
 
             if (dbAgent == null)
             {
@@ -24,6 +39,7 @@ namespace OpenAlprWebhookProcessor.Settings
                     EndpointUrl = agent.EndpointUrl,
                     Hostname = agent.Hostname,
                     IsDebugEnabled = agent.IsDebugEnabled,
+                    IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
                     Latitude = agent.Latitude,
                     Longitude = agent.Longitude,
                     OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,
@@ -42,6 +58,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 dbAgent.EndpointUrl = agent.EndpointUrl;
                 dbAgent.Hostname = agent.Hostname;
                 dbAgent.IsDebugEnabled = agent.IsDebugEnabled;
+                dbAgent.IsImageCompressionEnabled = agent.IsImageCompressionEnabled;
                 dbAgent.Latitude = agent.Latitude;
                 dbAgent.Longitude = agent.Longitude;
                 dbAgent.OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey;
@@ -54,6 +71,11 @@ namespace OpenAlprWebhookProcessor.Settings
             }
 
             await _processorContext.SaveChangesAsync();
+
+            if (wasImageCompressionEnabled)
+            {
+                _imageRetrieverService.AddImageCompressionJob();
+            }
         }
     }
 }

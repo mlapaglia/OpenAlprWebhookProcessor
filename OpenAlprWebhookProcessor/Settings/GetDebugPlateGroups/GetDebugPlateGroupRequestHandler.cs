@@ -22,7 +22,9 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups
             bool onlyFailedPlateGroups,
             CancellationToken cancellationToken)
         {
-            var query = _processorContext.RawPlateGroups.AsQueryable();
+            var query = _processorContext.RawPlateGroups
+                .AsNoTracking()
+                .AsQueryable();
 
             var stopEpoch = DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds();
 

@@ -23,6 +23,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
         public async Task HandleAsync(Guid plateId)
         {
             var plateGroup = await _processorContext.PlateGroups
+                .AsNoTracking()
                 .Where(x => x.Id == plateId)
                 .FirstOrDefaultAsync();
 

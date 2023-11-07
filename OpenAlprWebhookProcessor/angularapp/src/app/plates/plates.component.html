@@ -1,0 +1,155 @@
+<div style="display: flex; flex-wrap: wrap; align-content: space-between;">
+  <div style="flex: 8; margin-right: 15px; margin-left: 15px;">
+    <mat-accordion style="display: block;">
+      <mat-expansion-panel [hideToggle]="true" [disabled]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title style="display: flex; justify-content: space-between;">
+            <div style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Camera Id</div>
+            <div style="flex: 2; overflow: hidden; word-wrap: break-word;">Plate Number</div>
+            <div style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Vehicle Description</div>
+            <div style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Vehicle Direction</div>
+            <div style="flex: 3; overflow: hidden; word-wrap: break-word;">Date</div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngFor="let plate of plates" (opened)="plateOpened(plate.id)" (closed)="plateClosed(plate.id)">
+        <mat-expansion-panel-header [ngClass]="{'alertPlate': plate.isAlert === true, 'ignorePlate': plate.isIgnore === true}">
+          <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlateText': plate.isIgnore === true}">
+            <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">{{plate.openAlprCameraId}}</span>
+            <span style="flex: 2; overflow: hidden; word-wrap: break-word;">{{plate.plateNumber}}</span>
+            <span style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile"> {{plate.vehicleDescription}}</span>
+            <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile"><mat-icon [style.transform]="'rotate(' + (plate.direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction">arrow_right_alt</mat-icon></span>
+            <span style="flex: 3; overflow: hidden; word-wrap: break-word;">{{plate.receivedOn | date:"medium"}}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <app-plate [isVisible]="visiblePlateIds.includes(plate.id)" [plate]="plate"></app-plate>
+        </ng-template>
+        <mat-action-row style="display: flex; flex-wrap: wrap;">
+          <button mat-button color="primary" [disabled]="!plate.canBeEnriched" [class.spinner]="isEnrichingPlate" (click)="enrichPlate(plate.id)">Enrich plate</button>
+          <button mat-button color="primary" (click)="editPlate(plate.id)">Edit plate</button>
+          <button mat-button color="primary" (click)="searchPlates(plate.plateNumber)">Search for plate</button>
+          <button mat-button color="primary" [disabled]="plate.isIgnore || isAddingToIgnoreList" [class.spinner]="isAddingToIgnoreList" (click)="addToIgnoreList(plate.plateNumber)">Add to ignore list</button>
+          <button mat-button color="primary" [disabled]="plate.isAlert || isAddingToAlertList" [class.spinner]="isAddingToAlertList" (click)="addToAlertList(plate.plateNumber)">Add to alert list</button>
+          <button mat-button color="warn" [disabled]="isDeletingPlate" [class.spinner]="isDeletingPlate" (click)="deletePlate(plate.id, plate.plateNumber)">Delete plate</button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
+      <mat-progress-spinner
+        style="margin-right:15px; height: 40px; align-self: center;"
+        *ngIf="isLoading" 
+        color="primary" 
+        mode="indeterminate"
+        diameter="25">
+      </mat-progress-spinner>
+      <span
+      style="display: block; height: 100%; width: 100%;margin:20px; height: 15px; width: 15px;"
+      *ngIf="isSignalrConnected"
+      title="live plate updates are enabled"
+      class="pulse"></span>
+      <mat-paginator
+        [pageSizeOptions]="[10, 25, 75, 100]"
+        [pageSize]="pageSize"
+        [length]="totalNumberOfPlates"
+        (page)="onPaginatorPage($event)">
+      </mat-paginator>
+    </div>
+  </div>
+  <mat-card style="flex: 1; margin-right: 15px;">
+    <mat-card-header>
+      <mat-card-title>Filters</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker" [max]="todaysDate">
+          <input matStartDate [(ngModel)]="filterStartOn" placeholder="Start date">
+          <input matEndDate [(ngModel)]="filterEndOn" placeholder="End date">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Plate Number</mat-label>
+        <input matInput
+          [(ngModel)]="filterPlateNumber"
+          (keyup.enter)="searchPlates()"
+          (input)="validateSearchPlateNumber()"
+          placeholder="LRN2DRV" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Vehicle Make</mat-label>
+        <mat-select [disabled]="vehicleFilters.vehicleMakes?.length === 0" [(ngModel)]="filterVehicleMake">
+          <mat-option [value]=""></mat-option>
+          <mat-option *ngFor="let make of vehicleFilters.vehicleMakes" [value]="make">{{make}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Vehicle Model</mat-label>
+        <mat-select [disabled]="vehicleFilters.vehicleModels?.length === 0" [(ngModel)]="filterVehicleModel">
+          <mat-option [value]=""></mat-option>
+          <mat-option *ngFor="let model of vehicleFilters.vehicleModels" [value]="model">{{model}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Vehicle Type</mat-label>
+        <mat-select [disabled]="vehicleFilters.vehicleTypes?.length === 0" [(ngModel)]="filterVehicleType">
+          <mat-option [value]=""></mat-option>
+          <mat-option *ngFor="let type of vehicleFilters.vehicleTypes" [value]="type">{{type}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Vehicle Color</mat-label>
+        <mat-select [disabled]="vehicleFilters.vehicleColors?.length === 0" [(ngModel)]="filterVehicleColor">
+          <mat-option [value]=""></mat-option>
+          <mat-option *ngFor="let color of vehicleFilters.vehicleColors" [value]="color">{{color}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Vehicle Region</mat-label>
+        <mat-select [disabled]="vehicleFilters.vehicleRegions?.length === 0" [(ngModel)]="filterVehicleRegion">
+          <mat-option [value]=""></mat-option>
+          <mat-option *ngFor="let region of vehicleFilters.vehicleRegions" [value]="region">{{region}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-error *ngIf="!filterPlateNumberIsValid && regexSearchEnabled">Invalid regex pattern</mat-error>
+      <mat-error *ngIf="!filterPlateNumberIsValid && !regexSearchEnabled">Invalid search term</mat-error>
+      <ul>
+        <li>
+          <mat-checkbox 
+            color="primary"
+            [(ngModel)]="filterIgnoredPlates"
+            [disabled]="!filterIgnoredPlatesEnabled">Include Ignored Plates</mat-checkbox>
+        </li>
+        <li>
+          <mat-checkbox
+            color="primary"
+            (change)="regexSearchToggled()"
+            [(ngModel)]="regexSearchEnabled">Regex Search</mat-checkbox>
+        </li>
+        <li>
+          <mat-checkbox
+            color="primary"
+            [(ngModel)]="filterStrictMatch"
+            [disabled]="!filterStrictMatchEnabled">Lenient Matches</mat-checkbox>
+        </li>
+        <li>
+          <mat-checkbox
+            color="primary"
+            [(ngModel)]="filterPlatesSeenLessThan">Plates Seen Less Than 10 Times</mat-checkbox>
+        </li>
+      </ul>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button
+        style="margin: 8px 8px 8px 0;"
+        color="primary"
+        [disabled]="!this.filterPlateNumberIsValid"
+        (click)="searchPlates()">Apply</button>
+      <button mat-raised-button
+        color="warn"
+        (click)="clearFilters()">Clear</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

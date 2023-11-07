@@ -1,0 +1,15 @@
+﻿<nav mat-tab-nav-bar mat-align-tabs="start"
+    *ngIf="topBarVisible"
+    [tabPanel]="tabPanel">
+    <a mat-tab-link routerLink="/" class="home-button"><mat-icon>anchor</mat-icon><span>OpenALPR Webhook Processor</span></a>
+    <a mat-tab-link routerLink="/"><mat-icon>home</mat-icon><span>Home</span></a>
+    <a mat-tab-link routerLink="/plates"><mat-icon>crop_16_9</mat-icon><span>Plates</span></a>
+    <a mat-tab-link routerLink="/users"><mat-icon>account_box</mat-icon><span>Users</span></a>
+    <a mat-tab-link (click)="settingsButtonClicked();" routerLink="/settings"><mat-icon>settings</mat-icon><span>Settings</span></a>
+    <a mat-tab-link (click)="logout()"><mat-icon>exit_to_app</mat-icon><span>Logout</span></a>
+</nav>
+
+<alert></alert>
+<mat-tab-nav-panel #tabPanel>
+    <router-outlet></router-outlet>
+</mat-tab-nav-panel>

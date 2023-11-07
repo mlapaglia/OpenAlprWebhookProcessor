@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts
@@ -7,7 +8,7 @@ namespace OpenAlprWebhookProcessor.Alerts
     {
         Task SendAlertAsync(
             Alert alert,
-            string base64PreviewJpeg,
+            byte[] plateJpeg,
             CancellationToken cancellationToken);
 
         Task VerifyCredentialsAsync(

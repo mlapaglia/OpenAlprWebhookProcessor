@@ -16,7 +16,9 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public async Task<Agent> HandleAsync(CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await _processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (agent == null)
             {
@@ -28,6 +30,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 EndpointUrl = agent.EndpointUrl,
                 Hostname = agent.Hostname,
                 IsDebugEnabled = agent.IsDebugEnabled,
+                IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
                 Latitude = agent.Latitude,
                 Longitude = agent.Longitude,
                 OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,

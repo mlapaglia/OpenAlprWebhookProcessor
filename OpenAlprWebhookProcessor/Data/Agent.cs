@@ -31,5 +31,7 @@ namespace OpenAlprWebhookProcessor.Data
         public long LastSuccessfulScrapeEpoch { get; set; }
 
         public bool IsDebugEnabled { get; set; }
+
+        public bool IsImageCompressionEnabled { get; set; }
     }
 }

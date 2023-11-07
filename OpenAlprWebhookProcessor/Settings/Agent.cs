@@ -25,5 +25,7 @@
         public double TimezoneOffset { get; set; }
 
         public bool IsDebugEnabled { get; set; }
+
+        public bool IsImageCompressionEnabled { get; set; }
     }
 }

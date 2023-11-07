@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetIgnores
         {
             var ignores = new List<Ignore>();
 
-            foreach (var dbIgnore in await _processorContext.Ignores.ToListAsync())
+            foreach (var dbIgnore in await _processorContext.Ignores.AsNoTracking().ToListAsync())
             {
                 var ignore = new Ignore()
                 {

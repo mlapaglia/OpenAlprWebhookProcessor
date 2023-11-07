@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Agent", b =>
                 {
@@ -30,6 +30,9 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDebugEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsImageCompressionEnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("LastSuccessfulScrapeEpoch")
@@ -258,28 +261,16 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<string>("PlateCoordinates")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("PlateJpeg")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("PlatePreviewJpeg")
-                        .HasColumnType("TEXT");
-
                     b.Property<long>("ReceivedOnEpoch")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("VehicleColor")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("VehicleJpeg")
-                        .HasColumnType("BLOB");
-
                     b.Property<string>("VehicleMake")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VehicleMakeModel")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("VehiclePreviewJpeg")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VehicleRegion")
@@ -296,6 +287,18 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.HasIndex("OpenAlprUuid");
 
                     b.HasIndex("ReceivedOnEpoch");
+
+                    b.HasIndex("VehicleColor");
+
+                    b.HasIndex("VehicleMake");
+
+                    b.HasIndex("VehicleMakeModel");
+
+                    b.HasIndex("VehicleRegion");
+
+                    b.HasIndex("VehicleType");
+
+                    b.HasIndex("VehicleYear");
 
                     b.HasIndex("BestNumber", "ReceivedOnEpoch");
 
@@ -316,7 +319,9 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlateGroupId");
+                    b.HasIndex("Number");
+
+                    b.HasIndex("PlateGroupId", "Number");
 
                     b.ToTable("PlateGroupPossibleNumbers");
                 });
@@ -344,6 +349,31 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.ToTable("RawPlateGroups");
                 });
 
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCompressed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Jpeg")
+                        .HasColumnType("BLOB");
+
+                    b.Property<Guid>("PlateGroupId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("PlateGroupId")
+                        .IsUnique();
+
+                    b.ToTable("PlateImage");
+                });
+
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Pushover", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +395,88 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PushoverAlertClients");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.VehicleImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCompressed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Jpeg")
+                        .HasColumnType("BLOB");
+
+                    b.Property<Guid>("PlateGroupId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlateGroupId")
+                        .IsUnique();
+
+                    b.ToTable("VehicleImage");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebPushSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PrivateKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PublicKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WebPushSettings");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebPushSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Endpoint")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WebPushSubscriptions");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebPushSubscriptionKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("MobilePushSubscriptionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MobilePushSubscriptionId");
+
+                    b.ToTable("WebPushSubscriptionKeys");
                 });
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebhookForward", b =>
@@ -404,9 +516,51 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Navigation("PlateGroup");
                 });
 
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateImage", b =>
+                {
+                    b.HasOne("OpenAlprWebhookProcessor.Data.PlateGroup", "PlateGroup")
+                        .WithOne("PlateImage")
+                        .HasForeignKey("OpenAlprWebhookProcessor.Data.PlateImage", "PlateGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlateGroup");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.VehicleImage", b =>
+                {
+                    b.HasOne("OpenAlprWebhookProcessor.Data.PlateGroup", "PlateGroup")
+                        .WithOne("VehicleImage")
+                        .HasForeignKey("OpenAlprWebhookProcessor.Data.VehicleImage", "PlateGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlateGroup");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebPushSubscriptionKey", b =>
+                {
+                    b.HasOne("OpenAlprWebhookProcessor.Data.WebPushSubscription", "MobilePushSubscription")
+                        .WithMany("Keys")
+                        .HasForeignKey("MobilePushSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MobilePushSubscription");
+                });
+
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateGroup", b =>
                 {
+                    b.Navigation("PlateImage");
+
                     b.Navigation("PossibleNumbers");
+
+                    b.Navigation("VehicleImage");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.WebPushSubscription", b =>
+                {
+                    b.Navigation("Keys");
                 });
 #pragma warning restore 612, 618
         }

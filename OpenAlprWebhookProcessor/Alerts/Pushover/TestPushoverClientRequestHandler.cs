@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,16 +16,17 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
         private readonly IAlertClient _alertClient;
 
         public TestPushoverClientRequestHandler(ProcessorContext processorContext,
-            IAlertClient alertClient)
+            IEnumerable<IAlertClient> alertClients)
         {
             _processorContext = processorContext;
-            _alertClient = alertClient;
+            _alertClient = alertClients.First(x => x is WebPushNotificationProducer);
         }
 
         public async Task HandleAsync(CancellationToken cancellationToken)
         {
             var testPlateGroup = await _processorContext.PlateGroups
-                .Where(x => x.PlatePreviewJpeg != null)
+                .Include(x => x.PlateImage)
+                .Where(x => x.PlateImage != null)
                 .FirstOrDefaultAsync(cancellationToken);
 
             await _alertClient.VerifyCredentialsAsync(cancellationToken);
@@ -35,7 +38,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 PlateNumber = testPlateGroup.BestNumber,
                 StrictMatch = false,
             },
-            testPlateGroup.PlatePreviewJpeg,
+            testPlateGroup.PlateImage.Jpeg,
             cancellationToken);
         }
     }

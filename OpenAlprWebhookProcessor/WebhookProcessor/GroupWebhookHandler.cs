@@ -50,7 +50,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             bool isBulkImport,
             CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await _processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
             PlateGroupRaw rawDebugPlateGroup = null;
 
             if (agent.IsDebugEnabled)
@@ -68,6 +71,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             }
 
             var camera = await _processorContext.Cameras
+                .AsNoTracking()
                 .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -116,8 +120,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             plateGroup.OpenAlprUuid = webhook.Group.BestUuid;
             plateGroup.BestNumber = webhook.Group.BestPlateNumber;
             plateGroup.PossibleNumbers = webhook.Group.Candidates.Select(x => new PlateGroupPossibleNumbers() { Number = x.Plate }).ToList();
-            plateGroup.PlatePreviewJpeg = webhook.Group.BestPlate.PlateCropJpeg;
-            plateGroup.VehiclePreviewJpeg = webhook.Group.VehicleCropJpeg;
             plateGroup.Confidence = Math.Round(webhook.Group.BestPlate.Confidence, 2);
             plateGroup.ReceivedOnEpoch = webhook.Group.EpochStart;
 
@@ -184,7 +186,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     }
                 }
 
-                var forwards = await _processorContext.WebhookForwards.ToListAsync(cancellationToken);
+                var forwards = await _processorContext.WebhookForwards
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
 
                 foreach (var forward in forwards)
                 {

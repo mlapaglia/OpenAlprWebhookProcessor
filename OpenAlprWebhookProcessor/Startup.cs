@@ -9,9 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Data;
@@ -45,10 +43,12 @@ using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Settings.Enrichers;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
-using System.Text.Json.Serialization;
 using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
-using OpenAlprWebhookProcessor.ImageRelay.GetImage;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using Lib.Net.Http.WebPush;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Alerts.WebPush;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor
 
         private readonly string UsersContextConnectionString = $"Data Source={configurationDirectory}/users.db";
 
-        private readonly string ProcessorContextConnectionString = $"Data Source={configurationDirectory}/processor.db";
+        private readonly string ProcessorContextConnectionString = $"Data Source={configurationDirectory}/processor.db;foreign keys=true;";
 
         public Startup(IConfiguration configuration)
         {
@@ -70,12 +70,7 @@ namespace OpenAlprWebhookProcessor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services
-                .AddControllersWithViews()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+            services.AddControllersWithViews();
 
             services.AddSignalR();
 
@@ -128,7 +123,7 @@ namespace OpenAlprWebhookProcessor
                             {
                                 context.Token = context.Request.Cookies["jwtToken"];
                             }
-                            
+
                             return Task.CompletedTask;
                         }
                     };
@@ -137,16 +132,10 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/dist";
+                configuration.RootPath = "angularapp/dist";
             });
 
             services.AddScoped<IUserService, UserService>();
-
-            services.AddLogging(config =>
-            {
-                config.AddDebug();
-                config.AddConsole();
-            });
 
             services.AddDbContext<ProcessorContext>(options =>
                 options.UseSqlite(ProcessorContextConnectionString));
@@ -189,9 +178,20 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetDebugPlateGroupRequestHandler>();
             services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
 
+            services.AddScoped<UpsertWebPushClientRequestHandler>();
+            services.AddScoped<GetWebPushClientRequestHandler>();
+            services.AddScoped<TestWebPushClientRequestHandler>();
+
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 
             services.AddSingleton<IAlertClient, PushoverClient>();
+            services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
+            services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
+
+            services.AddHttpClient<PushServiceClient>();
+
+            services.AddSingleton<WebPushNotificationProducer>();
+            services.AddHostedService<WebPushNotificationProducer>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -204,12 +204,6 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<ImageRetrieverService>();
             services.AddSingleton<IHostedService>(p => p.GetService<ImageRetrieverService>());
-            
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
 
             var mapper = new MapperConfiguration(mc =>
             {
@@ -252,14 +246,6 @@ namespace OpenAlprWebhookProcessor
 
             app.UseSerilogRequestLogging();
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenALPR Webhook Processor");
-                c.RoutePrefix = "/swagger";
-            });
-
             app.UseStaticFiles();
 
             app.UseHangfireDashboard();
@@ -290,7 +276,7 @@ namespace OpenAlprWebhookProcessor
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "angularapp";
 
                 if (env.IsDevelopment())
                 {
@@ -299,10 +285,10 @@ namespace OpenAlprWebhookProcessor
             });
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
                 .Enrich.FromLogContext()
                 .WriteTo.File(
-                    "log-.txt",
+                    "./config/log-.txt",
                     rollingInterval: RollingInterval.Day,
                     shared: true,
                     flushToDiskInterval: TimeSpan.FromSeconds(5),
