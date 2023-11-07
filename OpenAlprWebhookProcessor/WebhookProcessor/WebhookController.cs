@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -21,22 +24,32 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly SinglePlateWebhookHandler _singlePlateWebhookHandler;
 
+        private readonly ProcessorContext _processorContext;
+
         public WebhookController(
             ILogger<WebhookController> logger,
             GroupWebhookHandler webhookHandler,
-            SinglePlateWebhookHandler singlePlateWebhookHandler)
+            SinglePlateWebhookHandler singlePlateWebhookHandler,
+            ProcessorContext processorContext)
         {
             _logger = logger;
             _groupWebhookHandler = webhookHandler;
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
+            _processorContext = processorContext;
         }
 
         [HttpPost("/api/accountinfo")]
-        public ActionResult GetAccountInfo()
+        public async Task<ActionResult> GetAccountInfo(CancellationToken cancellationToken)
         {
+            var agent = await _processorContext.Agents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var websocketUrl = agent.OpenAlprWebServerUrl.Replace("https://", "wss://");
+
             return Content(JsonSerializer.Serialize(new AccountInfo()
             {
-                WebsocketsUrl = "wss://localhost:5001/ws",
+                WebsocketsUrl = websocketUrl + "/ws",
             }));
         }
 
