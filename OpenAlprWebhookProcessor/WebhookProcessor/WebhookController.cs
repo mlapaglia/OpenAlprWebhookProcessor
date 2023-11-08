@@ -94,8 +94,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     var agent = await _processorContext.Agents
                         .FirstOrDefaultAsync(cancellationToken);
 
-                    agent.LastSuccessfulScrapeEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    await _processorContext.SaveChangesAsync();
+                    agent.LastHeartbeatEpochMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    await _processorContext.SaveChangesAsync(cancellationToken);
                 }
                 else
                 {
