@@ -7,7 +7,7 @@ using System.Linq;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.Extensions.Logging;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
@@ -19,10 +19,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         private readonly string _agentId;
 
+        private readonly ILogger _logger;
+
         public OpenAlprWebsocketClient(
+            ILogger logger,
             string agentId,
             WebSocket webSocket)
         {
+            _logger = logger;
             _agentId = agentId;
             _webSocket = webSocket;
             _availableResponses = new ConcurrentDictionary<Guid, string>();
@@ -89,6 +93,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Failed to deserialize AgentStatusResponse");
                     agentStatusResponse = null;
                     return false;
                 }

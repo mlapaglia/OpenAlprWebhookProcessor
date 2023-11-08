@@ -96,6 +96,9 @@ export class OpenalprAgentComponent implements OnInit {
         key: "Version",
         value: this.agentStatus.version,
       });
+    },
+    (error) => {
+      this.agentStatus.isConnected = false;
     });
   }
 

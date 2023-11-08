@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,13 +11,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     {
         private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients;
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-
-        private readonly ILogger<WebsocketClientOrganizer> _logger;
-
-        public WebsocketClientOrganizer(ILogger<WebsocketClientOrganizer> logger)
+        public WebsocketClientOrganizer()
         {
-            _logger = logger;
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
         }
 
@@ -35,9 +25,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string agentId,
             OpenAlprWebsocketClient webSocketClient)
         {
-            return _connectedClients.TryAdd(
+            var wasUpdated = false;
+
+            _connectedClients.AddOrUpdate(
                 agentId,
-                webSocketClient);
+                webSocketClient, (key, oldValue) =>
+                {
+                    wasUpdated = true;
+                    return webSocketClient;
+                });
+
+            return wasUpdated;
         }
 
         public async Task RemoveAgentAsync(

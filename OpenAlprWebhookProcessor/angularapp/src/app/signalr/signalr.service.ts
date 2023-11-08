@@ -14,6 +14,7 @@ export class SignalrService {
   public licensePlateReceived = new Subject<string>();
   public licensePlateAlerted = new Subject<string>();
   public processInformationLogged = new Subject<string>();
+  public openAlprAgentConnected = new Subject<string>();
   public isConnected: boolean;
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>();
 
@@ -43,6 +44,17 @@ export class SignalrService {
         this.processInformationLogged.next(logMessage);
       });
 
+      this.hubConnection.on('OpenAlprAgentConnected', (agentId, ipAddress) => {
+        this.snackbarService.create(`OpenALPR Agent Connected: ${agentId}`, SnackBarType.Connected, `IP Address: ${ipAddress}`);
+      });
+
+      this.hubConnection.on('OpenAlprAgentDisconnected', (agentId, ipAddress) => {
+        this.snackbarService.create(
+          `OpenALPR Agent Disconnected: ${agentId}`,
+          SnackBarType.Disconnected,
+          "IP Address: " + ipAddress);
+      });
+      
       this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {
         this.licensePlateReceived.next(plateNumber);
       });

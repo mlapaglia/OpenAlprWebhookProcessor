@@ -9,15 +9,16 @@ import { SnackBarType } from './snackbartype';
 export class SnackbarService {
   constructor(private snackBar: MatSnackBar) { }
 
-  create(message: string, snackBarType: SnackBarType) {
+  create(message: string, snackBarType: SnackBarType, message2?: string) {
     this.snackBar.openFromComponent(
       SnackbarComponent,
       {
         horizontalPosition: 'right',
         verticalPosition: 'bottom',
-        duration: 1500,
+        duration: 3000,
         data: {
           message: message,
+          message2: message2,
           snackType: snackBarType
         },
       });

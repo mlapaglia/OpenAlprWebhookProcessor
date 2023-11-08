@@ -41,6 +41,7 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
       this.subscribeForLogs();
     })
   }
+  
   public subscribeForLogs() {
     this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
       this.logMessages.unshift(logInformation);

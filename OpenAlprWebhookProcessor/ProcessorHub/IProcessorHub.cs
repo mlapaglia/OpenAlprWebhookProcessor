@@ -10,6 +10,10 @@ namespace OpenAlprWebhookProcessor.ProcessorHub
 
         Task ProcessInformationLogged(string log);
 
+        Task OpenAlprAgentConnected(string agentId, string ipAddress);
+
+        Task OpenAlprAgentDisconnected(string agentId, string ipAddress);
+
         Task ScrapeFinished();
     }
 }
