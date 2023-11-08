@@ -93,7 +93,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public bool LicenseValid { get; set; }
 
         [JsonPropertyName("memory_consumed_bytes")]
-        public long memoryConsumedBytes { get; set; }
+        public long MemoryConsumedBytes { get; set; }
 
         [JsonPropertyName("memory_last_update")]
         public long MemoryLastUpdate { get; set; }

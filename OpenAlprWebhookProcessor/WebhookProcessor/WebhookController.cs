@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -38,38 +34,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _processorContext = processorContext;
         }
 
-        [HttpPost("/api/accountinfo")]
-        public async Task<ActionResult> GetAccountInfo(CancellationToken cancellationToken)
-        {
-            var agent = await _processorContext.Agents
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
-
-            var websocketUrl = agent.OpenAlprWebServerUrl.Replace("https://", "wss://");
-
-            return Content(JsonSerializer.Serialize(new AccountInfo()
-            {
-                WebsocketsUrl = websocketUrl + "/ws",
-            }));
-        }
-
-        [HttpGet("/ws")]
-        public async Task GetWebsocket()
-        {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                _logger.LogInformation("Websocket connection received.");
-
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                await OpenAlprWebsocketClient.Echo(webSocket, _logger);
-            }
-            else
-            {
-                _logger.LogInformation("non websocket connection received.");
-                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            }
-        }
-
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
@@ -77,7 +41,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
-                var rawWebhook = await reader.ReadToEndAsync();
+                var rawWebhook = await reader.ReadToEndAsync(cancellationToken);
 
                 if (rawWebhook.Contains("alpr_alert"))
                 {

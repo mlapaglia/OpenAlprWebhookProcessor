@@ -21,6 +21,8 @@ namespace OpenAlprWebhookProcessor.Settings
     {
         private readonly GetAgentRequestHandler _getAgentRequestHandler;
 
+        private readonly GetAgentStatusRequestHandler _getAgentStatusRequestHandler;
+
         private readonly UpsertAgentRequestHandler _upsertAgentRequestHandler;
 
         private readonly GetIgnoresRequestHandler _getIgnoresRequestHandler;
@@ -55,7 +57,8 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertEnricherRequestHandler upsertEnricherRequestHandler,
             TestEnricherRequestHandler testEnricherRequestHandler,
             GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler,
-            DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler)
+            DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler,
+            GetAgentStatusRequestHandler getAgentStatusRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -69,12 +72,19 @@ namespace OpenAlprWebhookProcessor.Settings
             _testEnricherRequestHandler = testEnricherRequestHandler;
             _getDebugPlateGroupHandler = getDebugPlateGroupHandler;
             _deleteDebugPlateGroupRequestHandler = deleteDebugPlateGroupRequestHandler;
+            _getAgentStatusRequestHandler = getAgentStatusRequestHandler;
         }
 
         [HttpGet("agent")]
         public async Task<Agent> GetAgent(CancellationToken cancellationToken)
         {
             return await _getAgentRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpGet("agent/status")]
+        public async Task<AgentStatus> GetAgentStatus(CancellationToken cancellationToken)
+        {
+            return await _getAgentStatusRequestHandler.HandleAsync(cancellationToken);
         }
 
         [HttpPost("agent")]

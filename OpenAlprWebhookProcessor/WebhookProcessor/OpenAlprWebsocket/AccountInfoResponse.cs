@@ -2,7 +2,7 @@
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
-    public class AccountInfo
+    public class AccountInfoResponse
     {
         [JsonPropertyName("company_id")]
         public string CompanyId { get; set; }

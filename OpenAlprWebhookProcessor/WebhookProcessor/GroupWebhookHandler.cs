@@ -104,7 +104,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
 
                 _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
-
             }
             else
             {

@@ -5,6 +5,7 @@ import { Alert } from './alerts/alert/alert';
 import { Camera } from './cameras/camera';
 import { Ignore } from './ignores/ignore/ignore';
 import { Agent } from './openalpr-agent/agent'
+import { AgentStatus } from './openalpr-agent/agentStatus';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,10 @@ export class SettingsService {
 
   getAgent(): Observable<Agent> {
     return this.http.get<Agent>(`/settings/agent`);
+  }
+
+  getAgentStatus(): Observable<AgentStatus> {
+    return this.http.get<AgentStatus>(`/settings/agent/status`);
   }
 
   startAgentScrape(): Observable<any> {

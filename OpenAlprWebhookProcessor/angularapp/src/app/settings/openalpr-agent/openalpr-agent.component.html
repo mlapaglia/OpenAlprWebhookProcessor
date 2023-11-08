@@ -1,4 +1,27 @@
 <div style="margin:16px; display: flex; flex-wrap: wrap; justify-content: flex-start; flex-direction: column; row-gap: 10px; column-gap: 15px;" *ngIf="agent">
+    <mat-card>
+        <mat-card-header>
+            OpenAlpr Agent
+        </mat-card-header>
+        <mat-card-content *ngIf="agentStatus">
+            <div style="display: flex; flex-direction: column;">
+                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="developer_board" style="font-size:150px; height: 150px; width:150px; align-self: center;" [ngStyle]="{'color': agentStatus.isConnected ? '#32de84' : '#D2122E' }"></mat-icon>
+                <span style="align-self: center; font-weight:500;">{{agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
+            </div>
+            <table *ngIf="agentStatus"
+                mat-table [dataSource]="agentStatusData"
+                class="mat-elevation-z8"
+                style="margin-top:15px;">
+                <ng-container matColumnDef="key">
+                    <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                    <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+                </ng-container>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </mat-card-content>
+    </mat-card>
     <mat-form-field>
         <mat-label>Endpoint Url</mat-label>
         <input matInput [(ngModel)]="agent.endpointUrl" placeholder="http(s)://x.x.x.x:yyyy">

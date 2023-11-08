@@ -50,6 +50,7 @@ using Lib.Net.Http.WebPush;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
 using Microsoft.AspNetCore.Http;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -147,6 +148,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GroupWebhookHandler>();
             services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<GetAgentRequestHandler>();
+            services.AddScoped<GetAgentStatusRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<SetZoomAndFocusHandler>();
             services.AddScoped<GetZoomAndFocusHandler>();
@@ -193,6 +195,9 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<WebPushNotificationProducer>();
             services.AddHostedService<WebPushNotificationProducer>();
+
+            services.AddSingleton<WebsocketClientOrganizer>();
+            services.AddHostedService<WebsocketClientOrganizer>();
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
