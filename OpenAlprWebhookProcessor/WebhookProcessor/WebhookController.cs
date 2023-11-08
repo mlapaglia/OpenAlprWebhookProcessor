@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -88,6 +90,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 else if (rawWebhook.Contains("heartbeat"))
                 {
                     _logger.LogInformation("received heartbeat from agent");
+
+                    var agent = await _processorContext.Agents
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    agent.LastSuccessfulScrapeEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    await _processorContext.SaveChangesAsync();
                 }
                 else
                 {

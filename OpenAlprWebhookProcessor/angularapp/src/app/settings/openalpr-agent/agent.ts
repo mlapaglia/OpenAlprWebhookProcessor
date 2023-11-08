@@ -3,6 +3,7 @@ export class Agent {
     hostname: string;
     isDebugEnabled: boolean;
     isImageCompressionEnabled: boolean;
+    lastHeartbeatEpochMs: number;
     latitude: number;
     longitude: number;
     uid: string;

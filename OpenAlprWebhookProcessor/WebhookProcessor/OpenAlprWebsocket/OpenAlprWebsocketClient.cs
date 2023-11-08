@@ -105,10 +105,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         public async Task CloseConnectionAsync(CancellationToken cancellationToken)
         {
-            await _webSocket.CloseAsync(
-                WebSocketCloseStatus.NormalClosure,
-                "goodbye.",
-                cancellationToken);
+            if (_webSocket.State == WebSocketState.Open)
+            {
+                await _webSocket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure,
+                    "goodbye.",
+                    cancellationToken);
+            }
         }
 
         [GeneratedRegex("transaction_id\":\"(.*?)\"")]

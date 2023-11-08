@@ -1,17 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
 import { Agent } from './agent';
 import { AgentStatus } from './agentStatus';
 import { PlateStatisticsData } from 'app/plates/plate/plateStatistics';
+import { SignalrService } from 'app/signalr/signalr.service';
+import { Subscription } from 'rxjs';
+import { MatTable } from '@angular/material/table';
 
 @Component({
   selector: 'app-openalpr-agent',
   templateUrl: './openalpr-agent.component.html',
   styleUrls: ['./openalpr-agent.component.less']
 })
-export class OpenalprAgentComponent implements OnInit {
+export class OpenalprAgentComponent implements OnInit, OnDestroy {
+  @ViewChild('agentStatusTable') table: MatTable<any>;
+
   public agent: Agent;
   public agentStatus: AgentStatus;
   public agentStatusData: PlateStatisticsData[] = [];
@@ -20,13 +25,24 @@ export class OpenalprAgentComponent implements OnInit {
   public isSaving: boolean = false;
   public isHydrating: boolean = false;
 
+  private eventSubscriptions = new Subscription();
+  
   constructor(
     private settingsService: SettingsService,
-    private snackBarService: SnackbarService) { }
+    private snackBarService: SnackbarService,
+    private signalRHub: SignalrService) { }
 
   ngOnInit(): void {
     this.getAgent();
     this.getAgentStatus();
+
+    this.eventSubscriptions.add(this.signalRHub.openAlprAgentConnectionStatusChanged.subscribe((connected: boolean) => {
+      this.getAgentStatus();
+    }));
+  }
+
+  ngOnDestroy(): void {
+    this.eventSubscriptions.unsubscribe();
   }
 
   public saveAgent() {
@@ -56,49 +72,62 @@ export class OpenalprAgentComponent implements OnInit {
   private getAgentStatus() {
     this.settingsService.getAgentStatus().subscribe(result => {
       this.agentStatus = result;
+      this.agentStatusData = new Array<PlateStatisticsData>();
 
-      this.agentStatusData.push({
-        key: "Cpu Cores",
-        value: this.agentStatus.cpuCores.toString(),
-      });
+      if (this.agentStatus.isConnected) {
+        this.agentStatusData.push({
+          key: "Cpu Cores",
+          value: this.agentStatus.cpuCores.toString(),
+        });
 
-      this.agentStatusData.push({
-        key: "Cpu Usage",
-        value: this.agentStatus.cpuUsagePercent.toString() + "%",
-      });
+        this.agentStatusData.push({
+          key: "Cpu Usage",
+          value: this.agentStatus.cpuUsagePercent.toString() + "%",
+        });
 
-      this.agentStatusData.push({
-        key: "ALPR Daemon Active",
-        value: this.agentStatus.alprdActive ? "Yes" : "No",
-      });
+        this.agentStatusData.push({
+          key: "ALPR Daemon Active",
+          value: this.agentStatus.alprdActive ? "Yes" : "No",
+        });
 
-      this.agentStatusData.push({
-        key: "Daemon Uptime",
-        value: this.agentStatus.daemonUptimeSeconds.toString() + " seconds",
-      });
+        this.agentStatusData.push({
+          key: "Daemon Uptime",
+          value: this.agentStatus.daemonUptimeSeconds.toString() + " seconds",
+        });
 
-      this.agentStatusData.push({
-        key: "Free Disk Space",
-        value: this.formatBytes(this.agentStatus.diskFreeBytes),
-      });
+        this.agentStatusData.push({
+          key: "Free Disk Space",
+          value: this.formatBytes(this.agentStatus.diskFreeBytes),
+        });
 
-      this.agentStatusData.push({
-        key: "Hostname",
-        value: this.agentStatus.hostname,
-      });
+        this.agentStatusData.push({
+          key: "Hostname",
+          value: this.agentStatus.hostname,
+        });
 
-      this.agentStatusData.push({
-        key: "Current Time",
-        value: (new Date(this.agentStatus.agentEpochMs)).toString(),
-      });
+        this.agentStatusData.push({
+          key: "Current Time",
+          value: (new Date(this.agentStatus.agentEpochMs)).toString(),
+        });
 
-      this.agentStatusData.push({
-        key: "Version",
-        value: this.agentStatus.version,
-      });
+        this.agentStatusData.push({
+          key: "Version",
+          value: this.agentStatus.version,
+        });
+      } else {
+        this.agentStatusData.push({
+          key: "Last Heartbeat",
+          value: (new Date(this.agent.lastHeartbeatEpochMs)).toString(),
+        });
+      }
+
+      this.table.renderRows();
     },
     (error) => {
+      this.agentStatus = new AgentStatus();
       this.agentStatus.isConnected = false;
+      this.agentStatusData = new Array<PlateStatisticsData>();
+      this.table.renderRows();
     });
   }
 

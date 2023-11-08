@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -11,8 +12,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     {
         private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients;
 
-        public WebsocketClientOrganizer()
+        private readonly ILogger<WebsocketClientOrganizer> _logger;
+
+        public WebsocketClientOrganizer(
+            ILogger<WebsocketClientOrganizer> logger)
         {
+            _logger = logger;
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
         }
 
@@ -56,7 +61,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                throw new ArgumentException("AgentId is not connected.");
+                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                return null;
             }
 
             var transactionId = Guid.NewGuid();
@@ -76,7 +82,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 await Task.Delay(1000, cancellationToken);
             }
 
-            throw new TimeoutException("Agent did not respond to request.");
+            _logger.LogError("Agent did not respond to request.");
+            return null;
         }
     }
 }

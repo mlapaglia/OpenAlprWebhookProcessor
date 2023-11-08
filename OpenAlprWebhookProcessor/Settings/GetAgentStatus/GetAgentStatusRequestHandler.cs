@@ -23,12 +23,11 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public async Task<AgentStatus> HandleAsync(CancellationToken cancellationToken)
         {
-            var agentUid = await _processorContext.Agents
+            var agent = await _processorContext.Agents
                 .AsNoTracking()
-                .Select(x => x.Uid)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (agentUid == null)
+            if (agent.Uid == null)
             {
                 return new AgentStatus()
                 {
@@ -36,13 +35,14 @@ namespace OpenAlprWebhookProcessor.Settings
                 };
             }
 
-            var agentStatus = await _websocketClientOrganizer.GetAgentStatusAsync(agentUid, cancellationToken);
+            var agentStatus = await _websocketClientOrganizer.GetAgentStatusAsync(agent.Uid, cancellationToken);
 
             if (agentStatus == null)
             {
                 return new AgentStatus()
                 {
                     IsConnected = false,
+                    LastHeartbeatEpochMs = agent.LastHeartbeatEpochMs,
                 };
             }
 
@@ -50,14 +50,15 @@ namespace OpenAlprWebhookProcessor.Settings
             {
                 AgentEpochMs = agentStatus.AgentEpochMs,
                 AlprdActive = agentStatus.AgentStatus.AlprdActive,
-                Hostname = agentStatus.AgentStatus.AgentHostname,
-                IsConnected = true,
                 CpuCores = agentStatus.AgentStatus.CpuCores,
                 CpuUsagePercent = agentStatus.AgentStatus.CpuUsagePercent,
                 DaemonUptimeSeconds = agentStatus.AgentStatus.DaemonUptimeSeconds,
                 DiskFreeBytes = agentStatus.AgentStatus.DiskDriveFreeBytes,
-                Version = agentStatus.Version,
+                Hostname = agentStatus.AgentStatus.AgentHostname,
+                IsConnected = true,
+                LastHeartbeatEpochMs = agent.LastHeartbeatEpochMs,
                 SystemUptimeSeconds = agentStatus.AgentStatus.SystemUptimeSeconds,
+                Version = agentStatus.Version,
             };
         }
     }

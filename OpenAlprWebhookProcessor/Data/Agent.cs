@@ -33,5 +33,7 @@ namespace OpenAlprWebhookProcessor.Data
         public bool IsDebugEnabled { get; set; }
 
         public bool IsImageCompressionEnabled { get; set; }
+
+        public long LastHeartbeatEpochMs { get; set; }
     }
 }

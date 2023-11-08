@@ -21,5 +21,7 @@
         public long AgentEpochMs { get; set; }
 
         public bool AlprdActive { get; set; }
+
+        public long LastHeartbeatEpochMs { get; set; }
     }
 }

@@ -9,6 +9,7 @@
                 <span style="align-self: center; font-weight:500;">{{agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
             </div>
             <table *ngIf="agentStatus"
+                #agentStatusTable
                 mat-table [dataSource]="agentStatusData"
                 class="mat-elevation-z8"
                 style="margin-top:15px;">

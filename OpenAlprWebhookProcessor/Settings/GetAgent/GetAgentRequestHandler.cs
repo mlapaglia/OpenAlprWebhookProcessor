@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +31,7 @@ namespace OpenAlprWebhookProcessor.Settings
                 Hostname = agent.Hostname,
                 IsDebugEnabled = agent.IsDebugEnabled,
                 IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
+                LastHeartbeatEpochMs = agent.LastHeartbeatEpochMs,
                 Latitude = agent.Latitude,
                 Longitude = agent.Longitude,
                 OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,
