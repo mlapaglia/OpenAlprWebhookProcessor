@@ -45,6 +45,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     _availableResponses.TryAdd(Guid.Parse(transactionMatch.Groups[1].Value), rawMessage);
                 }
 
+                Array.Clear(buffer, 0, buffer.Length);
+
                 receiveResult = await _webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer),
                     cancellationToken);

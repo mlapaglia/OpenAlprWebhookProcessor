@@ -10,7 +10,7 @@
 
         public int CpuCores { get; set; }
 
-        public int CpuUsagePercent { get; set; }
+        public decimal CpuUsagePercent { get; set; }
 
         public long DaemonUptimeSeconds { get; set; }
 

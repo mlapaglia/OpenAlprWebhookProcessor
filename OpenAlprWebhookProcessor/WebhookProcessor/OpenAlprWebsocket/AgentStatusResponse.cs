@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
@@ -57,7 +58,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public long CpuLastUpdate { get; set; }
 
         [JsonPropertyName("cpu_usage_percent")]
-        public int CpuUsagePercent { get; set; }
+        public decimal CpuUsagePercent { get; set; }
 
         [JsonPropertyName("daemon_uptime_seconds")]
         public int DaemonUptimeSeconds { get; set; }
@@ -75,10 +76,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public long DiskDriveTotalBytes { get; set; }
 
         [JsonPropertyName("disk_quota_consumed_bytes")]
-        public int DiskQuotaConsumedBytes { get; set; }
+        public long DiskQuotaConsumedBytes { get; set; }
 
         [JsonPropertyName("disk_quota_earliest_result")]
-        public int DiskQuotaEarliestResult { get; set; }
+        public long DiskQuotaEarliestResult { get; set; }
 
         [JsonPropertyName("disk_quota_total_bytes")]
         public long DiskQuotaTotalBytes { get; set; }
@@ -123,7 +124,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public bool RecordingEnabled { get; set; }
 
         [JsonPropertyName("system_uptime_seconds")]
-        public int SystemUptimeSeconds { get; set; }
+        public long SystemUptimeSeconds { get; set; }
 
         [JsonPropertyName("timestamp")]
         public long Timestamp { get; set; }
@@ -135,25 +136,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     public class VideoStream
     {
         [JsonPropertyName("camera_id")]
-        public int CameraId { get; set; }
+        public long CameraId { get; set; }
 
         [JsonPropertyName("camera_name")]
         public string CameraName { get; set; }
 
         [JsonPropertyName("fps")]
-        public int Fps { get; set; }
+        public decimal Fps { get; set; }
 
         [JsonPropertyName("is_streaming")]
         public bool IsStreaming  { get; set; }
 
         [JsonPropertyName("last_plate_read")]
-        public int LastPlateRead { get; set; }
+        public long LastPlateRead { get; set; }
 
         [JsonPropertyName("last_update")]
         public long LastUpdate { get; set; }
 
         [JsonPropertyName("total_plate_reads")]
-        public int TotalPlateReads { get; set; }
+        public decimal TotalPlateReads { get; set; }
 
         [JsonPropertyName("url")]
         public string Url { get; set; }
