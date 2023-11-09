@@ -23,6 +23,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             ZoomFocus zoomAndFocus,
             CancellationToken cancellationToken);
 
+        Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken);
+
         Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken);
 
         Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken);

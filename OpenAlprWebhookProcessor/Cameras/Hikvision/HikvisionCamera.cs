@@ -196,5 +196,10 @@ namespace OpenAlprWebhookProcessor.Cameras
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

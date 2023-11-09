@@ -29,4 +29,8 @@ export class EditCameraService {
   setZoomAndFocus(cameraId: string, zoomFocus: ZoomFocus) {
     return this.http.post(`/cameras/${cameraId}/zoomAndFocus`, zoomFocus);
   }
+  
+  triggerAutofocus(cameraId: string) { 
+    return this.http.post(`/cameras/${cameraId}/triggerAutofocus`, null);
+  }
 }

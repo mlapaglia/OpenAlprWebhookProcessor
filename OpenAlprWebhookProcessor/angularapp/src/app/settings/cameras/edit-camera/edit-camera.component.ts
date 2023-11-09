@@ -72,4 +72,13 @@ export class EditCameraComponent implements OnInit {
       this.getZoomFocus();
     });
   }
+
+  public triggerAutofocus() {
+    this.editCameraService.triggerAutofocus(this.camera.id).subscribe(success => {
+      this.getZoomFocus();
+    },
+    (error) => {
+      this.snackBarService.create("auto focus failed", SnackBarType.Error);
+    });
+  }
 }

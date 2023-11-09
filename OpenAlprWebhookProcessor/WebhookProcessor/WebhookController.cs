@@ -39,7 +39,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("request received from: {ipAddress}", Request.HttpContext.Connection.RemoteIpAddress);
 
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {

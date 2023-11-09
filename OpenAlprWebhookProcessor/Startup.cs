@@ -47,9 +47,7 @@ using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Lib.Net.Http.WebPush;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
-using Microsoft.AspNetCore.Http;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 
 namespace OpenAlprWebhookProcessor
@@ -180,6 +178,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<EnrichLicensePlateRequestHandler>();
             services.AddScoped<GetDebugPlateGroupRequestHandler>();
             services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
+            services.AddScoped<TriggerAutofocusHandler>();
 
             services.AddScoped<UpsertWebPushClientRequestHandler>();
             services.AddScoped<GetWebPushClientRequestHandler>();

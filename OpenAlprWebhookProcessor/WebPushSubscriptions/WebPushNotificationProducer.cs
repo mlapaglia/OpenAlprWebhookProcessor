@@ -6,11 +6,9 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Generic;
 using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Flurl.Util;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {

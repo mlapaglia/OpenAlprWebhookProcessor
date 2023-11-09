@@ -3,14 +3,29 @@
         <mat-card-header>
             OpenAlpr Agent
         </mat-card-header>
-        <mat-card-content *ngIf="agentStatus">
+        <mat-card-content>
             <div style="display: flex; flex-direction: column;">
-                <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="developer_board" style="font-size:150px; height: 150px; width:150px; align-self: center;" [ngStyle]="{'color': agentStatus.isConnected ? '#32de84' : '#D2122E' }"></mat-icon>
-                <span style="align-self: center; font-weight:500;">{{agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
+                <mat-icon
+                    *ngIf="agentStatus && !isLoadingAgentStatus"
+                    aria-hidden="false"
+                    aria-label="Agent connected status icon"
+                    fontIcon="developer_board"
+                    style="font-size:150px; height: 150px; width:150px; align-self: center;"
+                    [ngStyle]="{'color': agentStatus.isConnected ? '#32de84' : '#D2122E' }">
+                </mat-icon>
+                <mat-progress-spinner
+                    *ngIf="isLoadingAgentStatus" 
+                    style="margin-right:15px; height: 40px; align-self: center;"
+                    color="primary" 
+                    mode="indeterminate"
+                    diameter="25">
+                </mat-progress-spinner>
+                <span style="align-self: center; font-weight:500;">{{isLoadingAgentStatus ? "Checking..." : agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
             </div>
-            <table *ngIf="agentStatus"
+            <table
                 #agentStatusTable
-                mat-table [dataSource]="agentStatusData"
+                mat-table
+                [dataSource]="agentStatusData"
                 class="mat-elevation-z8"
                 style="margin-top:15px;">
                 <ng-container matColumnDef="key">

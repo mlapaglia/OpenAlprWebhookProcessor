@@ -35,6 +35,7 @@ import { PushoverComponent } from './alerts/pushover/pushover.component';
 import { EnrichersComponent } from './enrichers/enrichers.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { WebpushComponent } from './alerts/webpush/webpush.component';
+import { PolygonDrawComponent } from './alerts/konva';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { WebpushComponent } from './alerts/webpush/webpush.component';
     PushoverComponent,
     EnrichersComponent,
     WebpushComponent,
+    PolygonDrawComponent
   ],
   imports: [
     CommonModule,
@@ -77,7 +79,7 @@ import { WebpushComponent } from './alerts/webpush/webpush.component';
     MatSlideToggleModule,
     MatCheckboxModule,
     MatRadioModule,
-    HighlightModule,
+    HighlightModule
   ]
 })
 export class SettingsModule { }

@@ -302,6 +302,26 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
+        public async Task<bool> TriggerAutofocusAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var dbCamera = await processorContext.Cameras.FirstOrDefaultAsync(
+                    x => x.Id == cameraId,
+                    cancellationToken);
+
+                var camera = CameraFactory.Create(
+                    dbCamera.Manufacturer,
+                    dbCamera);
+
+                return await camera.TriggerAutoFocusAsync(cancellationToken);
+            }
+        }
+
         private async Task ForceClearOverlaysAsync()
         {
             using (var scope = _serviceProvider.CreateScope())

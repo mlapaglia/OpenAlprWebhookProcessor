@@ -11,12 +11,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             {
                 case OpenAlprRequestType.agent_status:
                     return "agent_status";
-                case OpenAlprRequestType.site_id:
-                    return "site_id";
                 case OpenAlprRequestType.config_info:
                     return "config_info";
+                case OpenAlprRequestType.config_save_mask:
+                    return "config_save_mask";
+                case OpenAlprRequestType.image_download:
+                    return "image_download";
                 case OpenAlprRequestType.register:
                     return "register";
+                case OpenAlprRequestType.site_id:
+                    return "site_id";
+
                 default:
                     throw new KeyNotFoundException("Unable to find string value for enum: " + type.ToString());
             }
@@ -29,12 +34,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         agent_status,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        site_id,
-
-        [JsonConverter(typeof(JsonStringEnumConverter))]
         config_info,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
+        config_save_mask,
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        image_download,
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         register,
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        site_id,
     }
 }

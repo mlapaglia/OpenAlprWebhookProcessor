@@ -24,6 +24,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
 
   public isSaving: boolean = false;
   public isHydrating: boolean = false;
+  public isLoadingAgentStatus: boolean = false;
 
   private eventSubscriptions = new Subscription();
   
@@ -70,6 +71,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
   }
 
   private getAgentStatus() {
+    this.isLoadingAgentStatus = true;
     this.settingsService.getAgentStatus().subscribe(result => {
       this.agentStatus = result;
       this.agentStatusData = new Array<PlateStatisticsData>();
@@ -121,9 +123,12 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
         });
       }
 
+      this.isLoadingAgentStatus = false;
       this.table.renderRows();
+      
     },
     (error) => {
+      this.isLoadingAgentStatus = false;
       this.agentStatus = new AgentStatus();
       this.agentStatus.isConnected = false;
       this.agentStatusData = new Array<PlateStatisticsData>();

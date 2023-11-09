@@ -8,6 +8,8 @@ using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Collections;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
@@ -38,15 +40,26 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             var receiveResult = await _webSocket.ReceiveAsync(
                 new ArraySegment<byte>(buffer), cancellationToken);
 
+            var inFlightResponse = string.Empty;
+
             while (!receiveResult.CloseStatus.HasValue)
             {
-                var rawMessage = Encoding.UTF8.GetString(buffer.ToArray(), 0, Array.FindLastIndex(buffer, b => b != 0) + 1);
+                inFlightResponse += Encoding.UTF8.GetString(buffer.ToArray(), 0, Array.FindLastIndex(buffer, b => b != 0) + 1);
 
-                var transactionMatch = TransactionIdRegex().Match(rawMessage);
-
-                if (transactionMatch.Success)
+                if (receiveResult.EndOfMessage)
                 {
-                    _availableResponses.TryAdd(Guid.Parse(transactionMatch.Groups[1].Value), rawMessage);
+                    var transactionMatch = TransactionIdRegex().Match(inFlightResponse);
+
+                    if (transactionMatch.Success)
+                    {
+                        _availableResponses.TryAdd(Guid.Parse(transactionMatch.Groups[1].Value), inFlightResponse);
+                    }
+                    else
+                    {
+                        _logger.LogError("End of message but no transaction id found {response}", inFlightResponse);
+                    }
+
+                    inFlightResponse = string.Empty;
                 }
 
                 Array.Clear(buffer, 0, buffer.Length);
@@ -55,6 +68,54 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     new ArraySegment<byte>(buffer),
                     cancellationToken);
             }
+        }
+
+        public async Task SendGetImageRequestAsync(
+            Guid transactionId,
+            long cameraId,
+            CancellationToken cancellationToken)
+        {
+            var imageRequest = new ImageDownloadRequest()
+            {
+                CameraId = cameraId,
+                Direction = "request",
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.image_download),
+                TransactionId = transactionId,
+            };
+
+            var message = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(imageRequest));
+
+            await _webSocket.SendAsync(
+                new ArraySegment<byte>(message, 0, message.Length),
+                WebSocketMessageType.Binary,
+                true,
+                cancellationToken);
+        }
+
+        public bool TryGetImageDownloadResponse(
+            Guid transactionId,
+            out Stream imageDownloadResponse)
+        {
+            if (_availableResponses.TryRemove(transactionId, out string message))
+            {
+                try
+                {
+                    imageDownloadResponse = new MemoryStream(
+                        Encoding.UTF8.GetBytes(
+                            JsonSerializer.Deserialize<ImageDownloadResponse>(message).Image));
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to deserialize AgentStatusResponse");
+                    imageDownloadResponse = null;
+                    return false;
+                }
+            }
+
+            imageDownloadResponse = null;
+            return false;
         }
 
         public async Task SendGetAgentStatusRequestAsync(
@@ -101,6 +162,29 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             agentStatusResponse = null;
             return false;
+        }
+
+        public async Task SendSaveMaskRequestAsync(
+            Guid transactionId,
+            string maskImage,
+            string filename,
+            CancellationToken cancellationToken)
+        {
+            var saveMaskRequest = new ConfigSaveMaskRequest()
+            {
+                MaskImage = maskImage,
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.config_save_mask),
+                StreamFile = filename,
+                TransactionId = transactionId,
+            };
+
+            var message = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(saveMaskRequest));
+
+            await _webSocket.SendAsync(
+                new ArraySegment<byte>(message, 0, message.Length),
+                WebSocketMessageType.Binary,
+                true,
+                cancellationToken);
         }
 
         public async Task CloseConnectionAsync(CancellationToken cancellationToken)

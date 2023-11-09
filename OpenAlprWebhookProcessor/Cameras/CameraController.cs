@@ -25,13 +25,16 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private readonly SetZoomAndFocusHandler _setZoomAndFocusHandler;
 
+        private readonly TriggerAutofocusHandler _triggerAutofocusHandler;
+
         public CameraController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
             UpsertCameraHandler upsertCameraHandler,
             TestCameraHandler testCameraHandler,
             GetZoomAndFocusHandler getZoomAndFocusHandler,
-            SetZoomAndFocusHandler setZoomAndFocusHandler)
+            SetZoomAndFocusHandler setZoomAndFocusHandler,
+            TriggerAutofocusHandler triggerAutofocusHandler)
         {
             _getCameraHandler = getCameraHandler;
             _deleteCameraHandler = deleteCameraHandler;
@@ -39,6 +42,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             _testCameraHandler = testCameraHandler;
             _getZoomAndFocusHandler = getZoomAndFocusHandler;
             _setZoomAndFocusHandler = setZoomAndFocusHandler;
+            _triggerAutofocusHandler = triggerAutofocusHandler;
         }
 
         [HttpGet]
@@ -106,6 +110,16 @@ namespace OpenAlprWebhookProcessor.Cameras
             await _setZoomAndFocusHandler.HandleAsync(
                 cameraId,
                 zoomAndFocus,
+                cancellationToken);
+        }
+
+        [HttpPost("{cameraId}/triggerAutofocus")]
+        public async Task<bool> TriggerAutofocus(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _triggerAutofocusHandler.HandleAsync(
+                cameraId,
                 cancellationToken);
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,6 +52,43 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             {
                 await webSocketClient.CloseConnectionAsync(cancellationToken);
             }
+        }
+
+        public async Task<Stream> GetCameraImageAsync(
+            string agentId,
+            long cameraId,
+            CancellationToken cancellationToken)
+        {
+            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
+
+            if (!agentExists)
+            {
+                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                return null;
+            }
+
+            var transactionId = Guid.NewGuid();
+
+            await webSocketClient.SendGetImageRequestAsync(
+                transactionId,
+                cameraId,
+                cancellationToken);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (stopwatch.ElapsedMilliseconds < 100000)
+            {
+                if (webSocketClient.TryGetImageDownloadResponse(transactionId, out var imageDownloadResponse))
+                {
+                    return imageDownloadResponse;
+                }
+
+                await Task.Delay(1000, cancellationToken);
+            }
+
+            _logger.LogError("Agent did not respond to request.");
+            return null;
         }
 
         public async Task<AgentStatusResponse> GetAgentStatusAsync(
