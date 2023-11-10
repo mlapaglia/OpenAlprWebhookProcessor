@@ -79,7 +79,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             {
                 CameraId = cameraId,
                 Direction = "request",
-                RequestType = RequestType.GetRequestType(OpenAlprRequestType.image_download),
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.ImageDownload),
                 TransactionId = transactionId,
             };
 
@@ -127,7 +127,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 AgentId = _agentId,
                 Direction = "request",
                 TransactionId = transactionId.ToString(),
-                RequestType = RequestType.GetRequestType(OpenAlprRequestType.agent_status),
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.AgentStatus),
                 Version = 1,
             };
 
@@ -173,8 +173,33 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             var saveMaskRequest = new ConfigSaveMaskRequest()
             {
                 MaskImage = maskImage,
-                RequestType = RequestType.GetRequestType(OpenAlprRequestType.config_save_mask),
-                StreamFile = filename,
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.ConfigSaveMask),
+                StreamFile = "door",
+                TransactionId = transactionId,
+                Direction = "request",
+            };
+
+            var message = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(saveMaskRequest));
+
+            await _webSocket.SendAsync(
+                new ArraySegment<byte>(message, 0, message.Length),
+                WebSocketMessageType.Binary,
+                true,
+                cancellationToken);
+        }
+
+        public async Task SendAgentStartStopRequestAsync(
+            Guid transactionId,
+            AgentStartStopType startStopType,
+            string agentId,
+            CancellationToken cancellationToken)
+        {
+            var saveMaskRequest = new AgentStartStopRequest()
+            {
+                AgentId = agentId,
+                AgentOp = startStopType.ToString(),
+                Direction = "request",
+                RequestType = RequestType.GetRequestType(OpenAlprRequestType.ConfigAgentOperation),
                 TransactionId = transactionId,
             };
 

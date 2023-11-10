@@ -1,0 +1,27 @@
+<mat-card style="display: flex; margin:16px;">
+  <mat-card-header>
+    Modify Camera Mask
+  </mat-card-header>
+  <mat-card-content>
+    <div [hidden]="isLoadingSnapshot" class="canvasHolder">
+      <div>
+        <canvas class="canvas" #canvas width="960" height="540"></canvas>
+        <button mat-button color="primary" (click)="undoLastPoint()">Undo</button>
+        <button mat-button color="warn" (click)="resetCanvas()">Reset</button>
+      </div>
+      <div #measureDiv></div>
+      <div>
+        Mask Sample:
+        <canvas class="canvas" #sampleCanvas width="480" height="270" ></canvas>
+      </div>
+      <div>
+        <canvas class="canvas" #savingCanvas width="1920" height="1080"></canvas>
+      </div>
+    </div>
+    <div [hidden]="!isLoadingSnapshot">Loading...</div>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button color="primary" (click)="saveMask()">Save</button>
+    <button mat-button color="warn" (click)="cancelMask()">Cancel</button>
+  </mat-card-actions>
+</mat-card>

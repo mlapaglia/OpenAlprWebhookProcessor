@@ -25,7 +25,6 @@
     "@microsoft/signalr": "^7.0.12",
     "@swimlane/ngx-charts": "^20.4.1",
     "jest-editor-support": "*",
-    "ng2-konva": "^7.0.0",
     "ngx-highlightjs": "^10.0.0",
     "ngx-lightbox": "^3.0.0",
     "rxjs": "~7.8.0",

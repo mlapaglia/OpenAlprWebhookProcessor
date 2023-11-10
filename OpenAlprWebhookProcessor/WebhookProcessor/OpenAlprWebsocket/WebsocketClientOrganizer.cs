@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -122,6 +123,82 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             _logger.LogError("Agent did not respond to request.");
             return null;
+        }
+
+        public async Task<bool> DisableAgentAsync(
+            string agentId,
+            CancellationToken cancellationToken)
+        {
+            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
+
+            if (!agentExists)
+            {
+                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                return false;
+            }
+
+            var transactionId = Guid.NewGuid();
+
+            await webSocketClient.SendAgentStartStopRequestAsync(
+                transactionId,
+                AgentStartStopType.Stop,
+                agentId,
+                cancellationToken);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (stopwatch.ElapsedMilliseconds < 100000)
+            {
+                if (webSocketClient.TryGetAgentStatusResponse(transactionId, out var agentStatusResponse))
+                {
+                    return true;
+                }
+
+                await Task.Delay(1000, cancellationToken);
+            }
+
+            _logger.LogError("Agent did not respond to request.");
+            return false;
+        }
+
+        public async Task<bool> UpsertCameraMaskAsync(
+            string agentId,
+            string configFilename,
+            string maskImage,
+            CancellationToken cancellationToken)
+        {
+            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
+
+            if (!agentExists)
+            {
+                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                return false;
+            }
+
+            var transactionId = Guid.NewGuid();
+
+            await webSocketClient.SendSaveMaskRequestAsync(
+                transactionId,
+                maskImage,
+                configFilename,
+                cancellationToken);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while (stopwatch.ElapsedMilliseconds < 100000)
+            {
+                if (webSocketClient.TryGetAgentStatusResponse(transactionId, out var agentStatusResponse))
+                {
+                    return true;
+                }
+
+                await Task.Delay(1000, cancellationToken);
+            }
+
+            _logger.LogError("Agent did not respond to request.");
+            return false;
         }
     }
 }

@@ -1,8 +1,12 @@
-﻿namespace OpenAlprWebhookProcessor.Settings
+﻿using System;
+
+namespace OpenAlprWebhookProcessor.Settings
 {
     public class Agent
     {
         public string EndpointUrl { get; set; }
+
+        public Guid Id { get; set; }
 
         public string Hostname { get; set; }
 

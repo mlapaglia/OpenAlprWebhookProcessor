@@ -179,6 +179,8 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GetDebugPlateGroupRequestHandler>();
             services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
             services.AddScoped<TriggerAutofocusHandler>();
+            services.AddScoped<UpsertCameraMaskHandler>();
+            services.AddScoped<GetCameraMaskHandler>();
 
             services.AddScoped<UpsertWebPushClientRequestHandler>();
             services.AddScoped<GetWebPushClientRequestHandler>();

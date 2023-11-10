@@ -1,6 +1,7 @@
 export class Agent {
     endpointUrl: string;
     hostname: string;
+    id: string;
     isDebugEnabled: boolean;
     isImageCompressionEnabled: boolean;
     lastHeartbeatEpochMs: number;

@@ -136,6 +136,18 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
     });
   }
 
+  public enableAgent() {
+    this.settingsService.enableAgent(this.agent.id).subscribe(() => {
+      this.getAgentStatus();
+    });
+  }
+
+  public disableAgent() {
+    this.settingsService.disableAgent(this.agent.id).subscribe(() => {
+      this.getAgentStatus();
+    });
+  }
+
   private formatBytes(bytes: number, decimals = 2) {
     if (!+bytes) return '0 Bytes'
 

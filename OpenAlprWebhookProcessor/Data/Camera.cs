@@ -56,5 +56,7 @@ namespace OpenAlprWebhookProcessor.Data
         public string IpAddress { get; set; }
 
         public bool OpenAlprEnabled { get; set; }
+
+        public CameraMask Mask { get; set; }
     }
 }

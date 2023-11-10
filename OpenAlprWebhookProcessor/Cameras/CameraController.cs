@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,10 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private readonly TriggerAutofocusHandler _triggerAutofocusHandler;
 
+        private readonly UpsertCameraMaskHandler _upsertCameraMaskHandler;
+
+        private readonly GetCameraMaskHandler _getCameraMaskHandler;
+
         public CameraController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
@@ -34,7 +39,9 @@ namespace OpenAlprWebhookProcessor.Cameras
             TestCameraHandler testCameraHandler,
             GetZoomAndFocusHandler getZoomAndFocusHandler,
             SetZoomAndFocusHandler setZoomAndFocusHandler,
-            TriggerAutofocusHandler triggerAutofocusHandler)
+            TriggerAutofocusHandler triggerAutofocusHandler,
+            UpsertCameraMaskHandler upsertCameraMaskHandler,
+            GetCameraMaskHandler getCameraMaskHandler)
         {
             _getCameraHandler = getCameraHandler;
             _deleteCameraHandler = deleteCameraHandler;
@@ -43,6 +50,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             _getZoomAndFocusHandler = getZoomAndFocusHandler;
             _setZoomAndFocusHandler = setZoomAndFocusHandler;
             _triggerAutofocusHandler = triggerAutofocusHandler;
+            _upsertCameraMaskHandler = upsertCameraMaskHandler;
+            _getCameraMaskHandler = getCameraMaskHandler;
         }
 
         [HttpGet]
@@ -119,6 +128,22 @@ namespace OpenAlprWebhookProcessor.Cameras
             CancellationToken cancellationToken)
         {
             return await _triggerAutofocusHandler.HandleAsync(
+                cameraId,
+                cancellationToken);
+        }
+
+        [HttpPost("{cameraId}/mask")]
+        public async Task<bool> UpsertImageMask(CameraMask cameraMask, CancellationToken cancellationToken)
+        {
+            return await _upsertCameraMaskHandler.UpsertCameraMaskAsync(
+                cameraMask,
+                cancellationToken);
+        }
+
+        [HttpGet("{cameraId}/mask/coordinates")]
+        public async Task<List<MaskCoordinate>> GetImageMaskCoordinates(Guid cameraId, CancellationToken cancellationToken)
+        {
+            return await _getCameraMaskHandler.GetCameraMaskAsync(
                 cameraId,
                 cancellationToken);
         }

@@ -7,45 +7,41 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     {
         public static string GetRequestType(OpenAlprRequestType type)
         {
-            switch (type)
+            return type switch
             {
-                case OpenAlprRequestType.agent_status:
-                    return "agent_status";
-                case OpenAlprRequestType.config_info:
-                    return "config_info";
-                case OpenAlprRequestType.config_save_mask:
-                    return "config_save_mask";
-                case OpenAlprRequestType.image_download:
-                    return "image_download";
-                case OpenAlprRequestType.register:
-                    return "register";
-                case OpenAlprRequestType.site_id:
-                    return "site_id";
-
-                default:
-                    throw new KeyNotFoundException("Unable to find string value for enum: " + type.ToString());
-            }
+                OpenAlprRequestType.AgentStatus => "agent_status",
+                OpenAlprRequestType.ConfigAgentOperation => "config_agent_operation",
+                OpenAlprRequestType.ConfigInfo => "config_info",
+                OpenAlprRequestType.ConfigSaveMask => "config_save_mask",
+                OpenAlprRequestType.ImageDownload => "image_download",
+                OpenAlprRequestType.Register => "register",
+                OpenAlprRequestType.SiteId => "site_id",
+                _ => throw new KeyNotFoundException("Unable to find string value for enum: " + type.ToString()),
+            };
         }
     }
 
     public enum OpenAlprRequestType
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        agent_status,
+        AgentStatus,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        config_info,
+        ConfigAgentOperation,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        config_save_mask,
+        ConfigInfo,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        image_download,
+        ConfigSaveMask,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        register,
+        ImageDownload,
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        site_id,
+        Register,
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        SiteId,
     }
 }

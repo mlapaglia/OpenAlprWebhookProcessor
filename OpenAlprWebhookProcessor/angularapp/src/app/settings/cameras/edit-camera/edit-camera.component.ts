@@ -29,8 +29,9 @@ import { ZoomFocus } from './zoomfocus';
 })
 export class EditCameraComponent implements OnInit {
   public camera: Camera;
-  public hidePassword = true;
+  public hidePassword: boolean = true;
   public currentZoomFocus: ZoomFocus = new ZoomFocus();
+  public isEditingMask: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<EditCameraComponent>,
@@ -80,5 +81,9 @@ export class EditCameraComponent implements OnInit {
     (error) => {
       this.snackBarService.create("auto focus failed", SnackBarType.Error);
     });
+  }
+
+  public editMask() {
+      this.isEditingMask = !this.isEditingMask;
   }
 }

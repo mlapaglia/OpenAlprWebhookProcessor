@@ -38,6 +38,14 @@ export class SettingsService {
     return this.http.get<AgentStatus>(`/settings/agent/status`);
   }
 
+  disableAgent(agentId: string): Observable<boolean> {
+    return this.http.post<boolean>(`/settings/agent/disable`, agentId);
+  }
+
+  enableAgent(agentId: string): Observable<boolean> {
+    return this.http.post<boolean>(`/settings/agent/disable`, agentId);
+  }
+
   startAgentScrape(): Observable<any> {
     return this.http.post(`/settings/agent/scrape`, null);
   }

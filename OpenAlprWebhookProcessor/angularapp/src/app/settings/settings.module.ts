@@ -35,7 +35,7 @@ import { PushoverComponent } from './alerts/pushover/pushover.component';
 import { EnrichersComponent } from './enrichers/enrichers.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { WebpushComponent } from './alerts/webpush/webpush.component';
-import { PolygonDrawComponent } from './alerts/konva';
+import { CameraMaskComponent } from './cameras/edit-camera/camera-mask/camera-mask.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +53,7 @@ import { PolygonDrawComponent } from './alerts/konva';
     PushoverComponent,
     EnrichersComponent,
     WebpushComponent,
-    PolygonDrawComponent
+    CameraMaskComponent
   ],
   imports: [
     CommonModule,

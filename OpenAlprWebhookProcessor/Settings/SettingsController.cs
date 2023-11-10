@@ -45,6 +45,8 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly DeleteDebugPlateGroupRequestHandler _deleteDebugPlateGroupRequestHandler;
 
+        private readonly DisableAgentRequestHandler _disableAgentRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -58,7 +60,8 @@ namespace OpenAlprWebhookProcessor.Settings
             TestEnricherRequestHandler testEnricherRequestHandler,
             GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler,
             DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler,
-            GetAgentStatusRequestHandler getAgentStatusRequestHandler)
+            GetAgentStatusRequestHandler getAgentStatusRequestHandler,
+            DisableAgentRequestHandler disableAgentRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -73,6 +76,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _getDebugPlateGroupHandler = getDebugPlateGroupHandler;
             _deleteDebugPlateGroupRequestHandler = deleteDebugPlateGroupRequestHandler;
             _getAgentStatusRequestHandler = getAgentStatusRequestHandler;
+            _disableAgentRequestHandler = disableAgentRequestHandler;
         }
 
         [HttpGet("agent")]

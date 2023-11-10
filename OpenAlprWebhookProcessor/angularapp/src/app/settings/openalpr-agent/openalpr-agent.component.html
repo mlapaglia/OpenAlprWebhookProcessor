@@ -37,6 +37,10 @@
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
         </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button cdkFocusInitial (click)="disableAgent()">Disable Agent</button>
+            <button mat-raised-button cdkFocusInitial (click)="enableAgent()">Enable Agent</button>
+        </mat-card-actions>
     </mat-card>
     <mat-form-field>
         <mat-label>Endpoint Url</mat-label>

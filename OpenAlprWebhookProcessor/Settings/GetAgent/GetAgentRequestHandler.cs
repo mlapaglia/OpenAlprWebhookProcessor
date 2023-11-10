@@ -29,6 +29,7 @@ namespace OpenAlprWebhookProcessor.Settings
             {
                 EndpointUrl = agent.EndpointUrl,
                 Hostname = agent.Hostname,
+                Id = agent.Id,
                 IsDebugEnabled = agent.IsDebugEnabled,
                 IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
                 LastHeartbeatEpochMs = agent.LastHeartbeatEpochMs,
