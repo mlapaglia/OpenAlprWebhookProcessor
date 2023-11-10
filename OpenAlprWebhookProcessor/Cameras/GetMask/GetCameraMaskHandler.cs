@@ -29,6 +29,11 @@ namespace OpenAlprWebhookProcessor.Cameras
                 .Select(x => x.Coordinates)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            if (maskCoordinates == null)
+            {
+                maskCoordinates = string.Empty; 
+            }
+
             return JsonSerializer.Deserialize<List<MaskCoordinate>>(maskCoordinates);
         }
     }

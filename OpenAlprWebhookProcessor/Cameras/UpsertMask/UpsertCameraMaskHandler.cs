@@ -36,10 +36,18 @@ namespace OpenAlprWebhookProcessor.Cameras
                 .Include(x => x.Mask)
                 .FirstOrDefaultAsync(x => x.Id == cameraMask.CameraId, cancellationToken);
 
-            camera.Mask = new Data.CameraMask()
+            if (cameraMask.Coordinates.Any())
             {
-                Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
-            };
+                camera.Mask = new CameraMask()
+                {
+                    Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
+                };
+            }
+            else
+            {
+                camera.Mask = null;
+            }
+
 
             var result = await _websocketClientOrganizer.UpsertCameraMaskAsync(
                 agentUid,

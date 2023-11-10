@@ -196,30 +196,36 @@ export class CameraMaskComponent implements OnInit {
   }
   
   public saveMask() {
-    this.savingCtx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
-    this.savingCtx.fillStyle = 'white';
-    this.savingCtx.fillRect(0, 0, this.image.width, this.image.height);
-
-    this.savingCtx.beginPath();
-    this.savingCtx.moveTo(this.coordinates[0].x * this.scaleFactor, this.coordinates[0].y * this.scaleFactor);
-
-    for (let i = 1; i < this.coordinates.length; i++) {
-      this.savingCtx.lineTo(this.coordinates[i].x * this.scaleFactor, this.coordinates[i].y * this.scaleFactor);
-    }
-
-    this.savingCtx.closePath();
-    this.savingCtx.globalCompositeOperation = 'destination-out';
-    this.savingCtx.fill();
-    this.savingCtx.globalCompositeOperation = 'source-over';
-
     let cameraMask = new CameraMask();
-    cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/jpeg', 1.0);
-    cameraMask.cameraId = this.camera.id;
     cameraMask.coordinates = [];
+    cameraMask.cameraId = this.camera.id;
 
-    for (let i = 0; i < this.coordinates.length; i++) {
-      cameraMask.coordinates.push({ x: this.coordinates[i].x * this.scaleFactor, y: this.coordinates[i].y * this.scaleFactor });
+    if (this.coordinates.length > 0) {
+      this.savingCtx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
+      this.savingCtx.fillStyle = 'white';
+      this.savingCtx.fillRect(0, 0, this.image.width, this.image.height);
+
+      this.savingCtx.beginPath();
+      this.savingCtx.moveTo(this.coordinates[0].x * this.scaleFactor, this.coordinates[0].y * this.scaleFactor);
+
+      for (let i = 1; i < this.coordinates.length; i++) {
+        this.savingCtx.lineTo(this.coordinates[i].x * this.scaleFactor, this.coordinates[i].y * this.scaleFactor);
+      }
+
+      this.savingCtx.closePath();
+      this.savingCtx.globalCompositeOperation = 'destination-out';
+      this.savingCtx.fill();
+      this.savingCtx.globalCompositeOperation = 'source-over';
+
+      for (let i = 0; i < this.coordinates.length; i++) {
+        cameraMask.coordinates.push({ x: this.coordinates[i].x * this.scaleFactor, y: this.coordinates[i].y * this.scaleFactor });
+      }
+
+      cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/jpeg', 1.0);
     }
+
+    cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/jpeg', 1.0);
+    
 
     this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {
       this.snackbarService.create("Camera mask saved.", SnackBarType.Saved);
