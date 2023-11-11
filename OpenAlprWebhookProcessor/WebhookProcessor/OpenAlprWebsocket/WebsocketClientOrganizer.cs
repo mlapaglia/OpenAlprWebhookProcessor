@@ -164,8 +164,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         public async Task<bool> UpsertCameraMaskAsync(
             string agentId,
-            string configFilename,
             string maskImage,
+            string openAlprName,
             CancellationToken cancellationToken)
         {
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
@@ -181,7 +181,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             await webSocketClient.SendSaveMaskRequestAsync(
                 transactionId,
                 maskImage,
-                configFilename,
+                openAlprName,
                 cancellationToken);
 
             var stopwatch = new Stopwatch();

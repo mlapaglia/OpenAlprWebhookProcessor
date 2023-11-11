@@ -31,10 +31,12 @@ namespace OpenAlprWebhookProcessor.Cameras
 
             if (maskCoordinates == null)
             {
-                maskCoordinates = string.Empty; 
+                return new List<MaskCoordinate>();
             }
-
-            return JsonSerializer.Deserialize<List<MaskCoordinate>>(maskCoordinates);
+            else
+            {
+                return JsonSerializer.Deserialize<List<MaskCoordinate>>(maskCoordinates);
+            }
         }
     }
 }

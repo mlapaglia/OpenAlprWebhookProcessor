@@ -199,12 +199,13 @@ export class CameraMaskComponent implements OnInit {
     let cameraMask = new CameraMask();
     cameraMask.coordinates = [];
     cameraMask.cameraId = this.camera.id;
+    this.savingCtx.canvas.width = 810;
+    this.savingCtx.canvas.height = 1080;
+    this.savingCtx.drawImage(this.image, 0, 0, 810, 1080);
+    this.savingCtx.fillStyle = 'white';
+    this.savingCtx.fillRect(0, 0, 810, 1080);
 
     if (this.coordinates.length > 0) {
-      this.savingCtx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
-      this.savingCtx.fillStyle = 'white';
-      this.savingCtx.fillRect(0, 0, this.image.width, this.image.height);
-
       this.savingCtx.beginPath();
       this.savingCtx.moveTo(this.coordinates[0].x * this.scaleFactor, this.coordinates[0].y * this.scaleFactor);
 
@@ -213,18 +214,16 @@ export class CameraMaskComponent implements OnInit {
       }
 
       this.savingCtx.closePath();
-      this.savingCtx.globalCompositeOperation = 'destination-out';
-      this.savingCtx.fill();
       this.savingCtx.globalCompositeOperation = 'source-over';
+      this.savingCtx.fillStyle = "black";
+      this.savingCtx.fill();
 
       for (let i = 0; i < this.coordinates.length; i++) {
         cameraMask.coordinates.push({ x: this.coordinates[i].x * this.scaleFactor, y: this.coordinates[i].y * this.scaleFactor });
       }
-
-      cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/jpeg', 1.0);
     }
 
-    cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/jpeg', 1.0);
+    cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/png');
     
 
     this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {

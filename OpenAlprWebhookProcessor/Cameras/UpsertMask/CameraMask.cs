@@ -11,8 +11,6 @@ namespace OpenAlprWebhookProcessor.Cameras.UpsertMasks
 
         public string ImageMask { get; set; }
 
-        public string ConfigFilename { get; set; }
-
         public List<MaskCoordinate> Coordinates { get; set; }
     }
 }

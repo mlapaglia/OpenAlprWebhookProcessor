@@ -48,11 +48,10 @@ namespace OpenAlprWebhookProcessor.Cameras
                 camera.Mask = null;
             }
 
-
             var result = await _websocketClientOrganizer.UpsertCameraMaskAsync(
                 agentUid,
-                cameraMask.ConfigFilename,
                 cameraMask.ImageMask,
+                camera.OpenAlprName,
                 cancellationToken);
 
             await _processorContext.SaveChangesAsync(cancellationToken);

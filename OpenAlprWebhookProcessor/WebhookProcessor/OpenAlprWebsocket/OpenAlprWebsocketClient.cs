@@ -167,14 +167,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public async Task SendSaveMaskRequestAsync(
             Guid transactionId,
             string maskImage,
-            string filename,
+            string openAlprName,
             CancellationToken cancellationToken)
         {
             var saveMaskRequest = new ConfigSaveMaskRequest()
             {
-                MaskImage = maskImage,
+                MaskImage = maskImage.Remove(0, "data:image/png;base64,".Length),
                 RequestType = RequestType.GetRequestType(OpenAlprRequestType.ConfigSaveMask),
-                StreamFile = "door",
+                StreamFile = openAlprName + ".config",
                 TransactionId = transactionId,
                 Direction = "request",
             };
