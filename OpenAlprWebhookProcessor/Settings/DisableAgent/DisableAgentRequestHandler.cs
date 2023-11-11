@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async Task<bool> HandleAsync(string agentId, CancellationToken cancellationToken)
+        public async Task<bool> HandleAsync(Guid agentId, CancellationToken cancellationToken)
         {
             var agent = await _processorContext.Agents
                 .AsNoTracking()

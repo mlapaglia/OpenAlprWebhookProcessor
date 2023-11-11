@@ -47,6 +47,8 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly DisableAgentRequestHandler _disableAgentRequestHandler;
 
+        private readonly EnableAgentRequestHandler _enableAgentRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -61,7 +63,8 @@ namespace OpenAlprWebhookProcessor.Settings
             GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler,
             DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler,
             GetAgentStatusRequestHandler getAgentStatusRequestHandler,
-            DisableAgentRequestHandler disableAgentRequestHandler)
+            DisableAgentRequestHandler disableAgentRequestHandler,
+            EnableAgentRequestHandler enableAgentRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -77,6 +80,7 @@ namespace OpenAlprWebhookProcessor.Settings
             _deleteDebugPlateGroupRequestHandler = deleteDebugPlateGroupRequestHandler;
             _getAgentStatusRequestHandler = getAgentStatusRequestHandler;
             _disableAgentRequestHandler = disableAgentRequestHandler;
+            _enableAgentRequestHandler = enableAgentRequestHandler;
         }
 
         [HttpGet("agent")]
@@ -89,6 +93,18 @@ namespace OpenAlprWebhookProcessor.Settings
         public async Task<AgentStatus> GetAgentStatus(CancellationToken cancellationToken)
         {
             return await _getAgentStatusRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpPost("agent/disable")]
+        public async Task<bool> DisableAgent(Guid agentId, CancellationToken cancellationToken)
+        {
+            return await _disableAgentRequestHandler.HandleAsync(agentId, cancellationToken);
+        }
+
+        [HttpPost("agent/enable")]
+        public async Task<bool> EnableAgent(Guid agentId, CancellationToken cancellationToken)
+        {
+            return await _enableAgentRequestHandler.HandleAsync(agentId, cancellationToken);
         }
 
         [HttpPost("agent")]

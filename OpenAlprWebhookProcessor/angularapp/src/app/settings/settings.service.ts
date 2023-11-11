@@ -43,7 +43,7 @@ export class SettingsService {
   }
 
   enableAgent(agentId: string): Observable<boolean> {
-    return this.http.post<boolean>(`/settings/agent/disable`, agentId);
+    return this.http.post<boolean>(`/settings/agent/enable`, agentId);
   }
 
   startAgentScrape(): Observable<any> {

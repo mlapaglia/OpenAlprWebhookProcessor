@@ -68,7 +68,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     var webSocketClient = new OpenAlprWebsocketClient(
                         _logger,
                         agent.Uid,
-                        webSocket);
+                        webSocket,
+                        _processorHub);
 
                     if (_websocketClientOrganizer.AddAgent(agent.Uid, webSocketClient))
                     {

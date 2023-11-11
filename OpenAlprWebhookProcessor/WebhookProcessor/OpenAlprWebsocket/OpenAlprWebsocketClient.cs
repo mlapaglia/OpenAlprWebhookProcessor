@@ -10,6 +10,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Collections;
+using Microsoft.AspNetCore.SignalR;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket.OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
@@ -23,15 +25,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         private readonly ILogger _logger;
 
+        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+
         public OpenAlprWebsocketClient(
             ILogger logger,
             string agentId,
-            WebSocket webSocket)
+            WebSocket webSocket,
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
         {
             _logger = logger;
             _agentId = agentId;
             _webSocket = webSocket;
             _availableResponses = new ConcurrentDictionary<Guid, string>();
+            _processorHub = processorHub;
         }
 
         public async Task ConsumeMessagesAsync(CancellationToken cancellationToken)
@@ -140,27 +146,27 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 cancellationToken);
         }
 
-        public bool TryGetAgentStatusResponse(
+        public bool TryGetAgentResponse<T>(
             Guid transactionId,
-            out AgentStatusResponse agentStatusResponse)
+            out T agentStatusResponse)
         {
             if (_availableResponses.TryRemove(transactionId, out string message))
             {
                 try
                 {
-                    agentStatusResponse = JsonSerializer.Deserialize<AgentStatusResponse>(message);
+                    agentStatusResponse = JsonSerializer.Deserialize<T>(message);
 
                     return true;
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to deserialize AgentStatusResponse");
-                    agentStatusResponse = null;
+                    agentStatusResponse = default;
                     return false;
                 }
             }
 
-            agentStatusResponse = null;
+            agentStatusResponse = default;
             return false;
         }
 
@@ -197,7 +203,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             var saveMaskRequest = new AgentStartStopRequest()
             {
                 AgentId = agentId,
-                AgentOp = startStopType.ToString(),
+                AgentOp = startStopType.ToString().ToLowerInvariant(),
                 Direction = "request",
                 RequestType = RequestType.GetRequestType(OpenAlprRequestType.ConfigAgentOperation),
                 TransactionId = transactionId,

@@ -113,7 +113,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             while (stopwatch.ElapsedMilliseconds < 100000)
             {
-                if (webSocketClient.TryGetAgentStatusResponse(transactionId, out var agentStatusResponse))
+                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var agentStatusResponse))
                 {
                     return agentStatusResponse;
                 }
@@ -151,9 +151,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             while (stopwatch.ElapsedMilliseconds < 100000)
             {
-                if (webSocketClient.TryGetAgentStatusResponse(transactionId, out var agentStatusResponse))
+                if (webSocketClient.TryGetAgentResponse<AgentStartStopResponse>(transactionId, out var agentResponse))
                 {
-                    return true;
+                    return agentResponse.Success;
                 }
 
                 await Task.Delay(1000, cancellationToken);
@@ -190,7 +190,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             while (stopwatch.ElapsedMilliseconds < 100000)
             {
-                if (webSocketClient.TryGetAgentStatusResponse(transactionId, out var agentStatusResponse))
+                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var agentStatusResponse))
                 {
                     return true;
                 }
