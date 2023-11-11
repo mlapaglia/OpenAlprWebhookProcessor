@@ -11,11 +11,15 @@ export class CameraMaskService {
   
   constructor(private http: HttpClient) { }
 
-  getCameraSnapshot(imageUrl: string): Observable<Blob> {
-    let headers = new HttpHeaders({
-        'Accept': 'image/jpeg',
-      });
+  getCameraSnapshot(cameraId: string): Observable<string> {
+    return this.http.get<string>(`/cameras/${cameraId}/snapshot`);
+  }
 
+  getPlateCaptures(cameraId: string): Observable<string[]> {
+    return this.http.get<string[]>(`/cameras/${cameraId}/plateCaptures`);
+  }
+
+  getPlateCapture(imageUrl: string): Observable<Blob> {
     return this.http.get<Blob>(imageUrl, { responseType: 'blob' as 'json' });
   }
 

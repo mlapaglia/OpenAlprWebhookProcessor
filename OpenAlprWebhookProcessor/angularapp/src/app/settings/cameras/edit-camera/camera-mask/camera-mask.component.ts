@@ -1,10 +1,11 @@
-import { AfterContentInit, AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { CameraMaskService } from './camera-mask.service';
 import { CameraMask } from './camera-mask';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Camera } from '../../camera';
 import { Coordinate } from './coordinate';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-camera-mask',
@@ -38,14 +39,28 @@ export class CameraMaskComponent implements OnInit {
   public scaleFactor: number;
   public targetWidth: number = 960;
 
+  public paginatorIndex: number = 0;
+  public samplePlates: string[] = [];
+
   constructor(
     private snackbarService: SnackbarService,
     private cameraMaskService: CameraMaskService) { }
 
-    ngOnInit(): void {
-      this.prepareCanvases();
-      this.loadImageIntoCanvas();
-      this.addEventHandlers();
+  ngOnInit(): void {
+    this.getSamplePlates();
+    this.prepareCanvases();
+    this.loadImageIntoCanvas(this.camera.sampleImageUrl);
+    this.addEventHandlers();
+  }
+
+  public getSamplePlates() {
+    this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
+      this.samplePlates = plates;
+    })
+  }
+
+  public handlePageEvent(pageEvent: PageEvent) {
+    this.loadImageIntoCanvas(this.samplePlates[pageEvent.pageIndex]);
   }
 
   public prepareCanvases() {
@@ -137,9 +152,9 @@ export class CameraMaskComponent implements OnInit {
     });
   }
 
-  public loadImageIntoCanvas() {
+  public loadImageIntoCanvas(url: string) {
     this.isLoadingSnapshot = true;
-    this.cameraMaskService.getCameraSnapshot(this.camera.sampleImageUrl).subscribe((image: Blob) => {
+    this.cameraMaskService.getPlateCapture(url).subscribe((image: Blob) => {
       let reader = new FileReader()!;
 
       reader.onload = () => {
@@ -181,18 +196,24 @@ export class CameraMaskComponent implements OnInit {
 
   public loadMaskCoordinates() {
     this.currentPos = { x: 0, y: 0 };
-    
-    this.cameraMaskService.getCameraMaskCoordinates(this.camera.id).subscribe((coordinates) => {
-      coordinates.forEach(coordinate => {
-        coordinate.x /= this.scaleFactor;
-        coordinate.y /= this.scaleFactor;
-      });
 
-      this.coordinates = coordinates;
+    if (this.coordinates.length === 0) {
+      this.cameraMaskService.getCameraMaskCoordinates(this.camera.id).subscribe((coordinates) => {
+        coordinates.forEach(coordinate => {
+          coordinate.x /= this.scaleFactor;
+          coordinate.y /= this.scaleFactor;
+        });
+
+        this.coordinates = coordinates;
+        this.closePolygon();
+        this.draw();
+        this.isLoadingSnapshot = false;
+      });
+    } else {
       this.closePolygon();
       this.draw();
       this.isLoadingSnapshot = false;
-    });
+    }
   }
   
   public saveMask() {

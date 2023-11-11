@@ -11,7 +11,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { LightboxModule } from 'ngx-lightbox';
 import { MatButtonModule } from '@angular/material/button';
-import { FastSearchComponent } from './fast-search/fast-search.component';
 import { AccountService } from './_services';
 import { appInitializer } from './_helpers/app.initializer';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -68,7 +67,6 @@ import { ServiceWorkerModule } from '@angular/service-worker';
         AppComponent,
         AlertComponent,
         HomeComponent,
-        FastSearchComponent,
         SnackbarComponent
     ],
     providers: [

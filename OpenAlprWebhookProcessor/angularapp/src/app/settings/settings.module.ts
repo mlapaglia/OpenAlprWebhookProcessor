@@ -36,6 +36,8 @@ import { EnrichersComponent } from './enrichers/enrichers.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { WebpushComponent } from './alerts/webpush/webpush.component';
 import { CameraMaskComponent } from './cameras/edit-camera/camera-mask/camera-mask.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [
@@ -63,6 +65,7 @@ import { CameraMaskComponent } from './cameras/edit-camera/camera-mask/camera-ma
     MatIconModule,
     MatCardModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatGridListModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -73,6 +76,7 @@ import { CameraMaskComponent } from './cameras/edit-camera/camera-mask/camera-ma
     MatButtonModule,
     MatTooltipModule,
     MatTableModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatDatepickerModule,
     MatNativeDateModule,

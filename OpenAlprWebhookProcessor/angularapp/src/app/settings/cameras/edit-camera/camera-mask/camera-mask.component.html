@@ -3,11 +3,32 @@
     Modify Camera Mask
   </mat-card-header>
   <mat-card-content>
-    <div [hidden]="isLoadingSnapshot" class="canvasHolder">
-      <div>
+    <div class="canvasHolder">
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+          <div>
+            <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+              <mat-button-toggle value="snapshot">Snapshot</mat-button-toggle>
+              <mat-button-toggle value="plates">Plates</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+          <div style="display: flex;">
+            <button mat-button color="warn" style="align-self: center;" (click)="resetCanvas()">Reset</button>
+            <button mat-button color="primary" style="align-self: center;" (click)="undoLastPoint()">Undo</button>
+            <mat-paginator #paginator
+              *ngIf="samplePlates.length > 0"
+              (page)="handlePageEvent($event)"
+              [length]="samplePlates.length"
+              [pageSize]="1"
+              [showFirstLastButtons]="false"
+              [pageSizeOptions]="[]"
+              [hidePageSize]="true"
+              [pageIndex]="paginatorIndex"
+              aria-label="Select page">
+            </mat-paginator>
+          </div>
+        </div>
         <canvas class="canvas" #canvas width="960" height="540"></canvas>
-        <button mat-button color="primary" (click)="undoLastPoint()">Undo</button>
-        <button mat-button color="warn" (click)="resetCanvas()">Reset</button>
       </div>
       <div #measureDiv></div>
       <div>
