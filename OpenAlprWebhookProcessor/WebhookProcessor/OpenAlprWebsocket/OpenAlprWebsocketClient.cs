@@ -174,7 +174,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             {
                 MaskImage = maskImage.Remove(0, "data:image/png;base64,".Length),
                 RequestType = RequestType.GetRequestType(OpenAlprRequestType.ConfigSaveMask),
-                StreamFile = openAlprName + ".config",
+                StreamFile = openAlprName + ".conf",
                 TransactionId = transactionId,
                 Direction = "request",
             };

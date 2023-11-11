@@ -125,8 +125,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             return null;
         }
 
-        public async Task<bool> DisableAgentAsync(
+        public async Task<bool> DisableEnableAgentAsync(
             string agentId,
+            AgentStartStopType startStopType,
             CancellationToken cancellationToken)
         {
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
@@ -141,7 +142,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             await webSocketClient.SendAgentStartStopRequestAsync(
                 transactionId,
-                AgentStartStopType.Stop,
+                startStopType,
                 agentId,
                 cancellationToken);
 

@@ -31,8 +31,9 @@ namespace OpenAlprWebhookProcessor.Settings
                 return false;
             }
 
-            return await _websocketClientOrganizer.DisableAgentAsync(
+            return await _websocketClientOrganizer.DisableEnableAgentAsync(
                 agent.Uid,
+                AgentStartStopType.Start,
                 cancellationToken);
         }
     }
