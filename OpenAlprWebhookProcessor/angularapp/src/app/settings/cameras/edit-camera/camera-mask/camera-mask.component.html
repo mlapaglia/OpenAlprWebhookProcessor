@@ -7,7 +7,7 @@
       <div style="display: flex; flex-direction: column;">
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
           <div>
-            <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+            <mat-button-toggle-group (change)="handleToggleChange($event)" name="fontStyle" aria-label="Font Style">
               <mat-button-toggle value="snapshot">Snapshot</mat-button-toggle>
               <mat-button-toggle value="plates">Plates</mat-button-toggle>
             </mat-button-toggle-group>

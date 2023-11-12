@@ -6,6 +6,7 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Camera } from '../../camera';
 import { Coordinate } from './coordinate';
 import { PageEvent } from '@angular/material/paginator';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-camera-mask',
@@ -38,6 +39,7 @@ export class CameraMaskComponent implements OnInit {
   public imageWidth: number;
   public scaleFactor: number;
   public targetWidth: number = 960;
+  public imageInValidState: boolean = true;
 
   public paginatorIndex: number = 0;
   public samplePlates: string[] = [];
@@ -49,18 +51,27 @@ export class CameraMaskComponent implements OnInit {
   ngOnInit(): void {
     this.getSamplePlates();
     this.prepareCanvases();
-    this.loadImageIntoCanvas(this.camera.sampleImageUrl);
     this.addEventHandlers();
   }
 
   public getSamplePlates() {
     this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
       this.samplePlates = plates;
+      this.loadImageIntoCanvas(this.camera.sampleImageUrl);
     })
   }
 
   public handlePageEvent(pageEvent: PageEvent) {
     this.loadImageIntoCanvas(this.samplePlates[pageEvent.pageIndex]);
+  }
+
+  public handleToggleChange(toggleEvent: MatButtonToggleChange) {
+    if(toggleEvent.value === "snapshot") {
+      this.samplePlates = [`/images/${this.camera.id}/snapshot`];
+      this.loadImageIntoCanvas(this.samplePlates[0]);
+    } else {
+      this.getSamplePlates();
+    }
   }
 
   public prepareCanvases() {
@@ -72,6 +83,10 @@ export class CameraMaskComponent implements OnInit {
 
   public addEventHandlers() {
     this.canvas.nativeElement.addEventListener('mousedown', (event) => {
+      if(!this.imageInValidState) {
+        return;
+      }
+
       const mousePos = this.getMousePosition(event);
 
       if (this.isClosed && this.isPointInPolygon(mousePos.x, mousePos.y, this.coordinates)) {
@@ -91,6 +106,9 @@ export class CameraMaskComponent implements OnInit {
     });
 
     document.addEventListener('mousemove', (event) => {
+      if(!this.imageInValidState) {
+        return;
+      }
       const mousePos = this.getMousePosition(event);
 
       if (this.coordinates.length === 0) {
@@ -123,6 +141,9 @@ export class CameraMaskComponent implements OnInit {
     });
 
     this.canvas.nativeElement.addEventListener('mouseup', () => {
+      if(!this.imageInValidState) {
+        return;
+      }
       this.isDragging = false;
       this.dragStartIndex = -1;
       this.dragOffset = { x: 0, y: 0 };
@@ -131,6 +152,9 @@ export class CameraMaskComponent implements OnInit {
     });
 
     this.canvas.nativeElement.addEventListener('click', (event) => {
+      if(!this.imageInValidState) {
+        return;
+      }
       if (!this.isClosed && !this.isDragging) {
         const mousePos = this.getMousePosition(event);
 
@@ -143,6 +167,9 @@ export class CameraMaskComponent implements OnInit {
     });
 
     this.canvas.nativeElement.addEventListener('mouseleave', () => {
+      if(!this.imageInValidState) {
+        return;
+      }
       this.isDragging = false;
       this.dragStartIndex = -1;
       this.dragOffset = {x: 0, y: 0};
@@ -161,6 +188,7 @@ export class CameraMaskComponent implements OnInit {
         this.image = new Image();
 
         this.image.onload = () => {
+          this.imageInValidState = true;
           this.scaleFactor = this.image.width / this.targetWidth;
 
           this.measureDiv.nativeElement.appendChild(this.image);
@@ -182,11 +210,17 @@ export class CameraMaskComponent implements OnInit {
           }
 
           this.measureDiv.nativeElement.removeChild(this.image);
-          this.ctx.drawImage(this.image,0,0, this.imageWidth , this.imageHeight);
+          console.log("trying to draw image");
+          this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
           
           this.loadMaskCoordinates();
         }
 
+        this.image.onerror = () => {
+          console.log("failed to get image");
+          this.imageInValidState = false;
+        }
+        
         this.image.src = reader.result as string;
       }
 
@@ -261,7 +295,12 @@ export class CameraMaskComponent implements OnInit {
   
   public draw() {
     this.ctx.clearRect(0, 0, this.imageWidth, this.imageHeight);
-    this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
+    try {
+      this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
+    }
+    catch {
+      (this.ctx as any).reset();
+    }
 
     if (this.coordinates.length > 0) {
       this.ctx.fillStyle = 'rgba(139, 0, 0, 0.2)';

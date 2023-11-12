@@ -11,8 +11,8 @@ export class CameraMaskService {
   
   constructor(private http: HttpClient) { }
 
-  getCameraSnapshot(cameraId: string): Observable<string> {
-    return this.http.get<string>(`/cameras/${cameraId}/snapshot`);
+  getCameraSnapshot(cameraId: string): Observable<Blob> {
+    return this.http.get<Blob>(`/images/${cameraId}/snapshot`);
   }
 
   getPlateCaptures(cameraId: string): Observable<string[]> {
