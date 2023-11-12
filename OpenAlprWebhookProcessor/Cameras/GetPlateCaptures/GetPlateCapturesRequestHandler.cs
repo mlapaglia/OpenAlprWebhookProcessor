@@ -31,6 +31,7 @@ namespace OpenAlprWebhookProcessor.Cameras.GetPlateCaptures
                 .AsNoTracking()
                 .Where(x => x.OpenAlprCameraId == openAlprCameraId)
                 .Where(x => x.PlateImage != null)
+                .OrderByDescending(x => x.ReceivedOnEpoch)
                 .Select(x => x.OpenAlprUuid)
                 .Take(10)
                 .ToListAsync(cancellationToken);

@@ -249,16 +249,14 @@ export class CameraMaskComponent implements OnInit {
       this.isLoadingSnapshot = false;
     }
   }
-  
+
   public saveMask() {
     let cameraMask = new CameraMask();
     cameraMask.coordinates = [];
     cameraMask.cameraId = this.camera.id;
-    this.savingCtx.canvas.width = 810;
-    this.savingCtx.canvas.height = 1080;
-    this.savingCtx.drawImage(this.image, 0, 0, 810, 1080);
+    this.savingCtx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
     this.savingCtx.fillStyle = 'white';
-    this.savingCtx.fillRect(0, 0, 810, 1080);
+    this.savingCtx.fillRect(0, 0, this.imageWidth, this.imageHeight);
 
     if (this.coordinates.length > 0) {
       this.savingCtx.beginPath();
