@@ -254,30 +254,29 @@ export class CameraMaskComponent implements OnInit {
     let cameraMask = new CameraMask();
     cameraMask.coordinates = [];
     cameraMask.cameraId = this.camera.id;
-    this.savingCtx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
+    this.savingCtx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
     this.savingCtx.fillStyle = 'white';
-    this.savingCtx.fillRect(0, 0, this.imageWidth, this.imageHeight);
+    this.savingCtx.fillRect(0, 0, this.image.width, this.image.height);
 
     if (this.coordinates.length > 0) {
-      this.savingCtx.beginPath();
-      this.savingCtx.moveTo(this.coordinates[0].x * this.scaleFactor, this.coordinates[0].y * this.scaleFactor);
+      for (let i = 0; i < this.coordinates.length; i++) {
+        cameraMask.coordinates.push({ x: this.coordinates[i].x * this.scaleFactor, y: this.coordinates[i].y * this.scaleFactor });
+      }
 
-      for (let i = 1; i < this.coordinates.length; i++) {
-        this.savingCtx.lineTo(this.coordinates[i].x * this.scaleFactor, this.coordinates[i].y * this.scaleFactor);
+      this.savingCtx.beginPath();
+      this.savingCtx.moveTo(cameraMask.coordinates[0].x, cameraMask.coordinates[0].y);
+
+      for (let i = 1; i < cameraMask.coordinates.length; i++) {
+        this.savingCtx.lineTo(cameraMask.coordinates[i].x, cameraMask.coordinates[i].y);
       }
 
       this.savingCtx.closePath();
       this.savingCtx.globalCompositeOperation = 'source-over';
       this.savingCtx.fillStyle = "black";
       this.savingCtx.fill();
-
-      for (let i = 0; i < this.coordinates.length; i++) {
-        cameraMask.coordinates.push({ x: this.coordinates[i].x * this.scaleFactor, y: this.coordinates[i].y * this.scaleFactor });
-      }
     }
 
     cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/png');
-    
 
     this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {
       this.snackbarService.create("Camera mask saved.", SnackBarType.Saved);
