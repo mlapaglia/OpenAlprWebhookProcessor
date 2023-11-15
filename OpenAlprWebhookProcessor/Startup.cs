@@ -199,10 +199,10 @@ namespace OpenAlprWebhookProcessor
             services.AddHttpClient<PushServiceClient>();
 
             services.AddSingleton<WebPushNotificationProducer>();
-            services.AddHostedService<WebPushNotificationProducer>();
-
+            services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
+            
             services.AddSingleton<WebsocketClientOrganizer>();
-            services.AddHostedService<WebsocketClientOrganizer>();
+            services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());

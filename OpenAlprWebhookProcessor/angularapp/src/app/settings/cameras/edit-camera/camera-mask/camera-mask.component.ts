@@ -5,13 +5,18 @@ import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Camera } from '../../camera';
 import { Coordinate } from './coordinate';
-import { PageEvent } from '@angular/material/paginator';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
+import { NgIf } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-camera-mask',
-  templateUrl: './camera-mask.component.html',
-  styleUrls: ['./camera-mask.component.css']
+    selector: 'app-camera-mask',
+    templateUrl: './camera-mask.component.html',
+    styleUrls: ['./camera-mask.component.css'],
+    standalone: true,
+    imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, NgIf, MatPaginatorModule]
 })
 export class CameraMaskComponent implements OnInit {
   @Input() camera: Camera;

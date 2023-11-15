@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -8,11 +8,22 @@ import { PlateService } from '../plate.service';
 import { Plate } from './plate';
 import { PlateStatisticsData } from './plateStatistics';
 import { Subscription } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-plate',
-  templateUrl: './plate.component.html',
-  styleUrls: ['./plate.component.less']
+    selector: 'app-plate',
+    templateUrl: './plate.component.html',
+    styleUrls: ['./plate.component.less'],
+    standalone: true,
+    imports: [MatCardModule, MatProgressSpinnerModule, NgIf, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   @Input() plate: Plate;

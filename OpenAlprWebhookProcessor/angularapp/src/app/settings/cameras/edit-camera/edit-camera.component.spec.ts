@@ -8,8 +8,8 @@ describe('EditCameraComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditCameraComponent ]
-    })
+    imports: [EditCameraComponent]
+})
     .compileComponents();
   });
 

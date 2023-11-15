@@ -8,8 +8,8 @@ describe('OpenalprAgentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OpenalprAgentComponent ]
-    })
+    imports: [OpenalprAgentComponent]
+})
     .compileComponents();
   });
 

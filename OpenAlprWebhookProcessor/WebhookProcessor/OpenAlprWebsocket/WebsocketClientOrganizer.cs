@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -16,6 +15,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         private readonly ILogger<WebsocketClientOrganizer> _logger;
 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
         public WebsocketClientOrganizer(
             ILogger<WebsocketClientOrganizer> logger)
         {
@@ -23,35 +24,71 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            try
+            {
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                await Task.Delay(Timeout.Infinite, _cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException ex)
+            {
+                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {message}", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unknown error occurred {message}, stopping websockets: {message}", ex.Message);
+            }
+            finally
+            {
+                await DisconnectClientsAsync();
+            }
         }
 
-        public bool AddAgent(
+        public async Task<AddAgentResult> AddAgentAsync(
             string agentId,
-            OpenAlprWebsocketClient webSocketClient)
+            OpenAlprWebsocketClient webSocketClient,
+            CancellationToken cancellationToken)
         {
-            var wasUpdated = false;
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
 
-            _connectedClients.AddOrUpdate(
-                agentId,
-                webSocketClient, (key, oldValue) =>
+            var result = new AddAgentResult();
+
+            result.WasUpdated = _connectedClients.TryRemove(agentId, out var oldWebSocketClient);
+
+            if (result.WasUpdated)
+            {
+                try
                 {
-                    wasUpdated = true;
-                    return webSocketClient;
-                });
+                    await oldWebSocketClient.CloseConnectionAsync(linkedCancellationToken);
+                    result.UpdateWasCleanDisconnect = true;
+                }
+                catch
+                {
+                }
+            }
 
-            return wasUpdated;
+            if (_connectedClients.TryAdd(agentId, webSocketClient))
+            {
+                result.WasAdded = true;
+            }
+            else
+            {
+                _logger.LogError("Unable to add agent: {agentID}", agentId);
+            }
+
+            return result;
         }
 
         public async Task RemoveAgentAsync(
             string agentId,
             CancellationToken cancellationToken)
         {
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+
             if (_connectedClients.TryRemove(agentId, out var webSocketClient))
             {
-                await webSocketClient.CloseConnectionAsync(cancellationToken);
+                await webSocketClient.CloseConnectionAsync(linkedCancellationToken);
             }
         }
 
@@ -60,6 +97,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             long cameraId,
             CancellationToken cancellationToken)
         {
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
 
             if (!agentExists)
@@ -73,7 +112,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             await webSocketClient.SendGetImageRequestAsync(
                 transactionId,
                 cameraId,
-                cancellationToken);
+                linkedCancellationToken);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -85,7 +124,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     return imageDownloadResponse;
                 }
 
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(1000, linkedCancellationToken);
             }
 
             _logger.LogError("Agent did not respond to request.");
@@ -96,6 +135,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string agentId,
             CancellationToken cancellationToken)
         {
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
 
             if (!agentExists)
@@ -106,7 +147,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             var transactionId = Guid.NewGuid();
 
-            await webSocketClient.SendGetAgentStatusRequestAsync(transactionId, cancellationToken);
+            await webSocketClient.SendGetAgentStatusRequestAsync(transactionId, linkedCancellationToken);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -118,7 +159,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     return agentStatusResponse;
                 }
 
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(1000, linkedCancellationToken);
             }
 
             _logger.LogError("Agent did not respond to request.");
@@ -130,6 +171,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             AgentStartStopType startStopType,
             CancellationToken cancellationToken)
         {
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
 
             if (!agentExists)
@@ -144,7 +187,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 transactionId,
                 startStopType,
                 agentId,
-                cancellationToken);
+                linkedCancellationToken);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -156,7 +199,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     return agentResponse.Success;
                 }
 
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(1000, linkedCancellationToken);
             }
 
             _logger.LogError("Agent did not respond to request.");
@@ -169,6 +212,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string openAlprName,
             CancellationToken cancellationToken)
         {
+            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+
             var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
 
             if (!agentExists)
@@ -183,7 +228,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 transactionId,
                 maskImage,
                 openAlprName,
-                cancellationToken);
+                linkedCancellationToken);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -195,11 +240,24 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     return true;
                 }
 
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(1000, linkedCancellationToken);
             }
 
             _logger.LogError("Agent did not respond to request.");
             return false;
+        }
+
+        private CancellationToken GetLinkedCancellationToken(CancellationToken cancellationToken)
+        {
+            return CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken).Token;
+        }
+
+        private async Task DisconnectClientsAsync()
+        {
+            await Parallel.ForEachAsync(_connectedClients.Values, async (connectedClient, cancellationToken) =>
+            {
+                await connectedClient.CloseConnectionAsync(default);
+            });
         }
     }
 }

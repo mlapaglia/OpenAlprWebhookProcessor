@@ -8,8 +8,8 @@ describe('WebpushComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [WebpushComponent]
-    });
+    imports: [WebpushComponent]
+});
     fixture = TestBed.createComponent(WebpushComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -3,8 +3,14 @@ import { User } from 'app/_models';
 import { AccountService } from 'app/_services';
 import { HomeService } from './home.service';
 import { DayCount } from './plateCountResponse';
+import { BarChartModule } from '@swimlane/ngx-charts';
+import { MatCardModule } from '@angular/material/card';
 
-@Component({ templateUrl: 'home.component.html' })
+@Component({
+    templateUrl: 'home.component.html',
+    standalone: true,
+    imports: [MatCardModule, BarChartModule]
+})
 export class HomeComponent implements OnInit {
     user: User;
     public plateCounts: any[];

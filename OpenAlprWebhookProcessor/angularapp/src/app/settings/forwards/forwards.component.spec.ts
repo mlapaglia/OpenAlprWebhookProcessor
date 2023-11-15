@@ -8,8 +8,8 @@ describe('ForwardsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ForwardsComponent ]
-    })
+    imports: [ForwardsComponent]
+})
     .compileComponents();
   });
 

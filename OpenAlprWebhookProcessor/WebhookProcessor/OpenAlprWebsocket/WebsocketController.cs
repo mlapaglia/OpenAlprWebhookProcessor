@@ -71,9 +71,20 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                         webSocket,
                         _processorHub);
 
-                    if (_websocketClientOrganizer.AddAgent(agent.Uid, webSocketClient))
+                    var addResult = await _websocketClientOrganizer.AddAgentAsync(
+                        agent.Uid,
+                        webSocketClient,
+                        cancellationToken);
+
+                    if (!addResult.WasAdded)
                     {
-                        _logger.LogError("Multiple websocket connections for the same agent, overwriting old connection: {agentId}.", agent.Uid);
+                        _logger.LogError("Unable to disconnect client: {agentId}", agent.Uid);
+                        return;
+                    }
+
+                    if (addResult.WasUpdated)
+                    {
+                        _logger.LogWarning("Multiple websocket connections for the same agent, previous agent disconnected: {agentId}.", agent.Uid);
                     }
 
                     await _processorHub.Clients.All.OpenAlprAgentConnected(agent.Uid, HttpContext.Connection.RemoteIpAddress.ToString());
@@ -83,6 +94,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                         await webSocketClient.ConsumeMessagesAsync(cancellationToken);
 
                         await _websocketClientOrganizer.RemoveAgentAsync(agent.Uid, cancellationToken);
+
+                        _logger.LogInformation("Websocket connection closed: {agentId}", agent.Uid);
                     }
                     catch (Exception ex)
                     {

@@ -1,11 +1,16 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from 'app/_services';
+import { NgIf, NgClass } from '@angular/common';
 
-@Component({ templateUrl: 'add-edit.component.html' })
+@Component({
+    templateUrl: 'add-edit.component.html',
+    standalone: true,
+    imports: [NgIf, ReactiveFormsModule, NgClass, RouterLink]
+})
 export class AddEditComponent implements OnInit {
     form: FormGroup;
     id: string;

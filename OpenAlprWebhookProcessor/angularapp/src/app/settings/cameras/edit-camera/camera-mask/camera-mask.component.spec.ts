@@ -8,8 +8,8 @@ describe('CameraMaskComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CameraMaskComponent]
-    });
+    imports: [CameraMaskComponent]
+});
     fixture = TestBed.createComponent(CameraMaskComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

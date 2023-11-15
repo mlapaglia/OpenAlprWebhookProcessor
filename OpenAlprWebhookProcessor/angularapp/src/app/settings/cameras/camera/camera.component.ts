@@ -1,10 +1,18 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Camera } from '../camera';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { NgIf, DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-camera',
-  templateUrl: './camera.component.html',
-  styleUrls: ['./camera.component.less']
+    selector: 'app-camera',
+    templateUrl: './camera.component.html',
+    styleUrls: ['./camera.component.less'],
+    standalone: true,
+    imports: [NgIf, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTooltipModule, MatButtonModule, DatePipe]
 })
 export class CameraComponent implements OnInit {
   @Input() camera: Camera;

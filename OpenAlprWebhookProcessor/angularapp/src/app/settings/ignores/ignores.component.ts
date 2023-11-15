@@ -1,12 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SettingsService } from '../settings.service';
 import { Ignore } from './ignore/ignore';
+import { MatButtonModule } from '@angular/material/button';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
-  selector: 'app-ignores',
-  templateUrl: './ignores.component.html',
-  styleUrls: ['./ignores.component.less']
+    selector: 'app-ignores',
+    templateUrl: './ignores.component.html',
+    styleUrls: ['./ignores.component.less'],
+    standalone: true,
+    imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class IgnoresComponent implements OnInit {
   public ignores: MatTableDataSource<Ignore>;

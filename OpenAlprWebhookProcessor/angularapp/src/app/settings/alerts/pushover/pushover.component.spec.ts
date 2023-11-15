@@ -8,8 +8,8 @@ describe('PushoverComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PushoverComponent ]
-    })
+    imports: [PushoverComponent]
+})
     .compileComponents();
   });
 

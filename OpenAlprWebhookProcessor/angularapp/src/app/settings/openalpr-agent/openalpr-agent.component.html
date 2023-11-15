@@ -23,6 +23,7 @@
                 <span style="align-self: center; font-weight:500;">{{isLoadingAgentStatus ? "Checking..." : agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
             </div>
             <table
+                [hidden]="!agentStatus || isLoadingAgentStatus"
                 #agentStatusTable
                 mat-table
                 [dataSource]="agentStatusData"

@@ -3,8 +3,14 @@ import { first } from 'rxjs/operators';
 
 import { AccountService } from 'app/_services';
 import { User } from 'app/_models';
+import { NgFor, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
-@Component({ templateUrl: 'list.component.html' })
+@Component({
+    templateUrl: 'list.component.html',
+    standalone: true,
+    imports: [RouterLink, NgFor, NgIf]
+})
 export class ListComponent implements OnInit {
     users: User[] = [];
 

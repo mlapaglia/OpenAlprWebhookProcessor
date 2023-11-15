@@ -8,8 +8,8 @@ describe('EditPlateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditPlateComponent ]
-    })
+    imports: [EditPlateComponent]
+})
     .compileComponents();
   });
 

@@ -1,30 +1,37 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Webpush } from './webpush';
 import { WebpushService } from './webpush.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-webpush',
-  templateUrl: './webpush.component.html',
-  styleUrls: ['./webpush.component.css'],
-  animations: [
-    trigger(
-      'inOutAnimation',
-      [
-        transition(
-          ':enter', [
-          style({ height: 0, opacity: 0 }),
-          animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-            style({ height: '*', opacity: 1 }))]),
-        transition(
-          ':leave', [
-          style({ height: '*', opacity: 1 }),
-          animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-            style({ height: 0, opacity: 0 }))])
-      ])]
+    selector: 'app-webpush',
+    templateUrl: './webpush.component.html',
+    styleUrls: ['./webpush.component.css'],
+    animations: [
+        trigger('inOutAnimation', [
+            transition(':enter', [
+                style({ height: 0, opacity: 0 }),
+                animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 }))
+            ]),
+            transition(':leave', [
+                style({ height: '*', opacity: 1 }),
+                animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: 0, opacity: 0 }))
+            ])
+        ])
+    ],
+    standalone: true,
+    imports: [NgIf, MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatButtonModule]
 })
 export class WebpushComponent implements OnInit {
   public client: Webpush;

@@ -11,9 +11,7 @@ import { RegisterComponent } from './register.component';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        AccountRoutingModule
-    ],
-    declarations: [
+        AccountRoutingModule,
         LayoutComponent,
         LoginComponent,
         RegisterComponent

@@ -8,8 +8,8 @@ describe('IgnoresComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ IgnoresComponent ]
-    })
+    imports: [IgnoresComponent]
+})
     .compileComponents();
   });
 

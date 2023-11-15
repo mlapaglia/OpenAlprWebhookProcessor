@@ -7,12 +7,24 @@ import { AgentStatus } from './agentStatus';
 import { PlateStatisticsData } from 'app/plates/plate/plateStatistics';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
-import { MatTable } from '@angular/material/table';
+import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { NgIf, NgStyle } from '@angular/common';
 
 @Component({
-  selector: 'app-openalpr-agent',
-  templateUrl: './openalpr-agent.component.html',
-  styleUrls: ['./openalpr-agent.component.less']
+    selector: 'app-openalpr-agent',
+    templateUrl: './openalpr-agent.component.html',
+    styleUrls: ['./openalpr-agent.component.less'],
+    standalone: true,
+    imports: [NgIf, MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
   @ViewChild('agentStatusTable') table: MatTable<any>;

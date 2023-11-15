@@ -8,8 +8,8 @@ describe('EnrichersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EnrichersComponent ]
-    })
+    imports: [EnrichersComponent]
+})
     .compileComponents();
   });
 

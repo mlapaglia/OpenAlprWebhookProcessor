@@ -1,16 +1,22 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Subscription } from 'rxjs';
-import { SystemLogsService } from './systemLogs.service';
+import { SystemLogsService } from './system-logs.service';
+import { Highlight } from 'ngx-highlightjs';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
-  selector: 'app-logs',
-  templateUrl: './systemLogs.component.html',
-  styleUrls: ['./systemLogs.component.less']
+    selector: 'app-logs',
+    templateUrl: './system-logs.component.html',
+    styleUrls: ['./system-logs.component.less'],
+    standalone: true,
+    imports: [MatButtonModule, MatCheckboxModule, ReactiveFormsModule, FormsModule, Highlight]
 })
-export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SystemLogsComponent implements AfterViewInit, OnDestroy {
   public logMessages: string[];
   public logMessagesDisplay: string = '';
   public onlyFailedPlateGroups: boolean = false;
@@ -22,9 +28,6 @@ export class SystemLogsComponent implements OnInit, AfterViewInit, OnDestroy {
     private signalRHub: SignalrService,
     private systemLogsService: SystemLogsService,
     private snackBarService: SnackbarService) { }
-
-  ngOnInit(): void {
-  }
 
   ngAfterViewInit(): void {
     this.populateLogs();

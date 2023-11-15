@@ -2,21 +2,40 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AccountService } from './_services';
 import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { NavBarService } from './_services/nav-bar.service';
-import { SwUpdate, VersionEvent, VersionReadyEvent } from '@angular/service-worker';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { PushSubscriberService } from './_services/push-subscriber.service';
+import { AlertComponent } from './_components/alert.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
+import { CommonModule, NgIf } from '@angular/common';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
     selector: 'app',
     templateUrl: 'app.component.html',
-    styleUrls: ['app.component.css']
+    styleUrls: ['app.component.css'],
+    standalone: true,
+    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule]
 })
 export class AppComponent implements OnInit, OnDestroy {
     user: User;
     appSettingsVisible: boolean;
     menuButtonVisible: boolean;
     topBarVisible: boolean;
+    navBarVisible: boolean = false;
+    
+    public navItems = [
+        { linkTitle: "Cameras", icon: "videocam", link: "/settings/cameras"},
+        { linkTitle: "OpenALPR Agent", icon: "api", link: "/settings/agent"},
+        { linkTitle: "Alerts", icon: "notifications_active", link: "/settings/alerts"},
+        { linkTitle: "Ignores", icon: "alarm_off", link: "/settings/ignores"},
+        { linkTitle: "Webhook Forwards", icon: "forward_to_inbox", link: "/settings/forwards"},
+        { linkTitle: "System Logs", icon: "library_books", link: "/settings/logs"},
+        { linkTitle: "Enrichers", icon: "merge_type", link: "/settings/enrichers"},
+    ];
 
     constructor(
         private signalRService: SignalrService,
@@ -72,6 +91,10 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     public settingsButtonClicked() {
-        this.navBarService.settingsClicked();
+        this.navBarVisible = !this.navBarVisible;
+    }
+
+    public handleSideNavClick() {
+        this.navBarVisible = false;
     }
 }

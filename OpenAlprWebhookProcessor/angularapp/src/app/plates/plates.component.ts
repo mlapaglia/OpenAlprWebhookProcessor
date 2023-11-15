@@ -1,12 +1,12 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormGroupDirective, NgForm } from '@angular/forms';
-import { MatPaginator } from '@angular/material/paginator';
+import { FormControl, FormGroup, FormGroupDirective, NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
-import { ErrorStateMatcher } from '@angular/material/core';
+import { ErrorStateMatcher, MatOptionModule } from '@angular/material/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Ignore } from 'app/settings/ignores/ignore/ignore';
@@ -17,17 +17,52 @@ import { VehicleFilters } from './vehicleFilters';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from 'app/_services/local-storage.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { PlateComponent } from './plate/plate.component';
+import { MatIconModule } from '@angular/material/icon';
+import { NgFor, NgClass, NgIf, DatePipe } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
-  selector: 'app-plates',
-  templateUrl: './plates.component.html',
-  styleUrls: ['./plates.component.less'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
-      state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ])],
+    selector: 'app-plates',
+    templateUrl: './plates.component.html',
+    styleUrls: ['./plates.component.less'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ])
+    ],
+    standalone: true,
+    imports: [
+        MatExpansionModule,
+        NgFor,
+        NgClass,
+        MatIconModule,
+        PlateComponent,
+        MatButtonModule,
+        NgIf,
+        MatProgressSpinnerModule,
+        MatPaginatorModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatDatepickerModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatInputModule,
+        MatSelectModule,
+        MatOptionModule,
+        MatCheckboxModule,
+        DatePipe,
+    ],
 })
 export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public columnsToDisplay = [
