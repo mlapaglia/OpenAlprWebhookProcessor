@@ -14,19 +14,17 @@
         (error)="imageFailedToLoad()"
         alt="last capture from camera">
     <mat-card-content>
-        <div [hidden]="!isLoadingImage"
-            style="height:200px;">
+        <div *ngIf="isLoadingImage"
+            style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; height:200px;">
             <mat-progress-spinner
                 color="primary"
                 mode="indeterminate">
             </mat-progress-spinner>
         </div>
         <div *ngIf="!camera.sampleImageUrl || isLoadingFailed"
-            class="sample-image"
-            style="height:200px;">
+            style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height:200px;">
             <mat-icon
-                style="font-size: 100px;"
-                [inline]="true"
+                style="font-size: 100px; height: 90px; width: 90px;"
                 matTooltip="Image will display after first plate capture">help_center</mat-icon>
         </div>
         <div>
@@ -60,11 +58,10 @@
     </mat-card-header>
     <mat-card-content>
         <div class="sample-image"
-            style="height:200px; display: flex; justify-content: center; align-items: center;">
+            style="height:200px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
             <mat-icon
-            style="font-size: 100px;"
+            style="font-size: 100px; height: 90px; width: 90px;"
             (click)="addCamera()"
-            inline="true"
             color="primary">add_box</mat-icon>
         </div>
     </mat-card-content>
