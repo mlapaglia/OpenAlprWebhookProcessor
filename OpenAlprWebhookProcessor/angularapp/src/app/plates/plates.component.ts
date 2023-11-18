@@ -6,7 +6,7 @@ import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
 import { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
-import { ErrorStateMatcher, MatOptionModule } from '@angular/material/core';
+import { ErrorStateMatcher, MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Ignore } from 'app/settings/ignores/ignore/ignore';
@@ -14,7 +14,7 @@ import { SettingsService } from 'app/settings/settings.service';
 import { Alert } from 'app/settings/alerts/alert/alert';
 import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { VehicleFilters } from './vehicleFilters';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from 'app/_services/local-storage.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -27,7 +27,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { PlateComponent } from './plate/plate.component';
 import { MatIconModule } from '@angular/material/icon';
-import { NgFor, NgClass, NgIf, DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
@@ -44,15 +44,15 @@ import { MatExpansionModule } from '@angular/material/expansion';
     standalone: true,
     imports: [
         MatExpansionModule,
-        NgFor,
-        NgClass,
+        CommonModule,
         MatIconModule,
         PlateComponent,
         MatButtonModule,
-        NgIf,
         MatProgressSpinnerModule,
         MatPaginatorModule,
         MatCardModule,
+        MatDialogModule,
+        MatNativeDateModule,
         MatFormFieldModule,
         MatDatepickerModule,
         ReactiveFormsModule,

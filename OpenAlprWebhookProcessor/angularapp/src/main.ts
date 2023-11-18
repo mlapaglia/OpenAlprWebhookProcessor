@@ -35,7 +35,29 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
     providers: [
-        importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, LightboxModule, MatButtonModule, MatTabsModule, MatIconModule, MatCardModule, MatDatepickerModule, MatInputModule, MatFormFieldModule, MatCheckboxModule, MatDividerModule, MatSlideToggleModule, MatSnackBarModule, MatProgressSpinnerModule, MatExpansionModule, NgxChartsModule, HighlightModule, ServiceWorkerModule.register('ngsw-worker.js', {
+        importProvidersFrom(
+            BrowserModule,
+            AppRoutingModule,
+            FormsModule,
+            ReactiveFormsModule,
+            MatAutocompleteModule,
+            LightboxModule,
+            MatButtonModule,
+            MatTabsModule,
+            MatIconModule,
+            MatCardModule,
+            MatDatepickerModule,
+            MatInputModule,
+            MatFormFieldModule,
+            MatCheckboxModule,
+            MatDividerModule,
+            MatSlideToggleModule,
+            MatSnackBarModule,
+            MatProgressSpinnerModule,
+            MatExpansionModule,
+            NgxChartsModule,
+            HighlightModule,
+            ServiceWorkerModule.register('ngsw-worker.js', {
             enabled: !isDevMode(),
             // Register the ServiceWorker as soon as the application is stable
             // or after 30 seconds (whichever comes first).
@@ -59,7 +81,3 @@ bootstrapApplication(AppComponent, {
     ]
 })
     .catch(err => console.error(err));
-
-export function getBaseUrl() {
-    return document.getElementsByTagName('base')[0].href;
-    }

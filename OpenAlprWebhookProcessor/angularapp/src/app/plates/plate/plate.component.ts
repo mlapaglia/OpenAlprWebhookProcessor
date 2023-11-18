@@ -1,4 +1,4 @@
-import { DatePipe, NgIf } from '@angular/common';
+import { CommonModule, DatePipe, NgIf } from '@angular/common';
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -23,7 +23,7 @@ import { MatCardModule } from '@angular/material/card';
     templateUrl: './plate.component.html',
     styleUrls: ['./plate.component.less'],
     standalone: true,
-    imports: [MatCardModule, MatProgressSpinnerModule, NgIf, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
+    imports: [CommonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   @Input() plate: Plate;

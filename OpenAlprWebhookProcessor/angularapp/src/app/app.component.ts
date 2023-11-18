@@ -2,8 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AccountService } from './_services';
 import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { NavBarService } from './_services/nav-bar.service';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { PushSubscriberService } from './_services/push-subscriber.service';
 import { AlertComponent } from './_components/alert.component';
@@ -40,18 +39,10 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(
         private signalRService: SignalrService,
         private accountService: AccountService,
-        private navBarService: NavBarService,
-        private router: Router,
         private swUpdate: SwUpdate,
         private pushSubscriberService: PushSubscriberService) {
             this.accountService.user.subscribe(x => {
                 this.topBarVisible = x.id !== undefined;
-            });
-
-            this.router.events.subscribe((routerEvent) => {
-                if(routerEvent instanceof(NavigationEnd)) {
-                    this.menuButtonVisible =(routerEvent as NavigationEnd).url == "/settings";
-                }
             });
 
             this.swUpdate.unrecoverable.subscribe(event => {

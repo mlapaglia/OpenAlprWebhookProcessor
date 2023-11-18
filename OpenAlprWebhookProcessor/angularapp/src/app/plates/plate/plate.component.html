@@ -9,7 +9,7 @@
                 color="primary"
                 mode="indeterminate"
                 diameter="100"
-                [hidden]="!loadingVehicleImage"></mat-progress-spinner>
+                *ngIf="loadingVehicleImage"></mat-progress-spinner>
             <img [src]="this.vehicleImageUrl"
                 class="resize-mobile"
                 style="cursor: pointer;"
@@ -22,7 +22,7 @@
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
             <mat-progress-spinner
-                [hidden]="!loadingPlateImage"
+                *ngIf="loadingPlateImage"
                 color="primary"
                 mode="indeterminate"
                 diameter="100">
@@ -50,7 +50,7 @@
                 mode="indeterminate"
                 diameter="100"
                 style="margin: auto;"
-                [hidden]="!loadingStatistics"></mat-progress-spinner>
+                *ngIf="loadingStatistics"></mat-progress-spinner>
             <mat-icon style="font-size: 100px;"
                 *ngIf="loadingStatisticsFailed"
                 [inline]="true"

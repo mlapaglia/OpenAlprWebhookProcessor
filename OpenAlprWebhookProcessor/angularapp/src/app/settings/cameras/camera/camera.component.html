@@ -15,7 +15,7 @@
         alt="last capture from camera">
     <mat-card-content>
         <div [hidden]="!isLoadingImage"
-            style="height:200px; display: flex; justify-content: center; align-items: center;">
+            style="height:200px;">
             <mat-progress-spinner
                 color="primary"
                 mode="indeterminate">
@@ -23,7 +23,7 @@
         </div>
         <div *ngIf="!camera.sampleImageUrl || isLoadingFailed"
             class="sample-image"
-            style="height:200px; display: flex; justify-content: center; align-items: center;">
+            style="height:200px;">
             <mat-icon
                 style="font-size: 100px;"
                 [inline]="true"

@@ -3,15 +3,15 @@ import { first } from 'rxjs/operators';
 
 import { AccountService } from 'app/_services';
 import { User } from 'app/_models';
-import { NgFor, NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { RouterLink, RouterModule } from '@angular/router';
 
 @Component({
-    templateUrl: 'list.component.html',
+    templateUrl: 'users.component.html',
     standalone: true,
-    imports: [RouterLink, NgFor, NgIf]
+    imports: [CommonModule, RouterLink, RouterModule, NgFor, NgIf]
 })
-export class ListComponent implements OnInit {
+export class UsersComponent implements OnInit {
     users: User[] = [];
 
     constructor(private accountService: AccountService) {}

@@ -4,12 +4,17 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from 'app/_services';
-import { NgClass, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
+    selector: 'app-login',
     templateUrl: 'login.component.html',
     standalone: true,
-    imports: [ReactiveFormsModule, NgClass, NgIf, RouterLink]
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class LoginComponent implements OnInit {
   form: FormGroup;

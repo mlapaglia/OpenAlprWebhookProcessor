@@ -9,16 +9,29 @@ import { EnrichersComponent } from './settings/enrichers/enrichers.component';
 import { ForwardsComponent } from './settings/forwards/forwards.component';
 import { IgnoresComponent } from './settings/ignores/ignores.component';
 import { SystemLogsComponent } from './settings/system-logs/system-logs.component';
-
-const accountModule = () => import('./account/account.module').then(x => x.AccountModule);
-const usersModule = () => import('./users/users.module').then(x => x.UsersModule);
-const platesModule = () => import('./plates/plates.module').then(x => x.PlatesModule);
+import { PlatesComponent } from './plates/plates.component';
+import { AddEditComponent } from './users/add-edit.component';
+import { UsersComponent } from './users/users.component';
+import { LoginComponent } from './account/login.component';
+import { RegisterComponent } from './account/register.component';
 
 const routes: Routes = [
     { path: '', component: HomeComponent, canActivate: [AuthGuard] },
-    { path: 'users', loadChildren: usersModule, canActivate: [AuthGuard] },
-    { path: 'account', loadChildren: accountModule },
-    { path: 'plates', loadChildren: platesModule, canActivate: [AuthGuard] },
+    { path: 'account',
+        children: [
+            { path: 'login', component: LoginComponent },
+            { path: 'register', component: RegisterComponent },
+        ] },
+    { 
+        path: 'users',
+        children: [
+            { path: '', component: UsersComponent },
+            { path: 'add', component: AddEditComponent },
+            { path: 'edit/:id', component: AddEditComponent }
+        ],
+        canActivate: [AuthGuard],
+    },
+    { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard] },
     {
         path: 'settings',
         children: [

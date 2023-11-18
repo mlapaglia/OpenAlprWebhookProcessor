@@ -2,14 +2,14 @@
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
-
 import { AccountService, AlertService } from 'app/_services';
-import { NgIf, NgClass } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     templateUrl: 'add-edit.component.html',
     standalone: true,
-    imports: [NgIf, ReactiveFormsModule, NgClass, RouterLink]
+    imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterLink]
 })
 export class AddEditComponent implements OnInit {
     form: FormGroup;
@@ -29,7 +29,7 @@ export class AddEditComponent implements OnInit {
 
     ngOnInit() {
         this.id = this.route.snapshot.params['id'];
-        this.isAddingFirstUserMode = this.route.snapshot.routeConfig?.path !== 'add/more';
+        this.isAddingFirstUserMode = this.route.snapshot.routeConfig?.path !== 'add';
         this.isAddMode = !this.id;
         
         // password not required in edit mode
