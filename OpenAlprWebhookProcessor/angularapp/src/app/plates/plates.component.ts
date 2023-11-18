@@ -124,7 +124,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public isAddingToAlertList: boolean;
 
   public isLoading: boolean;
-  public isSignalrConnected: boolean;
+
 
   public pageSize: number = 10;
   private pageSizeCacheKey: string = "platePageSize";
@@ -151,7 +151,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
-    this.isSignalrConnected = this.signalRHub.isConnected;
+    
     var pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
     this.pageSize = pageSize != '' ? parseInt(pageSize) : 25;
     this.setInitialDateFilter();
@@ -183,10 +183,6 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.eventSubscriptions.add(this.signalRHub.connectionStatusChanged.subscribe(status => {
-      this.isSignalrConnected = status;
-    }));
-
     this.eventSubscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
         if (!this.isLoading) {
           this.searchPlates();

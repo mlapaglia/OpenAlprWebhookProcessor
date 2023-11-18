@@ -2,7 +2,6 @@
 import { User } from 'app/_models';
 import { AccountService } from 'app/_services';
 import { HomeService } from './home.service';
-import { DayCount } from './plateCountResponse';
 import { BarChartModule } from '@swimlane/ngx-charts';
 import { MatCardModule } from '@angular/material/card';
 

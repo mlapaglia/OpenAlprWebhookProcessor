@@ -11,13 +11,15 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule, NgIf } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { ThemePicker } from './theme-picker/theme-picker.component';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.css'],
     standalone: true,
-    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule]
+    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePicker]
 })
 export class AppComponent implements OnInit, OnDestroy {
     user: User;
@@ -25,7 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
     menuButtonVisible: boolean;
     topBarVisible: boolean;
     navBarVisible: boolean = false;
-    
+    isSignalrConnected: boolean;
+
     public navItems = [
         { linkTitle: "Cameras", icon: "videocam", link: "/settings/cameras"},
         { linkTitle: "OpenALPR Agent", icon: "api", link: "/settings/agent"},
@@ -36,6 +39,8 @@ export class AppComponent implements OnInit, OnDestroy {
         { linkTitle: "Enrichers", icon: "merge_type", link: "/settings/enrichers"},
     ];
 
+    private eventSubscriptions = new Subscription();
+    
     constructor(
         private signalRService: SignalrService,
         private accountService: AccountService,
@@ -69,6 +74,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
+        this.subscribeForUpdates();
         this.signalRService.startConnection();
         this.pushSubscriberService.subscribe();
     }
@@ -79,6 +85,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public logout() {
         this.accountService.logout();
+    }
+
+    public subscribeForUpdates() {
+        this.eventSubscriptions.add(this.signalRService.connectionStatusChanged.subscribe(status => {
+          this.isSignalrConnected = status;
+        }));
     }
 
     public settingsButtonClicked() {
