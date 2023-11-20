@@ -34,6 +34,8 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
         public string Icon { get; set; }
 
+        public string Image { get; set; }
+
         public IList<int> Vibrate { get; set; } = new List<int>();
 
         public IDictionary<string, object> Data { get; set; }

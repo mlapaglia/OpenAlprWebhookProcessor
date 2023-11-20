@@ -12,6 +12,8 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         public byte[] PlateJpeg { get; set; }
 
+        public string PlateJpegUrl { get; set; }
+
         public DateTimeOffset ReceivedOn { get; set; }
     }
 }

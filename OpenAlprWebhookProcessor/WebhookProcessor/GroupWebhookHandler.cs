@@ -143,13 +143,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (!isBulkImport)
             {
+                var plateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null;
+
                 if (camera.UpdateOverlayEnabled)
                 {
                     var updateRequest = new CameraUpdateRequest()
                     {
                         LicensePlateImageUuid = webhook.Group.BestUuid,
                         LicensePlate = webhook.Group.BestPlateNumber,
-                        LicensePlateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null,
+                        LicensePlateJpeg = plateJpeg,
                         Id = camera.Id,
                         OpenAlprProcessingTimeMs = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2) : 0,
                         ProcessedPlateConfidence = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.Confidence, 2) : 0,
@@ -180,6 +182,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         {
                             Description = $"{alert.PlateNumber} {alert.Description} was seen on {receivedOn:g}",
                             IsUrgent = false,
+                            PlateJpeg = plateJpeg,
+                            PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
                             PlateNumber = alert.PlateNumber,
                             ReceivedOn = receivedOn,
                         };
@@ -192,6 +196,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         {
                             Description = $"{plateGroup.BestNumber} was seen on {receivedOn:g}",
                             IsUrgent = true,
+                            PlateJpeg = plateJpeg,
+                            PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
                             PlateNumber = plateGroup.BestNumber,
                             ReceivedOn = receivedOn,
                         };

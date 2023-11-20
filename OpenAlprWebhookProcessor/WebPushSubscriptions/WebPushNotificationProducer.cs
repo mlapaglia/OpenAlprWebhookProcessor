@@ -63,6 +63,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                 Title = $"Plate Seen: {alert.PlateNumber}",
                 Body = $"Plate {alert.PlateNumber} seen at {DateTimeOffset.UtcNow:g}",
                 Icon = "assets/icons/icon-96x96.png",
+                Image = alert.PlateJpegUrl,
             }.ToPushMessage();
 
             foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())

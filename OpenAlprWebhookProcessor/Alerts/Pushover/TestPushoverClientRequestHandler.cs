@@ -35,6 +35,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 Description = "was seen on " + DateTimeOffset.UtcNow.ToString("g"),
                 PlateNumber = testPlateGroup.BestNumber,
                 PlateJpeg = testPlateGroup.PlateImage.Jpeg,
+                PlateJpegUrl = $"/images/crop/{testPlateGroup.OpenAlprUuid}",
                 IsUrgent = false,
                 ReceivedOn = DateTimeOffset.UtcNow,
             }, cancellationToken);
