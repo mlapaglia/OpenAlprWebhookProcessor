@@ -27,8 +27,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
         }
 
         public async Task SendAlertAsync(
-            Alert alert,
-            byte[] plateJpeg,
+            AlertUpdateRequest alert,
             CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -48,14 +47,15 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 {
                     content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data; boundary=" + boundary);
 
+                    content.Add(new StringContent("1"), "html");
                     content.Add(new StringContent(clientSettings.UserKey), "user");
                     content.Add(new StringContent(clientSettings.ApiToken), "token");
-                    content.Add(new StringContent(alert.PlateNumber + " " + alert.Description), "message");
+                    content.Add(new StringContent($"<b>{alert.PlateNumber}</b> {alert.Description}"), "message");
                     content.Add(new StringContent("openalpr alert"), "title");
 
-                    if (clientSettings.SendPlatePreview && plateJpeg != null)
+                    if (clientSettings.SendPlatePreview && alert.PlateJpeg != null)
                     {
-                        content.Add(new ByteArrayContent(plateJpeg), "attachment", "attachment.jpg");
+                        content.Add(new ByteArrayContent(alert.PlateJpeg), "attachment", "attachment.jpg");
                     }
 
                     try
@@ -81,6 +81,24 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         throw new InvalidOperationException("failed");
                     }
                 }
+            }
+        }
+
+        public async Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+
+                logger.LogInformation("Sending Alert via Pushover.");
+
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var clientSettings = await processorContext.PushoverAlertClients
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                return clientSettings.SendEveryPlateEnabled;
             }
         }
 

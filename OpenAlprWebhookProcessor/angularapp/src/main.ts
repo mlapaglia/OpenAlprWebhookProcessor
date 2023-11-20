@@ -58,11 +58,10 @@ bootstrapApplication(AppComponent, {
             NgxChartsModule,
             HighlightModule,
             ServiceWorkerModule.register('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            // Register the ServiceWorker as soon as the application is stable
-            // or after 30 seconds (whichever comes first).
-            registrationStrategy: 'registerWhenStable:30'
-        })),
+                enabled: !isDevMode(),
+                registrationStrategy: 'registerWhenStable:30'
+            })
+        ),
         DatePipe,
         { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -80,4 +79,4 @@ bootstrapApplication(AppComponent, {
         provideAnimations()
     ]
 })
-    .catch(err => console.error(err));
+.catch(err => console.error(err));

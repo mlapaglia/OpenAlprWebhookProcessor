@@ -9,6 +9,8 @@ using System;
 using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using OpenAlprWebhookProcessor.Alerts.Pushover;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -53,8 +55,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         }
 
         public async Task SendAlertAsync(
-            Alerts.Alert alert,
-            byte[] plateJpeg,
+            AlertUpdateRequest alert,
             CancellationToken cancellationToken)
         {
             PushMessage notification = new AngularWebPushNotification
@@ -103,6 +104,24 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                 {
                     _logger.LogInformation("WebPush credentials are present.");
                 }
+            }
+        }
+
+        public async Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+
+                logger.LogInformation("Sending Alert via Pushover.");
+
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var clientSettings = await processorContext.PushoverAlertClients
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                return clientSettings.SendEveryPlateEnabled;
             }
         }
     }

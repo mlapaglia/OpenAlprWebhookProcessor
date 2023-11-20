@@ -10,8 +10,8 @@ import { ForwardsComponent } from './settings/forwards/forwards.component';
 import { IgnoresComponent } from './settings/ignores/ignores.component';
 import { SystemLogsComponent } from './settings/system-logs/system-logs.component';
 import { PlatesComponent } from './plates/plates.component';
-import { AddEditComponent } from './users/add-edit.component';
-import { UsersComponent } from './users/users.component';
+import { AddEditComponent } from './settings/users/add-edit.component';
+import { UsersComponent } from './settings/users/users.component';
 import { LoginComponent } from './account/login.component';
 import { RegisterComponent } from './account/register.component';
 
@@ -21,15 +21,8 @@ const routes: Routes = [
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent },
-        ] },
-    { 
-        path: 'users',
-        children: [
-            { path: '', component: UsersComponent },
-            { path: 'add', component: AddEditComponent },
-            { path: 'edit/:id', component: AddEditComponent }
-        ],
-        canActivate: [AuthGuard],
+            { path: '', redirectTo: '/', pathMatch: 'full' },
+        ]
     },
     { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard] },
     {
@@ -42,9 +35,21 @@ const routes: Routes = [
             { path: 'forwards', component: ForwardsComponent },
             { path: 'ignores', component: IgnoresComponent },
             { path: 'logs', component: SystemLogsComponent },
+            { 
+                path: 'users',
+                children: [
+                    { path: '', component: UsersComponent },
+                    { path: 'add', component: AddEditComponent },
+                    { path: 'edit/:id', component: AddEditComponent }
+                ]
+            },
+            { path: '', redirectTo: '/', pathMatch: 'full' },
         ],
         canActivate: [AuthGuard],
     },
+    {
+        path: '**', redirectTo: '/', pathMatch: 'full'
+    }
 ];
 
 @NgModule({

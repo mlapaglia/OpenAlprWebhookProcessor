@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Hangfire.States;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -171,14 +172,28 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber
                         || plateGroup.PossibleNumbers.Any(y => y.Number == x.PlateNumber.ToUpper()));
 
+                    var receivedOn = DateTimeOffset.FromUnixTimeMilliseconds(webhook.Group.EpochStart);
+
                     if (alert != null)
                     {
                         var alertUpdateRequest = new AlertUpdateRequest()
                         {
-                            CameraId = camera.Id,
-                            Description = alert.PlateNumber + " " + alert.Description + " was seen on " + DateTimeOffset.Now.ToString("g"),
-                            LicensePlateId = plateGroup.Id,
-                            IsStrictMatch = alert.IsStrictMatch,
+                            Description = $"{alert.PlateNumber} {alert.Description} was seen on {receivedOn:g}",
+                            IsUrgent = false,
+                            PlateNumber = alert.PlateNumber,
+                            ReceivedOn = receivedOn,
+                        };
+
+                        _alertService.AddJob(alertUpdateRequest);
+                    }
+                    else
+                    {
+                        var alertUpdateRequest = new AlertUpdateRequest()
+                        {
+                            Description = $"{plateGroup.BestNumber} was seen on {receivedOn:g}",
+                            IsUrgent = true,
+                            PlateNumber = plateGroup.BestNumber,
+                            ReceivedOn = receivedOn,
                         };
 
                         _alertService.AddJob(alertUpdateRequest);

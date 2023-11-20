@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.SystemLogs
 
         public void Emit(LogEvent logEvent)
         {
-            _processorHub.Clients.All.ProcessInformationLogged($"{DateTimeOffset.Now} {logEvent.RenderMessage()}");
+            _processorHub.Clients.All.ProcessInformationLogged($"{DateTimeOffset.UtcNow} {logEvent.RenderMessage()}");
         }
     }
 }

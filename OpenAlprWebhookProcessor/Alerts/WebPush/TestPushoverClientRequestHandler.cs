@@ -31,15 +31,13 @@ namespace OpenAlprWebhookProcessor.Alerts.WebPush
 
             await _alertClient.VerifyCredentialsAsync(cancellationToken);
 
-            await _alertClient.SendAlertAsync(new Alert()
+            await _alertClient.SendAlertAsync(new AlertUpdateRequest()
             {
-                Description = "was seen on " + DateTimeOffset.Now.ToString("g"),
-                Id = testPlateGroup.Id,
+                Description = "was seen on " + DateTimeOffset.UtcNow.ToString("g"),
                 PlateNumber = testPlateGroup.BestNumber,
-                StrictMatch = false,
-            },
-            testPlateGroup.PlateImage.Jpeg,
-            cancellationToken);
+                PlateJpeg = testPlateGroup.PlateImage.Jpeg,
+                IsUrgent = false
+            }, cancellationToken);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
             IEnumerable<IAlertClient> alertClients)
         {
             _processorContext = processorContext;
-            _alertClient = alertClients.First(x => x is WebPushNotificationProducer);
+            _alertClient = alertClients.First(x => x is PushoverClient);
         }
 
         public async Task HandleAsync(CancellationToken cancellationToken)
@@ -31,15 +30,14 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
             await _alertClient.VerifyCredentialsAsync(cancellationToken);
 
-            await _alertClient.SendAlertAsync(new Alert()
+            await _alertClient.SendAlertAsync(new AlertUpdateRequest()
             {
-                Description = "was seen on " + DateTimeOffset.Now.ToString("g"),
-                Id = testPlateGroup.Id,
+                Description = "was seen on " + DateTimeOffset.UtcNow.ToString("g"),
                 PlateNumber = testPlateGroup.BestNumber,
-                StrictMatch = false,
-            },
-            testPlateGroup.PlateImage.Jpeg,
-            cancellationToken);
+                PlateJpeg = testPlateGroup.PlateImage.Jpeg,
+                IsUrgent = false,
+                ReceivedOn = DateTimeOffset.UtcNow,
+            }, cancellationToken);
         }
     }
 }

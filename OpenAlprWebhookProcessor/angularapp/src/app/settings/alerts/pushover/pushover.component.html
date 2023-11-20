@@ -22,6 +22,9 @@
             <div>
                 <mat-checkbox [(ngModel)]="client.sendPlatePreviewEnabled">Send Plate Preview Image</mat-checkbox>
             </div>
+            <div>
+                <mat-checkbox [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
+            </div>
         </div>
     </mat-card-content>
     <mat-card-actions align="end" *ngIf="client.isEnabled" [@inOutAnimation]>
@@ -33,5 +36,5 @@
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm mr-1"></span>
             Save
         </button>
-        </mat-card-actions>
+    </mat-card-actions>
 </mat-card>

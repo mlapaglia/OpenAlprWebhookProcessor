@@ -1,15 +1,18 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AccountService, AlertService } from 'app/_services';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     templateUrl: 'add-edit.component.html',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterLink]
+    imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class AddEditComponent implements OnInit {
     form: FormGroup;
