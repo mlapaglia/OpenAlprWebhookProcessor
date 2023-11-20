@@ -42,43 +42,46 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     .AsNoTracking()
                     .FirstOrDefaultAsync(cancellationToken);
 
-                var boundary = Guid.NewGuid().ToString();
-                using (var content = new MultipartFormDataContent(boundary))
+                if (clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
-                    content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data; boundary=" + boundary);
-
-                    content.Add(new StringContent("1"), "html");
-                    content.Add(new StringContent(clientSettings.UserKey), "user");
-                    content.Add(new StringContent(clientSettings.ApiToken), "token");
-                    content.Add(new StringContent($"<b>{alert.PlateNumber}</b> {alert.Description}"), "message");
-                    content.Add(new StringContent("openalpr alert"), "title");
-
-                    if (clientSettings.SendPlatePreview && alert.PlateJpeg != null)
+                    var boundary = Guid.NewGuid().ToString();
+                    using (var content = new MultipartFormDataContent(boundary))
                     {
-                        content.Add(new ByteArrayContent(alert.PlateJpeg), "attachment", "attachment.jpg");
-                    }
+                        content.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data; boundary=" + boundary);
 
-                    try
-                    {
-                        var response = await _httpClient.PostAsync(
-                            PushOverApiUrl,
-                            content,
-                            cancellationToken);
+                        content.Add(new StringContent("1"), "html");
+                        content.Add(new StringContent(clientSettings.UserKey), "user");
+                        content.Add(new StringContent(clientSettings.ApiToken), "token");
+                        content.Add(new StringContent($"<b>{alert.PlateNumber}</b> {alert.Description}"), "message");
+                        content.Add(new StringContent("openalpr alert"), "title");
 
-                        if (!response.IsSuccessStatusCode)
+                        if (clientSettings.SendPlatePreview && alert.PlateJpeg != null)
                         {
-                            var result = await response.Content.ReadAsStringAsync(cancellationToken);
-
-                            logger.LogError("Failed to send alert via Pushover: {result}", result);
-                            throw new InvalidOperationException("failed");
+                            content.Add(new ByteArrayContent(alert.PlateJpeg), "attachment", "attachment.jpg");
                         }
 
-                        logger.LogInformation("Alert sent via Pushover.");
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to send alert via Pushover: {exception}", ex.Message);
-                        throw new InvalidOperationException("failed");
+                        try
+                        {
+                            var response = await _httpClient.PostAsync(
+                                PushOverApiUrl,
+                                content,
+                                cancellationToken);
+
+                            if (!response.IsSuccessStatusCode)
+                            {
+                                var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                                logger.LogError("Failed to send alert via Pushover: {result}", result);
+                                throw new InvalidOperationException("failed");
+                            }
+
+                            logger.LogInformation("Alert sent via Pushover.");
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Failed to send alert via Pushover: {exception}", ex.Message);
+                            throw new InvalidOperationException("failed");
+                        }
                     }
                 }
             }
