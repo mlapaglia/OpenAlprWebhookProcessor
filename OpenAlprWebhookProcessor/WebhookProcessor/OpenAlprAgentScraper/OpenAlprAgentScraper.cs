@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 {
     public class OpenAlprAgentScraper
     {
-        private const int minutesToScrape = 60 * 24;
+        private const long millisecondsToScrape = 86400000;
 
         private const string scrapeUrl = "/list?start={0}&end={1}";
 
@@ -50,24 +49,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
         {
             var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
-            DateTimeOffset lastSuccessfulScrape;
             if (agent.LastSuccessfulScrapeEpoch == 0)
             {
-                lastSuccessfulScrape = await GetEarliestGroupEpochAsync(
+                agent.LastSuccessfulScrapeEpoch = await GetEarliestGroupEpochAsync(
                     agent,
                     cancellationToken);
             }
-            else
-            {
-                lastSuccessfulScrape = DateTimeOffset.FromUnixTimeMilliseconds(agent.LastSuccessfulScrapeEpoch);
-            }
 
-            var startDate = DateTimeOffset.UtcNow;
-            while (startDate > lastSuccessfulScrape)
+            var startDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            while (startDate > agent.LastSuccessfulScrapeEpoch)
             {
                 _logger.LogInformation("Scraping between {startTime} and {endTime}",
-                    lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString(),
-                    lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString());
+                    agent.LastSuccessfulScrapeEpoch,
+                    agent.LastSuccessfulScrapeEpoch += millisecondsToScrape);
 
                 var timer = new Stopwatch();
                 timer.Start();
@@ -75,8 +69,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 var scrapeResults = await _httpClient.GetAsync(
                     agent.EndpointUrl
                     + scrapeUrl
-                        .Replace("{0}", lastSuccessfulScrape.ToUnixTimeMilliseconds().ToString())
-                        .Replace("{1}", lastSuccessfulScrape.AddMinutes(minutesToScrape).ToUnixTimeMilliseconds().ToString()),
+                        .Replace("{0}", agent.LastSuccessfulScrapeEpoch.ToString())
+                        .Replace("{1}", agent.LastSuccessfulScrapeEpoch + millisecondsToScrape.ToString()),
                     cancellationToken);
 
                 timer.Stop();
@@ -86,7 +80,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 {
                     var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
                     _logger.LogError("no metadata found for given date range: {error}", error);
-                    lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
+                    agent.LastSuccessfulScrapeEpoch = agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
                     continue;
                 }
 
@@ -96,7 +90,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
                 _logger.LogInformation("Found {count} entries for: {date}",
                     metaDatasToQuery.Count,
-                    lastSuccessfulScrape.ToString());
+                    agent.LastSuccessfulScrapeEpoch.ToString());
 
                 foreach (var metadata in metaDatasToQuery)
                 {
@@ -168,14 +162,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
                 }
 
-                lastSuccessfulScrape = lastSuccessfulScrape.AddMinutes(minutesToScrape);
-
-                if (lastSuccessfulScrape > startDate)
-                {
-                    lastSuccessfulScrape = startDate;
-                }
+                agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
             }
 
+            if (agent.LastSuccessfulScrapeEpoch > startDate)
+            {
+                agent.LastSuccessfulScrapeEpoch = startDate;
+            }
+
+            await _processorContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Finished OpenALPR Agent scrape.");
         }
 
@@ -193,13 +188,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             foreach (var plateGroupId in plateGroupIds)
             {
-                _imageRetriever.AddJob(plateGroupId);
+                _imageRetriever.TryAddJob(plateGroupId);
             }
 
             _logger.LogInformation("Jobs added successfully.");
         }
 
-        private async Task<DateTimeOffset> GetEarliestGroupEpochAsync(
+        private async Task<long> GetEarliestGroupEpochAsync(
             Agent agent,
             CancellationToken cancellationToken)
         {
@@ -216,7 +211,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             var firstEpochMs = Regex.Match(content, "Earliest date epoch: ([0-9]+)").Groups[1].Value;
 
-            return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(firstEpochMs));
+            return long.Parse(firstEpochMs);
         }
     }
 }

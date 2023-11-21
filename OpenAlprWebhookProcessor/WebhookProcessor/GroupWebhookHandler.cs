@@ -139,7 +139,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             _logger.LogInformation("plate saved successfully");
 
-            _imageRetrieverService.AddJob(plateGroup.OpenAlprUuid);
+            _imageRetrieverService.TryAddJob(plateGroup.OpenAlprUuid);
 
             if (!isBulkImport)
             {

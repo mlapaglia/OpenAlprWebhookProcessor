@@ -49,32 +49,15 @@
         <mat-icon matTooltip="The URL used to reach the Watchman Agent" style="cursor:default" matSuffix>help_center</mat-icon>
     </mat-form-field>
     <mat-form-field>
-        <mat-label>Hostname</mat-label>
-        <input matInput maxlength="12" #hostnameInput [(ngModel)]="agent.hostname" placeholder="56ygf6e34879">
-        <mat-icon matTooltip="From the OpenALPR web server agent configuration page" style="cursor:default" matSuffix>help_center</mat-icon>
-        <mat-hint align="end">{{hostnameInput.value.length || 0}}/12</mat-hint>
-    </mat-form-field>
-    <mat-form-field>
         <mat-label>Uid</mat-label>
         <input matInput [(ngModel)]="agent.uid" maxlength="40" #uidInput placeholder="U8HGWA66CW58AV9Q7YB4JJ749CV7WXNQLLNIBT4N">
         <mat-icon matTooltip="From the OpenALPR web server agent configuration page" style="cursor:default" matSuffix>help_center</mat-icon>
         <mat-hint align="end">{{uidInput.value.length || 0}}/40</mat-hint>
     </mat-form-field>
     <mat-form-field>
-        <mat-label>OpenAlpr Web Server API Key</mat-label>
-        <mat-icon matTooltip="From the OpenALPR user profile configuration page (top right corner of site)" style="cursor:default" matSuffix>help_center</mat-icon>
-        <input matInput [(ngModel)]="agent.openAlprWebServerApiKey" #apiKeyInput maxlength="40" placeholder="U8HGWA66CW58AV9Q7YB4JJ749CV7WXNQLLNIBT4N">
-        <mat-hint align="end">{{apiKeyInput.value.length || 0}}/40</mat-hint>
-    </mat-form-field>
-    <mat-form-field>
         <mat-label>OpenAlpr Web Server Url</mat-label>
         <mat-icon matTooltip="The URL used to reach the OpenALPR server. Usually just https://cloud.openalpr.com" style="cursor:default" matSuffix>help_center</mat-icon>
         <input matInput [(ngModel)]="agent.openAlprWebServerUrl" placeholder="https://cloud.openalpr.com/">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Version</mat-label>
-        <mat-icon matTooltip="The version of the Watchman Agent running" style="cursor:default" matSuffix>help_center</mat-icon>
-        <input matInput [(ngModel)]="agent.version" placeholder="2.8.101">
     </mat-form-field>
     <mat-form-field>
         <mat-label>Latitude</mat-label>
@@ -111,6 +94,13 @@
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
       </mat-form-field>
+      <mat-form-field>
+        <mat-label style="padding-right: 15px;">Scheduled Agent Scraping {{agent.scheduledScrapingIntervalMinutes ? "(next scrape in " + agent.nextScrapeInMinutes + " minutes)": "(minutes)"}}</mat-label>
+        <mat-icon 
+            matTooltip="Scrape the Watchman Agent instead of relying on the Agent pushing results"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input type="number" matInput [(ngModel)]="agent.scheduledScrapingIntervalMinutes">
+      </mat-form-field>
       <div>
         <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isDebugEnabled"></mat-checkbox>
         <mat-label style="padding-right: 15px;">Debug Mode</mat-label>
@@ -122,7 +112,7 @@
         <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isImageCompressionEnabled"></mat-checkbox>
         <mat-label style="padding-right: 15px;">Image Compression</mat-label>
         <mat-icon 
-            matTooltip="Compresses images from the Watchman Agent before saving locally"
+            matTooltip="Compresses images from the Watchman Agent before saving locally, empty field disables scraping"
             style="cursor:default" matSuffix>help_center</mat-icon>
       </div>
 </div>

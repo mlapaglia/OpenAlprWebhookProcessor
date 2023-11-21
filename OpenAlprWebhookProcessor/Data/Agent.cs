@@ -35,5 +35,9 @@ namespace OpenAlprWebhookProcessor.Data
         public bool IsImageCompressionEnabled { get; set; }
 
         public long LastHeartbeatEpochMs { get; set; }
+
+        public int? ScheduledScrapingIntervalMinutes { get; set; }
+
+        public long? NextScrapeEpochMs { get; set; }
     }
 }

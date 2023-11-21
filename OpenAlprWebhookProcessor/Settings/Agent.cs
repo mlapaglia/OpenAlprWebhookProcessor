@@ -12,11 +12,7 @@ namespace OpenAlprWebhookProcessor.Settings
 
         public string Uid { get; set; }
 
-        public string OpenAlprWebServerApiKey { get; set; }
-
         public string OpenAlprWebServerUrl { get; set; }
-
-        public string Version { get; set; }
 
         public double? Latitude { get; set; }
 
@@ -33,5 +29,9 @@ namespace OpenAlprWebhookProcessor.Settings
         public bool IsImageCompressionEnabled { get; set; }
 
         public long LastHeartbeatEpochMs { get; set; }
+
+        public int? ScheduledScrapingIntervalMinutes { get; set; }
+
+        public int? NextScrapeInMinutes { get; set; }
     }
 }

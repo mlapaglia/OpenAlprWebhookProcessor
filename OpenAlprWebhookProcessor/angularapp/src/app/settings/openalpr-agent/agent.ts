@@ -1,6 +1,5 @@
 export class Agent {
     endpointUrl: string;
-    hostname: string;
     id: string;
     isDebugEnabled: boolean;
     isImageCompressionEnabled: boolean;
@@ -8,9 +7,9 @@ export class Agent {
     latitude: number;
     longitude: number;
     uid: string;
-    openAlprWebServerApiKey: string;
     openAlprWebServerUrl: string;
-    version: string;
+    nextScrapeInMinutes: Date;
+    scheduledScrapingIntervalMinutes: number;
     sunriseOffset: number;
     sunsetOffset: number;
     timezoneOffset: number;
