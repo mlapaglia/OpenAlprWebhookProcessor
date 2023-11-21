@@ -31,6 +31,9 @@
           <mat-icon>{{hidePrivateKey ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
       </mat-form-field>
+      <div>
+        <mat-checkbox [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
+      </div>
     </div>
   </mat-card-content>
   <mat-card-actions align="end" *ngIf="client.isEnabled" [@inOutAnimation]>

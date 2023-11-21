@@ -3,6 +3,7 @@ export class Webpush {
   emailAddress: string;
   publicKey: string;
   privateKey: boolean;
+  sendEveryPlateEnabled: boolean;
 
   constructor(init?: Partial<Webpush>) {
     Object.assign(this, init);
