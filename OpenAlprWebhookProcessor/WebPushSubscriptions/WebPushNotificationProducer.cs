@@ -69,10 +69,11 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                 {
                     PushMessage notification = new AngularWebPushNotification
                     {
-                        Title = $"Plate Seen: {alert.PlateNumber}",
                         Body = $"Plate {alert.PlateNumber} seen at {DateTimeOffset.UtcNow:g}",
                         Icon = "assets/icons/icon-96x96.png",
                         Image = alert.PlateJpegUrl,
+                        Title = $"Plate Seen: {alert.PlateNumber}",
+                        Url = $"plate/{alert.PlateId}"
                     }.ToPushMessage();
 
                     foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())

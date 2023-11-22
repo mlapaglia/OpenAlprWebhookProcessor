@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SignalrService } from 'app/signalr/signalr.service';
@@ -29,6 +29,7 @@ import { PlateComponent } from './plate/plate.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-plates',
@@ -65,6 +66,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     ],
 })
 export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() id: string;
+
   public columnsToDisplay = [
     {
       id: 'openAlprCameraId',
@@ -143,6 +146,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private alertsService: AlertsService,
     private settingsService: SettingsService,
     private localStorageService: LocalStorageService,
+    private route: ActivatedRoute,
     public dialog: MatDialog) {
       this.range = new FormGroup({
         start: new FormControl(),
@@ -151,12 +155,20 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
-    
     var pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
     this.pageSize = pageSize != '' ? parseInt(pageSize) : 25;
     this.setInitialDateFilter();
-    this.searchPlates();
     this.populateFilters();
+    this.eventSubscriptions.add(this.route.params.subscribe(params => {
+      const id = params['id'] as string;
+
+      if (id !== undefined) {
+        this.getPlate(id);
+      }
+      else {
+        this.searchPlates();
+      }
+    }));
   }
 
   ngOnDestroy(): void {
@@ -214,6 +226,22 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public populateFilters() {
     this.filterSubscription.add(this.plateService.getFilters().subscribe(result => {
       this.vehicleFilters = result;
+    }));
+  }
+
+  public getPlate(plateId: string) {
+    this.isLoading = true;
+    this.searchSubscription.add(this.plateService.getPlate(plateId).subscribe((plateResponse) => {
+      this.totalNumberOfPlates = 1;
+      this.plates = [
+        plateResponse.plate
+      ];
+
+      this.plates[0].isOpen = true;
+      this.isLoading = false;
+    }, (error) => {
+      this.isLoading = false;
+      this.snackbarService.create(`Error searching for plate, check the logs`, SnackBarType.Error)
     }));
   }
 

@@ -6,13 +6,14 @@ import { Plate } from "./plate/plate";
 import { PlateResponse } from "./plate/plateResponse";
 import { PlateStatistics } from "./plate/plateStatistics";
 import { VehicleFilters } from "./vehicleFilters";
+import { GetPlateResponse } from "./plate/getPlateResponse";
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
     private getRelayImageUrl = 'images';
     private searchPlatesUrl = 'licenseplates/search';
     private editPlateUrl = 'licenseplates/edit';
-    private deletePlateUrl = 'licenseplates';
+    private singlePlateUrl = 'licenseplates';
     private hydrateDatabaseUrl = "hydration/start";
     private getFiltersUrl = 'licenseplates/filters';
     private getStatistics = 'licenseplates/statistics';
@@ -29,7 +30,7 @@ export class PlateService {
     }
 
     deletePlate(plateId: string): Observable<any> {
-        return this.http.delete(`/${this.deletePlateUrl}/${plateId}`);
+        return this.http.delete(`/${this.singlePlateUrl}/${plateId}`);
     }
 
     getRelayImage(imageId: string) {
@@ -42,6 +43,10 @@ export class PlateService {
 
     getFilters(): Observable<VehicleFilters> {
         return this.http.get<VehicleFilters>(`/${this.getFiltersUrl}`);
+    }
+
+    getPlate(plateId: string): Observable<GetPlateResponse> {
+        return this.http.get<GetPlateResponse>(`/${this.singlePlateUrl}/${plateId}`);
     }
 
     getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {

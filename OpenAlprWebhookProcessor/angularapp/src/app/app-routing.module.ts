@@ -17,14 +17,16 @@ import { RegisterComponent } from './account/register.component';
 
 const routes: Routes = [
     { path: '', component: HomeComponent, canActivate: [AuthGuard] },
-    { path: 'account',
+    { 
+        path: 'account',
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent },
             { path: '', redirectTo: '/', pathMatch: 'full' },
         ]
     },
-    { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard] },
+    { path: 'plate/:id', component: PlatesComponent, canActivate: [AuthGuard] },
+    { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard], },
     {
         path: 'settings',
         children: [
@@ -47,9 +49,7 @@ const routes: Routes = [
         ],
         canActivate: [AuthGuard],
     },
-    {
-        path: '**', redirectTo: '/', pathMatch: 'full'
-    }
+    { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];
 
 @NgModule({

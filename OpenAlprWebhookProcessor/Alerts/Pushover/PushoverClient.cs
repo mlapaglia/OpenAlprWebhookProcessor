@@ -42,6 +42,8 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     .AsNoTracking()
                     .FirstOrDefaultAsync(cancellationToken);
 
+                var agent = await processorContext.Agents.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+
                 if (clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
                     var boundary = Guid.NewGuid().ToString();
@@ -53,6 +55,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         content.Add(new StringContent(clientSettings.UserKey), "user");
                         content.Add(new StringContent(clientSettings.ApiToken), "token");
                         content.Add(new StringContent($"<b>{alert.PlateNumber}</b> {alert.Description}"), "message");
+                        content.Add(new StringContent($"{agent.OpenAlprWebServerUrl}/plate/{alert.PlateId}"), "url");
                         content.Add(new StringContent("openalpr alert"), "title");
 
                         if (clientSettings.SendPlatePreview && alert.PlateJpeg != null)

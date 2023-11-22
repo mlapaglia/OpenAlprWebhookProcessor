@@ -21,6 +21,8 @@ export interface Plate {
 
     isIgnore: boolean;
 
+    isOpen: boolean;
+
     alertDescription: string;
 
     receivedOn: Date;

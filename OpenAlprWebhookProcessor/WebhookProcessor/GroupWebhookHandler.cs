@@ -182,6 +182,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         {
                             Description = $"{alert.PlateNumber} {alert.Description} was seen on {receivedOn:g}",
                             IsUrgent = true,
+                            PlateId = plateGroup.Id,
                             PlateJpeg = plateJpeg,
                             PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
                             PlateNumber = alert.PlateNumber,
@@ -196,6 +197,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         {
                             Description = $"{plateGroup.BestNumber} was seen on {receivedOn:g}",
                             IsUrgent = false,
+                            PlateId = plateGroup.Id,
                             PlateJpeg = plateJpeg,
                             PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
                             PlateNumber = plateGroup.BestNumber,

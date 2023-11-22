@@ -8,6 +8,8 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         public bool IsUrgent { get; set; }
 
+        public Guid PlateId { get; set; }
+
         public string PlateNumber { get; set; }
 
         public byte[] PlateJpeg { get; set; }
