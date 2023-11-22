@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
 using System.Collections.Generic;
+using Flurl;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -76,8 +77,16 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         Title = $"Plate Seen: {alert.PlateNumber}",
                         Data = new Dictionary<string, object>()
                         {
-                            { "plateid", alert.PlateId },
-                            { "url", $"plate/{alert.PlateId}" }
+                            { "onActionClick", new Dictionary<string, object>()
+                                {
+                                    { "default", new Dictionary<string, object>()
+                                        {
+                                            { "operation", "navigateLastFocusedOrOpen" },
+                                            {  "url", $"plate/{alert.PlateId}" }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }.ToPushMessage();
 
