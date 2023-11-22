@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -73,7 +74,11 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         Icon = "assets/icons/icon-96x96.png",
                         Image = alert.PlateJpegUrl,
                         Title = $"Plate Seen: {alert.PlateNumber}",
-                        Url = $"plate/{alert.PlateId}"
+                        Data = new Dictionary<string, object>()
+                        {
+                            { "plateid", alert.PlateId },
+                            { "url", $"plate/{alert.PlateId}" }
+                        }
                     }.ToPushMessage();
 
                     foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())

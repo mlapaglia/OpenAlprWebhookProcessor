@@ -29,7 +29,7 @@ import { PlateComponent } from './plate/plate.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-plates',
@@ -147,6 +147,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     private settingsService: SettingsService,
     private localStorageService: LocalStorageService,
     private route: ActivatedRoute,
+    private router: Router,
     public dialog: MatDialog) {
       this.range = new FormGroup({
         start: new FormControl(),
@@ -246,6 +247,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public searchPlates(plateNumber: string = '') {
+    this.router.navigate(["/plates"]);
+    
     if (!this.filterPlateNumberIsValid) {
       return;
     }
