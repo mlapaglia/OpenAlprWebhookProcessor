@@ -13,7 +13,7 @@ export class SystemLogsService {
     return this.http.get<string[]>(`/logs`);
   }
 
-  getPlateGroups(onlyFailedPlateGroups: Boolean): Observable<Blob> {
+  getPlateGroups(onlyFailedPlateGroups: boolean): Observable<Blob> {
     return this.http.get<Blob>(`/settings/debug/plates?onlyFailedPlateGroups=${onlyFailedPlateGroups}`, { responseType: 'blob' as 'json' });
   }
 

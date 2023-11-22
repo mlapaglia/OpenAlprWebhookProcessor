@@ -33,16 +33,16 @@ export class PushSubscriberService {
         serverPublicKey: publicKey
       })
         .then(subscription => this.httpClient.post(this.baseUrl + 'api/WebPushSubscriptions', subscription, this.httpOptions).subscribe(
-          success => {
+          () => {
             console.log("sent subscription to server.");
         },
           error => console.error(error)
         ))
-        .catch(error => {
+        .catch(() => {
             this.resetSubscription();
         });
     }, error => console.error(error));
-  };
+  }
 
   public unsubscribe() {
     this.swPush.unsubscribe()
@@ -58,9 +58,9 @@ export class PushSubscriberService {
       registration.pushManager.getSubscription()
         .then(pushSubscription => {
           if(pushSubscription){
-            pushSubscription.unsubscribe().then(successful => {
+            pushSubscription.unsubscribe().then(() => {
               this.subscribe();
-            }).catch(e => {})
+            }).catch(() => {})
           }
       });
     });

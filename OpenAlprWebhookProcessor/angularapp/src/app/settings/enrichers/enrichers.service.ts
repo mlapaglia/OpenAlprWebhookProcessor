@@ -14,8 +14,8 @@ export class EnrichersService {
     return this.http.get<Enricher>('/settings/enrichers');
   }
 
-  public upsertEnricher(enricher: Enricher): Observable<any> {
-    return this.http.post("/settings/enrichers", enricher);
+  public upsertEnricher(enricher: Enricher): Observable<void> {
+    return this.http.post<void>("/settings/enrichers", enricher);
   }
 
   public testEnricher(enricherId: string): Observable<boolean> {

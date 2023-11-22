@@ -19,7 +19,7 @@ export class ThemeStorage {
   storeTheme(theme: DocsSiteTheme) {
     try {
       window.localStorage[ThemeStorage.storageKey] = theme.name;
-    } catch { }
+    } catch { undefined }
 
     this.onThemeUpdate.emit(theme);
   }
@@ -35,6 +35,6 @@ export class ThemeStorage {
   clearStorage() {
     try {
       window.localStorage.removeItem(ThemeStorage.storageKey);
-    } catch { }
+    } catch { undefined }
   }
 }

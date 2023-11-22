@@ -36,10 +36,10 @@ export class AccountService {
   logout() {
     this.stopRefreshTokenTimer();
 
-    this.http.post<any>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe(() => {
+    this.http.post<void>(`/users/revoke-token`, {}, { withCredentials: true }).subscribe(() => {
       this.finalizeLogout();
     },
-    (error) => {
+    () => {
       this.finalizeLogout();
     });
   }
@@ -52,7 +52,7 @@ export class AccountService {
   }
 
   refreshToken() {
-    return this.http.post<any>(`/users/refresh-token`, {}, { withCredentials: true })
+    return this.http.post<User>(`/users/refresh-token`, {}, { withCredentials: true })
       .pipe(map((user) => {
         this.userSubject.next(user);
         this.startRefreshTokenTimer();

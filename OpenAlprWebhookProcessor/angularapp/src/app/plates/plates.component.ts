@@ -9,9 +9,9 @@ import { PlateRequest, PlateService } from './plate.service';
 import { ErrorStateMatcher, MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
-import { Ignore } from 'app/settings/ignores/ignore/ignore';
+import { Ignore } from 'app/settings/ignores/ignore';
 import { SettingsService } from 'app/settings/settings.service';
-import { Alert } from 'app/settings/alerts/alert/alert';
+import { Alert } from 'app/settings/alerts/alert';
 import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { VehicleFilters } from './vehicleFilters';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -156,7 +156,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     
   ngOnInit(): void {
-    var pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
+    const pageSize = this.localStorageService.getData(this.pageSizeCacheKey);
     this.pageSize = pageSize != '' ? parseInt(pageSize) : 25;
     this.setInitialDateFilter();
     this.populateFilters();
@@ -196,7 +196,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public subscribeForUpdates() {
-    this.eventSubscriptions.add(this.signalRHub.licensePlateReceived.subscribe(_ => {
+    this.eventSubscriptions.add(this.signalRHub.licensePlateReceived.subscribe(() => {
         if (!this.isLoading) {
           this.searchPlates();
         }
@@ -240,7 +240,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
       this.plates[0].isOpen = true;
       this.isLoading = false;
-    }, (error) => {
+    }, () => {
       this.isLoading = false;
       this.snackbarService.create(`Error searching for plate, check the logs`, SnackBarType.Error)
     }));
@@ -260,7 +260,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filterStartOn?.setUTCHours(0,0,0,0);
     this.filterEndOn?.setUTCHours(23,59,59,999);
 
-    var request = new PlateRequest();
+    const request = new PlateRequest();
 
     request.pageNumber = this.pageNumber;
     request.pageSize = this.pageSize;
@@ -286,7 +286,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.totalNumberOfPlates = result.totalCount;
       this.plates = result.plates;
       this.isLoading = false;
-    }, error => {
+    }, () => {
       this.isLoading = false;
       this.snackbarService.create(`Error searching for plates, check the logs`, SnackBarType.Error)
     }));
@@ -304,7 +304,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public addToIgnoreList(plateNumber: string = '') {
     this.isAddingToIgnoreList = true;
-    var ignore = new Ignore();
+    const ignore = new Ignore();
 
     ignore.plateNumber = plateNumber;
     ignore.strictMatch = true;
@@ -319,7 +319,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public addToAlertList(plateNumber: string = '') {
     this.isAddingToAlertList = true;
-    var alert = new Alert();
+    const alert = new Alert();
 
     alert.plateNumber = plateNumber;
     alert.strictMatch = true;
@@ -387,29 +387,29 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public enrichPlate(plateId: string) {
     this.isEnrichingPlate = true;
-    this.plateService.enrichPlate(plateId).subscribe(_ => {
+    this.plateService.enrichPlate(plateId).subscribe(() => {
       this.isEnrichingPlate = false;
       this.snackbarService.create("Plate successfully enriched.", SnackBarType.Saved);
     },
-    _ => {
+    () => {
       this.isEnrichingPlate = false;
       this.snackbarService.create("Failed to enrich plate, check the logs.", SnackBarType.Error);
     })
   }
 
   public openEditDialog(plateId: string): void {
-    var plateToEdit = this.plates.find(x => x.id == plateId);
+    const plateToEdit = this.plates.find(x => x.id == plateId);
 
     const dialogRef = this.dialog.open(EditPlateComponent, {
-      data: { 'plate': plateToEdit }
+      data: plateToEdit
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        var plateToSave = this.plates.find(x => x.id == plateId);
+        const plateToSave = this.plates.find(x => x.id == plateId);
 
         if(plateToSave !== undefined) {
-          this.plateService.upsertPlate(plateToSave).subscribe(_ => {
+          this.plateService.upsertPlate(plateToSave).subscribe(() => {
             this.searchPlates();
           });
         }

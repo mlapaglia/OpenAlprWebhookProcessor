@@ -187,7 +187,7 @@ export class CameraMaskComponent implements OnInit {
   public loadImageIntoCanvas(url: string) {
     this.isLoadingSnapshot = true;
     this.cameraMaskService.getPlateCapture(url).subscribe((image: Blob) => {
-      let reader = new FileReader()!;
+      const reader = new FileReader()!;
 
       reader.onload = () => {
         this.image = new Image();
@@ -197,7 +197,7 @@ export class CameraMaskComponent implements OnInit {
           this.scaleFactor = this.image.width / this.targetWidth;
 
           this.measureDiv.nativeElement.appendChild(this.image);
-          var wrh = this.image.width / this.image.height;
+          const wrh = this.image.width / this.image.height;
           this.imageWidth = this.canvas.nativeElement.width;
           this.imageHeight = this.imageWidth / wrh;
 
@@ -256,7 +256,7 @@ export class CameraMaskComponent implements OnInit {
   }
 
   public saveMask() {
-    let cameraMask = new CameraMask();
+    const cameraMask = new CameraMask();
     cameraMask.coordinates = [];
     cameraMask.cameraId = this.camera.id;
     this.savingCtx.drawImage(this.image, 0, 0, this.image.width, this.image.height);
@@ -286,7 +286,7 @@ export class CameraMaskComponent implements OnInit {
     this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {
       this.snackbarService.create("Camera mask saved.", SnackBarType.Saved);
     },
-    (error) => {
+    () => {
       this.snackbarService.create("Camera mask failed.", SnackBarType.Error);
     });
   }
@@ -301,7 +301,7 @@ export class CameraMaskComponent implements OnInit {
       this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
     }
     catch {
-      (this.ctx as any).reset();
+      (this.ctx).reset();
     }
 
     if (this.coordinates.length > 0) {
@@ -326,7 +326,7 @@ export class CameraMaskComponent implements OnInit {
       this.ctx.stroke();
       
       this.coordinates.forEach((point, index) => {
-        var tempDotRadius = this.dotRadius;
+        let tempDotRadius = this.dotRadius;
         if (!this.isClosed
           && this.coordinates.length > 1
           && index == 0
@@ -373,8 +373,8 @@ export class CameraMaskComponent implements OnInit {
 
     if (point === -1) {
       for(let i = 0; i < this.coordinates.length; i++) {
-        let dx = mospos.x - this.coordinates[i].x;
-        let dy = mospos.y - this.coordinates[i].y;
+        const dx = mospos.x - this.coordinates[i].x;
+        const dy = mospos.y - this.coordinates[i].y;
 
         if (dx * dx + dy * dy < this.forgiveness * this.forgiveness) {
           return true;

@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe, NgIf } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -141,7 +141,7 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
         value: this.plate.region,
       });
     },
-    error => {
+    () => {
       this.loadingStatistics = false;
       this.loadingStatisticsFailed = true;
     }));
@@ -162,7 +162,7 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   public openLightbox(url: Url, plateNumber: string) {
-    var albums = [{
+    const albums = [{
       src: url.toString(),
       caption: plateNumber,
       thumb: url.toString()
@@ -191,11 +191,11 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
 
   public saveNotes() {
     this.isSavingNotes = true;
-    this.plateService.upsertPlate(this.plate).subscribe(_ => {
+    this.plateService.upsertPlate(this.plate).subscribe(() => {
       this.isSavingNotes = false;
       this.snackbarService.create(`Notes saved for: ${this.plate.plateNumber}`, SnackBarType.Saved);
     },
-    error => {
+    () => {
       this.isSavingNotes = false;
       this.snackbarService.create(`Failed to save notes for: ${this.plate.plateNumber}`, SnackBarType.Error);
     });

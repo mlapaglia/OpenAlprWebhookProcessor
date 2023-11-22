@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 export class SignalrService {
   private hubConnection: signalR.HubConnection;
 
-  public connectionEstablished = new Subject<Boolean>();
+  public connectionEstablished = new Subject<boolean>();
   public licensePlateReceived = new Subject<string>();
   public licensePlateAlerted = new Subject<string>();
   public processInformationLogged = new Subject<string>();
@@ -86,7 +86,7 @@ export class SignalrService {
         this.triggerConnectionStatusChange(false);
       });
 
-      this.hubConnection.on('ScrapeFinished', _ => {
+      this.hubConnection.on('ScrapeFinished', () => {
         console.log("Scrape finished");
         this.snackbarService.create(`Scrape finished!`, SnackBarType.Info);
       });

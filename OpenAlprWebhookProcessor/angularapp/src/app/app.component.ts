@@ -11,15 +11,15 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule, NgIf } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { ThemePicker } from './theme-picker/theme-picker.component';
+import { ThemePickerComponent } from './theme-picker/theme-picker.component';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app',
+    selector: 'app-app',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.css'],
     standalone: true,
-    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePicker]
+    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
     user: User;
@@ -51,7 +51,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 this.topBarVisible = x.id !== undefined;
             });
 
-            this.swUpdate.unrecoverable.subscribe(event => {
+            this.swUpdate.unrecoverable.subscribe(() => {
                 confirm('An error occurred, please reload the page.')
                 {
                     window.location.reload();

@@ -66,7 +66,7 @@ export class EnrichersComponent implements OnInit {
       else {
         this.snackbarService.create("Enricher test failed, check the logs.", SnackBarType.Error);
       }
-    }, _ => {
+    }, () => {
       this.isSaving = false;
       this.snackbarService.create("Enricher test failed, check the logs.", SnackBarType.Error);
     });
@@ -75,12 +75,12 @@ export class EnrichersComponent implements OnInit {
   public saveEnricher() {
     this.isSaving = true;
 
-    this.enricherService.upsertEnricher(this.enricher).subscribe(_ => {
+    this.enricherService.upsertEnricher(this.enricher).subscribe(() => {
       this.isSaving = false;
       this.snackbarService.create("Enricher client saved.", SnackBarType.Successful);
       this.getEnricher();
     },
-    _ => {
+    () => {
       this.isSaving = false;
       this.snackbarService.create("Enricher client test failed, check the logs.", SnackBarType.Error);
     });
@@ -90,7 +90,7 @@ export class EnrichersComponent implements OnInit {
     if (!event.checked) {
       this.enricher.isEnabled = event.checked;
       this.isSaving = true;
-      this.enricherService.upsertEnricher(this.enricher).subscribe(_ => {
+      this.enricherService.upsertEnricher(this.enricher).subscribe(() => {
         this.isSaving = false;
       });
     }

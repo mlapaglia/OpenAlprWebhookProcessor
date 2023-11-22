@@ -27,7 +27,7 @@ import { NgIf, NgStyle } from '@angular/common';
     imports: [NgIf, MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
-  @ViewChild('agentStatusTable') table: MatTable<any>;
+  @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>;
 
   public agent: Agent;
   public agentStatus: AgentStatus;
@@ -49,7 +49,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
     this.getAgent();
     this.getAgentStatus();
 
-    this.eventSubscriptions.add(this.signalRHub.openAlprAgentConnectionStatusChanged.subscribe((connected: boolean) => {
+    this.eventSubscriptions.add(this.signalRHub.openAlprAgentConnectionStatusChanged.subscribe(() => {
       this.getAgentStatus();
     }));
   }
@@ -61,7 +61,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
   public saveAgent() {
     this.isSaving = true;
 
-    this.settingsService.upsertAgent(this.agent).subscribe(result => {
+    this.settingsService.upsertAgent(this.agent).subscribe(() => {
       this.isSaving = false;
       this.getAgent();
     });
@@ -70,7 +70,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
   public scrapeAgent() {
     this.isHydrating = true;
 
-    this.settingsService.startAgentScrape().subscribe(_ => {
+    this.settingsService.startAgentScrape().subscribe(() => {
       this.isHydrating = false;
       this.snackBarService.create("Agent Scraping has begun, check system logs for progress", SnackBarType.Info);
     });
@@ -139,7 +139,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
       this.table.renderRows();
       
     },
-    (error) => {
+    () => {
       this.isLoadingAgentStatus = false;
       this.agentStatus = new AgentStatus();
       this.agentStatus.isConnected = false;

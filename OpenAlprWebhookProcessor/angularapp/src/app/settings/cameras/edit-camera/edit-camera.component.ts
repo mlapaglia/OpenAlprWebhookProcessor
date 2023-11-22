@@ -46,27 +46,28 @@ export class EditCameraComponent implements OnInit {
     public dialogRef: MatDialogRef<EditCameraComponent>,
     private snackBarService: SnackbarService,
     private editCameraService: EditCameraService,
-    @Inject(MAT_DIALOG_DATA) public data: any) { }
+
+    @Inject(MAT_DIALOG_DATA) public data: Camera) { }
 
   ngOnInit(): void {
-    this.camera = this.data.camera;
+    this.camera = this.data;
     this.getZoomFocus();
   }
 
   public triggerDayMode() {
-    this.editCameraService.triggerDayMode(this.camera.id).subscribe(_ => {
+    this.editCameraService.triggerDayMode(this.camera.id).subscribe(() => {
       this.snackBarService.create("day mode test sent successfully", SnackBarType.Info);
     });
   }
 
   public triggerNightMode() {
-    this.editCameraService.triggerNightMode(this.camera.id).subscribe(_ => {
+    this.editCameraService.triggerNightMode(this.camera.id).subscribe(() => {
       this.snackBarService.create("night mode test sent successfully", SnackBarType.Info);
     });
   }
 
   public testOverlay() {
-    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(_ => {
+    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(() => {
       this.snackBarService.create("overlay test sent successfully", SnackBarType.Info);
     });
   }
@@ -78,16 +79,16 @@ export class EditCameraComponent implements OnInit {
   }
 
   public setZoomFocus() {
-    this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus).subscribe(_ => {
+    this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus).subscribe(() => {
       this.getZoomFocus();
     });
   }
 
   public triggerAutofocus() {
-    this.editCameraService.triggerAutofocus(this.camera.id).subscribe(success => {
+    this.editCameraService.triggerAutofocus(this.camera.id).subscribe(() => {
       this.getZoomFocus();
     },
-    (error) => {
+    () => {
       this.snackBarService.create("auto focus failed", SnackBarType.Error);
     });
   }

@@ -12,7 +12,7 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class HomeComponent implements OnInit {
     user: User;
-    public plateCounts: any[];
+    public plateCounts: {name: Date, value: number}[];
 
     view: [number, number] = [700, 400];
     constructor(
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
         });
     }
 
-      // options
+    // options
     showXAxis = true;
     showYAxis = true;
     gradient = false;

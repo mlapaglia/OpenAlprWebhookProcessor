@@ -10,15 +10,15 @@ export class WebpushService {
 
   constructor(private http: HttpClient) { }
 
-  public upsertWebpush(pushover: Webpush): Observable<any> {
-    return this.http.post('/alerts/webpush', pushover);
+  public upsertWebpush(pushover: Webpush): Observable<void> {
+    return this.http.post<void>('/alerts/webpush', pushover);
   }
 
   public getWebpush(): Observable<Webpush> {
     return this.http.get<Webpush>('/alerts/webpush');
   }
 
-  public testWebpush(): Observable<any> {
-    return this.http.post('/alerts/webpush/test', null);
+  public testWebpush(): Observable<void> {
+    return this.http.post<void>('/alerts/webpush/test', null);
   }
 }

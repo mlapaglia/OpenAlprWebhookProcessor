@@ -1,13 +1,13 @@
 ﻿import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs';
-
 import { Alert, AlertType } from 'app/_models';
 import { AlertService } from 'app/_services';
 import { NgFor } from '@angular/common';
 
 @Component({
-    selector: 'alert', templateUrl: 'alert.component.html',
+    selector: 'app-alert',
+    templateUrl: 'alert.component.html',
     standalone: true,
     imports: [NgFor]
 })

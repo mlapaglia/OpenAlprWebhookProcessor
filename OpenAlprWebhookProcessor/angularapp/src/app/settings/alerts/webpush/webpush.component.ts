@@ -52,7 +52,7 @@ export class WebpushComponent implements OnInit {
 
   public saveClient() {
     this.isSaving = true;
-    this.webpushService.upsertWebpush(this.client).subscribe(_ => {
+    this.webpushService.upsertWebpush(this.client).subscribe(() => {
       this.snackbarService.create("WebPush client saved.", SnackBarType.Saved);
       this.isSaving = false;
     });
@@ -60,11 +60,11 @@ export class WebpushComponent implements OnInit {
 
   public testClient() {
     this.isTesting = true;
-    this.webpushService.testWebpush().subscribe(_ => {
+    this.webpushService.testWebpush().subscribe(() => {
       this.snackbarService.create("WebPush client test successful.", SnackBarType.Successful);
       this.isTesting = false;
     },
-      _ => {
+      () => {
         this.snackbarService.create("WebPush client test failed.", SnackBarType.Error);
         this.isTesting = false;
       });
@@ -74,7 +74,7 @@ export class WebpushComponent implements OnInit {
     if (!event.checked) {
       this.client.isEnabled = event.checked;
       this.isSaving = true;
-      this.webpushService.upsertWebpush(this.client).subscribe(_ => {
+      this.webpushService.upsertWebpush(this.client).subscribe(() => {
         this.isSaving = false;
       });
     }

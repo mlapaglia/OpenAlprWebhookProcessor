@@ -10,15 +10,15 @@ export class PushoverService {
 
   constructor(private http: HttpClient) { }
 
-  public upsertPushover(pushover: Pushover): Observable<any> {
-    return this.http.post('/alerts/pushover', pushover);
+  public upsertPushover(pushover: Pushover): Observable<void> {
+    return this.http.post<void>('/alerts/pushover', pushover);
   }
 
   public getPushover(): Observable<Pushover> {
     return this.http.get<Pushover>('/alerts/pushover');
   }
 
-  public testPushover(): Observable<any> {
-    return this.http.post('/alerts/pushover/test', null);
+  public testPushover(): Observable<void> {
+    return this.http.post<void>('/alerts/pushover/test', null);
   }
 }

@@ -8,7 +8,7 @@ import { AccountService } from 'app/_services';
 export class JwtInterceptor implements HttpInterceptor {
     constructor(private accountService: AccountService) { }
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         const user = this.accountService.userValue;
         const isLoggedIn = user && user.jwtToken;
         if (isLoggedIn) {

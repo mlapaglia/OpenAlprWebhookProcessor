@@ -51,7 +51,7 @@ export class PushoverComponent implements OnInit {
 
   public saveClient() {
     this.isSaving = true;
-    this.pushoverService.upsertPushover(this.client).subscribe(_ => {
+    this.pushoverService.upsertPushover(this.client).subscribe(() => {
       this.snackbarService.create("Pushover client saved.", SnackBarType.Saved);
       this.isSaving = false;
     });
@@ -59,11 +59,11 @@ export class PushoverComponent implements OnInit {
 
   public testClient() {
     this.isTesting = true;
-    this.pushoverService.testPushover().subscribe(_ => {
+    this.pushoverService.testPushover().subscribe(() => {
       this.snackbarService.create("Pushover client test successful.", SnackBarType.Successful);
       this.isTesting = false;
     },
-    _ => {
+    () => {
       this.snackbarService.create("Pushover client test failed.", SnackBarType.Error);
       this.isTesting = false;
     });
@@ -73,7 +73,7 @@ export class PushoverComponent implements OnInit {
     if (!event.checked) {
       this.client.isEnabled = event.checked;
       this.isSaving = true;
-      this.pushoverService.upsertPushover(this.client).subscribe(_ => {
+      this.pushoverService.upsertPushover(this.client).subscribe(() => {
         this.isSaving = false;
       });
     }

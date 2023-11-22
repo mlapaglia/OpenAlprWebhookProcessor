@@ -54,18 +54,18 @@ export class SystemLogsComponent implements AfterViewInit, OnDestroy {
 
   public downloadPlates() {
     this.systemLogsService.getPlateGroups(this.onlyFailedPlateGroups).subscribe(blob => {
-      var objectUrl = URL.createObjectURL(blob);
+      const objectUrl = URL.createObjectURL(blob);
       window.open(objectUrl);
     });
   }
 
   public deletePlates() {
     this.isPurging = true;
-    this.systemLogsService.deletePlates().subscribe(_ => {
+    this.systemLogsService.deletePlates().subscribe(() => {
       this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted);
       this.isPurging = false;
     },
-    _ => {
+    () => {
       this.snackBarService.create("Failed to delete plates, check the logs.", SnackBarType.Error);
       this.isPurging = false;
     });

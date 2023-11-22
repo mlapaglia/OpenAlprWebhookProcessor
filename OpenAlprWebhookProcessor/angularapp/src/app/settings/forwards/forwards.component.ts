@@ -42,7 +42,7 @@ export class ForwardsComponent implements OnInit {
 
   public saveForwards() {
     this.isSaving = true;
-    this.forwardsService.upsertForwards(this.forwards.data).subscribe(result => {
+    this.forwardsService.upsertForwards(this.forwards.data).subscribe(() => {
       this.getForwards();
       this.isSaving = false;
     })

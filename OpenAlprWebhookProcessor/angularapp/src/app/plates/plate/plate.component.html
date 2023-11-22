@@ -13,10 +13,13 @@
             <img [src]="this.vehicleImageUrl"
                 class="resize-mobile"
                 style="cursor: pointer;"
+                alt="image of the vehicle"
+                tabindex="0"
                 [hidden]="loadingVehicleImage || loadingVehicleImageFailed"
                 (load)="vehicleImageLoaded()"
                 (error)="vehicleImageFailedToLoad()"
-                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
+                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
+                (keydown)="openLightbox(plate.imageUrl, plate.plateNumber)" />
             <mat-icon style="font-size: 100px; line-height: normal;"
                 *ngIf="!this.vehicleImageUrl|| loadingVehicleImageFailed"
                 [inline]="true"
@@ -30,6 +33,7 @@
             <img [src]="this.plateImageUrl"
                 class="resize-mobile"
                 style="width: 500px; padding-top:16px;"
+                alt="image of the vehicle's license plate"
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />

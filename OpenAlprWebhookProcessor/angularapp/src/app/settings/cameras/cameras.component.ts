@@ -33,25 +33,25 @@ export class CamerasComponent implements OnInit {
   }
 
   openEditDialog(cameraId: string): void {
-    var cameraToEdit = this.cameras.find(x => x.id == cameraId);
+    let cameraToEdit = this.cameras.find(x => x.id == cameraId);
 
     if (!cameraToEdit) {
       cameraToEdit = this.cameras[0];
     }
 
     const dialogRef = this.dialog.open(EditCameraComponent, {
-      data: { 'camera': cameraToEdit }
+      data: cameraToEdit
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        var cameraToSave = this.cameras.find(x => x.id == cameraId);
+        let cameraToSave = this.cameras.find(x => x.id == cameraId);
 
         if (!cameraToSave) {
           cameraToSave = this.cameras[0];
         }
 
-        this.settingsService.upsertCamera(cameraToSave).subscribe(_ => {
+        this.settingsService.upsertCamera(cameraToSave).subscribe(() => {
           this.getCameras();
         });
       }
@@ -63,7 +63,7 @@ export class CamerasComponent implements OnInit {
   }
 
   public deleteCamera($event: string) {
-    this.settingsService.deleteCamera($event).subscribe(_ => {
+    this.settingsService.deleteCamera($event).subscribe(() => {
       this.getCameras();
     });
   }

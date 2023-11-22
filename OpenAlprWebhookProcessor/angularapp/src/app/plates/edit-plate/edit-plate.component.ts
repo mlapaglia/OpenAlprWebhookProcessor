@@ -18,10 +18,10 @@ export class EditPlateComponent implements OnInit {
   public plate: Plate;
   
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: Plate
   ) { }
 
   ngOnInit(): void {
-    this.plate = this.data.plate;
+    this.plate = this.data;
   }
 }

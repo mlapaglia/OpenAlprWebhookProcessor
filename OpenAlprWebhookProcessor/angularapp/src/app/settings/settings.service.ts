@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Alert } from './alerts/alert/alert';
+import { Alert } from './alerts/alert';
 import { Camera } from './cameras/camera';
-import { Ignore } from './ignores/ignore/ignore';
+import { Ignore } from './ignores/ignore';
 import { Agent } from './openalpr-agent/agent'
 import { AgentStatus } from './openalpr-agent/agentStatus';
 
@@ -18,8 +18,8 @@ export class SettingsService {
     return this.http.get<Camera[]>(`cameras`);
   }
 
-  deleteCamera(cameraId: string): Observable<any> {
-    return this.http.post(`cameras/${cameraId}/delete`, null);
+  deleteCamera(cameraId: string): Observable<void> {
+    return this.http.post<void>(`cameras/${cameraId}/delete`, null);
   }
 
   upsertCamera(camera: Camera) {
@@ -46,8 +46,8 @@ export class SettingsService {
     return this.http.post<boolean>(`/settings/agent/enable`, agentId);
   }
 
-  startAgentScrape(): Observable<any> {
-    return this.http.post(`/settings/agent/scrape`, null);
+  startAgentScrape(): Observable<void> {
+    return this.http.post<void>(`/settings/agent/scrape`, null);
   }
 
   getIgnores(): Observable<Ignore[]> {

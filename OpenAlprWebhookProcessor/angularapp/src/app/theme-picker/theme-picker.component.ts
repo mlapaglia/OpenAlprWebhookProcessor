@@ -22,7 +22,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatListModule } from '@angular/material/list';
 
 @Component({
-  selector: 'theme-picker',
+  selector: 'app-theme-picker',
   templateUrl: './theme-picker.component.html',
   styleUrls: ['./theme-picker.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +30,7 @@ import { MatListModule } from '@angular/material/list';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, NgFor, MatRadioModule, MatListModule]
 })
-export class ThemePicker implements OnInit, OnDestroy {
+export class ThemePickerComponent implements OnInit, OnDestroy {
   private _queryParamSubscription = Subscription.EMPTY;
   currentTheme: DocsSiteTheme | undefined;
 
@@ -68,14 +68,15 @@ export class ThemePicker implements OnInit, OnDestroy {
   ];
 
   constructor(public styleManager: StyleManager,
-              private _themeStorage: ThemeStorage,
-              private _activatedRoute: ActivatedRoute,
-              private liveAnnouncer: LiveAnnouncer,
-              iconRegistry: MatIconRegistry,
-              sanitizer: DomSanitizer) {
+    private _themeStorage: ThemeStorage,
+    private _activatedRoute: ActivatedRoute,
+    private liveAnnouncer: LiveAnnouncer,
+    iconRegistry: MatIconRegistry,
+    sanitizer: DomSanitizer) {
     iconRegistry.addSvgIcon('theme-example',
-                            sanitizer.bypassSecurityTrustResourceUrl(
-                                'assets/img/theme-demo-icon.svg'));
+      sanitizer.bypassSecurityTrustResourceUrl(
+          'assets/img/theme-demo-icon.svg'));
+          
     const themeName = this._themeStorage.getStoredThemeName();
     if (themeName) {
       this.selectTheme(themeName);
