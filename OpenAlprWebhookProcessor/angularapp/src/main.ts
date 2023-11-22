@@ -58,7 +58,7 @@ bootstrapApplication(AppComponent, {
             NgxChartsModule,
             HighlightModule,
             ServiceWorkerModule.register('ngsw-worker.js', {
-                enabled: isDevMode(),
+                enabled: !isDevMode(),
                 registrationStrategy: 'registerWhenStable:30'
             })
         ),
