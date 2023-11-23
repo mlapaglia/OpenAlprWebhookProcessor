@@ -16,6 +16,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run build
         run: docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
+
+  front-end-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - name: Run frontend tests
         working-directory: ./OpenAlprWebhookProcessor/angularapp
         run: |
