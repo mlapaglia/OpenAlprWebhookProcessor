@@ -56,7 +56,9 @@ export class AddEditComponent implements OnInit {
     }
 
     // convenience getter for easy access to form fields
-    get f() { return this.form.controls; }
+    get f() {
+        return this.form.controls; 
+    }
 
     onSubmit() {
         this.submitted = true;
@@ -72,8 +74,7 @@ export class AddEditComponent implements OnInit {
         this.loading = true;
         if (!this.isAddingFirstUserMode) {
             this.addUser();
-        }
-        else if (this.isAddMode) {
+        } else if (this.isAddMode) {
             this.createUser();
         } else {
             this.updateUser();

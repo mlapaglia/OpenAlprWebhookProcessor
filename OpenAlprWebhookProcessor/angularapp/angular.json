@@ -121,7 +121,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/purple-green.css",
-              "src/styles.css"
+              "src/styles.less"
             ],
             "scripts": [],
             "karmaConfig": "karma.conf.js"

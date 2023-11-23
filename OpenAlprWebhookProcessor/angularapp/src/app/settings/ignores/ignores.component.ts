@@ -17,48 +17,48 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class IgnoresComponent implements OnInit {
-  public ignores: MatTableDataSource<Ignore>;
-  public isSaving: boolean = false;
+    public ignores: MatTableDataSource<Ignore>;
+    public isSaving: boolean = false;
 
-  constructor(private settingsService: SettingsService) { }
+    constructor(private settingsService: SettingsService) { }
 
-  public rowsToDisplay = [
-    'plateNumber',
-    'matchType',
-    'description',
-    'delete',
-  ];
+    public rowsToDisplay = [
+        'plateNumber',
+        'matchType',
+        'description',
+        'delete'
+    ];
 
-  ngOnInit(): void {
-    this.getIgnores();
-  }
+    ngOnInit(): void {
+        this.getIgnores();
+    }
 
-  private getIgnores() {
-    this.settingsService.getIgnores().subscribe(result => {
-      this.ignores = new MatTableDataSource<Ignore>(result);
-    });
-  }
+    private getIgnores() {
+        this.settingsService.getIgnores().subscribe(result => {
+            this.ignores = new MatTableDataSource<Ignore>(result);
+        });
+    }
 
-  public deleteIgnore(ignore: Ignore) {
-    this.ignores.data.forEach((item, index) => {
-      if(item === ignore) {
-        this.ignores.data.splice(index,1);
-      }
-    });
+    public deleteIgnore(ignore: Ignore) {
+        this.ignores.data.forEach((item, index) => {
+            if (item === ignore) {
+                this.ignores.data.splice(index, 1);
+            }
+        });
 
-    this.ignores._updateChangeSubscription();
-  }
+        this.ignores._updateChangeSubscription();
+    }
 
-  public addIgnore() {
-    this.ignores.data.push(new Ignore());
-    this.ignores._updateChangeSubscription();
-  }
+    public addIgnore() {
+        this.ignores.data.push(new Ignore());
+        this.ignores._updateChangeSubscription();
+    }
 
-  public saveIgnores() {
-    this.isSaving = true;
-    this.settingsService.upsertIgnores(this.ignores.data).subscribe(() => {
-      this.getIgnores();
-      this.isSaving = false;
-    });
-  }
+    public saveIgnores() {
+        this.isSaving = true;
+        this.settingsService.upsertIgnores(this.ignores.data).subscribe(() => {
+            this.getIgnores();
+            this.isSaving = false;
+        });
+    }
 }

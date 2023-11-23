@@ -5,7 +5,7 @@ export class Pushover {
     sendPlatePreviewEnabled: boolean;
     sendEveryPlateEnabled: boolean;
     
-    constructor(init?:Partial<Pushover>) {
+    constructor(init?: Partial<Pushover>) {
         Object.assign(this, init);
     }
 }

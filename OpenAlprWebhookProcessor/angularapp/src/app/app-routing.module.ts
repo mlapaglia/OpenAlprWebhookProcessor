@@ -22,11 +22,11 @@ const routes: Routes = [
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent },
-            { path: '', redirectTo: '/', pathMatch: 'full' },
+            { path: '', redirectTo: '/', pathMatch: 'full' }
         ]
     },
     { path: 'plate/:id', component: PlatesComponent, canActivate: [AuthGuard] },
-    { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard], },
+    { path: 'plates', component: PlatesComponent, canActivate: [AuthGuard] },
     {
         path: 'settings',
         children: [
@@ -45,9 +45,9 @@ const routes: Routes = [
                     { path: 'edit/:id', component: AddEditComponent }
                 ]
             },
-            { path: '', redirectTo: '/', pathMatch: 'full' },
+            { path: '', redirectTo: '/', pathMatch: 'full' }
         ],
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard]
     },
     { path: '**', redirectTo: '/', pathMatch: 'full' }
 ];

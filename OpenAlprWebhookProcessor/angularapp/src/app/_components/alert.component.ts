@@ -14,7 +14,6 @@ import { NgFor } from '@angular/common';
 export class AlertComponent implements OnInit, OnDestroy {
     @Input() id = 'default-alert';
     @Input() fade = true;
-
     alerts: Alert[] = [];
     alertSubscription: Subscription;
     routeSubscription: Subscription;
@@ -42,7 +41,7 @@ export class AlertComponent implements OnInit, OnDestroy {
                 if (alert.autoClose) {
                     setTimeout(() => this.removeAlert(alert), 3000);
                 }
-           });
+            });
 
         // clear alerts on location change
         this.routeSubscription = this.router.events.subscribe(event => {
@@ -86,7 +85,7 @@ export class AlertComponent implements OnInit, OnDestroy {
             [AlertType.Error]: 'alert alert-danger',
             [AlertType.Info]: 'alert alert-info',
             [AlertType.Warning]: 'alert alert-warning'
-        }
+        };
 
         classes.push(alertTypeClass[alert.type]);
 

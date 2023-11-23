@@ -4,7 +4,7 @@ export class Alert {
     strictMatch: boolean;
     description: string;
     
-    constructor(init?:Partial<Alert>) {
+    constructor(init?: Partial<Alert>) {
         Object.assign(this, init);
     }
 }

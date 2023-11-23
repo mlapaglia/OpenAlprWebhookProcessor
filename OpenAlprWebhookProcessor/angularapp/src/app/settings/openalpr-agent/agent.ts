@@ -14,7 +14,7 @@ export class Agent {
     sunsetOffset: number;
     timezoneOffset: number;
 
-    constructor(init?:Partial<Agent>) {
+    constructor(init?: Partial<Agent>) {
         Object.assign(this, init);
     }
 }

@@ -4,7 +4,7 @@ export class Ignore {
     strictMatch: boolean;
     description: string;
     
-    constructor(init?:Partial<Ignore>) {
+    constructor(init?: Partial<Ignore>) {
         Object.assign(this, init);
     }
 }

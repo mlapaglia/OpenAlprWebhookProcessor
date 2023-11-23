@@ -71,7 +71,7 @@ bootstrapApplication(AppComponent, {
             useValue: {
                 coreLibraryLoader: () => import('highlight.js/lib/core'),
                 languages: {
-                    plaintext: () => import('highlight.js/lib/languages/plaintext'),
+                    plaintext: () => import('highlight.js/lib/languages/plaintext')
                 }
             }
         },
@@ -79,4 +79,4 @@ bootstrapApplication(AppComponent, {
         provideAnimations()
     ]
 })
-.catch(err => console.error(err));
+    .catch(err => console.error(err));

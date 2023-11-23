@@ -1,25 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SystemLogsComponent } from './system-logs.component';
+import { SystemLogsService } from './system-logs.service';
+import { of } from 'rxjs';
 
-import { LogsComponent } from './logs.component';
+describe(SystemLogsComponent.name, () => {
+    let component: SystemLogsComponent;
+    let fixture: ComponentFixture<SystemLogsComponent>;
+    const systemLogsServiceSpy = jasmine.createSpyObj(SystemLogsService.name, ['getLogs']);
 
-describe('LogsComponent', () => {
-  let component: LogsComponent;
-  let fixture: ComponentFixture<LogsComponent>;
+    beforeEach(async() => {
+        await TestBed.configureTestingModule({
+            imports: [SystemLogsComponent],
+            providers: [
+                { provide: SystemLogsService, useValue: systemLogsServiceSpy }
+            ]
+        }).compileComponents();
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-    imports: [LogsComponent]
-})
-    .compileComponents();
-  });
+    beforeEach(() => {
+        const logs: string[] = [];
+        systemLogsServiceSpy.getLogs.and.returnValue(of(logs));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LogsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(SystemLogsComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+        expect(systemLogsServiceSpy.getLogs).toHaveBeenCalled();
+    });
 });

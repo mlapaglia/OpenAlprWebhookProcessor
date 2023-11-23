@@ -1,12 +1,12 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { Stream } from "stream";
-import { Plate } from "./plate/plate";
-import { PlateResponse } from "./plate/plateResponse";
-import { PlateStatistics } from "./plate/plateStatistics";
-import { VehicleFilters } from "./vehicleFilters";
-import { GetPlateResponse } from "./plate/getPlateResponse";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Stream } from 'stream';
+import { Plate } from './plate/plate';
+import { PlateResponse } from './plate/plateResponse';
+import { PlateStatistics } from './plate/plateStatistics';
+import { VehicleFilters } from './vehicleFilters';
+import { GetPlateResponse } from './plate/getPlateResponse';
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
@@ -14,7 +14,7 @@ export class PlateService {
     private searchPlatesUrl = 'licenseplates/search';
     private editPlateUrl = 'licenseplates/edit';
     private singlePlateUrl = 'licenseplates';
-    private hydrateDatabaseUrl = "hydration/start";
+    private hydrateDatabaseUrl = 'hydration/start';
     private getFiltersUrl = 'licenseplates/filters';
     private getStatistics = 'licenseplates/statistics';
     private enrichPlateUrl = 'licenseplates/enrich';
@@ -34,7 +34,7 @@ export class PlateService {
     }
 
     getRelayImage(imageId: string) {
-        return this.http.get<Stream>(`/${this.getRelayImageUrl}/${imageId}`)
+        return this.http.get<Stream>(`/${this.getRelayImageUrl}/${imageId}`);
     }
 
     hydrateDatabase(): Observable<void> {
@@ -50,7 +50,7 @@ export class PlateService {
     }
 
     getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {
-        return this.http.get<PlateStatistics>(`/${this.getStatistics}/${plateNumber}`)
+        return this.http.get<PlateStatistics>(`/${this.getStatistics}/${plateNumber}`);
     }
 
     enrichPlate(plateId: string): Observable<void> {
@@ -65,7 +65,7 @@ export class PlateRequest {
     strictMatch: boolean;
     filterIgnoredPlates: boolean;
     filterPlatesSeenLessThan: number;
-    regexSearchEnabled: boolean
+    regexSearchEnabled: boolean;
     pageNumber: number;
     pageSize: number;
     vehicleMake: string;

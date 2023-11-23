@@ -15,60 +15,60 @@ import { MatGridListModule } from '@angular/material/grid-list';
     imports: [MatGridListModule, NgFor, CameraComponent, MatDialogModule]
 })
 export class CamerasComponent implements OnInit {
-  public cameras: Camera[];
+    public cameras: Camera[];
   
-  constructor(
-    private settingsService: SettingsService,
-    public dialog: MatDialog) { }
+    constructor(
+        private settingsService: SettingsService,
+        public dialog: MatDialog) { }
 
-  ngOnInit(): void {
-    this.getCameras();
-  }
-
-  public getCameras() {
-    this.settingsService.getCameras().subscribe(result => {
-      result.unshift(new Camera());
-      this.cameras = result;
-    });
-  }
-
-  openEditDialog(cameraId: string): void {
-    let cameraToEdit = this.cameras.find(x => x.id == cameraId);
-
-    if (!cameraToEdit) {
-      cameraToEdit = this.cameras[0];
+    ngOnInit(): void {
+        this.getCameras();
     }
 
-    const dialogRef = this.dialog.open(EditCameraComponent, {
-      data: cameraToEdit
-    });
+    public getCameras() {
+        this.settingsService.getCameras().subscribe(result => {
+            result.unshift(new Camera());
+            this.cameras = result;
+        });
+    }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        let cameraToSave = this.cameras.find(x => x.id == cameraId);
+    openEditDialog(cameraId: string): void {
+        let cameraToEdit = this.cameras.find(x => x.id == cameraId);
 
-        if (!cameraToSave) {
-          cameraToSave = this.cameras[0];
+        if (!cameraToEdit) {
+            cameraToEdit = this.cameras[0];
         }
 
-        this.settingsService.upsertCamera(cameraToSave).subscribe(() => {
-          this.getCameras();
+        const dialogRef = this.dialog.open(EditCameraComponent, {
+            data: cameraToEdit
         });
-      }
-    });
-  }
 
-  public addCamera() {
-    this.openEditDialog("");
-  }
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                let cameraToSave = this.cameras.find(x => x.id == cameraId);
 
-  public deleteCamera($event: string) {
-    this.settingsService.deleteCamera($event).subscribe(() => {
-      this.getCameras();
-    });
-  }
+                if (!cameraToSave) {
+                    cameraToSave = this.cameras[0];
+                }
 
-  public editCamera($event: string) {
-    this.openEditDialog($event);
-  }
+                this.settingsService.upsertCamera(cameraToSave).subscribe(() => {
+                    this.getCameras();
+                });
+            }
+        });
+    }
+
+    public addCamera() {
+        this.openEditDialog('');
+    }
+
+    public deleteCamera($event: string) {
+        this.settingsService.deleteCamera($event).subscribe(() => {
+            this.getCameras();
+        });
+    }
+
+    public editCamera($event: string) {
+        this.openEditDialog($event);
+    }
 }

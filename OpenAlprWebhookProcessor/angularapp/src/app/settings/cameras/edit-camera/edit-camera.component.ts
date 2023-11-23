@@ -37,63 +37,63 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, NgIf, MatButtonModule, CameraMaskComponent]
 })
 export class EditCameraComponent implements OnInit {
-  public camera: Camera;
-  public hidePassword: boolean = true;
-  public currentZoomFocus: ZoomFocus = new ZoomFocus();
-  public isEditingMask: boolean = false;
+    public camera: Camera;
+    public hidePassword: boolean = true;
+    public currentZoomFocus: ZoomFocus = new ZoomFocus();
+    public isEditingMask: boolean = false;
 
-  constructor(
-    public dialogRef: MatDialogRef<EditCameraComponent>,
-    private snackBarService: SnackbarService,
-    private editCameraService: EditCameraService,
+    constructor(
+        public dialogRef: MatDialogRef<EditCameraComponent>,
+        private snackBarService: SnackbarService,
+        private editCameraService: EditCameraService,
 
-    @Inject(MAT_DIALOG_DATA) public data: Camera) { }
+        @Inject(MAT_DIALOG_DATA) public data: Camera) { }
 
-  ngOnInit(): void {
-    this.camera = this.data;
-    this.getZoomFocus();
-  }
+    ngOnInit(): void {
+        this.camera = this.data;
+        this.getZoomFocus();
+    }
 
-  public triggerDayMode() {
-    this.editCameraService.triggerDayMode(this.camera.id).subscribe(() => {
-      this.snackBarService.create("day mode test sent successfully", SnackBarType.Info);
-    });
-  }
+    public triggerDayMode() {
+        this.editCameraService.triggerDayMode(this.camera.id).subscribe(() => {
+            this.snackBarService.create('day mode test sent successfully', SnackBarType.Info);
+        });
+    }
 
-  public triggerNightMode() {
-    this.editCameraService.triggerNightMode(this.camera.id).subscribe(() => {
-      this.snackBarService.create("night mode test sent successfully", SnackBarType.Info);
-    });
-  }
+    public triggerNightMode() {
+        this.editCameraService.triggerNightMode(this.camera.id).subscribe(() => {
+            this.snackBarService.create('night mode test sent successfully', SnackBarType.Info);
+        });
+    }
 
-  public testOverlay() {
-    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(() => {
-      this.snackBarService.create("overlay test sent successfully", SnackBarType.Info);
-    });
-  }
+    public testOverlay() {
+        this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(() => {
+            this.snackBarService.create('overlay test sent successfully', SnackBarType.Info);
+        });
+    }
 
-  public getZoomFocus() {
-    this.editCameraService.getZoomAndFocus(this.camera.id).subscribe(result => {
-      this.currentZoomFocus = result;
-    });
-  }
+    public getZoomFocus() {
+        this.editCameraService.getZoomAndFocus(this.camera.id).subscribe(result => {
+            this.currentZoomFocus = result;
+        });
+    }
 
-  public setZoomFocus() {
-    this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus).subscribe(() => {
-      this.getZoomFocus();
-    });
-  }
+    public setZoomFocus() {
+        this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus).subscribe(() => {
+            this.getZoomFocus();
+        });
+    }
 
-  public triggerAutofocus() {
-    this.editCameraService.triggerAutofocus(this.camera.id).subscribe(() => {
-      this.getZoomFocus();
-    },
-    () => {
-      this.snackBarService.create("auto focus failed", SnackBarType.Error);
-    });
-  }
+    public triggerAutofocus() {
+        this.editCameraService.triggerAutofocus(this.camera.id).subscribe(() => {
+            this.getZoomFocus();
+        },
+        () => {
+            this.snackBarService.create('auto focus failed', SnackBarType.Error);
+        });
+    }
 
-  public editMask() {
-      this.isEditingMask = !this.isEditingMask;
-  }
+    public editMask() {
+        this.isEditingMask = !this.isEditingMask;
+    }
 }

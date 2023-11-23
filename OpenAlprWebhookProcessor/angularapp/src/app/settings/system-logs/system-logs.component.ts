@@ -17,62 +17,62 @@ import { MatButtonModule } from '@angular/material/button';
     imports: [MatButtonModule, MatCheckboxModule, ReactiveFormsModule, FormsModule, Highlight]
 })
 export class SystemLogsComponent implements AfterViewInit, OnDestroy {
-  public logMessages: string[];
-  public logMessagesDisplay: string = '';
-  public onlyFailedPlateGroups: boolean = false;
-  public isPurging: boolean = false;
+    public logMessages: string[];
+    public logMessagesDisplay: string = '';
+    public onlyFailedPlateGroups: boolean = false;
+    public isPurging: boolean = false;
 
-  private subscriptions = new Subscription();
+    private subscriptions = new Subscription();
 
-  constructor(
-    private signalRHub: SignalrService,
-    private systemLogsService: SystemLogsService,
-    private snackBarService: SnackbarService) { }
+    constructor(
+        private signalRHub: SignalrService,
+        private systemLogsService: SystemLogsService,
+        private snackBarService: SnackbarService) { }
 
-  ngAfterViewInit(): void {
-    this.populateLogs();
-  }
+    ngAfterViewInit(): void {
+        this.populateLogs();
+    }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+    }
 
-  public populateLogs() {
-    this.systemLogsService.getLogs().subscribe(result => {
-      this.logMessages = result;
-      this.formatLogs();
-      this.subscribeForLogs();
-    })
-  }
+    public populateLogs() {
+        this.systemLogsService.getLogs().subscribe(result => {
+            this.logMessages = result;
+            this.formatLogs();
+            this.subscribeForLogs();
+        });
+    }
   
-  public subscribeForLogs() {
-    this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
-      this.logMessages.unshift(logInformation);
-      this.formatLogs();
-    }));
-  }
+    public subscribeForLogs() {
+        this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe(logInformation => {
+            this.logMessages.unshift(logInformation);
+            this.formatLogs();
+        }));
+    }
 
-  public downloadPlates() {
-    this.systemLogsService.getPlateGroups(this.onlyFailedPlateGroups).subscribe(blob => {
-      const objectUrl = URL.createObjectURL(blob);
-      window.open(objectUrl);
-    });
-  }
+    public downloadPlates() {
+        this.systemLogsService.getPlateGroups(this.onlyFailedPlateGroups).subscribe(blob => {
+            const objectUrl = URL.createObjectURL(blob);
+            window.open(objectUrl);
+        });
+    }
 
-  public deletePlates() {
-    this.isPurging = true;
-    this.systemLogsService.deletePlates().subscribe(() => {
-      this.snackBarService.create("Deleted debug plates successfully.", SnackBarType.Deleted);
-      this.isPurging = false;
-    },
-    () => {
-      this.snackBarService.create("Failed to delete plates, check the logs.", SnackBarType.Error);
-      this.isPurging = false;
-    });
-  }
+    public deletePlates() {
+        this.isPurging = true;
+        this.systemLogsService.deletePlates().subscribe(() => {
+            this.snackBarService.create('Deleted debug plates successfully.', SnackBarType.Deleted);
+            this.isPurging = false;
+        },
+        () => {
+            this.snackBarService.create('Failed to delete plates, check the logs.', SnackBarType.Error);
+            this.isPurging = false;
+        });
+    }
 
-  private formatLogs() {
-    this.logMessages = this.logMessages.slice(0, 500);
-    this.logMessagesDisplay = this.logMessages.join("\r\n");
-  }
+    private formatLogs() {
+        this.logMessages = this.logMessages.slice(0, 500);
+        this.logMessagesDisplay = this.logMessages.join('\r\n');
+    }
 }

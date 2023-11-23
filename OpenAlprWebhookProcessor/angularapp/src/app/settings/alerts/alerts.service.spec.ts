@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-
-import { ForwardsService } from './forwards.service';
+import { AlertsService } from './alerts.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('ForwardsService', () => {
-    let service: ForwardsService;
+describe(AlertsService.name, () => {
+    let service: AlertsService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule]
         });
-        service = TestBed.inject(ForwardsService);
+
+        service = TestBed.inject(AlertsService);
     });
 
     it('should be created', () => {

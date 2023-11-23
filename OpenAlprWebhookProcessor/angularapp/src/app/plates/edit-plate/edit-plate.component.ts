@@ -15,13 +15,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 })
 export class EditPlateComponent implements OnInit {
 
-  public plate: Plate;
+    public plate: Plate;
   
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: Plate
-  ) { }
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: Plate
+    ) { }
 
-  ngOnInit(): void {
-    this.plate = this.data;
-  }
+    ngOnInit(): void {
+        this.plate = this.data;
+    }
 }

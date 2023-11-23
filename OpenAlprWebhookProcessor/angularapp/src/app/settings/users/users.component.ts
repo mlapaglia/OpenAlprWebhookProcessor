@@ -25,7 +25,7 @@ export class UsersComponent implements OnInit {
 
     deleteUser(id: string) {
         const user = this.users.find(x => x.id === id);
-        if(user !== undefined) {
+        if (user !== undefined) {
             user.isDeleting = true;
             this.accountService.delete(id)
                 .pipe(first())

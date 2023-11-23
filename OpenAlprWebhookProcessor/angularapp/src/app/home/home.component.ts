@@ -12,7 +12,7 @@ import { MatCardModule } from '@angular/material/card';
 })
 export class HomeComponent implements OnInit {
     user: User;
-    public plateCounts: {name: Date, value: number}[];
+    public plateCounts: { name: Date; value: number }[];
 
     view: [number, number] = [700, 400];
     constructor(
@@ -27,10 +27,10 @@ export class HomeComponent implements OnInit {
 
             result.counts.forEach(x => {
                 this.plateCounts.push(
-                {
-                    name: x.date,
-                    value: x.count,
-                });
+                    {
+                        name: x.date,
+                        value: x.count
+                    });
             });
         });
     }

@@ -35,47 +35,47 @@ import { NgIf } from '@angular/common';
     imports: [NgIf, MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatCheckboxModule, MatButtonModule]
 })
 export class PushoverComponent implements OnInit {
-  public client: Pushover;
-  public isSaving: boolean;
-  public isTesting: boolean;
+    public client: Pushover;
+    public isSaving: boolean;
+    public isTesting: boolean;
 
-  constructor(
-    private pushoverService: PushoverService,
-    private snackbarService: SnackbarService) { }
+    constructor(
+        private pushoverService: PushoverService,
+        private snackbarService: SnackbarService) { }
 
-  ngOnInit(): void {
-    this.pushoverService.getPushover().subscribe(result => {
-      this.client = result;
-    })
-  }
-
-  public saveClient() {
-    this.isSaving = true;
-    this.pushoverService.upsertPushover(this.client).subscribe(() => {
-      this.snackbarService.create("Pushover client saved.", SnackBarType.Saved);
-      this.isSaving = false;
-    });
-  }
-
-  public testClient() {
-    this.isTesting = true;
-    this.pushoverService.testPushover().subscribe(() => {
-      this.snackbarService.create("Pushover client test successful.", SnackBarType.Successful);
-      this.isTesting = false;
-    },
-    () => {
-      this.snackbarService.create("Pushover client test failed.", SnackBarType.Error);
-      this.isTesting = false;
-    });
-  }
-
-  public onPushoverToggle(event: MatSlideToggleChange) {
-    if (!event.checked) {
-      this.client.isEnabled = event.checked;
-      this.isSaving = true;
-      this.pushoverService.upsertPushover(this.client).subscribe(() => {
-        this.isSaving = false;
-      });
+    ngOnInit(): void {
+        this.pushoverService.getPushover().subscribe(result => {
+            this.client = result;
+        });
     }
-  }
+
+    public saveClient() {
+        this.isSaving = true;
+        this.pushoverService.upsertPushover(this.client).subscribe(() => {
+            this.snackbarService.create('Pushover client saved.', SnackBarType.Saved);
+            this.isSaving = false;
+        });
+    }
+
+    public testClient() {
+        this.isTesting = true;
+        this.pushoverService.testPushover().subscribe(() => {
+            this.snackbarService.create('Pushover client test successful.', SnackBarType.Successful);
+            this.isTesting = false;
+        },
+        () => {
+            this.snackbarService.create('Pushover client test failed.', SnackBarType.Error);
+            this.isTesting = false;
+        });
+    }
+
+    public onPushoverToggle(event: MatSlideToggleChange) {
+        if (!event.checked) {
+            this.client.isEnabled = event.checked;
+            this.isSaving = true;
+            this.pushoverService.upsertPushover(this.client).subscribe(() => {
+                this.isSaving = false;
+            });
+        }
+    }
 }

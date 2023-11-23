@@ -6,5 +6,5 @@ export enum SnackBarType {
     Saved,
     Deleted,
     Successful,
-    Error,
+    Error
 }

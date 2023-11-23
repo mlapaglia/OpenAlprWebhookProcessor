@@ -10,7 +10,7 @@ export class AgentStatus {
     agentEpochMs: number;
     alprdActive: boolean;
 
-    constructor(init?:Partial<AgentStatus>) {
+    constructor(init?: Partial<AgentStatus>) {
         Object.assign(this, init);
     }
 }

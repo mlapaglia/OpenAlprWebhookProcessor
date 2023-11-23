@@ -30,14 +30,14 @@ export class AppComponent implements OnInit, OnDestroy {
     isSignalrConnected: boolean;
 
     public navItems = [
-        { linkTitle: "Cameras", icon: "videocam", link: "/settings/cameras"},
-        { linkTitle: "OpenALPR Agent", icon: "api", link: "/settings/agent"},
-        { linkTitle: "Alerts", icon: "notifications_active", link: "/settings/alerts"},
-        { linkTitle: "Ignores", icon: "alarm_off", link: "/settings/ignores"},
-        { linkTitle: "Webhook Forwards", icon: "forward_to_inbox", link: "/settings/forwards"},
-        { linkTitle: "System Logs", icon: "library_books", link: "/settings/logs"},
-        { linkTitle: "Enrichers", icon: "merge_type", link: "/settings/enrichers"},
-        { linkTitle: "Users", icon: "person", link: "/settings/users"},
+        { linkTitle: 'Cameras', icon: 'videocam', link: '/settings/cameras'},
+        { linkTitle: 'OpenALPR Agent', icon: 'api', link: '/settings/agent'},
+        { linkTitle: 'Alerts', icon: 'notifications_active', link: '/settings/alerts'},
+        { linkTitle: 'Ignores', icon: 'alarm_off', link: '/settings/ignores'},
+        { linkTitle: 'Webhook Forwards', icon: 'forward_to_inbox', link: '/settings/forwards'},
+        { linkTitle: 'System Logs', icon: 'library_books', link: '/settings/logs'},
+        { linkTitle: 'Enrichers', icon: 'merge_type', link: '/settings/enrichers'},
+        { linkTitle: 'Users', icon: 'person', link: '/settings/users'}
     ];
 
     private eventSubscriptions = new Subscription();
@@ -47,31 +47,31 @@ export class AppComponent implements OnInit, OnDestroy {
         private accountService: AccountService,
         private swUpdate: SwUpdate,
         private pushSubscriberService: PushSubscriberService) {
-            this.accountService.user.subscribe(x => {
-                this.topBarVisible = x.id !== undefined;
-            });
+        this.accountService.user.subscribe(x => {
+            this.topBarVisible = x.id !== undefined;
+        });
 
-            this.swUpdate.unrecoverable.subscribe(() => {
-                confirm('An error occurred, please reload the page.')
-                {
-                    window.location.reload();
+        this.swUpdate.unrecoverable.subscribe(() => {
+            confirm('An error occurred, please reload the page.');
+            {
+                window.location.reload();
+            }
+        });
+
+        if (this.swUpdate.isEnabled) {
+            this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
+                switch (event.type) {
+                    case 'VERSION_READY':
+                        if (confirm('You\'re using an old version of the control panel. Want to update?')) {
+                            window.location.reload();
+                        }
+                        break;
+                    case 'VERSION_INSTALLATION_FAILED':
+                        console.log(`Failed to install app version '${event.version.hash}': ${event.error}`);
+                        break;
                 }
             });
-
-            if (this.swUpdate.isEnabled) {
-                this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
-                    switch (event.type) {
-                        case 'VERSION_READY':
-                          if (confirm("You're using an old version of the control panel. Want to update?")) {
-                            window.location.reload();
-                          }
-                          break;
-                        case 'VERSION_INSTALLATION_FAILED':
-                          console.log(`Failed to install app version '${event.version.hash}': ${event.error}`);
-                          break;
-                      }
-                });
-            }
+        }
     }
 
     public ngOnInit() {
@@ -90,7 +90,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public subscribeForUpdates() {
         this.eventSubscriptions.add(this.signalRService.connectionStatusChanged.subscribe(status => {
-          this.isSignalrConnected = status;
+            this.isSignalrConnected = status;
         }));
     }
 
