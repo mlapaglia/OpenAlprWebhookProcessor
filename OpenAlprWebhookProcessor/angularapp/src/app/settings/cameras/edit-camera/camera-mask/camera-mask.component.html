@@ -1,0 +1,48 @@
+<mat-card style="display: flex; margin:16px;">
+  <mat-card-header>
+    Modify Camera Mask
+  </mat-card-header>
+  <mat-card-content>
+    <div class="canvasHolder">
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+          <div>
+            <mat-button-toggle-group (change)="handleToggleChange($event)" name="fontStyle" aria-label="Font Style">
+              <mat-button-toggle value="snapshot">Snapshot</mat-button-toggle>
+              <mat-button-toggle value="plates">Plates</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+          <div style="display: flex;">
+            <button mat-button color="warn" style="align-self: center;" (click)="resetCanvas()">Reset</button>
+            <button mat-button color="primary" style="align-self: center;" (click)="undoLastPoint()">Undo</button>
+            <mat-paginator #paginator
+              *ngIf="samplePlates.length > 0"
+              (page)="handlePageEvent($event)"
+              [length]="samplePlates.length"
+              [pageSize]="1"
+              [showFirstLastButtons]="false"
+              [pageSizeOptions]="[]"
+              [hidePageSize]="true"
+              [pageIndex]="paginatorIndex"
+              aria-label="Select page">
+            </mat-paginator>
+          </div>
+        </div>
+        <canvas class="canvas" #canvas width="960" height="540"></canvas>
+      </div>
+      <div #measureDiv></div>
+      <div>
+        Mask Sample:
+        <canvas class="canvas" #sampleCanvas width="480" height="270" ></canvas>
+      </div>
+      <div>
+        <canvas class="canvas" #savingCanvas width="1920" height="1080"></canvas>
+      </div>
+    </div>
+    <div [hidden]="!isLoadingSnapshot">Loading...</div>
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button color="primary" (click)="saveMask()">Save</button>
+    <button mat-button color="warn" (click)="cancelMask()">Cancel</button>
+  </mat-card-actions>
+</mat-card>

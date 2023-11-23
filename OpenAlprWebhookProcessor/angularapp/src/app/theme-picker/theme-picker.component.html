@@ -1,0 +1,13 @@
+<mat-list-item [mat-menu-trigger-for]="themeMenu">
+  <mat-icon matListItemIcon>format_color_fill</mat-icon>
+  <span class="mobile-shrink">Theme</span>
+</mat-list-item>
+<mat-menu #themeMenu="matMenu" xPosition="before" class="docs-theme-picker-menu">
+  <button mat-menu-item *ngFor="let theme of themes" (click)="selectTheme(theme.name)">
+    <mat-icon [class.docs-theme-selected-icon]="currentTheme === theme"
+              [color]="currentTheme === theme ? 'accent' : undefined">
+      {{currentTheme === theme ? 'radio_button_checked' : 'radio_button_unchecked'}}
+    </mat-icon>
+    <span>{{theme.displayName}}</span>
+  </button>
+</mat-menu>

@@ -2,12 +2,17 @@
 import { User } from 'app/_models';
 import { AccountService } from 'app/_services';
 import { HomeService } from './home.service';
-import { DayCount } from './plateCountResponse';
+import { BarChartModule } from '@swimlane/ngx-charts';
+import { MatCardModule } from '@angular/material/card';
 
-@Component({ templateUrl: 'home.component.html' })
+@Component({
+    templateUrl: 'home.component.html',
+    standalone: true,
+    imports: [MatCardModule, BarChartModule]
+})
 export class HomeComponent implements OnInit {
     user: User;
-    public plateCounts: any[];
+    public plateCounts: { name: Date; value: number }[];
 
     view: [number, number] = [700, 400];
     constructor(
@@ -22,15 +27,15 @@ export class HomeComponent implements OnInit {
 
             result.counts.forEach(x => {
                 this.plateCounts.push(
-                {
-                    name: x.date,
-                    value: x.count,
-                });
+                    {
+                        name: x.date,
+                        value: x.count
+                    });
             });
         });
     }
 
-      // options
+    // options
     showXAxis = true;
     showYAxis = true;
     gradient = false;

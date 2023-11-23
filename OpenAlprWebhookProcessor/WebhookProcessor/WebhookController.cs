@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -19,24 +22,28 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly SinglePlateWebhookHandler _singlePlateWebhookHandler;
 
+        private readonly ProcessorContext _processorContext;
+
         public WebhookController(
             ILogger<WebhookController> logger,
             GroupWebhookHandler webhookHandler,
-            SinglePlateWebhookHandler singlePlateWebhookHandler)
+            SinglePlateWebhookHandler singlePlateWebhookHandler,
+            ProcessorContext processorContext)
         {
             _logger = logger;
             _groupWebhookHandler = webhookHandler;
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
+            _processorContext = processorContext;
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("request received from: " + Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("request received from: {ipAddress}", Request.HttpContext.Connection.RemoteIpAddress);
 
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
-                var rawWebhook = await reader.ReadToEndAsync();
+                var rawWebhook = await reader.ReadToEndAsync(cancellationToken);
 
                 if (rawWebhook.Contains("alpr_alert"))
                 {
@@ -83,6 +90,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 else if (rawWebhook.Contains("heartbeat"))
                 {
                     _logger.LogInformation("received heartbeat from agent");
+
+                    var agent = await _processorContext.Agents
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    agent.LastHeartbeatEpochMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    await _processorContext.SaveChangesAsync(cancellationToken);
                 }
                 else
                 {

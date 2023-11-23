@@ -1,6 +1,4 @@
-import { Url } from "url";
-
-export interface Plate {
+export class Plate {
     id: string;
     
     openAlprCameraId: number;
@@ -21,17 +19,23 @@ export interface Plate {
 
     isIgnore: boolean;
 
+    isOpen: boolean;
+
     alertDescription: string;
 
     receivedOn: Date;
 
     direction: number;
 
-    imageUrl: Url;
+    imageUrl: URL;
 
-    cropImageUrl: Url;
+    cropImageUrl: URL;
 
     notes: string;
 
     canBeEnriched: boolean;
+
+    constructor(init?: Partial<Plate>) {
+        Object.assign(this, init);
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using System.Reflection;
 
 namespace OpenAlprWebhookProcessor.Data
@@ -17,6 +18,8 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<PlateGroupPossibleNumbers> PlateGroupPossibleNumbers { get; set; }
 
         public DbSet<Camera> Cameras { get; set; }
+
+        public DbSet<CameraMask> CameraMasks { get; set; }
 
         public DbSet<Agent> Agents { get; set; }
 

@@ -11,8 +11,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
     {
         public static LicensePlate MapPlate(
             PlateGroup plate,
-            List<string> platesToIgnore,
-            List<string> platesToAlert)
+            List<string> platesToIgnore = null,
+            List<string> platesToAlert = null)
         {
             return new LicensePlate()
             {
@@ -22,8 +22,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
                 CanBeEnriched = !plate.IsEnriched,
                 CropImageUrl = new Uri($"/images/crop/{plate.OpenAlprUuid}", UriKind.Relative),
                 Id = plate.Id,
-                IsAlert = platesToAlert.Contains(plate.BestNumber),
-                IsIgnore = platesToIgnore.Contains(plate.BestNumber),
+                IsAlert = platesToAlert?.Contains(plate.BestNumber) ?? false,
+                IsIgnore = platesToIgnore?.Contains(plate.BestNumber) ?? false,
                 Notes = plate.Notes,
                 OpenAlprCameraId = plate.OpenAlprCameraId,
                 OpenAlprProcessingTimeMs = plate.OpenAlprProcessingTimeMs,

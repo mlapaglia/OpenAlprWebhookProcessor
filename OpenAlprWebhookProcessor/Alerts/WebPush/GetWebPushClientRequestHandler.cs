@@ -30,6 +30,7 @@ namespace OpenAlprWebhookProcessor.Alerts.WebPush
                 EmailAddress = client.Subject,
                 PublicKey = client.PublicKey,
                 PrivateKey = client.PrivateKey,
+                SendEveryPlateEnabled = client.SendEveryPlateEnabled,
             };
         }
     }

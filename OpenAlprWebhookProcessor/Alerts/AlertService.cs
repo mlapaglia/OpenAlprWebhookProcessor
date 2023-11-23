@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,8 +18,6 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        private readonly IServiceProvider _serviceProvider;
-
         private readonly ILogger _logger;
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
@@ -28,13 +25,11 @@ namespace OpenAlprWebhookProcessor.Alerts
         private readonly IEnumerable<IAlertClient> _alertClients;
 
         public AlertService(
-            IServiceProvider serviceProvider,
             ILogger<AlertService> logger,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
             IEnumerable<IAlertClient> alertClients)
         {
             _logger = logger;
-            _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
             _processorHub = processorHub;
@@ -67,48 +62,18 @@ namespace OpenAlprWebhookProcessor.Alerts
         {
             foreach (var job in _alertsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                using (var scope = _serviceProvider.CreateScope())
+                _logger.LogInformation("alerting for: {plateNumber}", job.PlateNumber);
+                await _processorHub.Clients.All.LicensePlateAlerted(job.PlateNumber);
+
+                foreach (var alertClient in _alertClients)
                 {
-                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                    var plateGroups = processorContext.PlateGroups.AsQueryable();
-
-                    if (job.IsStrictMatch)
+                    try
                     {
-                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId || x.PossibleNumbers.Any(x => x.Number == job.LicensePlateId.ToString()));
+                        await alertClient.SendAlertAsync(job, _cancellationTokenSource.Token);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        plateGroups = plateGroups.Where(x => x.Id == job.LicensePlateId);
-                    }
-
-                    var result = await plateGroups
-                        .Include(x => x.PlateImage)
-                        .FirstOrDefaultAsync(_cancellationTokenSource.Token);
-
-                    if (result != null)
-                    {
-                        _logger.LogInformation("alerting for: {alertId}", result.Id);
-                        await _processorHub.Clients.All.LicensePlateAlerted(result.Id.ToString());
-
-                        foreach (var alertClient in _alertClients)
-                        {
-                            try
-                            {
-                                await alertClient.SendAlertAsync(new Alert()
-                                {
-                                    Description = job.Description,
-                                    Id = result.Id,
-                                    PlateNumber = result.BestNumber,
-                                },
-                                result.PlateImage.Jpeg,
-                                _cancellationTokenSource.Token);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, $"failed to send alert to {nameof(alertClient)}");
-                            }
-                        }
+                        _logger.LogError(ex, $"failed to send alert to {nameof(alertClient)}");
                     }
                 }
             }

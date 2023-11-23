@@ -29,7 +29,17 @@ namespace OpenAlprWebhookProcessor.ImageRelay
 
             var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
 
-            return await camera.GetSnapshotAsync(cancellationToken);
+            int timeout = 5000;
+            var task = camera.GetSnapshotAsync(cancellationToken);
+            if (await Task.WhenAny(task, Task.Delay(timeout, cancellationToken)) == task)
+            {
+                return await task;
+
+            }
+            else
+            {
+                throw new TimeoutException("Unable to get image from camera");
+            }
         }
     }
 }

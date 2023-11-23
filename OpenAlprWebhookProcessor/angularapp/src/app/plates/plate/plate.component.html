@@ -9,20 +9,23 @@
                 color="primary"
                 mode="indeterminate"
                 diameter="100"
-                [hidden]="!loadingVehicleImage"></mat-progress-spinner>
+                *ngIf="loadingVehicleImage"></mat-progress-spinner>
             <img [src]="this.vehicleImageUrl"
                 class="resize-mobile"
                 style="cursor: pointer;"
+                alt="image of the vehicle"
+                tabindex="0"
                 [hidden]="loadingVehicleImage || loadingVehicleImageFailed"
                 (load)="vehicleImageLoaded()"
                 (error)="vehicleImageFailedToLoad()"
-                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"/>
+                (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
+                (keydown)="openLightbox(plate.imageUrl, plate.plateNumber)" />
             <mat-icon style="font-size: 100px; line-height: normal;"
                 *ngIf="!this.vehicleImageUrl|| loadingVehicleImageFailed"
                 [inline]="true"
                 matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
             <mat-progress-spinner
-                [hidden]="!loadingPlateImage"
+                *ngIf="loadingPlateImage"
                 color="primary"
                 mode="indeterminate"
                 diameter="100">
@@ -30,6 +33,7 @@
             <img [src]="this.plateImageUrl"
                 class="resize-mobile"
                 style="width: 500px; padding-top:16px;"
+                alt="image of the vehicle's license plate"
                 [hidden]="loadingPlateImage || loadingPlateImageFailed"
                 (load)="plateImageLoaded()"
                 (error)="plateImageFailedToLoad()" />
@@ -50,7 +54,7 @@
                 mode="indeterminate"
                 diameter="100"
                 style="margin: auto;"
-                [hidden]="!loadingStatistics"></mat-progress-spinner>
+                *ngIf="loadingStatistics"></mat-progress-spinner>
             <mat-icon style="font-size: 100px;"
                 *ngIf="loadingStatisticsFailed"
                 [inline]="true"

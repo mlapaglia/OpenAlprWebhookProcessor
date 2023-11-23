@@ -47,8 +47,10 @@ using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
 using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Lib.Net.Http.WebPush;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Cameras.GetPlateCaptures;
+using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -146,6 +148,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<GroupWebhookHandler>();
             services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<GetAgentRequestHandler>();
+            services.AddScoped<GetAgentStatusRequestHandler>();
             services.AddScoped<GetCameraRequestHandler>();
             services.AddScoped<SetZoomAndFocusHandler>();
             services.AddScoped<GetZoomAndFocusHandler>();
@@ -177,6 +180,13 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<EnrichLicensePlateRequestHandler>();
             services.AddScoped<GetDebugPlateGroupRequestHandler>();
             services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
+            services.AddScoped<TriggerAutofocusHandler>();
+            services.AddScoped<UpsertCameraMaskHandler>();
+            services.AddScoped<GetCameraMaskHandler>();
+            services.AddScoped<DisableAgentRequestHandler>();
+            services.AddScoped<EnableAgentRequestHandler>();
+            services.AddScoped<GetPlateCapturesHandler>();
+            services.AddScoped<GetPlateHandler>();
 
             services.AddScoped<UpsertWebPushClientRequestHandler>();
             services.AddScoped<GetWebPushClientRequestHandler>();
@@ -191,7 +201,10 @@ namespace OpenAlprWebhookProcessor
             services.AddHttpClient<PushServiceClient>();
 
             services.AddSingleton<WebPushNotificationProducer>();
-            services.AddHostedService<WebPushNotificationProducer>();
+            services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
+            
+            services.AddSingleton<WebsocketClientOrganizer>();
+            services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
@@ -263,6 +276,13 @@ namespace OpenAlprWebhookProcessor
                 .AllowAnyHeader());
 
             app.UseMiddleware<JwtMiddleware>();
+
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            };
+
+            app.UseWebSockets(webSocketOptions);
 
             app.UseAuthentication();
             app.UseAuthorization();

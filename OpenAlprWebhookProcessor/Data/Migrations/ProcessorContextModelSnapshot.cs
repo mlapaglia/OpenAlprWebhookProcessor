@@ -35,6 +35,9 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<bool>("IsImageCompressionEnabled")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long>("LastHeartbeatEpochMs")
+                        .HasColumnType("INTEGER");
+
                     b.Property<long>("LastSuccessfulScrapeEpoch")
                         .HasColumnType("INTEGER");
 
@@ -44,11 +47,17 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("REAL");
 
+                    b.Property<long?>("NextScrapeEpochMs")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("OpenAlprWebServerApiKey")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OpenAlprWebServerUrl")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("ScheduledScrapingIntervalMinutes")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SunriseOffset")
                         .HasColumnType("INTEGER");
@@ -174,6 +183,26 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cameras");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.CameraMask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CameraId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Coordinates")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CameraId")
+                        .IsUnique();
+
+                    b.ToTable("CameraMasks");
                 });
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Enricher", b =>
@@ -386,6 +415,9 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("SendEveryPlateEnabled")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("SendPlatePreview")
                         .HasColumnType("INTEGER");
 
@@ -434,6 +466,9 @@ namespace OpenAlprWebhookProcessor.Migrations
 
                     b.Property<string>("PublicKey")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("SendEveryPlateEnabled")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Subject")
                         .HasColumnType("TEXT");
@@ -505,6 +540,17 @@ namespace OpenAlprWebhookProcessor.Migrations
                     b.ToTable("WebhookForwards");
                 });
 
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.CameraMask", b =>
+                {
+                    b.HasOne("OpenAlprWebhookProcessor.Data.Camera", "Camera")
+                        .WithOne("Mask")
+                        .HasForeignKey("OpenAlprWebhookProcessor.Data.CameraMask", "CameraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Camera");
+                });
+
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateGroupPossibleNumbers", b =>
                 {
                     b.HasOne("OpenAlprWebhookProcessor.Data.PlateGroup", "PlateGroup")
@@ -547,6 +593,11 @@ namespace OpenAlprWebhookProcessor.Migrations
                         .IsRequired();
 
                     b.Navigation("MobilePushSubscription");
+                });
+
+            modelBuilder.Entity("OpenAlprWebhookProcessor.Data.Camera", b =>
+                {
+                    b.Navigation("Mask");
                 });
 
             modelBuilder.Entity("OpenAlprWebhookProcessor.Data.PlateGroup", b =>

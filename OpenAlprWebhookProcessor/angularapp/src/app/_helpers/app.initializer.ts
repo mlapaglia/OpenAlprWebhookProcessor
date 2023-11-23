@@ -1,5 +1,5 @@
-import { AccountService } from "app/_services";
-import { TeardownLogic } from "rxjs";
+import { AccountService } from 'app/_services';
+import { TeardownLogic } from 'rxjs';
 
 export function appInitializer(accountService: AccountService) {
     return () => new Promise(resolve => {

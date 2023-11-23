@@ -15,9 +15,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
     public class ImageRetrieverService : IHostedService
     {
-        private readonly BlockingCollection<string> _imageRequestsToProcess;
+        private readonly BlockingCollection<string> _imageRequestsToProcess = new BlockingCollection<string>();
 
-        private readonly BlockingCollection<string> _imageCompressionRequestsToProcess;
+        private readonly HashSet<string> _imageRequestsToProcessList = new();
+
+        private readonly object _imageRequestsToProcessGate = new();
+
+        private readonly BlockingCollection<string> _imageCompressionRequestsToProcess = new();
+
+        private readonly HashSet<string> _imageCompressionRequestsToProcessList = new();
+
+        private readonly object _imageCompressionRequestsToGate = new();
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -27,8 +35,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _serviceProvider = serviceProvider;
-            _imageRequestsToProcess = new BlockingCollection<string>();
-            _imageCompressionRequestsToProcess = new BlockingCollection<string>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -46,18 +52,39 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _imageCompressionRequestsToProcess.CompleteAdding();
+            _imageRequestsToProcess.CompleteAdding();
             _cancellationTokenSource.Cancel();
+
             return Task.CompletedTask;
         }
 
-        public void AddJob(string openAlprImageId)
+        public bool TryAddJob(string openAlprImageId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
                 logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
 
-                _imageRequestsToProcess.Add(openAlprImageId);
+                lock (_imageRequestsToProcessGate)
+                {
+                    if (_imageRequestsToProcessList.Contains(openAlprImageId))
+                    {
+                        logger.LogInformation("image is already queued for processing: {imageId}", openAlprImageId);
+                        return false;
+                    }
+                    else
+                    {
+                        if (!_imageRequestsToProcess.TryAdd(openAlprImageId))
+                        {
+                            logger.LogError("Unable to queue image for processing: {imageId}", openAlprImageId);
+                            return false;
+                        }
+
+                        _imageRequestsToProcessList.Add(openAlprImageId);
+                        return true;
+                    }
+                }
             }
         }
 
@@ -127,6 +154,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                         plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
+
+                        lock (_imageRequestsToProcessGate)
+                        {
+                            _imageRequestsToProcessList.Remove(job);
+                        }
                     }
 
                     logger.LogInformation("finished job for image: {imageId}", job);

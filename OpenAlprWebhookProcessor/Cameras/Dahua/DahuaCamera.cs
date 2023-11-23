@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Cameras
 {
-    public class DahuaCamera : ICamera
+    public partial class DahuaCamera : ICamera
     {
         private readonly Data.Camera _camera;
 
@@ -129,9 +129,37 @@ namespace OpenAlprWebhookProcessor.Cameras
 
             return new ZoomFocus()
             {
-                Focus = decimal.Parse(Regex.Match(response, "status\\.Focus=(.*)\\r").Groups[1].Value),
-                Zoom = decimal.Parse(Regex.Match(response, "status\\.Zoom=(.*)\\r").Groups[1].Value),
+                Focus = decimal.Parse(FocusRegex().Match(response).Groups[1].Value),
+                Zoom = decimal.Parse(ZoomRegex().Match(response).Groups[1].Value),
             };
         }
+
+        public async Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsync(
+                    $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=autoFocus",
+                    null,
+                    cancellationToken);
+
+                var response = await result.Content.ReadAsStringAsync(cancellationToken);
+
+                return bool.Parse(SuccessRegex().Match(response).Groups[1].Value);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [GeneratedRegex("result\":(.*?)\"")]
+        private static partial Regex SuccessRegex();
+
+        [GeneratedRegex("status\\.Focus=(.*)\\r")]
+        private static partial Regex FocusRegex();
+
+        [GeneratedRegex("status\\.Zoom=(.*)\\r")]
+        private static partial Regex ZoomRegex();
     }
 }

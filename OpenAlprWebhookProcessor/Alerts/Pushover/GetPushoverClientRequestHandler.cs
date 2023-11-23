@@ -28,6 +28,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 ApiToken = client.ApiToken,
                 IsEnabled = client.IsEnabled,
                 SendPlatePreviewEnabled = client.SendPlatePreview,
+                SendEveryPlateEnabled = client.SendEveryPlateEnabled,
                 UserKey = client.UserKey,
             };
         }

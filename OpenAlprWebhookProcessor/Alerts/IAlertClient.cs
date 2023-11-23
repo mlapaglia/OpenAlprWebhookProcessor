@@ -6,9 +6,10 @@ namespace OpenAlprWebhookProcessor.Alerts
 {
     public interface IAlertClient
     {
+        Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken);
+
         Task SendAlertAsync(
-            Alert alert,
-            byte[] plateJpeg,
+            AlertUpdateRequest alert,
             CancellationToken cancellationToken);
 
         Task VerifyCredentialsAsync(

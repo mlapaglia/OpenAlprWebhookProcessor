@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
 using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
@@ -32,6 +33,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly EnrichLicensePlateRequestHandler _enrichLicensePlateRequestHandler;
 
+        private readonly GetPlateHandler _getPlateHandler;
+
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
@@ -39,7 +42,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             GetLicensePlateFiltersHandler getLicensePlateFiltersHandler,
             GetStatisticsHandler getStatisticsHandler,
             UpsertPlateRequestHandler upsertPlateRequestHandler,
-            EnrichLicensePlateRequestHandler enrichLicensePlateRequestHandler)
+            EnrichLicensePlateRequestHandler enrichLicensePlateRequestHandler,
+            GetPlateHandler getPlateHandler)
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
@@ -48,6 +52,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             _getStatisticsHandler = getStatisticsHandler;
             _upsertPlateRequestHandler = upsertPlateRequestHandler;
             _enrichLicensePlateRequestHandler = enrichLicensePlateRequestHandler;
+            _getPlateHandler = getPlateHandler;
         }
 
         [HttpPost("search")]
@@ -67,6 +72,14 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         {
             await _upsertPlateRequestHandler.HandleAsync(
                 licensePlate,
+                cancellationToken);
+        }
+
+        [HttpGet("{plateId}")]
+        public async Task<GetPlateResponse> GetPlate(Guid plateId, CancellationToken cancellationToken)
+        {
+            return await _getPlateHandler.HandleAsync(
+                plateId,
                 cancellationToken);
         }
 

@@ -19,6 +19,7 @@ namespace OpenAlprWebhookProcessor.Alerts.WebPush
             var webPushClient = await _processorContext.WebPushSettings.FirstOrDefaultAsync();
 
             webPushClient.IsEnabled = request.IsEnabled;
+            webPushClient.SendEveryPlateEnabled = request.SendEveryPlateEnabled;
             webPushClient.Subject = request.EmailAddress;
 
             await _processorContext.SaveChangesAsync();

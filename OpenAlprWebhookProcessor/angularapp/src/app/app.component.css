@@ -13,3 +13,96 @@
         display: none;
     }
 }
+
+.home-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333; /* Set your desired text color */
+}
+
+.icon-container {
+    position: relative;
+}
+
+.pulse-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #FF0000; /* Green color, you can customize this */
+    width: 20px;
+    height: 20px;
+    animation: pulse 1.5s 1 forwards;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.0);
+        opacity: 1;
+        border-color: #FF0000;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0.5;
+        border-color: #4CAF50;
+    }
+}
+
+.pulse-circle-offline {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #4CAF50; /* Green color, you can customize this */
+    width: 20px;
+    height: 20px;
+    animation: pulse-offline 3s 1 forwards;
+}
+
+@keyframes pulse-offline {
+    0% {
+        transform: scale(1.2);
+        opacity: 0.5;
+        border-color: #4CAF50;
+    }
+    100% {
+        transform: scale(0.0);
+        opacity: 1;
+        border-color: #FF0000; /* Red color, you can customize this */
+    }
+}
+
+.glow {
+    animation: glow-transition 3s 1 forwards;
+}
+
+@keyframes glow-transition {
+    0% {
+        color: #FC100D;
+    }
+    100% {
+        color: #4CAF50;
+    }
+}
+
+.glow-offline {
+    color: #FC100D;
+    animation: glow-transition-offline 0.5s 1 forwards;
+    animation: glow-offline-long 3s infinite;
+}
+
+@keyframes glow-transition-offline {
+    0% {
+        color: #4CAF50;
+    }
+    100% {
+        color: #FC100D;
+    }
+}
+
+@keyframes glow-offline-long{
+    0% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale (0.8);
+    }
+}

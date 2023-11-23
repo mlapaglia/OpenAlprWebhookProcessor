@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenAlprWebhookProcessor.Cameras.GetPlateCaptures;
+using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System;
 using System.Collections.Generic;
@@ -25,13 +27,24 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private readonly SetZoomAndFocusHandler _setZoomAndFocusHandler;
 
+        private readonly TriggerAutofocusHandler _triggerAutofocusHandler;
+
+        private readonly UpsertCameraMaskHandler _upsertCameraMaskHandler;
+
+        private readonly GetCameraMaskHandler _getCameraMaskHandler;
+
+        private readonly GetPlateCapturesHandler _getPlateCapturesHandler;
         public CameraController(
             GetCameraRequestHandler getCameraHandler,
             DeleteCameraHandler deleteCameraHandler,
             UpsertCameraHandler upsertCameraHandler,
             TestCameraHandler testCameraHandler,
             GetZoomAndFocusHandler getZoomAndFocusHandler,
-            SetZoomAndFocusHandler setZoomAndFocusHandler)
+            SetZoomAndFocusHandler setZoomAndFocusHandler,
+            TriggerAutofocusHandler triggerAutofocusHandler,
+            UpsertCameraMaskHandler upsertCameraMaskHandler,
+            GetCameraMaskHandler getCameraMaskHandler,
+            GetPlateCapturesHandler getPlateCapturesHandler)
         {
             _getCameraHandler = getCameraHandler;
             _deleteCameraHandler = deleteCameraHandler;
@@ -39,6 +52,10 @@ namespace OpenAlprWebhookProcessor.Cameras
             _testCameraHandler = testCameraHandler;
             _getZoomAndFocusHandler = getZoomAndFocusHandler;
             _setZoomAndFocusHandler = setZoomAndFocusHandler;
+            _triggerAutofocusHandler = triggerAutofocusHandler;
+            _upsertCameraMaskHandler = upsertCameraMaskHandler;
+            _getCameraMaskHandler = getCameraMaskHandler;
+            _getPlateCapturesHandler = getPlateCapturesHandler;
         }
 
         [HttpGet]
@@ -106,6 +123,46 @@ namespace OpenAlprWebhookProcessor.Cameras
             await _setZoomAndFocusHandler.HandleAsync(
                 cameraId,
                 zoomAndFocus,
+                cancellationToken);
+        }
+
+        [HttpPost("{cameraId}/triggerAutofocus")]
+        public async Task<bool> TriggerAutofocus(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _triggerAutofocusHandler.HandleAsync(
+                cameraId,
+                cancellationToken);
+        }
+
+        [HttpPost("{cameraId}/mask")]
+        public async Task<bool> UpsertImageMask(
+            CameraMask cameraMask,
+            CancellationToken cancellationToken)
+        {
+            return await _upsertCameraMaskHandler.UpsertCameraMaskAsync(
+                cameraMask,
+                cancellationToken);
+        }
+
+        [HttpGet("{cameraId}/mask/coordinates")]
+        public async Task<List<MaskCoordinate>> GetImageMaskCoordinates(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _getCameraMaskHandler.GetCameraMaskAsync(
+                cameraId,
+                cancellationToken);
+        }
+
+        [HttpGet("{cameraId}/plateCaptures")]
+        public async Task<List<string>> GetPlateCaptures(
+            Guid cameraId,
+            CancellationToken cancellationToken)
+        {
+            return await _getPlateCapturesHandler.HandleAsync(
+                cameraId,
                 cancellationToken);
         }
     }

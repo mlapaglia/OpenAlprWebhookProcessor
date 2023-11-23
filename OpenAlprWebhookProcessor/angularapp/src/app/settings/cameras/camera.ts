@@ -25,12 +25,12 @@ export class Camera {
     sampleImageUrl: string;
     timezoneOffset: number;
     
-    constructor(init?:Partial<Camera>) {
+    constructor(init?: Partial<Camera>) {
         Object.assign(this, init);
     }
 }
 
 export enum Manufacturer {
-    Hikvision = "Hikvision",
-    Dahua = "Dahua"
+    Hikvision = 'Hikvision',
+    Dahua = 'Dahua'
 }

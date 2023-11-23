@@ -9,5 +9,7 @@
         public string ApiToken { get; set; }
 
         public bool SendPlatePreviewEnabled { get; set; }
+
+        public bool SendEveryPlateEnabled { get; set; }
     }
 }

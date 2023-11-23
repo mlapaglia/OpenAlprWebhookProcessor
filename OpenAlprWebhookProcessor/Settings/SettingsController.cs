@@ -21,6 +21,8 @@ namespace OpenAlprWebhookProcessor.Settings
     {
         private readonly GetAgentRequestHandler _getAgentRequestHandler;
 
+        private readonly GetAgentStatusRequestHandler _getAgentStatusRequestHandler;
+
         private readonly UpsertAgentRequestHandler _upsertAgentRequestHandler;
 
         private readonly GetIgnoresRequestHandler _getIgnoresRequestHandler;
@@ -43,6 +45,10 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly DeleteDebugPlateGroupRequestHandler _deleteDebugPlateGroupRequestHandler;
 
+        private readonly DisableAgentRequestHandler _disableAgentRequestHandler;
+
+        private readonly EnableAgentRequestHandler _enableAgentRequestHandler;
+
         public SettingsController(
             GetAgentRequestHandler getAgentRequestHandler,
             UpsertAgentRequestHandler upsertAgentRequestHandler,
@@ -55,7 +61,10 @@ namespace OpenAlprWebhookProcessor.Settings
             UpsertEnricherRequestHandler upsertEnricherRequestHandler,
             TestEnricherRequestHandler testEnricherRequestHandler,
             GetDebugPlateGroupRequestHandler getDebugPlateGroupHandler,
-            DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler)
+            DeleteDebugPlateGroupRequestHandler deleteDebugPlateGroupRequestHandler,
+            GetAgentStatusRequestHandler getAgentStatusRequestHandler,
+            DisableAgentRequestHandler disableAgentRequestHandler,
+            EnableAgentRequestHandler enableAgentRequestHandler)
         {
             _getAgentRequestHandler = getAgentRequestHandler;
             _upsertAgentRequestHandler = upsertAgentRequestHandler;
@@ -69,12 +78,33 @@ namespace OpenAlprWebhookProcessor.Settings
             _testEnricherRequestHandler = testEnricherRequestHandler;
             _getDebugPlateGroupHandler = getDebugPlateGroupHandler;
             _deleteDebugPlateGroupRequestHandler = deleteDebugPlateGroupRequestHandler;
+            _getAgentStatusRequestHandler = getAgentStatusRequestHandler;
+            _disableAgentRequestHandler = disableAgentRequestHandler;
+            _enableAgentRequestHandler = enableAgentRequestHandler;
         }
 
         [HttpGet("agent")]
         public async Task<Agent> GetAgent(CancellationToken cancellationToken)
         {
             return await _getAgentRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpGet("agent/status")]
+        public async Task<AgentStatus> GetAgentStatus(CancellationToken cancellationToken)
+        {
+            return await _getAgentStatusRequestHandler.HandleAsync(cancellationToken);
+        }
+
+        [HttpPost("agent/disable")]
+        public async Task<bool> DisableAgent(Guid agentId, CancellationToken cancellationToken)
+        {
+            return await _disableAgentRequestHandler.HandleAsync(agentId, cancellationToken);
+        }
+
+        [HttpPost("agent/enable")]
+        public async Task<bool> EnableAgent(Guid agentId, CancellationToken cancellationToken)
+        {
+            return await _enableAgentRequestHandler.HandleAsync(agentId, cancellationToken);
         }
 
         [HttpPost("agent")]

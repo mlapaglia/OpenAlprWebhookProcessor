@@ -1,4 +1,4 @@
-import { Plate } from "./plate";
+import { Plate } from './plate';
 
 export interface PlateResponse {
     plates: Plate[];

@@ -1,15 +1,36 @@
-﻿<nav mat-tab-nav-bar mat-align-tabs="start"
-    *ngIf="topBarVisible"
-    [tabPanel]="tabPanel">
-    <a mat-tab-link routerLink="/" class="home-button"><mat-icon>anchor</mat-icon><span>OpenALPR Webhook Processor</span></a>
-    <a mat-tab-link routerLink="/"><mat-icon>home</mat-icon><span>Home</span></a>
-    <a mat-tab-link routerLink="/plates"><mat-icon>crop_16_9</mat-icon><span>Plates</span></a>
-    <a mat-tab-link routerLink="/users"><mat-icon>account_box</mat-icon><span>Users</span></a>
-    <a mat-tab-link (click)="settingsButtonClicked();" routerLink="/settings"><mat-icon>settings</mat-icon><span>Settings</span></a>
-    <a mat-tab-link (click)="logout()"><mat-icon>exit_to_app</mat-icon><span>Logout</span></a>
-</nav>
-
-<alert></alert>
-<mat-tab-nav-panel #tabPanel>
-    <router-outlet></router-outlet>
-</mat-tab-nav-panel>
+﻿<mat-sidenav-container fullscreen>
+	<mat-sidenav
+        mode="over"
+        [(opened)]="navBarVisible"
+        [fixedInViewport]="false"
+        [fixedTopGap]="0"
+        [fixedBottomGap]="0">
+		<mat-nav-list>
+			<mat-list-item *ngFor="let item of navItems" (click)="handleSideNavClick();" routerLink="{{item.link}}">
+				<mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+				<span class="mobile-shrink">{{item.linkTitle}}</span>
+			</mat-list-item>
+            <app-theme-picker></app-theme-picker>
+		</mat-nav-list>
+	</mat-sidenav>
+	<mat-sidenav-content fullscreen>
+        <nav mat-tab-nav-bar mat-align-tabs="start"
+            *ngIf="topBarVisible"
+            [tabPanel]="tabPanel">
+            <a mat-tab-link routerLink="/" class="home-button">
+                <div class="icon-container">
+                    <div [ngClass]="isSignalrConnected ? 'pulse-circle': 'pulse-circle-offline'"></div>
+                    <mat-icon [ngClass]="isSignalrConnected ? 'glow' : 'glow-offline'">anchor</mat-icon>
+                </div>
+                <span style="padding-left:6px;">OpenALPR Webhook Processor</span></a>
+            <a mat-tab-link routerLink="/"><mat-icon>home</mat-icon><span>Home</span></a>
+            <a mat-tab-link routerLink="/plates"><mat-icon>crop_16_9</mat-icon><span>Plates</span></a>
+            <a mat-tab-link (click)="settingsButtonClicked();" (keydown)="settingsButtonClicked()" tabindex="0"><mat-icon>settings</mat-icon><span>Settings</span></a>
+            <a mat-tab-link (click)="logout()" (keydown)="settingsButtonClicked()" tabindex="0"><mat-icon>exit_to_app</mat-icon><span>Logout</span></a>
+        </nav>
+        <app-alert></app-alert>
+        <mat-tab-nav-panel #tabPanel>
+            <router-outlet></router-outlet>
+        </mat-tab-nav-panel>
+	</mat-sidenav-content>
+</mat-sidenav-container>

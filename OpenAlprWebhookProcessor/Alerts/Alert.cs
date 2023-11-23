@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts
 {
     public class Alert
     {
         public Guid Id { get; set; }
+
+        public bool IsUrgent { get; set; }
 
         public string PlateNumber { get; set; }
 

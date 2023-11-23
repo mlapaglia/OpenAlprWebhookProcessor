@@ -6,7 +6,7 @@ export class Forward {
     forwardGroupPreviews: boolean;
     forwardGroups: boolean;
 
-    constructor(init?:Partial<Forward>) {
+    constructor(init?: Partial<Forward>) {
         Object.assign(this, init);
     }
 }

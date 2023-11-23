@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Hangfire.States;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -104,7 +105,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
 
                 _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
-
             }
             else
             {
@@ -139,17 +139,19 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             _logger.LogInformation("plate saved successfully");
 
-            _imageRetrieverService.AddJob(plateGroup.OpenAlprUuid);
+            _imageRetrieverService.TryAddJob(plateGroup.OpenAlprUuid);
 
             if (!isBulkImport)
             {
+                var plateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null;
+
                 if (camera.UpdateOverlayEnabled)
                 {
                     var updateRequest = new CameraUpdateRequest()
                     {
                         LicensePlateImageUuid = webhook.Group.BestUuid,
                         LicensePlate = webhook.Group.BestPlateNumber,
-                        LicensePlateJpeg = webhook.Group.BestPlate != null ? Convert.FromBase64String(webhook.Group.BestPlate.PlateCropJpeg) : null,
+                        LicensePlateJpeg = plateJpeg,
                         Id = camera.Id,
                         OpenAlprProcessingTimeMs = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.ProcessingTimeMs, 2) : 0,
                         ProcessedPlateConfidence = webhook.Group.BestPlate != null ? Math.Round(webhook.Group.BestPlate.Confidence, 2) : 0,
@@ -172,14 +174,34 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber
                         || plateGroup.PossibleNumbers.Any(y => y.Number == x.PlateNumber.ToUpper()));
 
+                    var receivedOn = DateTimeOffset.FromUnixTimeMilliseconds(webhook.Group.EpochStart);
+
                     if (alert != null)
                     {
                         var alertUpdateRequest = new AlertUpdateRequest()
                         {
-                            CameraId = camera.Id,
-                            Description = alert.PlateNumber + " " + alert.Description + " was seen on " + DateTimeOffset.Now.ToString("g"),
-                            LicensePlateId = plateGroup.Id,
-                            IsStrictMatch = alert.IsStrictMatch,
+                            Description = $"{alert.PlateNumber} {alert.Description} was seen on {receivedOn:g}",
+                            IsUrgent = true,
+                            PlateId = plateGroup.Id,
+                            PlateJpeg = plateJpeg,
+                            PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
+                            PlateNumber = alert.PlateNumber,
+                            ReceivedOn = receivedOn,
+                        };
+
+                        _alertService.AddJob(alertUpdateRequest);
+                    }
+                    else
+                    {
+                        var alertUpdateRequest = new AlertUpdateRequest()
+                        {
+                            Description = $"{plateGroup.BestNumber} was seen on {receivedOn:g}",
+                            IsUrgent = false,
+                            PlateId = plateGroup.Id,
+                            PlateJpeg = plateJpeg,
+                            PlateJpegUrl = $"/images/crop/{plateGroup.OpenAlprUuid}",
+                            PlateNumber = plateGroup.BestNumber,
+                            ReceivedOn = receivedOn,
                         };
 
                         _alertService.AddJob(alertUpdateRequest);

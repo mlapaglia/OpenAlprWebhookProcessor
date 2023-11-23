@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Data;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,35 +25,62 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         }
 
         [HttpGet("{imageId}")]
-        public async Task<Stream> GetImage(
+        public async Task<IActionResult> GetImage(
             string imageId,
             CancellationToken cancellationToken)
         {
-            return await GetImageHandler.GetImageFromLocalAsync(
-                _processorContext,
-                imageId,
-                cancellationToken);
+            try
+            {
+                var image = await GetImageHandler.GetImageFromLocalAsync(
+                    _processorContext,
+                    imageId,
+                    cancellationToken);
+
+                return File(image, "image/jpeg");
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("crop/{imageId}")]
-        public async Task<Stream> GetCropImage(
+        public async Task<IActionResult> GetCropImage(
             string imageId,
             CancellationToken cancellationToken)
         {
-            return await GetImageHandler.GetCropImageFromLocalAsync(
-                _processorContext,
-                imageId,
-                cancellationToken);
+            try
+            {
+                var cropImage = await GetImageHandler.GetCropImageFromLocalAsync(
+                    _processorContext,
+                    imageId,
+                    cancellationToken);
+
+                return File(cropImage, "image/jpeg");
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{cameraId}/snapshot")]
-        public async Task<Stream> GetSnapshot(
+        public async Task<IActionResult> GetSnapshot(
             Guid cameraId,
             CancellationToken cancellationToken)
         {
-            return await _getSnapshotHandler.GetSnapshotAsync(
-                cameraId,
-                cancellationToken);
+            try
+            {
+                var snapshot = await _getSnapshotHandler.GetSnapshotAsync(
+                    cameraId,
+                    cancellationToken);
+
+                return File(snapshot, "image/jpeg");
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
     }
 }

@@ -6,11 +6,13 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
-using System.Collections.Generic;
 using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Flurl.Util;
+using Microsoft.EntityFrameworkCore;
+using OpenAlprWebhookProcessor.Alerts.Pushover;
+using System.Collections.Generic;
+using Flurl;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -35,12 +37,12 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             _serviceProvider = serviceProvider;
             _logger = logger;
 
-            using(var scope = _serviceProvider.CreateScope())
+            using (var scope = _serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                 var keys = VapidKeyHelper.GetVapidKeys(processorContext);
-                
+
                 _pushClient.DefaultAuthentication = new VapidAuthentication(
                     keys.PublicKey,
                     keys.PrivateKey)
@@ -55,30 +57,54 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         }
 
         public async Task SendAlertAsync(
-            Alerts.Alert alert,
-            byte[] plateJpeg,
+            AlertUpdateRequest alert,
             CancellationToken cancellationToken)
         {
-            PushMessage notification = new AngularWebPushNotification
+            using (var scope = _serviceProvider.CreateScope())
             {
-                Title = $"Plate Seen: {alert.PlateNumber}",
-                Body = $"Plate {alert.PlateNumber} seen at {DateTimeOffset.UtcNow:g}",
-                Icon = "assets/icons/icon-96x96.png",
-            }.ToPushMessage();
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var clientSettings = await processorContext.WebPushSettings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
 
-            foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())
-            {
-                try
+                if (clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
-                    await _pushClient.RequestPushMessageDeliveryAsync(
-                        subscription,
-                        notification,
-                        cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send WebPush message");
-                    _pushSubscriptionsService.Delete(subscription.Endpoint);
+                    PushMessage notification = new AngularWebPushNotification
+                    {
+                        Body = $"Plate {alert.PlateNumber} seen at {DateTimeOffset.UtcNow:g}",
+                        Icon = "assets/icons/icon-96x96.png",
+                        Image = alert.PlateJpegUrl,
+                        Title = $"Plate Seen: {alert.PlateNumber}",
+                        Data = new Dictionary<string, object>()
+                        {
+                            { "onActionClick", new Dictionary<string, object>()
+                                {
+                                    { "default", new Dictionary<string, object>()
+                                        {
+                                            { "operation", "navigateLastFocusedOrOpen" },
+                                            {  "url", $"plate/{alert.PlateId}" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }.ToPushMessage();
+
+                    foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())
+                    {
+                        try
+                        {
+                            await _pushClient.RequestPushMessageDeliveryAsync(
+                                subscription,
+                                notification,
+                                cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to send WebPush message");
+                            _pushSubscriptionsService.Delete(subscription.Endpoint);
+                        }
+                    }
                 }
             }
         }
@@ -99,12 +125,30 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
                 if (!credentialsValid)
                 {
-                    _logger.LogError("WebPush credentials are missing.");   
+                    _logger.LogError("WebPush credentials are missing.");
                 }
                 else
                 {
                     _logger.LogInformation("WebPush credentials are present.");
                 }
+            }
+        }
+
+        public async Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+
+                logger.LogInformation("Sending Alert via Pushover.");
+
+                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+
+                var clientSettings = await processorContext.PushoverAlertClients
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                return clientSettings.SendEveryPlateEnabled;
             }
         }
     }

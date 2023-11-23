@@ -1,14 +1,52 @@
 <div style="margin:16px; display: flex; flex-wrap: wrap; justify-content: flex-start; flex-direction: column; row-gap: 10px; column-gap: 15px;" *ngIf="agent">
+    <mat-card>
+        <mat-card-header>
+            OpenAlpr Agent
+        </mat-card-header>
+        <mat-card-content>
+            <div style="display: flex; flex-direction: column;">
+                <mat-icon
+                    *ngIf="agentStatus && !isLoadingAgentStatus"
+                    aria-hidden="false"
+                    aria-label="Agent connected status icon"
+                    fontIcon="developer_board"
+                    style="font-size:150px; height: 150px; width:150px; align-self: center;"
+                    [ngStyle]="{'color': agentStatus.isConnected ? '#32de84' : '#D2122E' }">
+                </mat-icon>
+                <mat-progress-spinner
+                    *ngIf="isLoadingAgentStatus" 
+                    style="margin-right:15px; height: 40px; align-self: center;"
+                    color="primary" 
+                    mode="indeterminate"
+                    diameter="25">
+                </mat-progress-spinner>
+                <span style="align-self: center; font-weight:500;">{{isLoadingAgentStatus ? "Checking..." : agentStatus.isConnected ? "Connected" : "Disconnected"}}</span>
+            </div>
+            <table
+                [hidden]="!agentStatus || isLoadingAgentStatus"
+                #agentStatusTable
+                mat-table
+                [dataSource]="agentStatusData"
+                class="mat-elevation-z8"
+                style="margin-top:15px;">
+                <ng-container matColumnDef="key">
+                    <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
+                </ng-container>
+                <ng-container matColumnDef="value">
+                    <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+                </ng-container>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button cdkFocusInitial (click)="disableAgent()">Disable Agent</button>
+            <button mat-raised-button cdkFocusInitial (click)="enableAgent()">Enable Agent</button>
+        </mat-card-actions>
+    </mat-card>
     <mat-form-field>
         <mat-label>Endpoint Url</mat-label>
         <input matInput [(ngModel)]="agent.endpointUrl" placeholder="http(s)://x.x.x.x:yyyy">
         <mat-icon matTooltip="The URL used to reach the Watchman Agent" style="cursor:default" matSuffix>help_center</mat-icon>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Hostname</mat-label>
-        <input matInput maxlength="12" #hostnameInput [(ngModel)]="agent.hostname" placeholder="56ygf6e34879">
-        <mat-icon matTooltip="From the OpenALPR web server agent configuration page" style="cursor:default" matSuffix>help_center</mat-icon>
-        <mat-hint align="end">{{hostnameInput.value.length || 0}}/12</mat-hint>
     </mat-form-field>
     <mat-form-field>
         <mat-label>Uid</mat-label>
@@ -17,20 +55,9 @@
         <mat-hint align="end">{{uidInput.value.length || 0}}/40</mat-hint>
     </mat-form-field>
     <mat-form-field>
-        <mat-label>OpenAlpr Web Server API Key</mat-label>
-        <mat-icon matTooltip="From the OpenALPR user profile configuration page (top right corner of site)" style="cursor:default" matSuffix>help_center</mat-icon>
-        <input matInput [(ngModel)]="agent.openAlprWebServerApiKey" #apiKeyInput maxlength="40" placeholder="U8HGWA66CW58AV9Q7YB4JJ749CV7WXNQLLNIBT4N">
-        <mat-hint align="end">{{apiKeyInput.value.length || 0}}/40</mat-hint>
-    </mat-form-field>
-    <mat-form-field>
         <mat-label>OpenAlpr Web Server Url</mat-label>
         <mat-icon matTooltip="The URL used to reach the OpenALPR server. Usually just https://cloud.openalpr.com" style="cursor:default" matSuffix>help_center</mat-icon>
         <input matInput [(ngModel)]="agent.openAlprWebServerUrl" placeholder="https://cloud.openalpr.com/">
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Version</mat-label>
-        <mat-icon matTooltip="The version of the Watchman Agent running" style="cursor:default" matSuffix>help_center</mat-icon>
-        <input matInput [(ngModel)]="agent.version" placeholder="2.8.101">
     </mat-form-field>
     <mat-form-field>
         <mat-label>Latitude</mat-label>
@@ -67,6 +94,13 @@
             style="cursor:default" matSuffix>help_center</mat-icon>
         <input type="number" matInput [(ngModel)]="agent.timezoneOffset">
       </mat-form-field>
+      <mat-form-field>
+        <mat-label style="padding-right: 15px;">Scheduled Agent Scraping {{agent.scheduledScrapingIntervalMinutes ? "(next scrape in " + agent.nextScrapeInMinutes + " minutes)": "(minutes)"}}</mat-label>
+        <mat-icon 
+            matTooltip="Scrape the Watchman Agent instead of relying on the Agent pushing results"
+            style="cursor:default" matSuffix>help_center</mat-icon>
+        <input type="number" matInput [(ngModel)]="agent.scheduledScrapingIntervalMinutes">
+      </mat-form-field>
       <div>
         <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isDebugEnabled"></mat-checkbox>
         <mat-label style="padding-right: 15px;">Debug Mode</mat-label>
@@ -78,7 +112,7 @@
         <mat-checkbox style="padding-right: 15px;" [(ngModel)]="agent.isImageCompressionEnabled"></mat-checkbox>
         <mat-label style="padding-right: 15px;">Image Compression</mat-label>
         <mat-icon 
-            matTooltip="Compresses images from the Watchman Agent before saving locally"
+            matTooltip="Compresses images from the Watchman Agent before saving locally, empty field disables scraping"
             style="cursor:default" matSuffix>help_center</mat-icon>
       </div>
 </div>

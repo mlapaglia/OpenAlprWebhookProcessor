@@ -91,4 +91,12 @@
 		</ItemGroup>
 	</Target>
 
+	<ItemGroup>
+	  <EditorConfigFiles Remove="E:\code\OpenAlprWebhookProcessor\OpenAlprWebhookProcessor\.editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="E:\code\OpenAlprWebhookProcessor\OpenAlprWebhookProcessor\.editorconfig" />
+	</ItemGroup>
+
 </Project>

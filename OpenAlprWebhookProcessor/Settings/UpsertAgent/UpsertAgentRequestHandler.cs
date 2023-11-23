@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.WebhookProcessor;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Settings
@@ -12,12 +12,16 @@ namespace OpenAlprWebhookProcessor.Settings
 
         private readonly ImageRetrieverService _imageRetrieverService;
 
+        private readonly HydrationService _hydrationService;
+
         public UpsertAgentRequestHandler(
             ProcessorContext processorContext,
-            ImageRetrieverService imageRetrieverService)
+            ImageRetrieverService imageRetrieverService,
+            HydrationService hydrationService)
         {
             _processorContext = processorContext;
             _imageRetrieverService = imageRetrieverService;
+            _hydrationService = hydrationService;
         }
 
         public async Task HandleAsync(Agent agent)
@@ -37,18 +41,16 @@ namespace OpenAlprWebhookProcessor.Settings
                 dbAgent = new Data.Agent()
                 {
                     EndpointUrl = agent.EndpointUrl,
-                    Hostname = agent.Hostname,
                     IsDebugEnabled = agent.IsDebugEnabled,
                     IsImageCompressionEnabled = agent.IsImageCompressionEnabled,
                     Latitude = agent.Latitude,
                     Longitude = agent.Longitude,
-                    OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey,
                     OpenAlprWebServerUrl = agent.OpenAlprWebServerUrl,
+                    ScheduledScrapingIntervalMinutes = agent.ScheduledScrapingIntervalMinutes,
                     SunriseOffset = agent.SunriseOffset,
                     SunsetOffset = agent.SunsetOffset,
                     TimeZoneOffset = agent.TimezoneOffset,
                     Uid = agent.Uid,
-                    Version = agent.Version,
                 };
 
                 _processorContext.Add(dbAgent);
@@ -56,18 +58,16 @@ namespace OpenAlprWebhookProcessor.Settings
             else
             {
                 dbAgent.EndpointUrl = agent.EndpointUrl;
-                dbAgent.Hostname = agent.Hostname;
                 dbAgent.IsDebugEnabled = agent.IsDebugEnabled;
                 dbAgent.IsImageCompressionEnabled = agent.IsImageCompressionEnabled;
                 dbAgent.Latitude = agent.Latitude;
                 dbAgent.Longitude = agent.Longitude;
-                dbAgent.OpenAlprWebServerApiKey = agent.OpenAlprWebServerApiKey;
                 dbAgent.OpenAlprWebServerUrl = agent.OpenAlprWebServerUrl;
+                dbAgent.ScheduledScrapingIntervalMinutes = agent.ScheduledScrapingIntervalMinutes;
                 dbAgent.SunsetOffset = agent.SunsetOffset;
                 dbAgent.SunriseOffset = agent.SunriseOffset;
                 dbAgent.TimeZoneOffset = agent.TimezoneOffset;
                 dbAgent.Uid = agent.Uid;
-                dbAgent.Version = agent.Version;
             }
 
             await _processorContext.SaveChangesAsync();
@@ -75,6 +75,11 @@ namespace OpenAlprWebhookProcessor.Settings
             if (wasImageCompressionEnabled)
             {
                 _imageRetrieverService.AddImageCompressionJob();
+            }
+
+            if (agent.ScheduledScrapingIntervalMinutes != null)
+            {
+                await _hydrationService.ScheduleHydrationAsync(default);
             }
         }
     }

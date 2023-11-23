@@ -1,4 +1,4 @@
-import { EnrichmentType } from "./enrichmentType";
+import { EnrichmentType } from './enrichmentType';
 
 export class Enricher {
     id: string;
@@ -6,7 +6,7 @@ export class Enricher {
     apiKey: string;
     enrichmentType: EnrichmentType;
     
-    constructor(init?:Partial<Enricher>) {
+    constructor(init?: Partial<Enricher>) {
         Object.assign(this, init);
     }
 }

@@ -13,5 +13,7 @@ namespace OpenAlprWebhookProcessor.Data
         public string ApiToken { get; set; }
 
         public bool SendPlatePreview { get; set; }
+
+        public bool SendEveryPlateEnabled { get; set; }
     }
 }
