@@ -17,6 +17,7 @@ jobs:
       - name: Run build
         run: docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
       - name: Run frontend tests
+        working-directory: ./OpenAlprWebhookProcessor/angularapp
         run: |
           npm ci
           npm run test:prod
