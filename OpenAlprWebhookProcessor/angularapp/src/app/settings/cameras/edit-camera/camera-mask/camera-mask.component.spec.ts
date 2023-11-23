@@ -11,7 +11,7 @@ describe(CameraMaskComponent.name, () => {
     let fixture: ComponentFixture<CameraMaskComponent>;
     const cameraMaskServiceSpy = jasmine.createSpyObj(CameraMaskService.name, ['getMask', 'getPlateCaptures']);
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await TestBed.configureTestingModule({
             imports: [CameraMaskComponent],
             providers: [

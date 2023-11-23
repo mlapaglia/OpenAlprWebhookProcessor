@@ -14,14 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run tests
+      - name: Run build
+        run: docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
+      - name: Run frontend tests
         run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
-          fi
+          npm ci
+          npm run test:prod
+          npm run lint
 
   windows-build-push:
     needs: build
