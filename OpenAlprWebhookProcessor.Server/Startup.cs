@@ -129,7 +129,7 @@ namespace OpenAlprWebhookProcessor
                         OnMessageReceived = context =>
                         {
                             if (string.IsNullOrWhiteSpace(context.Token)
-                                && context.HttpContext.Request.Path.StartsWithSegments("/images", StringComparison.OrdinalIgnoreCase))
+                                && context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
                             {
                                 context.Token = context.Request.Cookies["jwtToken"];
                             }
