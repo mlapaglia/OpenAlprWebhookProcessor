@@ -1,6 +1,3 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Settings;
 
 namespace Tests

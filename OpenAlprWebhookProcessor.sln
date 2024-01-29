@@ -4,13 +4,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{350E0804-C372-49AB-B670-75E037878FAF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAlprWebhookProcessor.Server", "OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.Server.csproj", "{F296E683-25F3-49B9-B82B-E17985808B3C}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "openalprwebhookprocessor.client", "openalprwebhookprocessor.client\openalprwebhookprocessor.client.esproj", "{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{620FC6F0-76E5-4E25-B1F4-35CF300BD22B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A7D26F37-32A1-4955-A106-06EB26086033}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{10CE0744-F0DE-4BB7-B31B-FEFF65327CCB}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\docker-publish.yml = .github\workflows\docker-publish.yml
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAlprWebhookProcessor", "OpenAlprWebhookProcessor\OpenAlprWebhookProcessor.csproj", "{7C3E9804-0A13-4060-B5FD-91A613647146}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,17 +24,27 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7C3E9804-0A13-4060-B5FD-91A613647146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C3E9804-0A13-4060-B5FD-91A613647146}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C3E9804-0A13-4060-B5FD-91A613647146}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C3E9804-0A13-4060-B5FD-91A613647146}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F296E683-25F3-49B9-B82B-E17985808B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F296E683-25F3-49B9-B82B-E17985808B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F296E683-25F3-49B9-B82B-E17985808B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F296E683-25F3-49B9-B82B-E17985808B3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64F8F6D-B621-454A-AB2A-3E4B871FF8E8}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{620FC6F0-76E5-4E25-B1F4-35CF300BD22B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{620FC6F0-76E5-4E25-B1F4-35CF300BD22B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{620FC6F0-76E5-4E25-B1F4-35CF300BD22B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{620FC6F0-76E5-4E25-B1F4-35CF300BD22B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A7D26F37-32A1-4955-A106-06EB26086033} = {350E0804-C372-49AB-B670-75E037878FAF}
+		{10CE0744-F0DE-4BB7-B31B-FEFF65327CCB} = {A7D26F37-32A1-4955-A106-06EB26086033}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CF708D1D-8C28-4A78-82C3-4E5A0D51B1A2}

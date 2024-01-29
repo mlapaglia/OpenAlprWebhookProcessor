@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build
-        run: docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
+        run: docker build . --file ./OpenAlprWebhookProcessor.Server/Dockerfile
   
   back-end-tests:
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
 
-      - name: Code Coverage Report
+      - name: Back End Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: coverage/**/coverage.cobertura.xml
@@ -54,6 +54,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         if: github.event_name == 'pull_request'
         with:
+          header: Back End Coverage
           recreate: true
           path: code-coverage-results.md
 
@@ -62,11 +63,32 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run frontend tests
-        working-directory: ./OpenAlprWebhookProcessor/angularapp
+        working-directory: ./openalprwebhookprocessor.client
         run: |
           npm ci
           npm run test:prod
           npm run lint
+
+      - name: Front End Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: ./openalprwebhookprocessor.client/coverage/cobertura-coverage.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '0 80'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: Front End Coverage
+          recreate: true
+          path: code-coverage-results.md
 
   windows-build-push:
     needs: build
@@ -86,25 +108,16 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
-          dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
-          dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
+          dotnet restore "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
+          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
         uses: softprops/action-gh-release@v1
-        if: contains(github.ref, 'alpha') != true
         with:
           files: "OpenAlprWebHookProcessor*"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        uses: softprops/action-gh-release@v1
-        if: contains(github.ref, 'alpha')
-        with:
-          files: "OpenAlprWebHookProcessor*"
-          prerelease: true
+          prerelease: ${{ contains(github.ref, 'alpha') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -130,20 +143,10 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Push to Docker Hub
-        if: contains(github.ref, 'alpha') != true
         uses: docker/build-push-action@v2
         with:
-          file: ./OpenAlprWebhookProcessor/Dockerfile
+          file: ./OpenAlprWebhookProcessor.Server/Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
-            mlapaglia/openalprwebhookprocessor:latest
-
-      - name: Push alpha build to Docker Hub
-        if: contains(github.ref, 'alpha')
-        uses: docker/build-push-action@v2
-        with:
-          file: ./OpenAlprWebhookProcessor/Dockerfile
-          push: true
-          tags: |
-            mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
+            ${{ contains(github.ref, 'alpha') && 'mlapaglia/openalprwebhookprocessor:alpha' || 'mlapaglia/openalprwebhookprocessor:latest' }}

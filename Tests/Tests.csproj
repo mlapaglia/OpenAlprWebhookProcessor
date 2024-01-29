@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpenAlprWebhookProcessor\OpenAlprWebhookProcessor.csproj" />
+    <ProjectReference Include="..\OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.Server.csproj" />
   </ItemGroup>
 
 </Project>
