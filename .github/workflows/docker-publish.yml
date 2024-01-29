@@ -115,18 +115,9 @@ jobs:
 
       - name: Publish
         uses: softprops/action-gh-release@v1
-        if: contains(github.ref, 'alpha') != true
         with:
-          files: "OpenAlprWebHookProcessor.Server*"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        uses: softprops/action-gh-release@v1
-        if: contains(github.ref, 'alpha')
-        with:
-          files: "OpenAlprWebHookProcessor.Server*"
-          prerelease: true
+          files: "OpenAlprWebHookProcessor*"
+          prerelease: ${{ contains(github.ref, 'alpha') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -152,20 +143,10 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Push to Docker Hub
-        if: contains(github.ref, 'alpha') != true
         uses: docker/build-push-action@v2
         with:
           file: ./OpenAlprWebhookProcessor.Server/Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
-            mlapaglia/openalprwebhookprocessor:latest
-
-      - name: Push alpha build to Docker Hub
-        if: contains(github.ref, 'alpha')
-        uses: docker/build-push-action@v2
-        with:
-          file: ./OpenAlprWebhookProcessor.Server/Dockerfile
-          push: true
-          tags: |
-            mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
+            ${{ contains(github.ref, 'alpha') && 'mlapaglia/openalprwebhookprocessor:alpha' || 'mlapaglia/openalprwebhookprocessor:latest' }}
