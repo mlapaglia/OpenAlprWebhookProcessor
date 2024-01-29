@@ -22,14 +22,17 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/openalprwebhookprocessor.client'),
+      dir: require('path').join(__dirname, './coverage'),
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
+        { type: 'cobertura' }
       ]
     },
-    reporters: ['progress', 'kjhtml'],
+    preprocessors: {
+      'src/**/*.ts': ['coverage']
+    },
+    reporters: ['progress', 'coverage', 'kjhtml'],
     browsers: ['Chrome'],
     restartOnFileChange: true
   });
