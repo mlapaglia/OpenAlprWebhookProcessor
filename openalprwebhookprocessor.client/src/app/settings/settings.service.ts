@@ -15,15 +15,15 @@ export class SettingsService {
     constructor(private http: HttpClient) { }
 
     getCameras(): Observable<Camera[]> {
-        return this.http.get<Camera[]>('cameras');
+        return this.http.get<Camera[]>('/api/cameras');
     }
 
     deleteCamera(cameraId: string): Observable<void> {
-        return this.http.post<void>(`cameras/${cameraId}/delete`, null);
+        return this.http.post<void>(`/api/cameras/${cameraId}/delete`, null);
     }
 
     upsertCamera(camera: Camera) {
-        return this.http.post('cameras', camera);
+        return this.http.post('/api/cameras', camera);
     }
 
     upsertAgent(agent: Agent) {

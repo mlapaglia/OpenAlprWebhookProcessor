@@ -28,6 +28,6 @@ export class CameraMaskService {
     }
 
     upsertImageMask(imageMask: CameraMask) {
-        return this.http.post(`/cameras/${imageMask.cameraId}/mask`, imageMask);
+        return this.http.post(`/api/cameras/${imageMask.cameraId}/mask`, imageMask);
     }
 }

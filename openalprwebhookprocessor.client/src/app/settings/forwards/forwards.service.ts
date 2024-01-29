@@ -10,11 +10,11 @@ export class ForwardsService {
     constructor(private http: HttpClient) { }
 
     getForwards(): Observable<Forward[]> {
-        return this.http.get<Forward[]>('settings/forwards');
+        return this.http.get<Forward[]>('/api/settings/forwards');
     }
 
     deleteForward(forwardsId: string) {
-        return this.http.delete(`/settings/forwards/${forwardsId}`);
+        return this.http.delete(`/api/settings/forwards/${forwardsId}`);
     }
 
     upsertForwards(forwards: Forward[]) {

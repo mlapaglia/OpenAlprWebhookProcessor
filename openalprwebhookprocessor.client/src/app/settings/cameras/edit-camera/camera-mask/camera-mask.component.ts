@@ -72,7 +72,7 @@ export class CameraMaskComponent implements OnInit {
 
     public handleToggleChange(toggleEvent: MatButtonToggleChange) {
         if (toggleEvent.value === 'snapshot') {
-            this.samplePlates = [`/images/${this.camera.id}/snapshot`];
+            this.samplePlates = [`/api/images/${this.camera.id}/snapshot`];
             this.loadImageIntoCanvas(this.samplePlates[0]);
         } else {
             this.getSamplePlates();

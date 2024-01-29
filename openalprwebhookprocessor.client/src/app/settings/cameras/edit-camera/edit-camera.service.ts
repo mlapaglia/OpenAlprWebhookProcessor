@@ -11,15 +11,15 @@ export class EditCameraService {
     constructor(private http: HttpClient) { }
 
     triggerDayMode(cameraId: string) {
-        return this.http.post(`/cameras/${cameraId}/test/day`, null);
+        return this.http.post(`/api/cameras/${cameraId}/test/day`, null);
     }
 
     triggerNightMode(cameraId: string) {
-        return this.http.post(`/cameras/${cameraId}/test/night`, null);
+        return this.http.post(`/api/cameras/${cameraId}/test/night`, null);
     }
 
     triggerTestOverlay(cameraId: string) {
-        return this.http.post(`/cameras/${cameraId}/test/overlay`, null);
+        return this.http.post(`/api/cameras/${cameraId}/test/overlay`, null);
     }
 
     getZoomAndFocus(cameraId: string): Observable<ZoomFocus> {
@@ -27,10 +27,10 @@ export class EditCameraService {
     }
 
     setZoomAndFocus(cameraId: string, zoomFocus: ZoomFocus) {
-        return this.http.post(`/cameras/${cameraId}/zoomAndFocus`, zoomFocus);
+        return this.http.post(`/api/cameras/${cameraId}/zoomAndFocus`, zoomFocus);
     }
   
     triggerAutofocus(cameraId: string) { 
-        return this.http.post(`/cameras/${cameraId}/triggerAutofocus`, null);
+        return this.http.post(`/api/cameras/${cameraId}/triggerAutofocus`, null);
     }
 }
