@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
         }
 
-        private DateTimeOffset? GetNextScheduledExecutionDate(
+        private static DateTimeOffset? GetNextScheduledExecutionDate(
             Agent agent,
             Data.Camera camera,
             JobDetailsDto dateToEnqueueAt)

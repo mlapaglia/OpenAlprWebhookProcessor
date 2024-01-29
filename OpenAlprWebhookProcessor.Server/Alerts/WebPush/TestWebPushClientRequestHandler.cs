@@ -38,7 +38,7 @@ namespace OpenAlprWebhookProcessor.Alerts.WebPush
                 PlateId = testPlateGroup.Id,
                 PlateNumber = testPlateGroup.BestNumber,
                 PlateJpeg = testPlateGroup.PlateImage.Jpeg,
-                PlateJpegUrl = $"/images/crop/{testPlateGroup.OpenAlprUuid}",
+                PlateJpegUrl = $"/api/images/crop/{testPlateGroup.OpenAlprUuid}",
                 ReceivedOn = DateTimeOffset.UtcNow,
             }, cancellationToken);
         }

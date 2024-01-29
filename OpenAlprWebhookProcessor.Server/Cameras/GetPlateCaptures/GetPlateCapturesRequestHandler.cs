@@ -36,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Cameras.GetPlateCaptures
                 .Take(10)
                 .ToListAsync(cancellationToken);
 
-            return capturedPlates.Select(x => Flurl.Url.Combine($"/images/{x}")).ToList();
+            return capturedPlates.Select(x => Flurl.Url.Combine($"/api/images/{x}")).ToList();
         }
     }
 }

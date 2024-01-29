@@ -36,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 IsUrgent = true,
                 PlateId = testPlateGroup.Id,
                 PlateJpeg = testPlateGroup.PlateImage.Jpeg,
-                PlateJpegUrl = $"/images/crop/{testPlateGroup.OpenAlprUuid}",
+                PlateJpegUrl = $"/api/images/crop/{testPlateGroup.OpenAlprUuid}",
                 PlateNumber = testPlateGroup.BestNumber,
                 ReceivedOn = DateTimeOffset.UtcNow,
             }, cancellationToken);
