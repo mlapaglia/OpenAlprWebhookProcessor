@@ -101,4 +101,6 @@ export class AppComponent implements OnInit, OnDestroy {
     public handleSideNavClick() {
         this.navBarVisible = false;
     }
+
+    title = 'openalprwebhookprocessor.client';
 }

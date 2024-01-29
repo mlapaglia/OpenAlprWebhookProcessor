@@ -9,7 +9,7 @@ namespace OpenAlprWebhookProcessor.ImageRelay
 {
     [Authorize]
     [ApiController]
-    [Route("images")]
+    [Route("api/images")]
     public class ImageRelayController : ControllerBase
     {
         private readonly GetSnapshotHandler _getSnapshotHandler;

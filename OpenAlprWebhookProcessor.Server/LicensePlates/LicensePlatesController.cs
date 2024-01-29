@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 {
     [Authorize]
     [ApiController]
-    [Route("licensePlates")]
+    [Route("/api/licensePlates")]
     public class LicensePlatesController : ControllerBase
     {
         private readonly SearchLicensePlateHandler _searchLicensePlateHandler;

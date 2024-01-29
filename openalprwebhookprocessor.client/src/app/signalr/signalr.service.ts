@@ -24,7 +24,7 @@ export class SignalrService {
   
     public startConnection() {
         this.hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl('/processorhub')
+            .withUrl('/api/processorhub')
             .withAutomaticReconnect()
             .build();
 

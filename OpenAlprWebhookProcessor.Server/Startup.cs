@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,7 +71,7 @@ namespace OpenAlprWebhookProcessor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddControllersWithViews();
+            services.AddControllers();
 
             services.AddSignalR();
 
@@ -140,11 +139,6 @@ namespace OpenAlprWebhookProcessor
                     };
                 });
             }
-
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "angularapp/dist";
-            });
 
             services.AddScoped<IUserService, UserService>();
 
@@ -255,29 +249,12 @@ namespace OpenAlprWebhookProcessor
             IApplicationBuilder app,
             IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-
-                app.UseHsts();
-            }
-
             app.UseSerilogRequestLogging();
 
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseHangfireDashboard();
-
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
-
-            app.UseRouting();
 
             app.UseCors(x => x
                 .AllowAnyOrigin()
@@ -294,23 +271,16 @@ namespace OpenAlprWebhookProcessor
             app.UseWebSockets(webSocketOptions);
 
             app.UseAuthentication();
+
+            app.UseRouting();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ProcessorHub.ProcessorHub>("/processorhub");
-                endpoints.MapHangfireDashboard();
-            });
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "angularapp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
+                endpoints.MapFallbackToFile("/index.html");
+                endpoints.MapHub<ProcessorHub.ProcessorHub>("/api/processorHub");
             });
 
             Log.Logger = new LoggerConfiguration()

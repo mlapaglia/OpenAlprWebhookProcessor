@@ -11,14 +11,14 @@ export class EnrichersService {
     constructor(private http: HttpClient) { }
 
     public getEnricher(): Observable<Enricher> {
-        return this.http.get<Enricher>('/settings/enrichers');
+        return this.http.get<Enricher>('/api/settings/enrichers');
     }
 
     public upsertEnricher(enricher: Enricher): Observable<void> {
-        return this.http.post<void>('/settings/enrichers', enricher);
+        return this.http.post<void>('/api/settings/enrichers', enricher);
     }
 
     public testEnricher(enricherId: string): Observable<boolean> {
-        return this.http.post<boolean>(`/settings/enrichers/${enricherId}/test`, null);
+        return this.http.post<boolean>(`/api/settings/enrichers/${enricherId}/test`, null);
     }
 }

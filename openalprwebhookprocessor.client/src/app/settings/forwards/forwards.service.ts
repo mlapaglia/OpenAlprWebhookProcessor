@@ -18,6 +18,6 @@ export class ForwardsService {
     }
 
     upsertForwards(forwards: Forward[]) {
-        return this.http.post('/settings/forwards', forwards);
+        return this.http.post('/api/settings/forwards', forwards);
     }
 }

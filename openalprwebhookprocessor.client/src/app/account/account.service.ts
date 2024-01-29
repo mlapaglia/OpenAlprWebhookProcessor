@@ -23,7 +23,7 @@ export class AccountService {
     }
 
     login(username: string, password: string) {
-        return this.http.post<User>('/users/authenticate', { username, password })
+        return this.http.post<User>('/api/users/authenticate', { username, password })
             .pipe(map(user => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
@@ -36,7 +36,7 @@ export class AccountService {
     logout() {
         this.stopRefreshTokenTimer();
 
-        this.http.post<void>('/users/revoke-token', {}, { withCredentials: true }).subscribe(() => {
+        this.http.post<void>('/api/users/revoke-token', {}, { withCredentials: true }).subscribe(() => {
             this.finalizeLogout();
         },
         () => {
@@ -52,7 +52,7 @@ export class AccountService {
     }
 
     refreshToken() {
-        return this.http.post<User>('/users/refresh-token', {}, { withCredentials: true })
+        return this.http.post<User>('/api/users/refresh-token', {}, { withCredentials: true })
             .pipe(map((user) => {
                 this.userSubject.next(user);
                 this.startRefreshTokenTimer();
@@ -61,23 +61,23 @@ export class AccountService {
     }
 
     canRegister() {
-        return this.http.get<boolean>('/users/canregister');
+        return this.http.get<boolean>('/api/users/canregister');
     }
 
     add(user: User) {
-        return this.http.post('/users/add', user);
+        return this.http.post('/api/users/add', user);
     }
   
     register(user: User) {
-        return this.http.post('/users/register', user);
+        return this.http.post('/api/users/register', user);
     }
 
     getAll() {
-        return this.http.get<User[]>('/users');
+        return this.http.get<User[]>('/api/users');
     }
 
     getById(id: string) {
-        return this.http.get<User>(`/users/${id}`);
+        return this.http.get<User>(`/api/users/${id}`);
     }
 
     update(id, params) {

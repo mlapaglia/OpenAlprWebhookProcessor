@@ -356,4 +356,4 @@ dist/
 **/log*.txt
 *db-shm
 *db-wal
-OpenAlprWebhookProcessor/angularapp/.angular/*
+openalprwebhookprocessor.client/.angular/*

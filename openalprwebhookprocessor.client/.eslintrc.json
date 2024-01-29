@@ -1,8 +1,9 @@
 {
-  "plugins": [
-    "@stylistic/ts"
-  ],
-  "root": true,
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
   "ignorePatterns": [
     "projects/**/*",
     "e2e/**/*",
@@ -10,7 +11,7 @@
   ],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [ "*.ts" ],
       "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
@@ -25,22 +26,30 @@
          */
         "@angular-eslint/directive-selector": [
           "error",
-          { "type": "attribute", "prefix": "app", "style": "camelCase" }
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
         ],
         "@angular-eslint/component-selector": [
           "error",
-          { "type": "element", "prefix": "app", "style": "kebab-case" }
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
         ],
-        "@stylistic/ts/indent": ["error", 4],
-        "@stylistic/ts/object-curly-spacing": ["off"],
-        "@stylistic/ts/quotes": ["error", "single"],
-        "@stylistic/ts/space-before-function-paren": ["error", "never"],
-        "@stylistic/ts/lines-between-class-members": ["off"]
-        
+        "@stylistic/ts/indent": [ "error", 4 ],
+        "@stylistic/ts/object-curly-spacing": [ "off" ],
+        "@stylistic/ts/quotes": [ "error", "single" ],
+        "@stylistic/ts/space-before-function-paren": [ "error", "never" ],
+        "@stylistic/ts/lines-between-class-members": [ "off" ]
+
       }
     },
     {
-      "files": ["*.html"],
+      "files": [ "*.html" ],
       "extends": [
         "plugin:@angular-eslint/template/recommended",
         "plugin:@angular-eslint/template/accessibility"
@@ -52,5 +61,12 @@
          */
       }
     }
-  ]
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2023
+  },
+  "plugins": [
+    "@stylistic/ts"
+  ],
+  "root": true
 }

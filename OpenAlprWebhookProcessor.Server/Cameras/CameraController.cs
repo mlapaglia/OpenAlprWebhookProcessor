@@ -12,7 +12,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 {
     [Authorize]
     [ApiController]
-    [Route("cameras")]
+    [Route("api/cameras")]
     public class CameraController : Controller
     {
         private readonly GetCameraRequestHandler _getCameraHandler;

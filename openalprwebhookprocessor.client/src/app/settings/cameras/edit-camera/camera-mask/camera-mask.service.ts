@@ -12,11 +12,11 @@ export class CameraMaskService {
     constructor(private http: HttpClient) { }
 
     getCameraSnapshot(cameraId: string): Observable<Blob> {
-        return this.http.get<Blob>(`/images/${cameraId}/snapshot`);
+        return this.http.get<Blob>(`/api/images/${cameraId}/snapshot`);
     }
 
     getPlateCaptures(cameraId: string): Observable<string[]> {
-        return this.http.get<string[]>(`/cameras/${cameraId}/plateCaptures`);
+        return this.http.get<string[]>(`/api/cameras/${cameraId}/plateCaptures`);
     }
 
     getPlateCapture(imageUrl: string): Observable<Blob> {
@@ -24,7 +24,7 @@ export class CameraMaskService {
     }
 
     getCameraMaskCoordinates(cameraId: string): Observable<Coordinate[]> {
-        return this.http.get<Coordinate[]>(`/cameras/${cameraId}/mask/coordinates`);
+        return this.http.get<Coordinate[]>(`/api/cameras/${cameraId}/mask/coordinates`);
     }
 
     upsertImageMask(imageMask: CameraMask) {

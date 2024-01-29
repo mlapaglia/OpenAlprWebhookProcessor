@@ -27,31 +27,31 @@ export class SettingsService {
     }
 
     upsertAgent(agent: Agent) {
-        return this.http.post('/settings/agent', agent);
+        return this.http.post('/api/settings/agent', agent);
     }
 
     getAgent(): Observable<Agent> {
-        return this.http.get<Agent>('/settings/agent');
+        return this.http.get<Agent>('/api/settings/agent');
     }
 
     getAgentStatus(): Observable<AgentStatus> {
-        return this.http.get<AgentStatus>('/settings/agent/status');
+        return this.http.get<AgentStatus>('/api/settings/agent/status');
     }
 
     disableAgent(agentId: string): Observable<boolean> {
-        return this.http.post<boolean>('/settings/agent/disable', agentId);
+        return this.http.post<boolean>('/api/settings/agent/disable', agentId);
     }
 
     enableAgent(agentId: string): Observable<boolean> {
-        return this.http.post<boolean>('/settings/agent/enable', agentId);
+        return this.http.post<boolean>('/api/settings/agent/enable', agentId);
     }
 
     startAgentScrape(): Observable<void> {
-        return this.http.post<void>('/settings/agent/scrape', null);
+        return this.http.post<void>('/api/settings/agent/scrape', null);
     }
 
     getIgnores(): Observable<Ignore[]> {
-        return this.http.get<Ignore[]>('/settings/ignores');
+        return this.http.get<Ignore[]>('/api/settings/ignores');
     }
 
     deleteIgnore(ignoreId: string) {
@@ -59,14 +59,14 @@ export class SettingsService {
     }
 
     upsertIgnores(ignores: Ignore[]) {
-        return this.http.post('/settings/ignores', ignores);
+        return this.http.post('/api/settings/ignores', ignores);
     }
 
     addIgnore(ignore: Ignore) {
-        return this.http.post('/settings/ignores/add', ignore);
+        return this.http.post('/api/settings/ignores/add', ignore);
     }
 
     addAlert(alert: Alert) {
-        return this.http.post('/settings/alerts/add', alert);
+        return this.http.post('/api/settings/alerts/add', alert);
     }
 }

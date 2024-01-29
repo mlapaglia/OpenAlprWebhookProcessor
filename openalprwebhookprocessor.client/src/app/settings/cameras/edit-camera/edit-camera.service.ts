@@ -23,7 +23,7 @@ export class EditCameraService {
     }
 
     getZoomAndFocus(cameraId: string): Observable<ZoomFocus> {
-        return this.http.get<ZoomFocus>(`/cameras/${cameraId}/zoomAndFocus`);
+        return this.http.get<ZoomFocus>(`/api/cameras/${cameraId}/zoomAndFocus`);
     }
 
     setZoomAndFocus(cameraId: string, zoomFocus: ZoomFocus) {

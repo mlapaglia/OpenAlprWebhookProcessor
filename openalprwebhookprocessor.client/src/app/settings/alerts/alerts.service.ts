@@ -10,7 +10,7 @@ export class AlertsService {
     constructor(private http: HttpClient) { }
 
     getAlerts(): Observable<Alert[]> {
-        return this.http.get<Alert[]>('/alerts');
+        return this.http.get<Alert[]>('/api/alerts');
     }
 
     deleteAlert(alertId: string) {
@@ -18,14 +18,14 @@ export class AlertsService {
     }
 
     upsertAlerts(alerts: Alert[]) {
-        return this.http.post('/alerts', alerts);
+        return this.http.post('/api/alerts', alerts);
     }
 
     addAlert(alert: Alert) {
-        return this.http.post('/alerts/add', alert);
+        return this.http.post('/api/alerts/add', alert);
     }
 
     testAlert() {
-        return this.http.post('/alerts/test', null);
+        return this.http.post('/api/alerts/test', null);
     }
 }

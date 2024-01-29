@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Settings
 {
     [Authorize]
     [ApiController]
-    [Route("settings")]
+    [Route("/api/settings")]
     public class SettingsController : ControllerBase
     {
         private readonly GetAgentRequestHandler _getAgentRequestHandler;

@@ -1,0 +1,6 @@
+@AngularApp1.Server_HostAddress = https://localhost:5001
+
+GET {{AngularApp1.Server_HostAddress}}/plates/
+Accept: application/json
+
+###

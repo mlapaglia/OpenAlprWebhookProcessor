@@ -10,7 +10,7 @@ namespace OpenAlprWebhookProcessor.Alerts
 {
     [Authorize]
     [ApiController]
-    [Route("alerts")]
+    [Route("api/alerts")]
     public class AlertsController : Controller
     {
         private readonly GetAlertsRequestHandler _getAlertsRequestHandler;

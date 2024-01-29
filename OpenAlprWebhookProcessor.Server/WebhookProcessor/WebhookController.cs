@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
     [ApiController]
-    [Route("webhook")]
+    [Route("api/webhook")]
     public class WebhookController : ControllerBase
     {
         private readonly ILogger<WebhookController> _logger;

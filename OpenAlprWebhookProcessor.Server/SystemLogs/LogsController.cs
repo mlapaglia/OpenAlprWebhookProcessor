@@ -10,7 +10,7 @@ namespace OpenAlprWebhookProcessor.SystemLogs
 {
     [Authorize]
     [ApiController]
-    [Route("logs")]
+    [Route("api/logs")]
     public class LogsController : ControllerBase
     {
         public LogsController()

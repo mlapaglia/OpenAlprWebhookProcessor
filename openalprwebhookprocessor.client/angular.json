@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angularapp": {
+    "openalprwebhookprocessor.client": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/",
+            "outputPath": "dist/openalprwebhookprocessor.client",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -92,18 +92,21 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angularapp:build:production"
+              "buildTarget": "openalprwebhookprocessor.client:build:production"
             },
             "development": {
-              "buildTarget": "angularapp:build:development"
+              "buildTarget": "openalprwebhookprocessor.client:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "src/proxy.conf.js"
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "angularapp:build"
+            "buildTarget": "openalprwebhookprocessor.client:build"
           }
         },
         "test": {

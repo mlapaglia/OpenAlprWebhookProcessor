@@ -22,39 +22,39 @@ export class PlateService {
     constructor(private http: HttpClient) { }
 
     searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
-        return this.http.post<PlateResponse>(`/${this.searchPlatesUrl}`, plateRequest);
+        return this.http.post<PlateResponse>(`/api/${this.searchPlatesUrl}`, plateRequest);
     }
 
     upsertPlate(plate: Plate): Observable<void> {
-        return this.http.post<void>(`/${this.editPlateUrl}`, plate);
+        return this.http.post<void>(`/api/${this.editPlateUrl}`, plate);
     }
 
     deletePlate(plateId: string): Observable<void> {
-        return this.http.delete<void>(`/${this.singlePlateUrl}/${plateId}`);
+        return this.http.delete<void>(`/api/${this.singlePlateUrl}/${plateId}`);
     }
 
     getRelayImage(imageId: string) {
-        return this.http.get<Stream>(`/${this.getRelayImageUrl}/${imageId}`);
+        return this.http.get<Stream>(`/api/${this.getRelayImageUrl}/${imageId}`);
     }
 
     hydrateDatabase(): Observable<void> {
-        return this.http.post<void>(`/${this.hydrateDatabaseUrl}`, {});
+        return this.http.post<void>(`/api/${this.hydrateDatabaseUrl}`, {});
     }
 
     getFilters(): Observable<VehicleFilters> {
-        return this.http.get<VehicleFilters>(`/${this.getFiltersUrl}`);
+        return this.http.get<VehicleFilters>(`/api/${this.getFiltersUrl}`);
     }
 
     getPlate(plateId: string): Observable<GetPlateResponse> {
-        return this.http.get<GetPlateResponse>(`/${this.singlePlateUrl}/${plateId}`);
+        return this.http.get<GetPlateResponse>(`/api/${this.singlePlateUrl}/${plateId}`);
     }
 
     getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {
-        return this.http.get<PlateStatistics>(`/${this.getStatistics}/${plateNumber}`);
+        return this.http.get<PlateStatistics>(`/api/${this.getStatistics}/${plateNumber}`);
     }
 
     enrichPlate(plateId: string): Observable<void> {
-        return this.http.post<void>(`/${this.enrichPlateUrl}/${plateId}`, null);
+        return this.http.post<void>(`/api/${this.enrichPlateUrl}/${plateId}`, null);
     }
 }
 
