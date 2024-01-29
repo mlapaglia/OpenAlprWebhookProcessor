@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run build
-        run: docker build . --file ./OpenAlprWebhookProcessor/Dockerfile
+        run: docker build . --file ./OpenAlprWebhookProcessor.Server/Dockerfile
   
   back-end-tests:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run frontend tests
-        working-directory: ./OpenAlprWebhookProcessor/angularapp
+        working-directory: ./openalprwebhookprocessor.client
         run: |
           npm ci
           npm run test:prod
@@ -86,16 +86,16 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
-          dotnet restore "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj"
-          dotnet build "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor/OpenAlprWebhookProcessor.csproj" -c Release -o "$release_name"
+          dotnet restore "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
+          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release
+          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
         uses: softprops/action-gh-release@v1
         if: contains(github.ref, 'alpha') != true
         with:
-          files: "OpenAlprWebHookProcessor*"
+          files: "OpenAlprWebHookProcessor.Server*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -103,7 +103,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: contains(github.ref, 'alpha')
         with:
-          files: "OpenAlprWebHookProcessor*"
+          files: "OpenAlprWebHookProcessor.Server*"
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -133,7 +133,7 @@ jobs:
         if: contains(github.ref, 'alpha') != true
         uses: docker/build-push-action@v2
         with:
-          file: ./OpenAlprWebhookProcessor/Dockerfile
+          file: ./OpenAlprWebhookProcessor.Server/Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
@@ -143,7 +143,7 @@ jobs:
         if: contains(github.ref, 'alpha')
         uses: docker/build-push-action@v2
         with:
-          file: ./OpenAlprWebhookProcessor/Dockerfile
+          file: ./OpenAlprWebhookProcessor.Server/Dockerfile
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
