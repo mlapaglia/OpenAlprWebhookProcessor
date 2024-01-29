@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\docker-publish.yml = .github\workflows\docker-publish.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAlprWebhookProcessor", "OpenAlprWebhookProcessor\OpenAlprWebhookProcessor.csproj", "{7C3E9804-0A13-4060-B5FD-91A613647146}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAlprWebhookProcessor", "OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.csproj", "{7C3E9804-0A13-4060-B5FD-91A613647146}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{DD123D3E-8A09-4104-AF20-D5FBFAA6F52E}"
 EndProject
