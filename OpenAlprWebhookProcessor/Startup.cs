@@ -84,6 +84,15 @@ namespace OpenAlprWebhookProcessor
             using (var context = new ProcessorContext(processorOptionsBuilder.Options))
             {
                 context.Database.Migrate();
+                var agent = context.Agents.FirstOrDefault();
+
+                if (agent == null)
+                {
+                    agent = new Data.Agent();
+
+                    context.Agents.Add(agent);
+                    context.SaveChanges();
+                }
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
@@ -202,7 +211,7 @@ namespace OpenAlprWebhookProcessor
 
             services.AddSingleton<WebPushNotificationProducer>();
             services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
-            
+
             services.AddSingleton<WebsocketClientOrganizer>();
             services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
 
