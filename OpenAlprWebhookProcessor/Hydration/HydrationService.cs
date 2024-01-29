@@ -68,6 +68,13 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                 var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
+                if (string.IsNullOrWhiteSpace(agent.Uid))
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                    logger.LogWarning("Agent UID is not set. Cannot schedule hydration.");
+                    return;
+                }
+
                 if (agent.ScheduledScrapingIntervalMinutes == null)
                 {
                     RecurringJob.RemoveIfExists(agent.Uid);
