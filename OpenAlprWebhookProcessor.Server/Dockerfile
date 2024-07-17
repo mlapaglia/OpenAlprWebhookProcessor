@@ -16,10 +16,9 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
     && apt-get update && apt-get install nodejs -y
 
-COPY ["openalprwebhookprocessor.client/nuget.config", "openalprwebhookprocessor.client/"]
+
 COPY ["OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj", "OpenAlprWebhookProcessor.Server/"]
-COPY ["openalprwebhookprocessor.client/openalprwebhookprocessor.client.esproj", "openalprwebhookprocessor.client/"]
-RUN dotnet restore "./OpenAlprWebhookProcessor.Server/./OpenAlprWebhookProcessor.Server.csproj"
+RUN dotnet restore "./OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
 COPY . .
 WORKDIR "/src/OpenAlprWebhookProcessor.Server"
 RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
