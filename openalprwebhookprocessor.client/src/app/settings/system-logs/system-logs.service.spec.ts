@@ -1,15 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { SystemLogsService } from './system-logs.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe(SystemLogsService.name, () => {
     let service: SystemLogsService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [SystemLogsService]
-        });
+    imports: [],
+    providers: [SystemLogsService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
         service = TestBed.inject(SystemLogsService);
     });
 
