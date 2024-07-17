@@ -8,10 +8,10 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 describe(PlatesComponent.name, () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [RouterTestingModule,
-        BrowserAnimationsModule],
-    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-});
+            imports: [RouterTestingModule,
+                BrowserAnimationsModule],
+            providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+        });
     });
 
     it('should create the app', () => {
