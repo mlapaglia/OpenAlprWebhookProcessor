@@ -17,7 +17,7 @@ namespace Tests
         {
             using (var processorContext = _contextCreator.CreateContext())
             {
-                if (processorContext.Database.EnsureCreated())
+                if (await processorContext.Database.EnsureCreatedAsync())
                 {
                     processorContext.Agents.Add(new OpenAlprWebhookProcessor.Data.Agent()
                     {

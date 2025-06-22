@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Alerts
         {
             var alerts = new List<Alert>();
 
-            foreach (var dbAlert in await _processorContext.Alerts.ToListAsync())
+            foreach (var dbAlert in await _processorContext.Alerts.ToListAsync(cancellationToken))
             {
                 var alert = new Alert()
                 {
