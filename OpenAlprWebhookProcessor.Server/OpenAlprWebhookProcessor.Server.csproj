@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <SpaRoot>..\openalprwebhookprocessor.client</SpaRoot>
@@ -11,29 +11,29 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="12.0.1" />
-		<PackageReference Include="Bogus" Version="35.4.0" />
-		<PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
-		<PackageReference Include="CoordinateSharp" Version="2.21.1.1" />
+		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="Bogus" Version="35.6.3" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.6.1" />
+		<PackageReference Include="CoordinateSharp" Version="3.2.1.1" />
 		<PackageReference Include="Flurl" Version="4.0.0" />
-		<PackageReference Include="Hangfire" Version="1.8.9" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.9" />
-		<PackageReference Include="Hangfire.InMemory" Version="0.7.0" />
-		<PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.1" />
-		<PackageReference Include="Magick.NET-Q8-x64" Version="13.5.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+		<PackageReference Include="Hangfire" Version="1.8.20" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.20" />
+		<PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
+		<PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.2" />
+		<PackageReference Include="Magick.NET-Q8-x64" Version="14.6.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
-		<PackageReference Include="NUnit" Version="4.0.1" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+		<PackageReference Include="NUnit" Version="4.3.2" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
 	</ItemGroup>
 
 	<ItemGroup>
