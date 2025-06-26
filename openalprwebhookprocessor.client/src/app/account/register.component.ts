@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from 'app/_services';
-import { NgClass } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     templateUrl: 'register.component.html',
-    imports: [ReactiveFormsModule, NgClass, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule]
+    imports: [ReactiveFormsModule, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class RegisterComponent implements OnInit {
     form: FormGroup;
