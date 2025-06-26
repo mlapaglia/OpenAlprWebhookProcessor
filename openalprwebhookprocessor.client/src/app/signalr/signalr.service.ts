@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import * as signalR from '@microsoft/signalr';
@@ -8,6 +8,8 @@ import { Subject } from 'rxjs';
     providedIn: 'root'
 })
 export class SignalrService {
+    private snackbarService = inject(SnackbarService);
+
     private hubConnection: signalR.HubConnection;
 
     public connectionEstablished = new Subject<boolean>();
@@ -17,10 +19,6 @@ export class SignalrService {
     public openAlprAgentConnectionStatusChanged = new Subject<boolean>();
     public isConnected: boolean;
     public connectionStatusChanged: Subject<boolean> = new Subject<boolean>();
-
-    constructor(
-        private snackbarService: SnackbarService
-    ) { }
   
     public startConnection() {
         this.hubConnection = new signalR.HubConnectionBuilder()

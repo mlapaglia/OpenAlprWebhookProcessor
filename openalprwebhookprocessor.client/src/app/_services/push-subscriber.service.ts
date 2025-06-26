@@ -1,10 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 
 @Injectable({ providedIn: 'root' })
 export class PushSubscriberService {
+    private swPush = inject(SwPush);
+    private httpClient = inject(HttpClient);
+    private router = inject(Router);
+
     private _subscription: PushSubscription;
     private baseUrl: string = document.getElementsByTagName('base')[0].href;
 
@@ -14,10 +18,9 @@ export class PushSubscriberService {
         })
     };
     
-    constructor(
-        private swPush: SwPush,
-        private httpClient: HttpClient,
-        private router: Router) {
+    constructor() {
+        const swPush = this.swPush;
+
         swPush.subscription.subscribe(subscription => {
             this._subscription = subscription!;
         });

@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -34,14 +34,13 @@ import { MatCardModule } from '@angular/material/card';
     imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatRadioModule, MatButtonModule]
 })
 export class EnrichersComponent implements OnInit {
+    private enricherService = inject(EnrichersService);
+    private snackbarService = inject(SnackbarService);
+
     public isTesting: boolean;
     public isSaving: boolean;
 
     public enricher: Enricher;
-  
-    constructor(
-        private enricherService: EnrichersService,
-        private snackbarService: SnackbarService) { }
 
     ngOnInit(): void {
         this.getEnricher();

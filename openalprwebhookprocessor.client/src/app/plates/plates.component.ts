@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormGroup, FormGroupDirective, NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SignalrService } from 'app/signalr/signalr.service';
@@ -65,6 +65,16 @@ import { ActivatedRoute, Router } from '@angular/router';
     ]
 })
 export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
+    private plateService = inject(PlateService);
+    private signalRHub = inject(SignalrService);
+    private snackbarService = inject(SnackbarService);
+    private alertsService = inject(AlertsService);
+    private settingsService = inject(SettingsService);
+    private localStorageService = inject(LocalStorageService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    dialog = inject(MatDialog);
+
     @Input() id: string;
 
     public columnsToDisplay = [
@@ -138,16 +148,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   
     @ViewChild(MatPaginator) paginator: MatPaginator;
   
-    constructor(
-        private plateService: PlateService,
-        private signalRHub: SignalrService,
-        private snackbarService: SnackbarService,
-        private alertsService: AlertsService,
-        private settingsService: SettingsService,
-        private localStorageService: LocalStorageService,
-        private route: ActivatedRoute,
-        private router: Router,
-        public dialog: MatDialog) {
+    constructor() {
         this.range = new FormGroup({
             start: new FormControl(),
             end: new FormControl()

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Forward } from './forward';
 
@@ -7,7 +7,8 @@ import { Forward } from './forward';
     providedIn: 'root'
 })
 export class ForwardsService {
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     getForwards(): Observable<Forward[]> {
         return this.http.get<Forward[]>('/api/settings/forwards');

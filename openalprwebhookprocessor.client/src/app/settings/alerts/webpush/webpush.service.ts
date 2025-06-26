@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Webpush } from './webpush';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
@@ -7,8 +7,8 @@ import { HttpClient } from '@angular/common/http';
     providedIn: 'root'
 })
 export class WebpushService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) { }
 
     public upsertWebpush(pushover: Webpush): Observable<void> {
         return this.http.post<void>('/api/alerts/webpush', pushover);

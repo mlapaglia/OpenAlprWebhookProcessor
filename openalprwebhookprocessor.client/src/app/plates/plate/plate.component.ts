@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, inject } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
@@ -24,6 +24,11 @@ import { MatCardModule } from '@angular/material/card';
     imports: [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
+    private lightbox = inject(Lightbox);
+    private plateService = inject(PlateService);
+    private datePipe = inject(DatePipe);
+    private snackbarService = inject(SnackbarService);
+
     @Input() plate: Plate;
     @Input() isVisible: boolean;
 
@@ -45,13 +50,6 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
     public displayedColumns: string[] = ['key', 'value'];
 
     private statisticsSubscription = new Subscription();
-
-    constructor(
-        private lightbox: Lightbox,
-        private plateService: PlateService,
-        private datePipe: DatePipe,
-        private snackbarService: SnackbarService
-    ) { }
 
     ngOnInit(): void {
         this.loadingVehicleImage = true;

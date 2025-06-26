@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Forward } from './forward';
 import { ForwardsService } from './forwards.service';
@@ -15,6 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule]
 })
 export class ForwardsComponent implements OnInit {
+    private forwardsService = inject(ForwardsService);
+
     public forwards: MatTableDataSource<Forward>;
     public isSaving: boolean = false;
 
@@ -26,8 +28,6 @@ export class ForwardsComponent implements OnInit {
         'ignoreSslErrors',
         'delete'
     ];
-
-    constructor(private forwardsService: ForwardsService) { }
 
     ngOnInit(): void {
         this.getForwards();

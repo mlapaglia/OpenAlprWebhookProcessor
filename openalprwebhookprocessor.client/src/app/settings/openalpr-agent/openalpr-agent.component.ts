@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
@@ -26,6 +26,10 @@ import { NgStyle } from '@angular/common';
     imports: [MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
+    private settingsService = inject(SettingsService);
+    private snackBarService = inject(SnackbarService);
+    private signalRHub = inject(SignalrService);
+
     @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>;
 
     public agent: Agent;
@@ -38,11 +42,6 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
     public isLoadingAgentStatus: boolean = false;
 
     private eventSubscriptions = new Subscription();
-  
-    constructor(
-        private settingsService: SettingsService,
-        private snackBarService: SnackbarService,
-        private signalRHub: SignalrService) { }
 
     ngOnInit(): void {
         this.getAgent();

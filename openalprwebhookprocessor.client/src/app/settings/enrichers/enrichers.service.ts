@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Enricher } from './enricher';
 
@@ -7,8 +7,8 @@ import { Enricher } from './enricher';
     providedIn: 'root'
 })
 export class EnrichersService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) { }
 
     public getEnricher(): Observable<Enricher> {
         return this.http.get<Enricher>('/api/settings/enrichers');

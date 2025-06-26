@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Camera } from './camera';
 import { SettingsService } from '../settings.service';
@@ -14,11 +14,10 @@ import { MatGridListModule } from '@angular/material/grid-list';
     imports: [MatGridListModule, CameraComponent, MatDialogModule]
 })
 export class CamerasComponent implements OnInit {
+    private settingsService = inject(SettingsService);
+    dialog = inject(MatDialog);
+
     public cameras: Camera[];
-  
-    constructor(
-        private settingsService: SettingsService,
-        public dialog: MatDialog) { }
 
     ngOnInit(): void {
         this.getCameras();

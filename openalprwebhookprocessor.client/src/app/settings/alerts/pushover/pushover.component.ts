@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -34,13 +34,12 @@ import { MatCardModule } from '@angular/material/card';
     imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatCheckboxModule, MatButtonModule]
 })
 export class PushoverComponent implements OnInit {
+    private pushoverService = inject(PushoverService);
+    private snackbarService = inject(SnackbarService);
+
     public client: Pushover;
     public isSaving: boolean;
     public isTesting: boolean;
-
-    constructor(
-        private pushoverService: PushoverService,
-        private snackbarService: SnackbarService) { }
 
     ngOnInit(): void {
         this.pushoverService.getPushover().subscribe(result => {

@@ -8,9 +8,9 @@ describe(SystemLogsService.name, () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [SystemLogsService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-});
+            imports: [],
+            providers: [SystemLogsService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+        });
         service = TestBed.inject(SystemLogsService);
     });
 

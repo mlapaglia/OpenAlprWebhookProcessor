@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { SnackBarType } from './snackbartype';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +11,8 @@ import { SnackBar } from './snackbar';
     imports: [MatIconModule]
 })
 export class SnackbarComponent {
-    constructor(@Inject(MAT_SNACK_BAR_DATA) public data: SnackBar) { }
+    data = inject<SnackBar>(MAT_SNACK_BAR_DATA);
+
 
     get getIcon() {
         switch (this.data.snackType) {

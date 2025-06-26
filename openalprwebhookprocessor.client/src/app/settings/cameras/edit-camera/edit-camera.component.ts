@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -36,17 +36,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CameraMaskComponent]
 })
 export class EditCameraComponent implements OnInit {
+    dialogRef = inject<MatDialogRef<EditCameraComponent>>(MatDialogRef);
+    private snackBarService = inject(SnackbarService);
+    private editCameraService = inject(EditCameraService);
+    data = inject<Camera>(MAT_DIALOG_DATA);
+
     public camera: Camera;
     public hidePassword: boolean = true;
     public currentZoomFocus: ZoomFocus = new ZoomFocus();
     public isEditingMask: boolean = false;
-
-    constructor(
-        public dialogRef: MatDialogRef<EditCameraComponent>,
-        private snackBarService: SnackbarService,
-        private editCameraService: EditCameraService,
-
-        @Inject(MAT_DIALOG_DATA) public data: Camera) { }
 
     ngOnInit(): void {
         this.camera = this.data;

@@ -14,18 +14,18 @@ describe('PlateComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-    imports: [BrowserAnimationsModule,
-        PlateComponent],
-    providers: [
-        DatePipe,
-        Lightbox,
-        LightboxConfig,
-        LightboxEvent,
-        PlateService,
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
-    ]
-})
+            imports: [BrowserAnimationsModule,
+                PlateComponent],
+            providers: [
+                DatePipe,
+                Lightbox,
+                LightboxConfig,
+                LightboxEvent,
+                PlateService,
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
+            ]
+        })
             .compileComponents();
     });
 

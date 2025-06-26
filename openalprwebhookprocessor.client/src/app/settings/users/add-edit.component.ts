@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
@@ -14,20 +14,18 @@ import { MatButtonModule } from '@angular/material/button';
     imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class AddEditComponent implements OnInit {
+    private formBuilder = inject(FormBuilder);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private accountService = inject(AccountService);
+    private alertService = inject(AlertService);
+
     form: FormGroup;
     id: string;
     isAddMode: boolean;
     isAddingFirstUserMode: boolean;
     loading = false;
     submitted = false;
-
-    constructor(
-        private formBuilder: FormBuilder,
-        private route: ActivatedRoute,
-        private router: Router,
-        private accountService: AccountService,
-        private alertService: AlertService
-    ) {}
 
     ngOnInit() {
         this.id = this.route.snapshot.params['id'];

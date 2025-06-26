@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Stream } from 'stream';
 import { Plate } from './plate/plate';
@@ -10,6 +10,8 @@ import { GetPlateResponse } from './plate/getPlateResponse';
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
+    private http = inject(HttpClient);
+
     private getRelayImageUrl = 'images';
     private searchPlatesUrl = 'licenseplates/search';
     private editPlateUrl = 'licenseplates/edit';
@@ -18,8 +20,6 @@ export class PlateService {
     private getFiltersUrl = 'licenseplates/filters';
     private getStatistics = 'licenseplates/statistics';
     private enrichPlateUrl = 'licenseplates/enrich';
-
-    constructor(private http: HttpClient) { }
 
     searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
         return this.http.post<PlateResponse>(`/api/${this.searchPlatesUrl}`, plateRequest);

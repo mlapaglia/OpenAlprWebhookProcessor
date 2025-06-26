@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CameraMask } from './camera-mask';
 import { Coordinate } from './coordinate';
@@ -8,8 +8,8 @@ import { Coordinate } from './coordinate';
     providedIn: 'root'
 })
 export class CameraMaskService {
-  
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     getCameraSnapshot(cameraId: string): Observable<Blob> {
         return this.http.get<Blob>(`/api/images/${cameraId}/snapshot`);

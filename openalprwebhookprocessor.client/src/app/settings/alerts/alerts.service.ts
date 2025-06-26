@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Alert } from './alert';
 
@@ -7,7 +7,8 @@ import { Alert } from './alert';
     providedIn: 'root'
 })
 export class AlertsService {
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     getAlerts(): Observable<Alert[]> {
         return this.http.get<Alert[]>('/api/alerts');

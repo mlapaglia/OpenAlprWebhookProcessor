@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Pushover } from './pushover';
 
@@ -7,7 +7,8 @@ import { Pushover } from './pushover';
     providedIn: 'root'
 })
 export class PushoverService {
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     public upsertPushover(pushover: Pushover): Observable<void> {
         return this.http.post<void>('/api/alerts/pushover', pushover);

@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SystemLogsService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) { }
 
     getLogs(): Observable<string[]> {
         return this.http.get<string[]>('/api/logs');

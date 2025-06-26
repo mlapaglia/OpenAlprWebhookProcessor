@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -34,14 +34,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatButtonModule, MatCheckboxModule]
 })
 export class WebpushComponent implements OnInit {
+    private webpushService = inject(WebpushService);
+    private snackbarService = inject(SnackbarService);
+
     public client: Webpush;
     public isSaving: boolean;
     public isTesting: boolean;
     public hidePrivateKey: boolean = true;
-
-    constructor(
-        private webpushService: WebpushService,
-        private snackbarService: SnackbarService) { }
 
     ngOnInit(): void {
         this.webpushService.getWebpush().subscribe(result => {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SettingsService } from '../settings.service';
 import { Ignore } from './ignore';
@@ -16,10 +16,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class IgnoresComponent implements OnInit {
+    private settingsService = inject(SettingsService);
+
     public ignores: MatTableDataSource<Ignore>;
     public isSaving: boolean = false;
-
-    constructor(private settingsService: SettingsService) { }
 
     public rowsToDisplay = [
         'plateNumber',

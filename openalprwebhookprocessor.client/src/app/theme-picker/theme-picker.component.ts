@@ -1,10 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewEncapsulation
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core';
 
 import {DocsSiteTheme, ThemeStorage} from './theme-storage/theme-storage';
 import {MatButtonModule} from '@angular/material/button';
@@ -30,6 +24,11 @@ import { MatListModule } from '@angular/material/list';
     imports: [MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, MatRadioModule, MatListModule]
 })
 export class ThemePickerComponent implements OnInit, OnDestroy {
+    styleManager = inject(StyleManager);
+    private _themeStorage = inject(ThemeStorage);
+    private _activatedRoute = inject(ActivatedRoute);
+    private liveAnnouncer = inject(LiveAnnouncer);
+
     private _queryParamSubscription = Subscription.EMPTY;
     currentTheme: DocsSiteTheme | undefined;
 
@@ -66,12 +65,10 @@ export class ThemePickerComponent implements OnInit, OnDestroy {
         }
     ];
 
-    constructor(public styleManager: StyleManager,
-        private _themeStorage: ThemeStorage,
-        private _activatedRoute: ActivatedRoute,
-        private liveAnnouncer: LiveAnnouncer,
-        iconRegistry: MatIconRegistry,
-        sanitizer: DomSanitizer) {
+    constructor() {
+        const iconRegistry = inject(MatIconRegistry);
+        const sanitizer = inject(DomSanitizer);
+
         iconRegistry.addSvgIcon('theme-example',
             sanitizer.bypassSecurityTrustResourceUrl(
                 'assets/img/theme-demo-icon.svg'));

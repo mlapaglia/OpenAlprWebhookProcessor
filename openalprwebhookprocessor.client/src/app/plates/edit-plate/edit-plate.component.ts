@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { Plate } from '../plate/plate';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,12 +13,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     imports: [MatDialogModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class EditPlateComponent implements OnInit {
+    data = inject<Plate>(MAT_DIALOG_DATA);
+
 
     public plate: Plate;
-  
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public data: Plate
-    ) { }
 
     ngOnInit(): void {
         this.plate = this.data;

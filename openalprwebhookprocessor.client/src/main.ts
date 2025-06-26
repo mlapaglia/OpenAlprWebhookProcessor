@@ -64,9 +64,9 @@ bootstrapApplication(AppComponent, {
         ),
         DatePipe,
         provideAppInitializer(() => {
-        const initializerFn = (appInitializer)(inject(AccountService));
-        return initializerFn();
-      }),
+            const initializerFn = appInitializer(inject(AccountService));
+            return initializerFn();
+        }),
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         {

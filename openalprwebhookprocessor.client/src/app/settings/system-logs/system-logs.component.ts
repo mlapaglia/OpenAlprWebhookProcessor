@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, inject } from '@angular/core';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -16,17 +16,16 @@ import { MatButtonModule } from '@angular/material/button';
     imports: [MatButtonModule, MatCheckboxModule, ReactiveFormsModule, FormsModule, Highlight]
 })
 export class SystemLogsComponent implements AfterViewInit, OnDestroy {
+    private signalRHub = inject(SignalrService);
+    private systemLogsService = inject(SystemLogsService);
+    private snackBarService = inject(SnackbarService);
+
     public logMessages: string[];
     public logMessagesDisplay: string = '';
     public onlyFailedPlateGroups: boolean = false;
     public isPurging: boolean = false;
 
     private subscriptions = new Subscription();
-
-    constructor(
-        private signalRHub: SignalrService,
-        private systemLogsService: SystemLogsService,
-        private snackBarService: SnackbarService) { }
 
     ngAfterViewInit(): void {
         this.populateLogs();

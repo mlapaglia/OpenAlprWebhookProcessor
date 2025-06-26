@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Alert } from './alerts/alert';
 import { Camera } from './cameras/camera';
@@ -11,8 +11,8 @@ import { AgentStatus } from './openalpr-agent/agentStatus';
     providedIn: 'root'
 })
 export class SettingsService {
-  
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     getCameras(): Observable<Camera[]> {
         return this.http.get<Camera[]>('/api/cameras');

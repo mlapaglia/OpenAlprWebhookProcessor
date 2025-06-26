@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { AccountService } from 'app/_services';
 import { User } from 'app/_models';
@@ -12,9 +12,10 @@ import { MatTableModule } from '@angular/material/table';
     imports: [RouterLink, RouterModule, MatButtonModule, MatTableModule]
 })
 export class UsersComponent implements OnInit {
+    private accountService = inject(AccountService);
+
     users: User[] = [];
     public displayedColumns: string[] = ['firstName', 'lastName', 'username', 'actions'];
-    constructor(private accountService: AccountService) {}
 
     ngOnInit() {
         this.accountService.getAll()

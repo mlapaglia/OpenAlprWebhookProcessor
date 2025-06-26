@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AccountService } from './_services';
 import { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
@@ -21,6 +21,11 @@ import { Subscription } from 'rxjs';
     imports: [MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
+    private signalRService = inject(SignalrService);
+    private accountService = inject(AccountService);
+    private swUpdate = inject(SwUpdate);
+    private pushSubscriberService = inject(PushSubscriberService);
+
     user: User;
     appSettingsVisible: boolean;
     menuButtonVisible: boolean;
@@ -41,11 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     private eventSubscriptions = new Subscription();
     
-    constructor(
-        private signalRService: SignalrService,
-        private accountService: AccountService,
-        private swUpdate: SwUpdate,
-        private pushSubscriberService: PushSubscriberService) {
+    constructor() {
         this.accountService.user.subscribe(x => {
             this.topBarVisible = x.id !== undefined;
         });

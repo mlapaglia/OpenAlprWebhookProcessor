@@ -20,7 +20,7 @@ export class ThemeStorage {
         try {
             window.localStorage[ThemeStorage.storageKey] = theme.name;
         } catch {
-            undefined; 
+            // ignore
         }
 
         this.onThemeUpdate.emit(theme);
@@ -38,7 +38,7 @@ export class ThemeStorage {
         try {
             window.localStorage.removeItem(ThemeStorage.storageKey);
         } catch {
-            undefined; 
+            // ignore
         }
     }
 }

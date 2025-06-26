@@ -10,9 +10,9 @@ describe('CamerasComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-    imports: [CamerasComponent],
-    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
-}).compileComponents();
+            imports: [CamerasComponent],
+            providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+        }).compileComponents();
     });
 
     beforeEach(() => {

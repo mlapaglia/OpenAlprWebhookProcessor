@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { CameraMaskService } from './camera-mask.service';
 import { CameraMask } from './camera-mask';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -18,6 +18,9 @@ import { MatCardModule } from '@angular/material/card';
     imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, MatPaginatorModule]
 })
 export class CameraMaskComponent implements OnInit {
+    private snackbarService = inject(SnackbarService);
+    private cameraMaskService = inject(CameraMaskService);
+
     @Input() camera: Camera;
 
     @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
@@ -47,10 +50,6 @@ export class CameraMaskComponent implements OnInit {
 
     public paginatorIndex: number = 0;
     public samplePlates: string[] = [];
-
-    constructor(
-        private snackbarService: SnackbarService,
-        private cameraMaskService: CameraMaskService) { }
 
     ngOnInit(): void {
         this.getSamplePlates();

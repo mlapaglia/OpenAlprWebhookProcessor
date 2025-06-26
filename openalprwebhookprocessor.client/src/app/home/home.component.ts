@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { User } from 'app/_models';
 import { AccountService } from 'app/_services';
 import { HomeService } from './home.service';
@@ -10,13 +10,14 @@ import { MatCardModule } from '@angular/material/card';
     imports: [MatCardModule, BarChartModule]
 })
 export class HomeComponent implements OnInit {
+    private accountService = inject(AccountService);
+    private homeService = inject(HomeService);
+
     user: User;
     public plateCounts: { name: Date; value: number }[];
 
     view: [number, number] = [700, 400];
-    constructor(
-        private accountService: AccountService,
-        private homeService: HomeService) {
+    constructor() {
         this.user = this.accountService.userValue;
     }
     

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ZoomFocus } from './zoomfocus';
 
@@ -7,8 +7,8 @@ import { ZoomFocus } from './zoomfocus';
     providedIn: 'root'
 })
 export class EditCameraService {
-  
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
+
 
     triggerDayMode(cameraId: string) {
         return this.http.post(`/api/cameras/${cameraId}/test/day`, null);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Alert } from './alert';
 import { AlertsService } from './alerts.service';
@@ -18,10 +18,10 @@ import { PushoverComponent } from './pushover/pushover.component';
     imports: [PushoverComponent, WebpushComponent, MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class AlertsComponent implements OnInit {
+    private alertsService = inject(AlertsService);
+
     public alerts: MatTableDataSource<Alert>;
     public isSaving: boolean = false;
-
-    constructor(private alertsService: AlertsService) { }
 
     public rowsToDisplay = [
         'plateNumber',
