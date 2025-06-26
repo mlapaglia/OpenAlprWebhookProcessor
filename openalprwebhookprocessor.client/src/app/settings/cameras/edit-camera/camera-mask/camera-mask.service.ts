@@ -1,33 +1,32 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CameraMask } from './camera-mask';
-import { Coordinate } from './coordinate';
+import { HttpClient } from '@angular/common/http'
+import { Injectable, inject } from '@angular/core'
+import { Observable } from 'rxjs'
+import { CameraMask } from './camera-mask'
+import { Coordinate } from './coordinate'
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class CameraMaskService {
-    private http = inject(HttpClient);
+  private http = inject(HttpClient)
 
+  getCameraSnapshot(cameraId: string): Observable<Blob> {
+    return this.http.get<Blob>(`/api/images/${cameraId}/snapshot`)
+  }
 
-    getCameraSnapshot(cameraId: string): Observable<Blob> {
-        return this.http.get<Blob>(`/api/images/${cameraId}/snapshot`);
-    }
+  getPlateCaptures(cameraId: string): Observable<string[]> {
+    return this.http.get<string[]>(`/api/cameras/${cameraId}/plateCaptures`)
+  }
 
-    getPlateCaptures(cameraId: string): Observable<string[]> {
-        return this.http.get<string[]>(`/api/cameras/${cameraId}/plateCaptures`);
-    }
+  getPlateCapture(imageUrl: string): Observable<Blob> {
+    return this.http.get<Blob>(imageUrl, { responseType: 'blob' as 'json' })
+  }
 
-    getPlateCapture(imageUrl: string): Observable<Blob> {
-        return this.http.get<Blob>(imageUrl, { responseType: 'blob' as 'json' });
-    }
+  getCameraMaskCoordinates(cameraId: string): Observable<Coordinate[]> {
+    return this.http.get<Coordinate[]>(`/api/cameras/${cameraId}/mask/coordinates`)
+  }
 
-    getCameraMaskCoordinates(cameraId: string): Observable<Coordinate[]> {
-        return this.http.get<Coordinate[]>(`/api/cameras/${cameraId}/mask/coordinates`);
-    }
-
-    upsertImageMask(imageMask: CameraMask) {
-        return this.http.post(`/api/cameras/${imageMask.cameraId}/mask`, imageMask);
-    }
+  upsertImageMask(imageMask: CameraMask) {
+    return this.http.post(`/api/cameras/${imageMask.cameraId}/mask`, imageMask)
+  }
 }

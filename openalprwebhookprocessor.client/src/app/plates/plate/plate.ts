@@ -1,41 +1,41 @@
 export class Plate {
-    id: string;
-    
-    openAlprCameraId: number;
+  id: string
 
-    vehicleDescription: string;
+  openAlprCameraId: number
 
-    plateNumber: string;
+  vehicleDescription: string
 
-    region: string;
-    
-    possiblePlateNumbers: string;
+  plateNumber: string
 
-    openAlprProcessingTimeMs: number;
+  region: string
 
-    processedPlateConfidence: number;
+  possiblePlateNumbers: string
 
-    isAlert: boolean;
+  openAlprProcessingTimeMs: number
 
-    isIgnore: boolean;
+  processedPlateConfidence: number
 
-    isOpen: boolean;
+  isAlert: boolean
 
-    alertDescription: string;
+  isIgnore: boolean
 
-    receivedOn: Date;
+  isOpen: boolean
 
-    direction: number;
+  alertDescription: string
 
-    imageUrl: URL;
+  receivedOn: Date
 
-    cropImageUrl: URL;
+  direction: number
 
-    notes: string;
+  imageUrl: URL
 
-    canBeEnriched: boolean;
+  cropImageUrl: URL
 
-    constructor(init?: Partial<Plate>) {
-        Object.assign(this, init);
-    }
+  notes: string
+
+  canBeEnriched: boolean
+
+  constructor(init?: Partial<Plate>) {
+    Object.assign(this, init)
+  }
 }

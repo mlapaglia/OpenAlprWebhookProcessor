@@ -1,64 +1,64 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Forward } from './forward';
-import { ForwardsService } from './forwards.service';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { Component, OnInit, inject } from '@angular/core'
+import { MatTableDataSource, MatTableModule } from '@angular/material/table'
+import { Forward } from './forward'
+import { ForwardsService } from './forwards.service'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'
+import { MatInputModule } from '@angular/material/input'
+import { MatFormFieldModule } from '@angular/material/form-field'
 
 @Component({
-    selector: 'app-forwards',
-    templateUrl: './forwards.component.html',
-    styleUrls: ['./forwards.component.less'],
-    imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule]
+  selector: 'app-forwards',
+  templateUrl: './forwards.component.html',
+  styleUrls: ['./forwards.component.less'],
+  imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule],
 })
 export class ForwardsComponent implements OnInit {
-    private forwardsService = inject(ForwardsService);
+  private forwardsService = inject(ForwardsService)
 
-    public forwards: MatTableDataSource<Forward>;
-    public isSaving: boolean = false;
+  public forwards: MatTableDataSource<Forward>
+  public isSaving = false
 
-    public rowsToDisplay = [
-        'destination',
-        'forwardSinglePlates',
-        'forwardGroupPreviews',
-        'forwardGroups',
-        'ignoreSslErrors',
-        'delete'
-    ];
+  public rowsToDisplay = [
+    'destination',
+    'forwardSinglePlates',
+    'forwardGroupPreviews',
+    'forwardGroups',
+    'ignoreSslErrors',
+    'delete',
+  ]
 
-    ngOnInit(): void {
-        this.getForwards();
-    }
+  ngOnInit(): void {
+    this.getForwards()
+  }
 
-    private getForwards() {
-        this.forwardsService.getForwards().subscribe(result => {
-            this.forwards = new MatTableDataSource<Forward>(result);
-        });
-    }
+  private getForwards() {
+    this.forwardsService.getForwards().subscribe((result) => {
+      this.forwards = new MatTableDataSource<Forward>(result)
+    })
+  }
 
-    public saveForwards() {
-        this.isSaving = true;
-        this.forwardsService.upsertForwards(this.forwards.data).subscribe(() => {
-            this.getForwards();
-            this.isSaving = false;
-        });
-    }
+  public saveForwards() {
+    this.isSaving = true
+    this.forwardsService.upsertForwards(this.forwards.data).subscribe(() => {
+      this.getForwards()
+      this.isSaving = false
+    })
+  }
 
-    public addForward() {
-        this.forwards.data.push(new Forward());
-        this.forwards._updateChangeSubscription();
-    }
+  public addForward() {
+    this.forwards.data.push(new Forward())
+    this.forwards._updateChangeSubscription()
+  }
 
-    public deleteForward(forward: Forward) {
-        this.forwards.data.forEach((item, index) => {
-            if (item === forward) {
-                this.forwards.data.splice(index, 1);
-            }
-        });
+  public deleteForward(forward: Forward) {
+    this.forwards.data.forEach((item, index) => {
+      if (item === forward) {
+        this.forwards.data.splice(index, 1)
+      }
+    })
 
-        this.forwards._updateChangeSubscription();
-    }
+    this.forwards._updateChangeSubscription()
+  }
 }
