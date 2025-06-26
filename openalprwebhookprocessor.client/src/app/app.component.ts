@@ -18,7 +18,6 @@ import { Subscription } from 'rxjs';
     selector: 'app-app',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.css'],
-    standalone: true,
     imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {

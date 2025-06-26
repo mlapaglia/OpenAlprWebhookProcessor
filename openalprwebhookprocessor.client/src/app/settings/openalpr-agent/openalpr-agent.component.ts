@@ -23,7 +23,6 @@ import { NgIf, NgStyle } from '@angular/common';
     selector: 'app-openalpr-agent',
     templateUrl: './openalpr-agent.component.html',
     styleUrls: ['./openalpr-agent.component.less'],
-    standalone: true,
     imports: [NgIf, MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {

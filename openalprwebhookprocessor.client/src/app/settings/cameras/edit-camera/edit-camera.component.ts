@@ -33,7 +33,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
             ])
         ])
     ],
-    standalone: true,
     imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, NgIf, MatButtonModule, CameraMaskComponent]
 })
 export class EditCameraComponent implements OnInit {

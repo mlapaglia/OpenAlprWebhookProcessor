@@ -31,7 +31,6 @@ import { NgIf } from '@angular/common';
             ])
         ])
     ],
-    standalone: true,
     imports: [NgIf, MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatRadioModule, MatButtonModule]
 })
 export class EnrichersComponent implements OnInit {

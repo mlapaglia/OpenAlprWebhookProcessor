@@ -13,7 +13,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     selector: 'app-ignores',
     templateUrl: './ignores.component.html',
     styleUrls: ['./ignores.component.less'],
-    standalone: true,
     imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class IgnoresComponent implements OnInit {

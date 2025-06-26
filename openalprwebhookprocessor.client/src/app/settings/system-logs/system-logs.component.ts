@@ -13,7 +13,6 @@ import { MatButtonModule } from '@angular/material/button';
     selector: 'app-logs',
     templateUrl: './system-logs.component.html',
     styleUrls: ['./system-logs.component.less'],
-    standalone: true,
     imports: [MatButtonModule, MatCheckboxModule, ReactiveFormsModule, FormsModule, Highlight]
 })
 export class SystemLogsComponent implements AfterViewInit, OnDestroy {

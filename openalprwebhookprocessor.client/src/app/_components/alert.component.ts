@@ -8,7 +8,6 @@ import { NgFor } from '@angular/common';
 @Component({
     selector: 'app-alert',
     templateUrl: 'alert.component.html',
-    standalone: true,
     imports: [NgFor]
 })
 export class AlertComponent implements OnInit, OnDestroy {

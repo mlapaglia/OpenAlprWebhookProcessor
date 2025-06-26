@@ -15,7 +15,6 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-camera-mask',
     templateUrl: './camera-mask.component.html',
     styleUrls: ['./camera-mask.component.css'],
-    standalone: true,
     imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, NgIf, MatPaginatorModule]
 })
 export class CameraMaskComponent implements OnInit {

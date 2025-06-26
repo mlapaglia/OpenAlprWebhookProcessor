@@ -12,7 +12,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     selector: 'app-forwards',
     templateUrl: './forwards.component.html',
     styleUrls: ['./forwards.component.less'],
-    standalone: true,
     imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule]
 })
 export class ForwardsComponent implements OnInit {

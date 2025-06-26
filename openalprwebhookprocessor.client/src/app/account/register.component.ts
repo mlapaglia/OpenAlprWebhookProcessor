@@ -12,7 +12,6 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     templateUrl: 'register.component.html',
-    standalone: true,
     imports: [ReactiveFormsModule, NgClass, NgIf, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class RegisterComponent implements OnInit {

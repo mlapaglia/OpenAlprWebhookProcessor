@@ -13,7 +13,6 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
     selector: 'app-login',
     templateUrl: 'login.component.html',
-    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class LoginComponent implements OnInit {

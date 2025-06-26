@@ -9,7 +9,6 @@ import { MatTableModule } from '@angular/material/table';
 
 @Component({
     templateUrl: 'users.component.html',
-    standalone: true,
     imports: [CommonModule, RouterLink, RouterModule, NgFor, NgIf, MatButtonModule, MatTableModule]
 })
 export class UsersComponent implements OnInit {

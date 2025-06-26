@@ -10,7 +10,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     selector: 'app-edit-plate',
     templateUrl: './edit-plate.component.html',
     styleUrls: ['./edit-plate.component.less'],
-    standalone: true,
     imports: [MatDialogModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class EditPlateComponent implements OnInit {

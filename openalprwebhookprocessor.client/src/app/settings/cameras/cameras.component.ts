@@ -11,7 +11,6 @@ import { MatGridListModule } from '@angular/material/grid-list';
     selector: 'app-cameras',
     templateUrl: './cameras.component.html',
     styleUrls: ['./cameras.component.less'],
-    standalone: true,
     imports: [MatGridListModule, NgFor, CameraComponent, MatDialogModule]
 })
 export class CamerasComponent implements OnInit {

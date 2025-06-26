@@ -31,7 +31,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
             ])
         ])
     ],
-    standalone: true,
     imports: [NgIf, MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatButtonModule, MatCheckboxModule]
 })
 export class WebpushComponent implements OnInit {

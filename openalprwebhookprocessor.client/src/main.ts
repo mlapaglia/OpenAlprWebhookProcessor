@@ -1,4 +1,4 @@
-import { enableProdMode, APP_INITIALIZER, isDevMode, importProvidersFrom } from '@angular/core';
+import { enableProdMode, isDevMode, importProvidersFrom, inject, provideAppInitializer } from '@angular/core';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -63,7 +63,10 @@ bootstrapApplication(AppComponent, {
             })
         ),
         DatePipe,
-        { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AccountService] },
+        provideAppInitializer(() => {
+        const initializerFn = (appInitializer)(inject(AccountService));
+        return initializerFn();
+      }),
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
         {

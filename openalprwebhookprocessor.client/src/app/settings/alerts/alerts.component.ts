@@ -15,7 +15,6 @@ import { PushoverComponent } from './pushover/pushover.component';
     selector: 'app-alerts',
     templateUrl: './alerts.component.html',
     styleUrls: ['./alerts.component.less'],
-    standalone: true,
     imports: [PushoverComponent, WebpushComponent, MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule]
 })
 export class AlertsComponent implements OnInit {

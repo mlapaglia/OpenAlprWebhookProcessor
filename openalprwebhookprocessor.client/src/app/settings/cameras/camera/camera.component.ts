@@ -11,7 +11,6 @@ import { NgIf, DatePipe } from '@angular/common';
     selector: 'app-camera',
     templateUrl: './camera.component.html',
     styleUrls: ['./camera.component.less'],
-    standalone: true,
     imports: [NgIf, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTooltipModule, MatButtonModule, DatePipe]
 })
 export class CameraComponent implements OnInit {

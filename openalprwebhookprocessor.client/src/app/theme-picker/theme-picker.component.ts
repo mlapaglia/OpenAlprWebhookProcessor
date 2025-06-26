@@ -27,7 +27,6 @@ import { MatListModule } from '@angular/material/list';
     styleUrls: ['./theme-picker.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
-    standalone: true,
     imports: [CommonModule, MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, NgFor, MatRadioModule, MatListModule]
 })
 export class ThemePickerComponent implements OnInit, OnDestroy {

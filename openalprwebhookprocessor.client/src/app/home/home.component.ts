@@ -7,7 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 
 @Component({
     templateUrl: 'home.component.html',
-    standalone: true,
     imports: [MatCardModule, BarChartModule]
 })
 export class HomeComponent implements OnInit {

@@ -8,7 +8,6 @@ import { SnackBar } from './snackbar';
     selector: 'app-snackbar',
     templateUrl: './snackbar.component.html',
     styleUrls: ['./snackbar.component.less'],
-    standalone: true,
     imports: [MatIconModule]
 })
 export class SnackbarComponent {

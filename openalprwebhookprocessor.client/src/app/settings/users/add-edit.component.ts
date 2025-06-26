@@ -11,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     templateUrl: 'add-edit.component.html',
-    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class AddEditComponent implements OnInit {

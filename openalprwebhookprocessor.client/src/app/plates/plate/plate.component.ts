@@ -21,7 +21,6 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-plate',
     templateUrl: './plate.component.html',
     styleUrls: ['./plate.component.less'],
-    standalone: true,
     imports: [CommonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
