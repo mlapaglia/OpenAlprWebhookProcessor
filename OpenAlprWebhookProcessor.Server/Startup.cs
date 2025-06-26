@@ -1,55 +1,36 @@
 using AutoMapper;
 using Hangfire;
+using Lib.Net.Http.WebPush;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.ImageRelay;
-using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
-using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
-using OpenAlprWebhookProcessor.SystemLogs;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.Settings;
-using OpenAlprWebhookProcessor.Settings.GetIgnores;
-using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
-using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
+using OpenAlprWebhookProcessor.SystemLogs;
 using OpenAlprWebhookProcessor.Users;
 using OpenAlprWebhookProcessor.Users.Data;
 using OpenAlprWebhookProcessor.Users.Register;
 using OpenAlprWebhookProcessor.WebhookProcessor;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Serilog;
 using System;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System.IO;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
-using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
-using OpenAlprWebhookProcessor.Settings.AgentHydration;
-using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
-using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
-using OpenAlprWebhookProcessor.Settings.Enrichers;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
-using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
-using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
-using Lib.Net.Http.WebPush;
-using OpenAlprWebhookProcessor.Alerts.WebPush;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
-using OpenAlprWebhookProcessor.Cameras.GetPlateCaptures;
-using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -148,52 +129,16 @@ namespace OpenAlprWebhookProcessor
             services.AddDbContext<UsersContext>(options =>
                 options.UseSqlite(UsersContextConnectionString));
 
-            services.AddScoped<GroupWebhookHandler>();
-            services.AddScoped<SinglePlateWebhookHandler>();
-            services.AddScoped<GetAgentRequestHandler>();
-            services.AddScoped<GetAgentStatusRequestHandler>();
-            services.AddScoped<GetCameraRequestHandler>();
-            services.AddScoped<SetZoomAndFocusHandler>();
-            services.AddScoped<GetZoomAndFocusHandler>();
-            services.AddScoped<DeleteCameraHandler>();
-            services.AddScoped<UpsertIgnoresRequestHandler>();
-            services.AddScoped<TestCameraHandler>();
-            services.AddScoped<UpsertAgentRequestHandler>();
-            services.AddScoped<GetAlertsRequestHandler>();
-            services.AddScoped<GetIgnoresRequestHandler>();
-            services.AddScoped<UpsertCameraHandler>();
-            services.AddScoped<SearchLicensePlateHandler>();
-            services.AddScoped<UpsertAlertsRequestHandler>();
-            services.AddScoped<GetSnapshotHandler>();
-            services.AddScoped<GetLicensePlateCountsHandler>();
-            services.AddScoped<DeleteLicensePlateGroupRequestHandler>();
-            services.AddScoped<GetWebhookForwardsRequestHandler>();
-            services.AddScoped<UpsertWebhookForwardsRequestHandler>();
-            services.AddScoped<OpenAlprAgentScraper>();
-            services.AddScoped<GetLicensePlateFiltersHandler>();
-            services.AddScoped<AgentScrapeRequestHandler>();
-            services.AddScoped<GetStatisticsHandler>();
-            services.AddScoped<UpsertPlateRequestHandler>();
-            services.AddScoped<UpsertPushoverClientRequestHandler>();
-            services.AddScoped<GetPushoverClientRequestHandler>();
-            services.AddScoped<TestPushoverClientRequestHandler>();
-            services.AddScoped<GetEnrichersRequestHandler>();
-            services.AddScoped<UpsertEnricherRequestHandler>();
-            services.AddScoped<TestEnricherRequestHandler>();
-            services.AddScoped<EnrichLicensePlateRequestHandler>();
-            services.AddScoped<GetDebugPlateGroupRequestHandler>();
-            services.AddScoped<DeleteDebugPlateGroupRequestHandler>();
-            services.AddScoped<TriggerAutofocusHandler>();
-            services.AddScoped<UpsertCameraMaskHandler>();
-            services.AddScoped<GetCameraMaskHandler>();
-            services.AddScoped<DisableAgentRequestHandler>();
-            services.AddScoped<EnableAgentRequestHandler>();
-            services.AddScoped<GetPlateCapturesHandler>();
-            services.AddScoped<GetPlateHandler>();
+            var handlerTypes = Assembly.GetExecutingAssembly()
+             .GetTypes()
+             .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Handler"));
 
-            services.AddScoped<UpsertWebPushClientRequestHandler>();
-            services.AddScoped<GetWebPushClientRequestHandler>();
-            services.AddScoped<TestWebPushClientRequestHandler>();
+            foreach (var handlerType in handlerTypes)
+            {
+                services.TryAddScoped(handlerType);
+            }
+
+            services.AddScoped<OpenAlprAgentScraper>();
 
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
 

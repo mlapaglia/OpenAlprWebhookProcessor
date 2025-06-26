@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
 using OpenAlprWebhookProcessor.LicensePlates.Enricher;
 using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.LicensePlates.GetMostSeenPlates;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
 using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
@@ -23,6 +24,8 @@ namespace OpenAlprWebhookProcessor.LicensePlates
 
         private readonly GetLicensePlateCountsHandler _getLicensePlateCountsHandler;
 
+        private readonly GetMostSeenPlatesHandler _getMostSeenPlatesHandler;
+
         private readonly DeleteLicensePlateGroupRequestHandler _deleteLicensePlateGroupHandler;
 
         private readonly GetLicensePlateFiltersHandler _getLicensePlateFiltersHandler;
@@ -38,6 +41,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         public LicensePlatesController(
             SearchLicensePlateHandler searchLicensePlateHandler,
             GetLicensePlateCountsHandler getLicensePlateCountsHandler,
+            GetMostSeenPlatesHandler getMostSeenPlatesHandler,
             DeleteLicensePlateGroupRequestHandler deleteLicensePlateGroupHandler,
             GetLicensePlateFiltersHandler getLicensePlateFiltersHandler,
             GetStatisticsHandler getStatisticsHandler,
@@ -47,6 +51,7 @@ namespace OpenAlprWebhookProcessor.LicensePlates
         {
             _searchLicensePlateHandler = searchLicensePlateHandler;
             _getLicensePlateCountsHandler = getLicensePlateCountsHandler;
+            _getMostSeenPlatesHandler = getMostSeenPlatesHandler;
             _deleteLicensePlateGroupHandler = deleteLicensePlateGroupHandler;
             _getLicensePlateFiltersHandler = getLicensePlateFiltersHandler;
             _getStatisticsHandler = getStatisticsHandler;
@@ -99,6 +104,16 @@ namespace OpenAlprWebhookProcessor.LicensePlates
             var request = new GetLicensePlateCountsRequest();
 
             return await _getLicensePlateCountsHandler.HandleAsync(
+                request,
+                cancellationToken);
+        }
+
+        [HttpGet("mostseen")]
+        public async Task<GetMostSeenPlatesResponse> GetMostSeenPlates(CancellationToken cancellationToken)
+        {
+            var request = new GetMostSeenPlatesRequest();
+
+            return await _getMostSeenPlatesHandler.HandleAsync(
                 request,
                 cancellationToken);
         }

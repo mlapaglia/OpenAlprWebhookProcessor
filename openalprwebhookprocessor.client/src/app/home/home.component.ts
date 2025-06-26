@@ -15,6 +15,7 @@ export class HomeComponent implements OnInit {
 
   user: User
   public plateCounts: { name: Date, value: number }[]
+  public mostSeenCounts: { name: string, value: number }[]
 
   view: [number, number] = [700, 400]
   constructor() {
@@ -33,6 +34,18 @@ export class HomeComponent implements OnInit {
           })
       })
     })
+
+    this.homeService.getMostSeenPlates().subscribe((result) => {
+      this.mostSeenCounts = []
+
+      result.counts.forEach((x) => {
+        this.mostSeenCounts.push(
+          {
+            name: x.plateNumber,
+            value: x.count,
+          })
+      })
+    })
   }
 
   // options
@@ -40,7 +53,7 @@ export class HomeComponent implements OnInit {
   showYAxis = true
   gradient = false
   showLegend = false
-  showXAxisLabel = true
+  showXAxisLabel = false
   xAxisLabel = 'Date'
   showYAxisLabel = true
   yAxisLabel = 'Plates Seen'

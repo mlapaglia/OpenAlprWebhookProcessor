@@ -70,8 +70,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     agent.EndpointUrl
                     + scrapeUrl
                         .Replace("{0}", agent.LastSuccessfulScrapeEpoch.ToString())
-                        .Replace("{1}", agent.LastSuccessfulScrapeEpoch + millisecondsToScrape.ToString()),
-                    cancellationToken);
+                        .Replace("{1}", (agent.LastSuccessfulScrapeEpoch + millisecondsToScrape).ToString()),
+                    cancellationToken);     
 
                 timer.Stop();
                 _logger.LogInformation("Scraping took {seconds} seconds", timer.Elapsed.Seconds);
