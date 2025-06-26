@@ -50,6 +50,7 @@ using OpenAlprWebhookProcessor.Alerts.WebPush;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using OpenAlprWebhookProcessor.Cameras.GetPlateCaptures;
 using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
+using OpenAlprWebhookProcessor.LicensePlates.GetMostSeenPlates;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -190,6 +191,7 @@ namespace OpenAlprWebhookProcessor
             services.AddScoped<EnableAgentRequestHandler>();
             services.AddScoped<GetPlateCapturesHandler>();
             services.AddScoped<GetPlateHandler>();
+            services.AddScoped<GetMostSeenPlatesHandler>();
 
             services.AddScoped<UpsertWebPushClientRequestHandler>();
             services.AddScoped<GetWebPushClientRequestHandler>();
