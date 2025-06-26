@@ -1,6 +1,6 @@
-import { Plate } from './plate';
+import { Plate } from './plate'
 
 export interface PlateResponse {
-    plates: Plate[];
-    totalCount: number;
+  plates: Plate[]
+  totalCount: number
 }

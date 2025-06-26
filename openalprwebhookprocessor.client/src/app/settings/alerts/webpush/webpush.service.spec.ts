@@ -1,19 +1,21 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-import { WebpushService } from './webpush.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WebpushService } from './webpush.service'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe('WebpushService', () => {
-    let service: WebpushService;
+  let service: WebpushService
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule]
-        });
-        service = TestBed.inject(WebpushService);
-    });
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
+    })
+    service = TestBed.inject(WebpushService)
+  })
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
-    });
-});
+  it('should be created', () => {
+    expect(service).toBeTruthy()
+  })
+})

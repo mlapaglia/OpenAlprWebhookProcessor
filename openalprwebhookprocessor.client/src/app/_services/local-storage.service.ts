@@ -1,23 +1,19 @@
-// eslint-disable-next-line @stylistic/ts/quotes
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class LocalStorageService {
+  public setData(key: string, data) {
+    const jsonData = JSON.stringify(data)
+    localStorage.setItem(key, jsonData)
+  }
 
-    constructor() { }
+  public getData(key: string): string {
+    return localStorage.getItem(key) || ''
+  }
 
-    public setData(key: string, data) {
-        const jsonData = JSON.stringify(data);
-        localStorage.setItem(key, jsonData);
-    }
-
-    public getData(key: string): string {
-        return   localStorage.getItem(key) || '';
-    }
-
-    removeData(key: string) {
-        localStorage.removeItem(key);
-    }
+  removeData(key: string) {
+    localStorage.removeItem(key)
+  }
 }

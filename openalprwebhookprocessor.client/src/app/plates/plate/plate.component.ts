@@ -1,205 +1,203 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { SnackbarService } from 'app/snackbar/snackbar.service';
-import { SnackBarType } from 'app/snackbar/snackbartype';
-import { Lightbox } from 'ngx-lightbox';
-import { PlateService } from '../plate.service';
-import { Plate } from './plate';
-import { PlateStatisticsData } from './plateStatistics';
-import { Subscription } from 'rxjs';
-import { MatButtonModule } from '@angular/material/button';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { TextFieldModule } from '@angular/cdk/text-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCardModule } from '@angular/material/card';
+import { DatePipe } from '@angular/common'
+import { Component, Input, OnChanges, OnDestroy, OnInit, inject } from '@angular/core'
+import { SnackbarService } from 'app/snackbar/snackbar.service'
+import { SnackBarType } from 'app/snackbar/snackbartype'
+import { Lightbox } from 'ngx-lightbox'
+import { PlateService } from '../plate.service'
+import { Plate } from './plate'
+import { PlateStatisticsData } from './plateStatistics'
+import { Subscription } from 'rxjs'
+import { MatButtonModule } from '@angular/material/button'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'
+import { TextFieldModule } from '@angular/cdk/text-field'
+import { MatInputModule } from '@angular/material/input'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatTableModule } from '@angular/material/table'
+import { MatIconModule } from '@angular/material/icon'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatCardModule } from '@angular/material/card'
 
 @Component({
-    selector: 'app-plate',
-    templateUrl: './plate.component.html',
-    styleUrls: ['./plate.component.less'],
-    standalone: true,
-    imports: [CommonModule, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule]
+  selector: 'app-plate',
+  templateUrl: './plate.component.html',
+  styleUrls: ['./plate.component.less'],
+  imports: [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule],
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
-    @Input() plate: Plate;
-    @Input() isVisible: boolean;
+  private lightbox = inject(Lightbox)
+  private plateService = inject(PlateService)
+  private datePipe = inject(DatePipe)
+  private snackbarService = inject(SnackbarService)
 
-    public isInitialized: boolean;
+  @Input() plate: Plate
+  @Input() isVisible: boolean
 
-    public loadingVehicleImage: boolean;
-    public vehicleImageUrl: string;
-    public loadingVehicleImageFailed: boolean;
+  public isInitialized: boolean
 
-    public loadingPlateImage: boolean;
-    public loadingPlateImageFailed: boolean;
-    public plateImageUrl: string;
+  public loadingVehicleImage: boolean
+  public vehicleImageUrl: string
+  public loadingVehicleImageFailed: boolean
 
-    public loadingStatistics: boolean;
-    public loadingStatisticsFailed: boolean;
-    public isSavingNotes: boolean;
+  public loadingPlateImage: boolean
+  public loadingPlateImageFailed: boolean
+  public plateImageUrl: string
 
-    public plateStatistics: PlateStatisticsData[] = [];
-    public displayedColumns: string[] = ['key', 'value'];
+  public loadingStatistics: boolean
+  public loadingStatisticsFailed: boolean
+  public isSavingNotes: boolean
 
-    private statisticsSubscription = new Subscription();
+  public plateStatistics: PlateStatisticsData[] = []
+  public displayedColumns: string[] = ['key', 'value']
 
-    constructor(
-        private lightbox: Lightbox,
-        private plateService: PlateService,
-        private datePipe: DatePipe,
-        private snackbarService: SnackbarService
-    ) { }
+  private statisticsSubscription = new Subscription()
 
-    ngOnInit(): void {
-        this.loadingVehicleImage = true;
-        this.loadingPlateImage = true;
-        this.getPlateStatistics();
-        this.getPlateImages();
-        this.isInitialized = true;
-    }
+  ngOnInit(): void {
+    this.loadingVehicleImage = true
+    this.loadingPlateImage = true
+    this.getPlateStatistics()
+    this.getPlateImages()
+    this.isInitialized = true
+  }
 
-    ngOnChanges(): void {
-        if (this.isInitialized) {
-            if (!this.isVisible) {
-                this.loadingStatistics = false;
-                this.loadingStatisticsFailed = false;
-                this.statisticsSubscription.unsubscribe();
+  ngOnChanges(): void {
+    if (this.isInitialized) {
+      if (!this.isVisible) {
+        this.loadingStatistics = false
+        this.loadingStatisticsFailed = false
+        this.statisticsSubscription.unsubscribe()
 
-                if (this.loadingVehicleImage) {
-                    this.vehicleImageUrl = '';
-                }
-
-                if (this.loadingPlateImage) {
-                    this.plateImageUrl = '';
-                }
-            } else {
-                if (this.plateStatistics.length == 0) {
-                    this.getPlateStatistics();
-                }
-        
-                this.getPlateImages();
-            }
+        if (this.loadingVehicleImage) {
+          this.vehicleImageUrl = ''
         }
-    }
 
-    ngOnDestroy(): void {
-        this.statisticsSubscription.unsubscribe();
-        this.vehicleImageUrl = '';
-        this.plateImageUrl = '';
-    }
-
-    private getPlateStatistics() {
-        this.loadingStatistics = true;
-        this.statisticsSubscription.closed = false;
-        this.statisticsSubscription.add(this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe(result => {
-            this.loadingStatistics = false;
-            this.loadingStatisticsFailed = false;
-
-            this.plateStatistics.push({
-                key: 'Confidence',
-                value: this.plate.processedPlateConfidence + '%'
-            });
-
-            this.plateStatistics.push({
-                key: 'Seen past 90 days',
-                value: result.last90Days.toString()
-            });
-
-            this.plateStatistics.push({
-                key: 'Total Seen',
-                value: result.totalSeen.toString()
-            });
-
-            this.plateStatistics.push({
-                key: 'First seen',
-                value: this.datePipe.transform(result.firstSeen, 'medium') || ''
-            });
-
-            this.plateStatistics.push({
-                key: 'Last seen',
-                value: this.datePipe.transform(result.lastSeen, 'medium') || ''
-            });
-
-            this.plateStatistics.push({
-                key: 'Processing time',
-                value: this.plate.openAlprProcessingTimeMs.toString() + 'ms'
-            });
-
-            this.plateStatistics.push({
-                key: 'Possible plates',
-                value: this.plate.possiblePlateNumbers
-            });
-
-            this.plateStatistics.push({
-                key: 'Region',
-                value: this.plate.region
-            });
-        },
-        () => {
-            this.loadingStatistics = false;
-            this.loadingStatisticsFailed = true;
-        }));
-    }
-
-    private getPlateImages() {
-        if (!this.vehicleImageUrl) {
-            this.loadingVehicleImage = true;
-            this.loadingVehicleImageFailed = false;
-            this.vehicleImageUrl = this.plate.imageUrl.toString();
+        if (this.loadingPlateImage) {
+          this.plateImageUrl = ''
         }
-    
-        if (!this.plateImageUrl) {
-            this.loadingPlateImage = true;
-            this.loadingPlateImageFailed = false;
-            this.plateImageUrl = this.plate.cropImageUrl.toString();
+      }
+      else {
+        if (this.plateStatistics.length == 0) {
+          this.getPlateStatistics()
         }
+
+        this.getPlateImages()
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.statisticsSubscription.unsubscribe()
+    this.vehicleImageUrl = ''
+    this.plateImageUrl = ''
+  }
+
+  private getPlateStatistics() {
+    this.loadingStatistics = true
+    this.statisticsSubscription.closed = false
+    this.statisticsSubscription.add(this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe((result) => {
+      this.loadingStatistics = false
+      this.loadingStatisticsFailed = false
+
+      this.plateStatistics.push({
+        key: 'Confidence',
+        value: this.plate.processedPlateConfidence + '%',
+      })
+
+      this.plateStatistics.push({
+        key: 'Seen past 90 days',
+        value: result.last90Days.toString(),
+      })
+
+      this.plateStatistics.push({
+        key: 'Total Seen',
+        value: result.totalSeen.toString(),
+      })
+
+      this.plateStatistics.push({
+        key: 'First seen',
+        value: this.datePipe.transform(result.firstSeen, 'medium') || '',
+      })
+
+      this.plateStatistics.push({
+        key: 'Last seen',
+        value: this.datePipe.transform(result.lastSeen, 'medium') || '',
+      })
+
+      this.plateStatistics.push({
+        key: 'Processing time',
+        value: this.plate.openAlprProcessingTimeMs.toString() + 'ms',
+      })
+
+      this.plateStatistics.push({
+        key: 'Possible plates',
+        value: this.plate.possiblePlateNumbers,
+      })
+
+      this.plateStatistics.push({
+        key: 'Region',
+        value: this.plate.region,
+      })
+    },
+    () => {
+      this.loadingStatistics = false
+      this.loadingStatisticsFailed = true
+    }))
+  }
+
+  private getPlateImages() {
+    if (!this.vehicleImageUrl) {
+      this.loadingVehicleImage = true
+      this.loadingVehicleImageFailed = false
+      this.vehicleImageUrl = this.plate.imageUrl.toString()
     }
 
-    public openLightbox(url: URL, plateNumber: string) {
-        const albums = [{
-            src: url.toString(),
-            caption: plateNumber,
-            thumb: url.toString()
-        }];
-
-        this.lightbox.open(albums, 0);
+    if (!this.plateImageUrl) {
+      this.loadingPlateImage = true
+      this.loadingPlateImageFailed = false
+      this.plateImageUrl = this.plate.cropImageUrl.toString()
     }
+  }
 
-    public vehicleImageLoaded() {
-        this.loadingVehicleImage = false;
-    }
+  public openLightbox(url: URL, plateNumber: string) {
+    const albums = [{
+      src: url.toString(),
+      caption: plateNumber,
+      thumb: url.toString(),
+    }]
 
-    public vehicleImageFailedToLoad() {
-        this.loadingVehicleImage = false;
-        this.loadingVehicleImageFailed = true;
-    }
+    this.lightbox.open(albums, 0)
+  }
 
-    public plateImageLoaded() {
-        this.loadingPlateImage = false;
-    }
+  public vehicleImageLoaded() {
+    this.loadingVehicleImage = false
+  }
 
-    public plateImageFailedToLoad() {
-        this.loadingPlateImage = false;
-        this.loadingPlateImageFailed = true;
-    }
+  public vehicleImageFailedToLoad() {
+    this.loadingVehicleImage = false
+    this.loadingVehicleImageFailed = true
+  }
 
-    public saveNotes() {
-        this.isSavingNotes = true;
-        this.plateService.upsertPlate(this.plate).subscribe(() => {
-            this.isSavingNotes = false;
-            this.snackbarService.create(`Notes saved for: ${this.plate.plateNumber}`, SnackBarType.Saved);
-        },
-        () => {
-            this.isSavingNotes = false;
-            this.snackbarService.create(`Failed to save notes for: ${this.plate.plateNumber}`, SnackBarType.Error);
-        });
-    }
+  public plateImageLoaded() {
+    this.loadingPlateImage = false
+  }
 
-    public clearNotes() {
-        this.plate.notes = '';
-    }
+  public plateImageFailedToLoad() {
+    this.loadingPlateImage = false
+    this.loadingPlateImageFailed = true
+  }
+
+  public saveNotes() {
+    this.isSavingNotes = true
+    this.plateService.upsertPlate(this.plate).subscribe(() => {
+      this.isSavingNotes = false
+      this.snackbarService.create(`Notes saved for: ${this.plate.plateNumber}`, SnackBarType.Saved)
+    },
+    () => {
+      this.isSavingNotes = false
+      this.snackbarService.create(`Failed to save notes for: ${this.plate.plateNumber}`, SnackBarType.Error)
+    })
+  }
+
+  public clearNotes() {
+    this.plate.notes = ''
+  }
 }

@@ -1,5 +1,5 @@
-import { Plate } from './plate';
+import { Plate } from './plate'
 
 export interface GetPlateResponse {
-    plate: Plate;
+  plate: Plate
 }

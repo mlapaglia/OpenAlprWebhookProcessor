@@ -1,125 +1,125 @@
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { User } from 'app/_models';
+import { Injectable, inject } from '@angular/core'
+import { Router } from '@angular/router'
+import { HttpClient } from '@angular/common/http'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { User } from 'app/_models'
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
-    private userSubject: BehaviorSubject<User>;
-    public user: Observable<User>;
+  private router = inject(Router)
+  private http = inject(HttpClient)
 
-    constructor(
-        private router: Router,
-        private http: HttpClient
-    ) {
-        this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user') || '{}') ?? new User);
-        this.user = this.userSubject.asObservable();
-    }
+  private userSubject: BehaviorSubject<User>
+  public user: Observable<User>
 
-    public get userValue(): User {
-        return this.userSubject.value;
-    }
+  constructor() {
+    this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user') || '{}') ?? new User())
+    this.user = this.userSubject.asObservable()
+  }
 
-    login(username: string, password: string) {
-        return this.http.post<User>('/api/users/authenticate', { username, password })
-            .pipe(map(user => {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('user', JSON.stringify(user));
-                this.userSubject.next(user);
-                this.startRefreshTokenTimer();
-                return user;
-            }));
-    }
+  public get userValue(): User {
+    return this.userSubject.value
+  }
 
-    logout() {
-        this.stopRefreshTokenTimer();
+  login(username: string, password: string) {
+    return this.http.post<User>('/api/users/authenticate', { username, password })
+      .pipe(map((user) => {
+        // store user details and jwt token in local storage to keep user logged in between page refreshes
+        localStorage.setItem('user', JSON.stringify(user))
+        this.userSubject.next(user)
+        this.startRefreshTokenTimer()
+        return user
+      }))
+  }
 
-        this.http.post<void>('/api/users/revoke-token', {}, { withCredentials: true }).subscribe(() => {
-            this.finalizeLogout();
-        },
-        () => {
-            this.finalizeLogout();
-        });
-    }
+  logout() {
+    this.stopRefreshTokenTimer()
 
-    finalizeLogout() {
-        this.userValue.jwtToken = '';
-        localStorage.removeItem('user');
-        this.router.navigate(['/account/login']);
-        this.userSubject.next(new User());
-    }
+    this.http.post<null>('/api/users/revoke-token', {}, { withCredentials: true }).subscribe(() => {
+      this.finalizeLogout()
+    },
+    () => {
+      this.finalizeLogout()
+    })
+  }
 
-    refreshToken() {
-        return this.http.post<User>('/api/users/refresh-token', {}, { withCredentials: true })
-            .pipe(map((user) => {
-                this.userSubject.next(user);
-                this.startRefreshTokenTimer();
-                return user;
-            }));
-    }
+  finalizeLogout() {
+    this.userValue.jwtToken = ''
+    localStorage.removeItem('user')
+    this.router.navigate(['/account/login'])
+    this.userSubject.next(new User())
+  }
 
-    canRegister() {
-        return this.http.get<boolean>('/api/users/canregister');
-    }
+  refreshToken() {
+    return this.http.post<User>('/api/users/refresh-token', {}, { withCredentials: true })
+      .pipe(map((user) => {
+        this.userSubject.next(user)
+        this.startRefreshTokenTimer()
+        return user
+      }))
+  }
 
-    add(user: User) {
-        return this.http.post('/api/users/add', user);
-    }
-  
-    register(user: User) {
-        return this.http.post('/api/users/register', user);
-    }
+  canRegister() {
+    return this.http.get<boolean>('/api/users/canregister')
+  }
 
-    getAll() {
-        return this.http.get<User[]>('/api/users');
-    }
+  add(user: User) {
+    return this.http.post('/api/users/add', user)
+  }
 
-    getById(id: string) {
-        return this.http.get<User>(`/api/users/${id}`);
-    }
+  register(user: User) {
+    return this.http.post('/api/users/register', user)
+  }
 
-    update(id, params) {
-        return this.http.post(`/api/users/${id}`, params)
-            .pipe(map(x => {
-                // update stored user if the logged in user updated their own record
-                if (id == this.userValue.id) {
-                    // update local storage
-                    const user = { ...this.userValue, ...params };
-                    localStorage.setItem('user', JSON.stringify(user));
+  getAll() {
+    return this.http.get<User[]>('/api/users')
+  }
 
-                    // publish updated user to subscribers
-                    this.userSubject.next(user);
-                }
-                return x;
-            }));
-    }
+  getById(id: string) {
+    return this.http.get<User>(`/api/users/${id}`)
+  }
 
-    delete(id: string) {
-        return this.http.delete(`/users/${id}`)
-            .pipe(map(x => {
-                // auto logout if the logged in user deleted their own record
-                if (id == this.userValue.id) {
-                    this.logout();
-                }
-                return x;
-            }));
-    }
+  update(id, params) {
+    return this.http.post(`/api/users/${id}`, params)
+      .pipe(map((x) => {
+        // update stored user if the logged in user updated their own record
+        if (id == this.userValue.id) {
+          // update local storage
+          const user = { ...this.userValue, ...params }
+          localStorage.setItem('user', JSON.stringify(user))
 
-    private refreshTokenTimeout;
+          // publish updated user to subscribers
+          this.userSubject.next(user)
+        }
+        return x
+      }))
+  }
 
-    private startRefreshTokenTimer() {
+  delete(id: string) {
+    return this.http.delete(`/users/${id}`)
+      .pipe(map((x) => {
+        // auto logout if the logged in user deleted their own record
+        if (id == this.userValue.id) {
+          this.logout()
+        }
+        return x
+      }))
+  }
+
+  private refreshTokenTimeout
+
+  private startRefreshTokenTimer() {
     // parse json object from base64 encoded jwt token
-        const jwtToken = JSON.parse(atob(this.userValue.jwtToken.split('.')[1]));
+    const jwtToken = JSON.parse(atob(this.userValue.jwtToken.split('.')[1]))
 
-        // set a timeout to refresh the token a minute before it expires
-        const expires = new Date(jwtToken.exp * 1000);
-        const timeout = expires.getTime() - Date.now() - 60 * 1000;
-        this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
-    }
+    // set a timeout to refresh the token a minute before it expires
+    const expires = new Date(jwtToken.exp * 1000)
+    const timeout = expires.getTime() - Date.now() - 60 * 1000
+    this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout)
+  }
 
-    private stopRefreshTokenTimer() {
-        clearTimeout(this.refreshTokenTimeout);
-    }
+  private stopRefreshTokenTimer() {
+    clearTimeout(this.refreshTokenTimeout)
+  }
 }

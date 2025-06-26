@@ -1,174 +1,172 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { SnackbarService } from 'app/snackbar/snackbar.service';
-import { SnackBarType } from 'app/snackbar/snackbartype';
-import { SettingsService } from '../settings.service';
-import { Agent } from './agent';
-import { AgentStatus } from './agentStatus';
-import { PlateStatisticsData } from 'app/plates/plate/plateStatistics';
-import { SignalrService } from 'app/signalr/signalr.service';
-import { Subscription } from 'rxjs';
-import { MatTable, MatTableModule } from '@angular/material/table';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { NgIf, NgStyle } from '@angular/common';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core'
+import { SnackbarService } from 'app/snackbar/snackbar.service'
+import { SnackBarType } from 'app/snackbar/snackbartype'
+import { SettingsService } from '../settings.service'
+import { Agent } from './agent'
+import { AgentStatus } from './agentStatus'
+import { PlateStatisticsData } from 'app/plates/plate/plateStatistics'
+import { SignalrService } from 'app/signalr/signalr.service'
+import { Subscription } from 'rxjs'
+import { MatTable, MatTableModule } from '@angular/material/table'
+import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatTooltipModule } from '@angular/material/tooltip'
+import { ReactiveFormsModule, FormsModule } from '@angular/forms'
+import { MatInputModule } from '@angular/material/input'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatButtonModule } from '@angular/material/button'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatIconModule } from '@angular/material/icon'
+import { MatCardModule } from '@angular/material/card'
+import { NgStyle } from '@angular/common'
 
 @Component({
-    selector: 'app-openalpr-agent',
-    templateUrl: './openalpr-agent.component.html',
-    styleUrls: ['./openalpr-agent.component.less'],
-    standalone: true,
-    imports: [NgIf, MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
+  selector: 'app-openalpr-agent',
+  templateUrl: './openalpr-agent.component.html',
+  styleUrls: ['./openalpr-agent.component.less'],
+  imports: [MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule],
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
-    @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>;
+  private settingsService = inject(SettingsService)
+  private snackBarService = inject(SnackbarService)
+  private signalRHub = inject(SignalrService)
 
-    public agent: Agent;
-    public agentStatus: AgentStatus;
-    public agentStatusData: PlateStatisticsData[] = [];
-    public displayedColumns: string[] = ['key', 'value'];
+  @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>
 
-    public isSaving: boolean = false;
-    public isHydrating: boolean = false;
-    public isLoadingAgentStatus: boolean = false;
+  public agent: Agent
+  public agentStatus: AgentStatus
+  public agentStatusData: PlateStatisticsData[] = []
+  public displayedColumns: string[] = ['key', 'value']
 
-    private eventSubscriptions = new Subscription();
-  
-    constructor(
-        private settingsService: SettingsService,
-        private snackBarService: SnackbarService,
-        private signalRHub: SignalrService) { }
+  public isSaving = false
+  public isHydrating = false
+  public isLoadingAgentStatus = false
 
-    ngOnInit(): void {
-        this.getAgent();
-        this.getAgentStatus();
+  private eventSubscriptions = new Subscription()
 
-        this.eventSubscriptions.add(this.signalRHub.openAlprAgentConnectionStatusChanged.subscribe(() => {
-            this.getAgentStatus();
-        }));
-    }
+  ngOnInit(): void {
+    this.getAgent()
+    this.getAgentStatus()
 
-    ngOnDestroy(): void {
-        this.eventSubscriptions.unsubscribe();
-    }
+    this.eventSubscriptions.add(this.signalRHub.openAlprAgentConnectionStatusChanged.subscribe(() => {
+      this.getAgentStatus()
+    }))
+  }
 
-    public saveAgent() {
-        this.isSaving = true;
+  ngOnDestroy(): void {
+    this.eventSubscriptions.unsubscribe()
+  }
 
-        this.settingsService.upsertAgent(this.agent).subscribe(() => {
-            this.isSaving = false;
-            this.getAgent();
-        });
-    }
+  public saveAgent() {
+    this.isSaving = true
 
-    public scrapeAgent() {
-        this.isHydrating = true;
+    this.settingsService.upsertAgent(this.agent).subscribe(() => {
+      this.isSaving = false
+      this.getAgent()
+    })
+  }
 
-        this.settingsService.startAgentScrape().subscribe(() => {
-            this.isHydrating = false;
-            this.snackBarService.create('Agent Scraping has begun, check system logs for progress', SnackBarType.Info);
-        });
-    }
+  public scrapeAgent() {
+    this.isHydrating = true
 
-    private getAgent() {
-        this.settingsService.getAgent().subscribe(result => {
-            this.agent = result;
-        });
-    }
+    this.settingsService.startAgentScrape().subscribe(() => {
+      this.isHydrating = false
+      this.snackBarService.create('Agent Scraping has begun, check system logs for progress', SnackBarType.Info)
+    })
+  }
 
-    private getAgentStatus() {
-        this.isLoadingAgentStatus = true;
-        this.settingsService.getAgentStatus().subscribe(result => {
-            this.agentStatus = result;
-            this.agentStatusData = new Array<PlateStatisticsData>();
+  private getAgent() {
+    this.settingsService.getAgent().subscribe((result) => {
+      this.agent = result
+    })
+  }
 
-            if (this.agentStatus.isConnected) {
-                this.agentStatusData.push({
-                    key: 'Cpu Cores',
-                    value: this.agentStatus.cpuCores.toString()
-                });
+  private getAgentStatus() {
+    this.isLoadingAgentStatus = true
+    this.settingsService.getAgentStatus().subscribe((result) => {
+      this.agentStatus = result
+      this.agentStatusData = new Array<PlateStatisticsData>()
 
-                this.agentStatusData.push({
-                    key: 'Cpu Usage',
-                    value: this.agentStatus.cpuUsagePercent.toString() + '%'
-                });
+      if (this.agentStatus.isConnected) {
+        this.agentStatusData.push({
+          key: 'Cpu Cores',
+          value: this.agentStatus.cpuCores.toString(),
+        })
 
-                this.agentStatusData.push({
-                    key: 'ALPR Daemon Active',
-                    value: this.agentStatus.alprdActive ? 'Yes' : 'No'
-                });
+        this.agentStatusData.push({
+          key: 'Cpu Usage',
+          value: this.agentStatus.cpuUsagePercent.toString() + '%',
+        })
 
-                this.agentStatusData.push({
-                    key: 'Daemon Uptime',
-                    value: this.agentStatus.daemonUptimeSeconds.toString() + ' seconds'
-                });
+        this.agentStatusData.push({
+          key: 'ALPR Daemon Active',
+          value: this.agentStatus.alprdActive ? 'Yes' : 'No',
+        })
 
-                this.agentStatusData.push({
-                    key: 'Free Disk Space',
-                    value: this.formatBytes(this.agentStatus.diskFreeBytes)
-                });
+        this.agentStatusData.push({
+          key: 'Daemon Uptime',
+          value: this.agentStatus.daemonUptimeSeconds.toString() + ' seconds',
+        })
 
-                this.agentStatusData.push({
-                    key: 'Hostname',
-                    value: this.agentStatus.hostname
-                });
+        this.agentStatusData.push({
+          key: 'Free Disk Space',
+          value: this.formatBytes(this.agentStatus.diskFreeBytes),
+        })
 
-                this.agentStatusData.push({
-                    key: 'Current Time',
-                    value: new Date(this.agentStatus.agentEpochMs).toString()
-                });
+        this.agentStatusData.push({
+          key: 'Hostname',
+          value: this.agentStatus.hostname,
+        })
 
-                this.agentStatusData.push({
-                    key: 'Version',
-                    value: this.agentStatus.version
-                });
-            } else {
-                this.agentStatusData.push({
-                    key: 'Last Heartbeat',
-                    value: new Date(this.agent.lastHeartbeatEpochMs).toString()
-                });
-            }
+        this.agentStatusData.push({
+          key: 'Current Time',
+          value: new Date(this.agentStatus.agentEpochMs).toString(),
+        })
 
-            this.isLoadingAgentStatus = false;
-            this.table.renderRows();
-      
-        },
-        () => {
-            this.isLoadingAgentStatus = false;
-            this.agentStatus = new AgentStatus();
-            this.agentStatus.isConnected = false;
-            this.agentStatusData = new Array<PlateStatisticsData>();
-            this.table.renderRows();
-        });
-    }
+        this.agentStatusData.push({
+          key: 'Version',
+          value: this.agentStatus.version,
+        })
+      }
+      else {
+        this.agentStatusData.push({
+          key: 'Last Heartbeat',
+          value: new Date(this.agent.lastHeartbeatEpochMs).toString(),
+        })
+      }
 
-    public enableAgent() {
-        this.settingsService.enableAgent(this.agent.id).subscribe(() => {
-            this.getAgentStatus();
-        });
-    }
+      this.isLoadingAgentStatus = false
+      this.table.renderRows()
+    },
+    () => {
+      this.isLoadingAgentStatus = false
+      this.agentStatus = new AgentStatus()
+      this.agentStatus.isConnected = false
+      this.agentStatusData = new Array<PlateStatisticsData>()
+      this.table.renderRows()
+    })
+  }
 
-    public disableAgent() {
-        this.settingsService.disableAgent(this.agent.id).subscribe(() => {
-            this.getAgentStatus();
-        });
-    }
+  public enableAgent() {
+    this.settingsService.enableAgent(this.agent.id).subscribe(() => {
+      this.getAgentStatus()
+    })
+  }
 
-    private formatBytes(bytes: number, decimals = 2) {
-        if (!+bytes) return '0 Bytes';
+  public disableAgent() {
+    this.settingsService.disableAgent(this.agent.id).subscribe(() => {
+      this.getAgentStatus()
+    })
+  }
 
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+  private formatBytes(bytes: number, decimals = 2) {
+    if (!+bytes) return '0 Bytes'
 
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
 
-        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-    }
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+  }
 }
