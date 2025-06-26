@@ -17,13 +17,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { NgIf, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 
 @Component({
     selector: 'app-openalpr-agent',
     templateUrl: './openalpr-agent.component.html',
     styleUrls: ['./openalpr-agent.component.less'],
-    imports: [NgIf, MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
+    imports: [MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule]
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
     @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>;

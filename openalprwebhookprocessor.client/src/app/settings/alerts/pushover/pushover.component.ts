@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { NgIf } from '@angular/common';
+
 
 @Component({
     selector: 'app-pushover',
@@ -31,7 +31,7 @@ import { NgIf } from '@angular/common';
             ])
         ])
     ],
-    imports: [NgIf, MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatCheckboxModule, MatButtonModule]
+    imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatCheckboxModule, MatButtonModule]
 })
 export class PushoverComponent implements OnInit {
     public client: Pushover;

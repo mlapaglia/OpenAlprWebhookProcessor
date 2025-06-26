@@ -4,14 +4,14 @@ import { Camera } from './camera';
 import { SettingsService } from '../settings.service';
 import { EditCameraComponent } from './edit-camera/edit-camera.component';
 import { CameraComponent } from './camera/camera.component';
-import { NgFor } from '@angular/common';
+
 import { MatGridListModule } from '@angular/material/grid-list';
 
 @Component({
     selector: 'app-cameras',
     templateUrl: './cameras.component.html',
     styleUrls: ['./cameras.component.less'],
-    imports: [MatGridListModule, NgFor, CameraComponent, MatDialogModule]
+    imports: [MatGridListModule, CameraComponent, MatDialogModule]
 })
 export class CamerasComponent implements OnInit {
     public cameras: Camera[];

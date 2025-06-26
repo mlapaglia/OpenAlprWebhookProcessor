@@ -5,13 +5,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-import { NgIf, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-camera',
     templateUrl: './camera.component.html',
     styleUrls: ['./camera.component.less'],
-    imports: [NgIf, MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTooltipModule, MatButtonModule, DatePipe]
+    imports: [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTooltipModule, MatButtonModule, DatePipe]
 })
 export class CameraComponent implements OnInit {
     @Input() camera: Camera;

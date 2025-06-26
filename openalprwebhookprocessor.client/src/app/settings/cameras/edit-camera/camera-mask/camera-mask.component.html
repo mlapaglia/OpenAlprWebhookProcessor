@@ -15,17 +15,18 @@
           <div style="display: flex;">
             <button mat-button color="warn" style="align-self: center;" (click)="resetCanvas()">Reset</button>
             <button mat-button color="primary" style="align-self: center;" (click)="undoLastPoint()">Undo</button>
-            <mat-paginator #paginator
-              *ngIf="samplePlates.length > 0"
-              (page)="handlePageEvent($event)"
-              [length]="samplePlates.length"
-              [pageSize]="1"
-              [showFirstLastButtons]="false"
-              [pageSizeOptions]="[]"
-              [hidePageSize]="true"
-              [pageIndex]="paginatorIndex"
-              aria-label="Select page">
-            </mat-paginator>
+            @if (samplePlates.length > 0) {
+              <mat-paginator #paginator
+                (page)="handlePageEvent($event)"
+                [length]="samplePlates.length"
+                [pageSize]="1"
+                [showFirstLastButtons]="false"
+                [pageSizeOptions]="[]"
+                [hidePageSize]="true"
+                [pageIndex]="paginatorIndex"
+                aria-label="Select page">
+              </mat-paginator>
+            }
           </div>
         </div>
         <canvas class="canvas" #canvas width="960" height="540"></canvas>

@@ -11,7 +11,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule, MatIconRegistry} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {CommonModule, NgFor} from '@angular/common';
+
 import {ActivatedRoute, ParamMap} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -27,7 +27,7 @@ import { MatListModule } from '@angular/material/list';
     styleUrls: ['./theme-picker.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
-    imports: [CommonModule, MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, NgFor, MatRadioModule, MatListModule]
+    imports: [MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, MatRadioModule, MatListModule]
 })
 export class ThemePickerComponent implements OnInit, OnDestroy {
     private _queryParamSubscription = Subscription.EMPTY;

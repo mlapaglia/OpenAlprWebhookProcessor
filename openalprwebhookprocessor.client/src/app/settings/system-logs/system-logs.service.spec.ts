@@ -15,7 +15,7 @@ describe(SystemLogsService.name, () => {
     });
 
     it('should be created', () => {
-        service = TestBed.get(SystemLogsService);
+        service = TestBed.inject(SystemLogsService);
         expect(service).toBeTruthy();
     });
 });

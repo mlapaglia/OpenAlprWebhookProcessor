@@ -7,7 +7,7 @@ import { Camera } from '../../camera';
 import { Coordinate } from './coordinate';
 import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
-import { NgIf } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
@@ -15,7 +15,7 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-camera-mask',
     templateUrl: './camera-mask.component.html',
     styleUrls: ['./camera-mask.component.css'],
-    imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, NgIf, MatPaginatorModule]
+    imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, MatPaginatorModule]
 })
 export class CameraMaskComponent implements OnInit {
     @Input() camera: Camera;

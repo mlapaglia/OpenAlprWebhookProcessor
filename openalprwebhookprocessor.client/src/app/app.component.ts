@@ -8,7 +8,7 @@ import { PushSubscriberService } from './_services/push-subscriber.service';
 import { AlertComponent } from './_components/alert.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { ThemePickerComponent } from './theme-picker/theme-picker.component';
@@ -18,7 +18,7 @@ import { Subscription } from 'rxjs';
     selector: 'app-app',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.css'],
-    imports: [NgIf, MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent]
+    imports: [MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
     user: User;

@@ -8,7 +8,7 @@ import { EditCameraService } from './edit-camera.service';
 import { ZoomFocus } from './zoomfocus';
 import { CameraMaskComponent } from './camera-mask/camera-mask.component';
 import { MatButtonModule } from '@angular/material/button';
-import { NgIf } from '@angular/common';
+
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -33,7 +33,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
             ])
         ])
     ],
-    imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, NgIf, MatButtonModule, CameraMaskComponent]
+    imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CameraMaskComponent]
 })
 export class EditCameraComponent implements OnInit {
     public camera: Camera;

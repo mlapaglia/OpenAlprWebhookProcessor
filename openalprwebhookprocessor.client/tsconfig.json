@@ -14,7 +14,7 @@
       "sourceMap": true,
       "declaration": false,
       "experimentalDecorators": true,
-      "moduleResolution": "node",
+      "moduleResolution": "bundler",
       "importHelpers": true,
       "strictPropertyInitialization": false,
       "target": "ES2022",
@@ -25,8 +25,12 @@
         "dom"
       ],
       "paths": {
-        "app/*": ["./app/*"],
-        "environments/*": ["./environments/*"]
+        "app/*": [
+          "./app/*"
+        ],
+        "environments/*": [
+          "./environments/*"
+        ]
       }
     },
     "angularCompilerOptions": {
