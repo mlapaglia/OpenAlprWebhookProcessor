@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace OpenAlprWebhookProcessor.Users.Data
+namespace OpenAlprWebhookProcessor.Server.Users.Data
 {
     public class UsersContext : DbContext
     {

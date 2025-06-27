@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Server.Alerts.UpsertAlert
 {
     public class UpsertAlertsRequestHandler
     {

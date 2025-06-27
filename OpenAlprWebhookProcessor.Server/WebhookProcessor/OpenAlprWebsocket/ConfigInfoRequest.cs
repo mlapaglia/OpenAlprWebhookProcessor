@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
     public class ConfigInfoRequest
     {

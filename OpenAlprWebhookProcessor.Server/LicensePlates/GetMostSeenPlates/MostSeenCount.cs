@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetMostSeenPlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetMostSeenPlates
 {
     public class MostSeenCount
     {

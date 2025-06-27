@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.LicensePlates.DeletePlate;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
-using OpenAlprWebhookProcessor.LicensePlates.GetMostSeenPlates;
-using OpenAlprWebhookProcessor.LicensePlates.GetPlate;
-using OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters;
-using OpenAlprWebhookProcessor.LicensePlates.GetStatistics;
-using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
-using OpenAlprWebhookProcessor.LicensePlates.UpsertPlate;
+using OpenAlprWebhookProcessor.Server.LicensePlates.DeletePlate;
+using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.Server.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Server.LicensePlates.GetMostSeenPlates;
+using OpenAlprWebhookProcessor.Server.LicensePlates.GetPlate;
+using OpenAlprWebhookProcessor.Server.LicensePlates.GetPlateFilters;
+using OpenAlprWebhookProcessor.Server.LicensePlates.GetStatistics;
+using OpenAlprWebhookProcessor.Server.LicensePlates.SearchLicensePlates;
+using OpenAlprWebhookProcessor.Server.LicensePlates.UpsertPlate;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates
 {
     [Authorize]
     [ApiController]

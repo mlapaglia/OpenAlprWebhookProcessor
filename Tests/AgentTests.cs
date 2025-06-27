@@ -1,4 +1,4 @@
-using OpenAlprWebhookProcessor.Settings;
+using OpenAlprWebhookProcessor.Server.Settings.GetAgent;
 
 namespace Tests
 {
@@ -17,9 +17,9 @@ namespace Tests
         {
             using (var processorContext = _contextCreator.CreateContext())
             {
-                if (processorContext.Database.EnsureCreated())
+                if (await processorContext.Database.EnsureCreatedAsync())
                 {
-                    processorContext.Agents.Add(new OpenAlprWebhookProcessor.Data.Agent()
+                    processorContext.Agents.Add(new OpenAlprWebhookProcessor.Server.Data.Agent()
                     {
                         EndpointUrl = "http://google.com",
                         Hostname = "localhost",

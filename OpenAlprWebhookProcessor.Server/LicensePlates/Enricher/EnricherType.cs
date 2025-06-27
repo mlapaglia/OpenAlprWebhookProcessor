@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
+﻿namespace OpenAlprWebhookProcessor.Server.LicensePlates.Enricher
 {
     public enum EnricherType
     {

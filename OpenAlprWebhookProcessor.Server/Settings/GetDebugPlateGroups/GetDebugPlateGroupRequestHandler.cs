@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups
+namespace OpenAlprWebhookProcessor.Server.Settings.GetDebugPlateGroups
 {
     public class GetDebugPlateGroupRequestHandler
     {
@@ -39,7 +39,7 @@ namespace OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups
                 .Select(x => x.RawPlateGroup)
                 .ToListAsync(cancellationToken);
 
-            return "[" + String.Join(",", results.Take(10).ToList()) + "]";
+            return "[" + string.Join(",", results.Take(10).ToList()) + "]";
         }
     }
 }

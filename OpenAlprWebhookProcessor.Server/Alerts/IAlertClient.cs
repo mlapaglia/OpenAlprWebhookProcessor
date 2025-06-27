@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Server.Alerts
 {
     public interface IAlertClient
     {

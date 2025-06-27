@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.Enricher.LicensePlateData
 {
     public class LicensePlateDataRoot
     {

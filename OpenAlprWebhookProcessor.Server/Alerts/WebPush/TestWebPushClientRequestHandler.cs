@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts.WebPush
+namespace OpenAlprWebhookProcessor.Server.Alerts.WebPush
 {
     public class TestWebPushClientRequestHandler
     {

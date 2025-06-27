@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings
+namespace OpenAlprWebhookProcessor.Server.Settings.EnableAgent
 {
     public class EnableAgentRequestHandler
     {

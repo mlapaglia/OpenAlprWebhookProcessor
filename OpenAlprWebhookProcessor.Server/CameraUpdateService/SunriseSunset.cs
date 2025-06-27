@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.CameraUpdateService
+﻿namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 {
     public enum SunriseSunset
     {

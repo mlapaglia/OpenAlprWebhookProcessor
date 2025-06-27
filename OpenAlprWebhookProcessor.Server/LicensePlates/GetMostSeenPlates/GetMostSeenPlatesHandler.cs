@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetMostSeenPlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetMostSeenPlates
 {
     public class GetMostSeenPlatesHandler
     {

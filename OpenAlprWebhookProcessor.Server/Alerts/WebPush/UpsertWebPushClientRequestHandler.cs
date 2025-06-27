@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
+using OpenAlprWebhookProcessor.Server.Data;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts.WebPush
+namespace OpenAlprWebhookProcessor.Server.Alerts.WebPush
 {
     public class UpsertWebPushClientRequestHandler
     {

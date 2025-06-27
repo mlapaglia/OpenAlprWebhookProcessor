@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.ProcessorHub
+namespace OpenAlprWebhookProcessor.Server.ProcessorHub
 {
     public interface IProcessorHub
     {

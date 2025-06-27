@@ -2,7 +2,7 @@
 using System.Threading;
 using System;
 
-namespace OpenAlprWebhookProcessor.Cameras.ZoomAndFocus
+namespace OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus
 {
     public class TriggerAutofocusHandler
     {

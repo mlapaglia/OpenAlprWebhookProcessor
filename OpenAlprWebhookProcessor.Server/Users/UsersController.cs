@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
-using OpenAlprWebhookProcessor.Users.Register;
 using AutoMapper;
 using System.Threading.Tasks;
 using System.Threading;
+using OpenAlprWebhookProcessor.Server.Users.Register;
+using OpenAlprWebhookProcessor.Server.Users.Data;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     [Authorize]
     [ApiController]
@@ -109,7 +110,11 @@ namespace OpenAlprWebhookProcessor.Users
 
             try
             {
-                await _userService.CreateAsync(user, model.Password);
+                await _userService.CreateAsync(
+                    user,
+                    model.Password,
+                    cancellationToken);
+
                 return Ok();
             }
             catch (AppException ex)
@@ -135,7 +140,11 @@ namespace OpenAlprWebhookProcessor.Users
                     return Forbid();
                 }
 
-                await _userService.CreateAsync(user, model.Password);
+                await _userService.CreateAsync(
+                    user,
+                    model.Password,
+                    cancellationToken);
+
                 return Ok();
             }
             catch (AppException ex)
@@ -163,9 +172,11 @@ namespace OpenAlprWebhookProcessor.Users
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteById(int id)
+        public async Task<IActionResult> DeleteById(
+            int id,
+            CancellationToken cancellationToken)
         {
-            await _userService.DeleteAsync(id);
+            await _userService.DeleteAsync(id, cancellationToken);
 
             return Ok();
         }
@@ -176,8 +187,14 @@ namespace OpenAlprWebhookProcessor.Users
             [FromBody] UpdateModel updateModel,
             CancellationToken cancellationToken)
         {
-            var user = await _userService.GetByIdAsync(id, cancellationToken);
-            await _userService.UpdateAsync(user, updateModel.Password);
+            var user = await _userService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+            await _userService.UpdateAsync(
+                user,
+                cancellationToken,
+                updateModel.Password);
 
             return Ok();
         }

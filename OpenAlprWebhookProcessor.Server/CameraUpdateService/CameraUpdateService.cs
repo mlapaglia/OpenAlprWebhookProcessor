@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Cameras;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Cameras;
+using OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.CameraUpdateService
+namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 {
     public class CameraUpdateService : IHostedService
     {

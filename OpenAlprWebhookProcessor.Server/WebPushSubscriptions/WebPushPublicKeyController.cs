@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions
 {
     [Route("api/[controller]")]
     [ApiController]

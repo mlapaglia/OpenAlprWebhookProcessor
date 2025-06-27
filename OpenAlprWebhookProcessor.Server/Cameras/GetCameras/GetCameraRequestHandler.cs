@@ -1,12 +1,12 @@
 ﻿using Hangfire;
 using Hangfire.Storage.Monitoring;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.GetCameras
 {
     public class GetCameraRequestHandler
     {

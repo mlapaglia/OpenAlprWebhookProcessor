@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Cameras.ZoomAndFocus
+﻿namespace OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus
 {
     public class ZoomFocus
     {

@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Settings.Enrichers
+﻿namespace OpenAlprWebhookProcessor.Server.Settings.Enrichers
 {
     public enum EnrichmentType
     {

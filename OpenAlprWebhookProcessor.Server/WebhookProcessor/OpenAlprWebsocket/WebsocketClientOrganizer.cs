@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
     public class WebsocketClientOrganizer : BackgroundService
     {
@@ -24,11 +24,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
-                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
                 await Task.Delay(Timeout.Infinite, _cancellationTokenSource.Token);
             }
             catch (OperationCanceledException ex)
@@ -37,11 +37,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unknown error occurred {message}, stopping websockets: {message}", ex.Message);
+                _logger.LogError(ex, "Unknown error occurred, stopping websockets: {message}", ex.Message);
             }
             finally
             {
                 await DisconnectClientsAsync();
+                _cancellationTokenSource.Dispose();
             }
         }
 
@@ -63,8 +64,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     await oldWebSocketClient.CloseConnectionAsync(linkedCancellationToken);
                     result.UpdateWasCleanDisconnect = true;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogError("Unable to close connection: {message}", ex.Message);
                 }
             }
 
@@ -235,7 +237,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             while (stopwatch.ElapsedMilliseconds < 100000)
             {
-                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var agentStatusResponse))
+                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out _))
                 {
                     return true;
                 }

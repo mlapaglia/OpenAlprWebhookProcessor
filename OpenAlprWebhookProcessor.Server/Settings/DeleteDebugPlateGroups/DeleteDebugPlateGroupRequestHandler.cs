@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups
+namespace OpenAlprWebhookProcessor.Server.Settings.DeleteDebugPlateGroups
 {
     public class DeleteDebugPlateGroupRequestHandler
     {

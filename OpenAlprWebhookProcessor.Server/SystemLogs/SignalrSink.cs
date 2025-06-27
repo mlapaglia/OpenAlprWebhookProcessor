@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.ProcessorHub;
+using OpenAlprWebhookProcessor.Server.ProcessorHub;
 using Serilog.Core;
 using Serilog.Events;
 using System;
 
-namespace OpenAlprWebhookProcessor.SystemLogs
+namespace OpenAlprWebhookProcessor.Server.SystemLogs
 {
     public class SignalrSink : ILogEventSink
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.Data
+namespace OpenAlprWebhookProcessor.Server.Data
 {
     public class WebPushSubscription
     {

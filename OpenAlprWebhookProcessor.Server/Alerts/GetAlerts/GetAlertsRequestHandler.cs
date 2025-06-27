@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Alerts;
+using OpenAlprWebhookProcessor.Server.Data;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Server.Alerts.GetAlerts
 {
     public class GetAlertsRequestHandler
     {

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using OpenAlprWebhookProcessor.Server.LicensePlates;
+using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.SearchLicensePlates
 {
     public class SearchLicensePlateResponse
     {

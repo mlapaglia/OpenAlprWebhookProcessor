@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Cameras;
+using OpenAlprWebhookProcessor.Server.Data;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertCamera
 {
     public class UpsertCameraHandler
     {

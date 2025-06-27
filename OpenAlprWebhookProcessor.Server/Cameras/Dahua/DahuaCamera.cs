@@ -1,5 +1,6 @@
-﻿using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
-using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.Server.Cameras;
+using OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.Server.CameraUpdateService;
 using System;
 using System.IO;
 using System.Net;
@@ -12,11 +13,11 @@ namespace OpenAlprWebhookProcessor.Cameras
 {
     public partial class DahuaCamera : ICamera
     {
-        private readonly Data.Camera _camera;
+        private readonly Server.Data.Camera _camera;
 
         private readonly HttpClient _httpClient;
 
-        public DahuaCamera(Data.Camera camera)
+        public DahuaCamera(Server.Data.Camera camera)
         {
             _camera = camera;
             _httpClient = GetHttpClient();

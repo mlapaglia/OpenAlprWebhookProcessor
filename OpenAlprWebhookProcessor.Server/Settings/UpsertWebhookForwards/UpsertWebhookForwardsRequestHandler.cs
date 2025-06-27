@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards
+namespace OpenAlprWebhookProcessor.Server.Settings.UpsertWebhookForwards
 {
     public class UpsertWebhookForwardsRequestHandler
     {

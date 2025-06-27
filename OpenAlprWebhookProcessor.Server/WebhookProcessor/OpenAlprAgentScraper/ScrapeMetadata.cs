@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprAgentScraper
 {
     public class ScrapeMetadata
     {

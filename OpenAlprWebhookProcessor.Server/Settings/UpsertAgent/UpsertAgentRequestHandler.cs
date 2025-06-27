@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.WebhookProcessor;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Hydration;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings
+namespace OpenAlprWebhookProcessor.Server.Settings.UpsertAgent
 {
     public class UpsertAgentRequestHandler
     {

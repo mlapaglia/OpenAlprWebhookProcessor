@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher;
 using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.Enricher.LicensePlateData
 {
     public class LicensePlateDataClient : ILicensePlateEnricherClient
     {

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.ImageRelay.GetImage
+namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
 {
     public interface IGetImageHandler
     {

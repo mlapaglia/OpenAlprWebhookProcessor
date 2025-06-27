@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Cameras;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.ImageRelay
+namespace OpenAlprWebhookProcessor.Server.ImageRelay.SnapshotRelay
 {
     public class GetSnapshotHandler
     {

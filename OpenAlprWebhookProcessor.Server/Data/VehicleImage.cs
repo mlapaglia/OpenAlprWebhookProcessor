@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace OpenAlprWebhookProcessor.Data
+namespace OpenAlprWebhookProcessor.Server.Data
 {
     public class VehicleImage
     {

@@ -4,23 +4,23 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire.States;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Utilities;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.Server.Alerts;
+using OpenAlprWebhookProcessor.Server.CameraUpdateService;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.ProcessorHub;
+using OpenAlprWebhookProcessor.Server.Utilities;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebhook;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 {
     public class GroupWebhookHandler
     {
         private readonly ILogger _logger;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+        private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
@@ -34,7 +34,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub,
             AlertService alertService,
             ImageRetrieverService imageRetrieverService)
         {
@@ -47,7 +47,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         public async Task HandleWebhookAsync(
-            OpenAlprWebhook.Webhook webhook,
+            Webhook webhook,
             bool isBulkImport,
             CancellationToken cancellationToken)
         {
@@ -98,7 +98,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .ToListAsync(cancellationToken);
 
-            Data.PlateGroup plateGroup;
+            PlateGroup plateGroup;
             if (previousPreviewGroups.Count > 0)
             {
                 plateGroup = previousPreviewGroups[0];
@@ -108,7 +108,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             }
             else
             {
-                plateGroup = new Data.PlateGroup();
+                plateGroup = new PlateGroup();
             }
 
             plateGroup.AlertDescription = webhook.Description;
@@ -214,7 +214,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                 foreach (var forward in forwards)
                 {
-                    if (forward.ForwardGroups || (forward.ForwardGroupPreviews && webhook.Group.IsPreview))
+                    if (forward.ForwardGroups || forward.ForwardGroupPreviews && webhook.Group.IsPreview)
                     {
                         try
                         {
@@ -234,8 +234,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         }
 
         private static void MapVehicle(
-            Data.PlateGroup plateGroup,
-            OpenAlprWebhook.Webhook webhook)
+            PlateGroup plateGroup,
+            Webhook webhook)
         {
             if (webhook.Group.Vehicle?.MakeModels.First()?.Confidence > 30)
             {

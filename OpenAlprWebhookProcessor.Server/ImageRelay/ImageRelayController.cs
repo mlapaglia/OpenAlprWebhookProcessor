@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.ImageRelay.GetImage;
+using OpenAlprWebhookProcessor.Server.ImageRelay.SnapshotRelay;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.ImageRelay
+namespace OpenAlprWebhookProcessor.Server.ImageRelay
 {
     [Authorize]
     [ApiController]

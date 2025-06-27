@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     // Custom exception class for throwing application specific exceptions (e.g. for validation) 
     // that can be caught and handled within the application
@@ -12,7 +12,7 @@ namespace OpenAlprWebhookProcessor.Users
         public AppException(string message) : base(message) { }
 
         public AppException(string message, params object[] args)
-            : base(String.Format(CultureInfo.CurrentCulture, message, args))
+            : base(string.Format(CultureInfo.CurrentCulture, message, args))
         {
         }
     }

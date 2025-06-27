@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 
-namespace OpenAlprWebhookProcessor.Utilities
+namespace OpenAlprWebhookProcessor.Server.Utilities
 {
     public static class VehicleUtilities
     {

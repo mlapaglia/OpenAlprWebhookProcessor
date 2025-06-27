@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace OpenAlprWebhookProcessor
+namespace OpenAlprWebhookProcessor.Server
 {
     public class Program
     {

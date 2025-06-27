@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.Cameras.UpsertMasks
+namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertMask
 {
     public class CameraMask
     {

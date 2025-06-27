@@ -1,5 +1,4 @@
-﻿using OpenAlprWebhookProcessor.Cameras.Hikvision;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -8,10 +7,11 @@ using System.IO;
 using System.Threading;
 using System.Collections.Generic;
 using System.Net;
-using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.Server.CameraUpdateService;
+using OpenAlprWebhookProcessor.Server.Cameras;
+using OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.Hikvision
 {
     public class HikvisionCamera : ICamera
     {

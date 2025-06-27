@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.Enricher
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.Enricher
 {
     public interface ILicensePlateEnricherClient
     {

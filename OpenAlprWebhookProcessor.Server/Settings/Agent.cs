@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Settings
+namespace OpenAlprWebhookProcessor.Server.Settings
 {
     public class Agent
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras.ZoomAndFocus
+namespace OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus
 {
     public class SetZoomAndFocusHandler
     {

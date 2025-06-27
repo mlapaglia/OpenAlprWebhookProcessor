@@ -1,14 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Cameras.GetPlateCaptures;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.Server.Cameras.DeleteCamera;
+using OpenAlprWebhookProcessor.Server.Cameras.GetCameras;
+using OpenAlprWebhookProcessor.Server.Cameras.GetMask;
+using OpenAlprWebhookProcessor.Server.Cameras.GetPlateCaptures;
+using OpenAlprWebhookProcessor.Server.Cameras.TestCamera;
+using OpenAlprWebhookProcessor.Server.Cameras.UpsertCamera;
+using OpenAlprWebhookProcessor.Server.Cameras.UpsertMask;
+using OpenAlprWebhookProcessor.Server.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.Server.CameraUpdateService;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras
 {
     [Authorize]
     [ApiController]
@@ -89,7 +95,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         {
             _testCameraHandler.SendNightModeCommand(
                 cameraId,
-                CameraUpdateService.SunriseSunset.Sunset);
+                SunriseSunset.Sunset);
 
             return Ok();
         }
@@ -99,7 +105,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         {
             _testCameraHandler.SendNightModeCommand(
                 cameraId,
-                CameraUpdateService.SunriseSunset.Sunrise);
+                SunriseSunset.Sunrise);
 
             return Ok();
         }

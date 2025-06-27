@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using System.Linq;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
@@ -23,11 +24,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             private readonly WebsocketClientOrganizer _websocketClientOrganizer;
 
-            private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+            private readonly IHubContext<Server.ProcessorHub.ProcessorHub, Server.ProcessorHub.IProcessorHub> _processorHub;
 
             public WebsocketController(
                 ILogger<WebsocketController> logger,
-                IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+                IHubContext<Server.ProcessorHub.ProcessorHub, Server.ProcessorHub.IProcessorHub> processorHub,
                 ProcessorContext processorContext,
                 WebsocketClientOrganizer websocketClientOrganizer)
             {
@@ -68,8 +69,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     var webSocketClient = new OpenAlprWebsocketClient(
                         _logger,
                         agent.Uid,
-                        webSocket,
-                        _processorHub);
+                        webSocket);
 
                     var addResult = await _websocketClientOrganizer.AddAgentAsync(
                         agent.Uid,

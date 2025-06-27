@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.UpdatedCameras
+namespace OpenAlprWebhookProcessor.Server.Settings.UpsertIgnore
 {
     public class UpsertIgnoresRequestHandler
     {

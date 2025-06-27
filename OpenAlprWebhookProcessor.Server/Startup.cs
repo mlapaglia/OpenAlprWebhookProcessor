@@ -10,29 +10,30 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
-using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.SystemLogs;
-using OpenAlprWebhookProcessor.Users;
-using OpenAlprWebhookProcessor.Users.Data;
-using OpenAlprWebhookProcessor.Users.Register;
-using OpenAlprWebhookProcessor.WebhookProcessor;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Server.Alerts;
+using OpenAlprWebhookProcessor.Server.Alerts.Pushover;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Hydration;
+using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher.LicensePlateData;
+using OpenAlprWebhookProcessor.Server.ProcessorHub;
+using OpenAlprWebhookProcessor.Server.SystemLogs;
+using OpenAlprWebhookProcessor.Server.Users;
+using OpenAlprWebhookProcessor.Server.Users.Data;
+using OpenAlprWebhookProcessor.Server.Users.Register;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions;
 using Serilog;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor
+namespace OpenAlprWebhookProcessor.Server
 {
     public class Startup
     {
@@ -68,7 +69,7 @@ namespace OpenAlprWebhookProcessor
 
                 if (agent == null)
                 {
-                    agent = new Data.Agent();
+                    agent = new Agent();
 
                     context.Agents.Add(agent);
                     context.SaveChanges();
@@ -86,7 +87,7 @@ namespace OpenAlprWebhookProcessor
                 }
 
                 var userService = new UserService(context);
-                var secretKey = userService.GetJwtSecretKeyAsync().Result;
+                var secretKey = userService.GetJwtSecretKeyAsync(CancellationToken.None).Result;
 
                 services.AddAuthentication(x =>
                 {

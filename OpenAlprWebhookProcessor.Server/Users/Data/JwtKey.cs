@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Users.Data
+namespace OpenAlprWebhookProcessor.Server.Users.Data
 {
     public class JwtKey
     {

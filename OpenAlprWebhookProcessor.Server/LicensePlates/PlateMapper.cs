@@ -1,11 +1,11 @@
-﻿using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Utilities;
+﻿using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace OpenAlprWebhookProcessor.LicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates
 {
     public static class PlateMapper
     {

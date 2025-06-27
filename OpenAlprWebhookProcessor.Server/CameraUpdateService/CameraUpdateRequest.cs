@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.CameraUpdateService
+namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 {
     public class CameraUpdateRequest
     {

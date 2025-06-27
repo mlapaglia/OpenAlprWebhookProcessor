@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Alerts.Pushover
+﻿namespace OpenAlprWebhookProcessor.Server.Alerts.Pushover
 {
     public class PushoverConfiguration
     {

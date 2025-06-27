@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys
 {
     public static class VapidKeyHelper
     {

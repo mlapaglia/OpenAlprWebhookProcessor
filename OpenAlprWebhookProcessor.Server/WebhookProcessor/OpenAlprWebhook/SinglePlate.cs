@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebhook
 {
     public class SinglePlate
     {

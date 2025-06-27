@@ -9,35 +9,28 @@ using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.IO;
-using System.Collections;
-using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket.OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
     public partial class OpenAlprWebsocketClient
     {
         private readonly ConcurrentDictionary<Guid, string> _availableResponses;
 
-        private WebSocket _webSocket;
+        private readonly WebSocket _webSocket;
 
         private readonly string _agentId;
 
         private readonly ILogger _logger;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
-
         public OpenAlprWebsocketClient(
             ILogger logger,
             string agentId,
-            WebSocket webSocket,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            WebSocket webSocket)
         {
             _logger = logger;
             _agentId = agentId;
             _webSocket = webSocket;
             _availableResponses = new ConcurrentDictionary<Guid, string>();
-            _processorHub = processorHub;
         }
 
         public async Task ConsumeMessagesAsync(CancellationToken cancellationToken)

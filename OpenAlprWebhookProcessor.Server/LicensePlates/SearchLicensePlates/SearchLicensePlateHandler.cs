@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.LicensePlates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.SearchLicensePlates
 {
     public class SearchLicensePlateHandler
     {

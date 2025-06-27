@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.ImageRelay;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.ImageRelay.GetImage;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 {
     public class ImageRetrieverService : IHostedService
     {
@@ -22,10 +22,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         private readonly object _imageRequestsToProcessGate = new();
 
         private readonly BlockingCollection<string> _imageCompressionRequestsToProcess = new();
-
-        private readonly HashSet<string> _imageCompressionRequestsToProcessList = new();
-
-        private readonly object _imageCompressionRequestsToGate = new();
 
         private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -55,6 +51,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             _imageCompressionRequestsToProcess.CompleteAdding();
             _imageRequestsToProcess.CompleteAdding();
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
 
             return Task.CompletedTask;
         }

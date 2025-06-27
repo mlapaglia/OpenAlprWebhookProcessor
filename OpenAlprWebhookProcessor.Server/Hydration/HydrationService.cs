@@ -3,19 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAlprWebhookProcessor.ProcessorHub;
 using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.Storage;
 using System.Linq.Expressions;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.ProcessorHub;
 
-namespace OpenAlprWebhookProcessor.Hydrator
+namespace OpenAlprWebhookProcessor.Server.Hydration
 {
     public class HydrationService : IHostedService
     {
@@ -57,6 +57,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
             return Task.CompletedTask;
         }
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using OpenAlprWebhookProcessor.Users.Data;
+using OpenAlprWebhookProcessor.Server.Users.Data;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     public interface IUserService
     {
@@ -28,15 +28,17 @@ namespace OpenAlprWebhookProcessor.Users
 
         Task<User> CreateAsync(
             User user,
-            string password);
+            string password,
+            CancellationToken cancellationToken);
 
         Task UpdateAsync(
             User requestedUser,
+            CancellationToken cancellationToken,
             string password = null);
 
-        Task DeleteAsync(int id);
+        Task DeleteAsync(int id ,CancellationToken cancellationToken);
 
-        Task<byte[]> GetJwtSecretKeyAsync();
+        Task<byte[]> GetJwtSecretKeyAsync(CancellationToken cancellationToken);
 
         Task<AuthenticateResponse> RefreshTokenAsync(
             string token,
@@ -58,14 +60,19 @@ namespace OpenAlprWebhookProcessor.Users
             _usersContext = context;
         }
 
-        public async Task<User> CreateAsync(User user, string password)
+        public async Task<User> CreateAsync(
+            User user,
+            string password,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(password))
             {
                 throw new AppException("Password is required");
             }
 
-            if (_usersContext.Users.Any(x => x.Username == user.Username))
+            if (await _usersContext.Users.AnyAsync(x =>
+                x.Username == user.Username,
+                cancellationToken))
             {
                 throw new AppException("Username \"" + user.Username + "\" is already taken");
             }
@@ -76,16 +83,19 @@ namespace OpenAlprWebhookProcessor.Users
             user.PasswordSalt = passwordSalt;
 
             _usersContext.Users.Add(user);
-            await _usersContext.SaveChangesAsync();
+            await _usersContext.SaveChangesAsync(cancellationToken);
 
             return user;
         }
 
         public async Task UpdateAsync(
             User requestedUser,
+            CancellationToken cancellationToken,
             string password = null)
         {
-            var user = await _usersContext.Users.FindAsync(requestedUser.Id);
+            var user = await _usersContext.Users.FindAsync(
+                [requestedUser.Id],
+                cancellationToken);
 
             if (user == null)
             {
@@ -94,7 +104,9 @@ namespace OpenAlprWebhookProcessor.Users
 
             if (!string.IsNullOrWhiteSpace(user.Username) && user.Username != requestedUser.Username)
             {
-                if (_usersContext.Users.Any(x => x.Username == user.Username))
+                if (await _usersContext.Users.AnyAsync(x =>
+                    x.Username == user.Username,
+                    cancellationToken))
                     throw new AppException("Username " + user.Username + " is already taken");
 
                 user.Username = requestedUser.Username;
@@ -122,14 +134,18 @@ namespace OpenAlprWebhookProcessor.Users
             await _usersContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var user = await _usersContext.Users.FindAsync(id);
+            var user = await _usersContext.Users.FindAsync(
+                [id],
+                cancellationToken);
 
             if (user != null)
             {
                 _usersContext.Users.Remove(user);
-                await _usersContext.SaveChangesAsync();
+                await _usersContext.SaveChangesAsync(cancellationToken);
             }
         }
 
@@ -156,7 +172,7 @@ namespace OpenAlprWebhookProcessor.Users
                 return null;
             }
 
-            var jwtToken = await GenerateJwtTokenAsync(user);
+            var jwtToken = await GenerateJwtTokenAsync(user, cancellationToken);
             var refreshToken = GenerateRefreshToken(ipAddress);
 
             user.RefreshTokens.Add(refreshToken);
@@ -202,7 +218,7 @@ namespace OpenAlprWebhookProcessor.Users
 
             await _usersContext.SaveChangesAsync(cancellationToken);
 
-            var jwtToken = await GenerateJwtTokenAsync(user);
+            var jwtToken = await GenerateJwtTokenAsync(user, cancellationToken);
 
             return new AuthenticateResponse(
                 user,
@@ -244,9 +260,9 @@ namespace OpenAlprWebhookProcessor.Users
             return await _usersContext.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<byte[]> GetJwtSecretKeyAsync()
+        public async Task<byte[]> GetJwtSecretKeyAsync(CancellationToken cancellationToken)
         {
-            var jwtKey = await _usersContext.JwtKeys.FirstOrDefaultAsync();
+            var jwtKey = await _usersContext.JwtKeys.FirstOrDefaultAsync(cancellationToken);
 
             if (jwtKey == null)
             {
@@ -256,20 +272,22 @@ namespace OpenAlprWebhookProcessor.Users
                 };
 
                 _usersContext.Add(jwtKey);
-                await _usersContext.SaveChangesAsync();
+                await _usersContext.SaveChangesAsync(cancellationToken);
             }
             else if (jwtKey.Key.Length < 128)
             {
                 jwtKey.Key = GenerateJwtSecretKey(128);
-                await _usersContext.SaveChangesAsync();
+                await _usersContext.SaveChangesAsync(cancellationToken);
             }
 
             return Convert.FromBase64String(jwtKey.Key);
         }
 
-        private async Task<string> GenerateJwtTokenAsync(User user)
+        private async Task<string> GenerateJwtTokenAsync(
+            User user,
+            CancellationToken cancellationToken)
         {
-            var jwtSecretKey = await GetJwtSecretKeyAsync();
+            var jwtSecretKey = await GetJwtSecretKeyAsync(cancellationToken);
 
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -332,10 +350,7 @@ namespace OpenAlprWebhookProcessor.Users
             byte[] storedHash,
             byte[] storedSalt)
         {
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
+            ArgumentNullException.ThrowIfNull(password);
 
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -354,7 +369,7 @@ namespace OpenAlprWebhookProcessor.Users
 
             using (var hmac = new HMACSHA512(storedSalt))
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 for (int i = 0; i < computedHash.Length; i++)
                 {
                     if (computedHash[i] != storedHash[i]) return false;

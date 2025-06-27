@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     [Owned]
     public class RefreshToken

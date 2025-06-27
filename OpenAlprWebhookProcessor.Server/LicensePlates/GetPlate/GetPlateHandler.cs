@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.LicensePlates;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetPlate
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetPlate
 {
     public class GetPlateHandler
     {

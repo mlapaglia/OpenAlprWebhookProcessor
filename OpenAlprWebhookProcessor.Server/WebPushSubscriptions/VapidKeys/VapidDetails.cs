@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
+﻿namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys
 {
     public class VapidDetails
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetLicensePlateCounts
 {
     public class GetLicensePlateCountsRequest
     {

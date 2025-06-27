@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
-using OpenAlprWebhookProcessor.Alerts.WebPush;
+using OpenAlprWebhookProcessor.Server.Alerts.GetAlerts;
+using OpenAlprWebhookProcessor.Server.Alerts.Pushover;
+using OpenAlprWebhookProcessor.Server.Alerts.UpsertAlert;
+using OpenAlprWebhookProcessor.Server.Alerts.WebPush;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Server.Alerts
 {
     [Authorize]
     [ApiController]

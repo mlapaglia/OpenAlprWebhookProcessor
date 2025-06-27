@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using OpenAlprWebhookProcessor.Server.Users;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users.Data
 {
     public class User
     {

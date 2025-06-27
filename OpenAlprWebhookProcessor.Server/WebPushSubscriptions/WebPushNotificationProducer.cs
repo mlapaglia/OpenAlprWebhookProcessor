@@ -2,19 +2,19 @@
 using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
-using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 using System.Collections.Generic;
 using Flurl;
+using OpenAlprWebhookProcessor.Server.Alerts;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys;
+using OpenAlprWebhookProcessor.Server.Alerts.Pushover;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions
 {
     public class WebPushNotificationProducer : BackgroundService, IAlertClient
     {
@@ -90,7 +90,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         }
                     }.ToPushMessage();
 
-                    foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())
+                    foreach (PushSubscription subscription in await _pushSubscriptionsService.GetAllAsync(cancellationToken))
                     {
                         try
                         {
@@ -102,7 +102,9 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Failed to send WebPush message");
-                            _pushSubscriptionsService.Delete(subscription.Endpoint);
+                            await _pushSubscriptionsService.DeleteAsync(
+                                subscription.Endpoint,
+                                cancellationToken);
                         }
                     }
                 }

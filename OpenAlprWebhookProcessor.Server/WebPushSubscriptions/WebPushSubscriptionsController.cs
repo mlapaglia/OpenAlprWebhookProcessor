@@ -1,7 +1,9 @@
 ﻿using Lib.Net.Http.WebPush;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -15,15 +17,23 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         }
 
         [HttpPost]
-        public void Post([FromBody] PushSubscription subscription)
+        public async Task Post(
+            [FromBody] PushSubscription subscription,
+            CancellationToken cancellationToken)
         {
-            _pushSubscriptionsService.Insert(subscription);
+            await _pushSubscriptionsService.InsertAsync(
+                subscription,
+                cancellationToken);
         }
 
         [HttpDelete("{endpoint}")]
-        public void Delete(string endpoint)
+        public async Task Delete(
+            string endpoint,
+            CancellationToken cancellationToken)
         {
-            _pushSubscriptionsService.Delete(endpoint);
+            await _pushSubscriptionsService.DeleteAsync(
+                endpoint,
+                cancellationToken);
         }
     }
 }

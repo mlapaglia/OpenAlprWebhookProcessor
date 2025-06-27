@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetPlateFilters
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetPlateFilters
 {
     public class GetLicensePlateFiltersResponse
     {

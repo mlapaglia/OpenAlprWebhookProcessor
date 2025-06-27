@@ -1,18 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Settings.AgentHydration;
-using OpenAlprWebhookProcessor.Settings.Enrichers;
-using OpenAlprWebhookProcessor.Settings.GetDebubPlateGroups;
-using OpenAlprWebhookProcessor.Settings.GetDebugPlateGroups;
-using OpenAlprWebhookProcessor.Settings.GetIgnores;
-using OpenAlprWebhookProcessor.Settings.UpdatedCameras;
-using OpenAlprWebhookProcessor.Settings.UpsertWebhookForwards;
+using OpenAlprWebhookProcessor.Server.Settings.AgentHydration;
+using OpenAlprWebhookProcessor.Server.Settings.DeleteDebugPlateGroups;
+using OpenAlprWebhookProcessor.Server.Settings.DisableAgent;
+using OpenAlprWebhookProcessor.Server.Settings.EnableAgent;
+using OpenAlprWebhookProcessor.Server.Settings.Enrichers;
+using OpenAlprWebhookProcessor.Server.Settings.GetAgent;
+using OpenAlprWebhookProcessor.Server.Settings.GetAgentStatus;
+using OpenAlprWebhookProcessor.Server.Settings.GetDebugPlateGroups;
+using OpenAlprWebhookProcessor.Server.Settings.GetIgnores;
+using OpenAlprWebhookProcessor.Server.Settings.GetWebhookForwards;
+using OpenAlprWebhookProcessor.Server.Settings.UpsertAgent;
+using OpenAlprWebhookProcessor.Server.Settings.UpsertIgnore;
+using OpenAlprWebhookProcessor.Server.Settings.UpsertWebhookForwards;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings
+namespace OpenAlprWebhookProcessor.Server.Settings
 {
     [Authorize]
     [ApiController]

@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using OpenAlprWebhookProcessor.Server.Users.Data;
+using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     public class AuthenticateResponse
     {

@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Cameras.Configuration
+﻿namespace OpenAlprWebhookProcessor.Server.Cameras.Configuration
 {
     public enum CameraManufacturer
     {

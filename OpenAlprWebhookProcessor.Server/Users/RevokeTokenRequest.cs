@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Users
+﻿namespace OpenAlprWebhookProcessor.Server.Users
 {
     public class RevokeTokenRequest
     {

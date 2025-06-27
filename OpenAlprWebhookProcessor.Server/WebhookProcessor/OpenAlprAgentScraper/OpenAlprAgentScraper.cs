@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprAgentScraper
 {
     public class OpenAlprAgentScraper
     {
@@ -112,14 +112,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                         continue;
                     }
 
-                    Group group;
+                    OpenAlprWebhook.Group group;
 
                     try
                     {
                         timer.Reset();
                         timer.Start();
                         _logger.LogDebug("deserializing key: {key}", metadata.Key);
-                        group = await JsonSerializer.DeserializeAsync<Group>(
+                        group = await JsonSerializer.DeserializeAsync<OpenAlprWebhook.Group>(
                             await newGroup.Content.ReadAsStreamAsync(cancellationToken),
                             cancellationToken: cancellationToken);
                         timer.Stop();

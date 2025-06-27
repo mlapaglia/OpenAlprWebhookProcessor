@@ -1,10 +1,10 @@
-﻿using OpenAlprWebhookProcessor.Data;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys;
 
-namespace OpenAlprWebhookProcessor.Alerts.WebPush
+namespace OpenAlprWebhookProcessor.Server.Alerts.WebPush
 {
     public class GetWebPushClientRequestHandler
     {

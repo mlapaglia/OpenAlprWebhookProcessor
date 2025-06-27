@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
+using OpenAlprWebhookProcessor.Server.Cameras.UpsertMask;
 using System.Reflection;
 
-namespace OpenAlprWebhookProcessor.Data
+namespace OpenAlprWebhookProcessor.Server.Data
 {
     public class ProcessorContext : DbContext
     {

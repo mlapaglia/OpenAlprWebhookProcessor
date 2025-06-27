@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Data
+namespace OpenAlprWebhookProcessor.Server.Data
 {
     public class PlateGroupRaw
     {

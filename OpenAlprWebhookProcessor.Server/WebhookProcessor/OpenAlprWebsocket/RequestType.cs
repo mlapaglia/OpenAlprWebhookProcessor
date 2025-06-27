@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
     public static class RequestType
     {

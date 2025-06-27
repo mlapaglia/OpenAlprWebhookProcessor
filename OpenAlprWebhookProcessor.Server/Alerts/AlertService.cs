@@ -1,16 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.ProcessorHub;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Server.Alerts
 {
     public class AlertService : IHostedService
     {
@@ -20,13 +18,13 @@ namespace OpenAlprWebhookProcessor.Alerts
 
         private readonly ILogger _logger;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
+        private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
 
         private readonly IEnumerable<IAlertClient> _alertClients;
 
         public AlertService(
             ILogger<AlertService> logger,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
+            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub,
             IEnumerable<IAlertClient> alertClients)
         {
             _logger = logger;
@@ -54,6 +52,7 @@ namespace OpenAlprWebhookProcessor.Alerts
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
 
             return Task.CompletedTask;
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace OpenAlprWebhookProcessor.ProcessorHub
+namespace OpenAlprWebhookProcessor.Server.ProcessorHub
 {
     public class ProcessorHub : Hub<IProcessorHub>
     {

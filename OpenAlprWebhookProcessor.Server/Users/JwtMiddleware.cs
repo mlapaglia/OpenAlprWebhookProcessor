@@ -4,9 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Users
+namespace OpenAlprWebhookProcessor.Server.Users
 {
     public class JwtMiddleware
     {
@@ -24,9 +25,10 @@ namespace OpenAlprWebhookProcessor.Users
 
         public async Task Invoke(
             HttpContext context,
-            IUserService userService)
+            IUserService userService,
+            CancellationToken cancellationToken)
         {
-            var token = context.Request.Headers["Authorization"]
+            var token = context.Request.Headers.Authorization
                 .FirstOrDefault()?
                 .Split(" ")
                 .Last();
@@ -36,7 +38,8 @@ namespace OpenAlprWebhookProcessor.Users
                 await AttachUserToContextAsync(
                     context,
                     userService,
-                    token);
+                    token,
+                    cancellationToken);
             }
 
             await _next(context);
@@ -45,12 +48,13 @@ namespace OpenAlprWebhookProcessor.Users
         private async Task AttachUserToContextAsync(
             HttpContext context,
             IUserService userService,
-            string token)
+            string token,
+            CancellationToken cancellationToken)
         {
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = await userService.GetJwtSecretKeyAsync();
+                var key = await userService.GetJwtSecretKeyAsync(cancellationToken);
 
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {

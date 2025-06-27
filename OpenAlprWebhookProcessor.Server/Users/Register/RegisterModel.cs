@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OpenAlprWebhookProcessor.Users.Register
+namespace OpenAlprWebhookProcessor.Server.Users.Register
 {
     public class RegisterModel
     {

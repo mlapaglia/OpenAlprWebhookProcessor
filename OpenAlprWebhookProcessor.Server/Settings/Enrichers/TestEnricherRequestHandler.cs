@@ -1,8 +1,8 @@
-﻿using OpenAlprWebhookProcessor.LicensePlates.Enricher;
+﻿using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.Enrichers
+namespace OpenAlprWebhookProcessor.Server.Settings.Enrichers
 {
     public class TestEnricherRequestHandler
     {

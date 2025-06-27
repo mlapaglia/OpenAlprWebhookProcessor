@@ -1,18 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertMask
 {
     public class UpsertCameraMaskHandler
     {
         private readonly ProcessorContext _processorContext;
-
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
         private readonly WebsocketClientOrganizer _websocketClientOrganizer;
 
@@ -25,7 +23,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         public async Task<bool> UpsertCameraMaskAsync(
-            UpsertMasks.CameraMask cameraMask,
+            CameraMask cameraMask,
             CancellationToken cancellationToken)
         {
             var agentUid = await _processorContext.Agents
@@ -38,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
             if (cameraMask.Coordinates.Any())
             {
-                camera.Mask = new CameraMask()
+                camera.Mask = new Data.CameraMask()
                 {
                     Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
                 };

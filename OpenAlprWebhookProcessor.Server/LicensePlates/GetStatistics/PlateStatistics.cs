@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetStatistics
 {
     public class PlateStatistics
     {

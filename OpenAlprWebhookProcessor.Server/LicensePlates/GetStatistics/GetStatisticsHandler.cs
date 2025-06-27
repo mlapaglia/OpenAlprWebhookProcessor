@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.WebPushSubscriptions;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.GetStatistics
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.GetStatistics
 {
     public class GetStatisticsHandler
     {

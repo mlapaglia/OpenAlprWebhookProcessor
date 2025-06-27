@@ -1,7 +1,7 @@
-﻿using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.Server.CameraUpdateService;
 using System;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.TestCamera
 {
     public class TestCameraHandler
     {
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public void SendTestCameraOverlay(Guid cameraId)
         {
-            _cameraUpdateService.ScheduleOverlayRequest(new CameraUpdateService.CameraUpdateRequest()
+            _cameraUpdateService.ScheduleOverlayRequest(new CameraUpdateRequest()
             {
                 Id = cameraId,
                 IsTest = true,

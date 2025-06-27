@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 {
     public static class WebhookForwarder
     {

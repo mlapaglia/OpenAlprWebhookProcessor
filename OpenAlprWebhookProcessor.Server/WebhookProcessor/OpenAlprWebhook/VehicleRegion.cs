@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebhook
 {
     public class VehicleRegion
     {

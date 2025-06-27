@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.LicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates
 {
     public class LicensePlate
     {

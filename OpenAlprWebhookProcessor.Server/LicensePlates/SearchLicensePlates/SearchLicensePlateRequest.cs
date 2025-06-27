@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates
+namespace OpenAlprWebhookProcessor.Server.LicensePlates.SearchLicensePlates
 {
     public class SearchLicensePlateRequest
     {

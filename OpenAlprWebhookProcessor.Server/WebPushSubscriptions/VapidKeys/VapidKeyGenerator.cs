@@ -5,9 +5,9 @@ using Org.BouncyCastle.Security;
 using System;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions.VapidKeys
 {
-    public class VapidKeyGenerator
+    public static class VapidKeyGenerator
     {
         public static VapidDetails GenerateVapidKeys()
         {

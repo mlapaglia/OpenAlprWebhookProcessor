@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
+using OpenAlprWebhookProcessor.Server.Settings;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Settings.GetIgnores
+namespace OpenAlprWebhookProcessor.Server.Settings.GetIgnores
 {
     public class GetIgnoresRequestHandler
     {

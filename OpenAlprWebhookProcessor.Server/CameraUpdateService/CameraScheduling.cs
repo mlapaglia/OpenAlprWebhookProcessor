@@ -2,12 +2,12 @@
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.CameraUpdateService
+namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 {
     public static class CameraScheduling
     {

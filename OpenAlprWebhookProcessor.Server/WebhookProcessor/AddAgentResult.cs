@@ -1,6 +1,6 @@
-﻿using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+﻿using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
 
-namespace OpenAlprWebhookProcessor.WebhookProcessor
+namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 {
     public class AddAgentResult
     {

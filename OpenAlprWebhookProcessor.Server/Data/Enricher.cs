@@ -1,8 +1,8 @@
-﻿using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.Settings.Enrichers;
+﻿using OpenAlprWebhookProcessor.Server.LicensePlates.Enricher;
+using OpenAlprWebhookProcessor.Server.Settings.Enrichers;
 using System;
 
-namespace OpenAlprWebhookProcessor.Data
+namespace OpenAlprWebhookProcessor.Server.Data
 {
     public class Enricher
     {

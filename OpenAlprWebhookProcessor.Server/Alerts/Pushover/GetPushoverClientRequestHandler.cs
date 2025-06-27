@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts.Pushover
+namespace OpenAlprWebhookProcessor.Server.Alerts.Pushover
 {
     public class GetPushoverClientRequestHandler
     {

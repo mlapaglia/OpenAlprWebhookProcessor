@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Alerts.WebPush
+﻿namespace OpenAlprWebhookProcessor.Server.Alerts.WebPush
 {
     public class WebPushRequest
     {

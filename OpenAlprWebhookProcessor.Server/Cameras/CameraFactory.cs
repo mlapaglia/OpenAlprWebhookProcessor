@@ -1,7 +1,9 @@
-﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
+﻿using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.Server.Cameras.Configuration;
+using OpenAlprWebhookProcessor.Server.Cameras.Hikvision;
 using System;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras
 {
     public static class CameraFactory
     {

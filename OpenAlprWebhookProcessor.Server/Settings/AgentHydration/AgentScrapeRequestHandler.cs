@@ -1,6 +1,6 @@
-﻿using OpenAlprWebhookProcessor.Hydrator;
+﻿using OpenAlprWebhookProcessor.Server.Hydration;
 
-namespace OpenAlprWebhookProcessor.Settings.AgentHydration
+namespace OpenAlprWebhookProcessor.Server.Settings.AgentHydration
 {
     public class AgentScrapeRequestHandler
     {

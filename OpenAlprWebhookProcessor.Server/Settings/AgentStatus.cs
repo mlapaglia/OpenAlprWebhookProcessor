@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Settings
+﻿namespace OpenAlprWebhookProcessor.Server.Settings
 {
     public class AgentStatus
     {

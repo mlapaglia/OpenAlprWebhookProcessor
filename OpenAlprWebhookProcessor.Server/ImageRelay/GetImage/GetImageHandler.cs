@@ -1,6 +1,6 @@
 ﻿using ImageMagick;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.IO;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.ImageRelay
+namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
 {
     public static class GetImageHandler
     {

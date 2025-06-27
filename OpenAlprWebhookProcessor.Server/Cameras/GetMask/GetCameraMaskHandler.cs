@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Cameras.UpsertMask;
+using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Server.Cameras.GetMask
 {
     public class GetCameraMaskHandler
     {

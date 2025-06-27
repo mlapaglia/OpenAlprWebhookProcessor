@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.SystemLogs
+namespace OpenAlprWebhookProcessor.Server.SystemLogs
 {
     [Authorize]
     [ApiController]

@@ -1,14 +1,20 @@
 ﻿using Lib.Net.Http.WebPush;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Server.WebPushSubscriptions
 {
     public interface IWebPushSubscriptionsService
     {
-        List<PushSubscription> GetAll();
+        Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken);
 
-        void Insert(PushSubscription subscription);
+        Task InsertAsync(
+            PushSubscription subscription,
+            CancellationToken cancellationToken);
 
-        void Delete(string endpoint);
+        Task DeleteAsync(
+            string endpoint,
+            CancellationToken cancellationToken);
     }
 }
