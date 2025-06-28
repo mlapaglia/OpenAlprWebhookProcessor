@@ -61,6 +61,17 @@ jobs:
           npm ci
           npm run test:prod
 
+      - name: Debug Coverage Directory
+        run: |
+          echo "Root directory contents:"
+          ls -la
+
+          echo "Backend coverage directory contents:"
+          ls -la coverage/
+
+          echo "Frontend coverage directory contents:"
+          ls -la openalprwebhookprocessor.client/coverage/
+
       - name: End SonarQube Analysis
         run: |
           dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
