@@ -37,8 +37,8 @@ jobs:
 
       - name: Install SonarQube Cloud scanner
         run: |
-          dotnet tool install dotnet-sonarscanner
-      
+          dotnet tool install --global dotnet-sonarscanner
+
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
