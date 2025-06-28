@@ -1,16 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NUnit.Framework;
 using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.WebhookProcessor
 {

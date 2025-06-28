@@ -11,7 +11,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
     public class WebsocketClientOrganizer : BackgroundService
     {
-        private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients;
+        private readonly ConcurrentDictionary<string, IOpenAlprWebsocketClient> _connectedClients;
 
         private readonly ILogger<WebsocketClientOrganizer> _logger;
 
@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
             ILogger<WebsocketClientOrganizer> logger)
         {
             _logger = logger;
-            _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
+            _connectedClients = new ConcurrentDictionary<string, IOpenAlprWebsocketClient>();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -48,7 +48,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 
         public async Task<AddAgentResult> AddAgentAsync(
             string agentId,
-            OpenAlprWebsocketClient webSocketClient,
+            IOpenAlprWebsocketClient webSocketClient,
             CancellationToken cancellationToken)
         {
             var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
@@ -82,15 +82,26 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
             return result;
         }
 
-        public async Task RemoveAgentAsync(
+        public async Task<bool> RemoveAgentAsync(
             string agentId,
             CancellationToken cancellationToken)
         {
             var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
 
-            if (_connectedClients.TryRemove(agentId, out var webSocketClient))
+            try
             {
-                await webSocketClient.CloseConnectionAsync(linkedCancellationToken);
+                if (_connectedClients.TryRemove(agentId, out var webSocketClient))
+                {
+                    await webSocketClient.CloseConnectionAsync(linkedCancellationToken);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unable to remove Agent: {Message}.", ex.Message);
+                return false;
             }
         }
 
@@ -143,7 +154,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return null;
             }
 
@@ -220,7 +231,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return false;
             }
 

@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
     /// Maintains a web socket connection with the OpenALPR agent. Allows for simultaneous
     /// requests to be sent and processes responses in an async manner.
     /// </summary>
-    public partial class OpenAlprWebsocketClient
+    public partial class OpenAlprWebsocketClient : IOpenAlprWebsocketClient
     {
         private readonly ConcurrentDictionary<Guid, string> _availableResponses;
 
