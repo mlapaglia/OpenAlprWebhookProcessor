@@ -40,7 +40,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Start Analysis
+      - name: Start SonarQube Analysis
         run: |
           dotnet-sonarscanner begin \
           /k:"mlapaglia_OpenAlprWebhookProcessor" \
@@ -55,13 +55,13 @@ jobs:
           dotnet build --no-restore
           dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --results-directory ./coverage
 
-      - name: Build and Test Frontend\
+      - name: Build and Test Frontend
         working-directory: ./openalprwebhookprocessor.client
         run: |
           npm ci
-          npm run test
+          npm run test:prod
 
-      - name: End Analysis
+      - name: End SonarQube Analysis
         run: |
           dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       
