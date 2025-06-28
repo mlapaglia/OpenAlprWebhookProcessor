@@ -25,8 +25,7 @@ module.exports = function (config) {
       dir: require('path').join(__dirname, './coverage'),
       subdir: '.',
       reporters: [
-        { type: 'html' },
-        { type: 'cobertura' }
+        { type: 'lcov' }
       ]
     },
     preprocessors: {

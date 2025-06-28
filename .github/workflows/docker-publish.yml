@@ -40,16 +40,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build, Test, and Analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Start Analysis
         run: |
-          dotnet-sonarscanner begin /k:"mlapaglia_OpenAlprWebhookProcessor" /o:"openalprwebhookprocessor" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml"
+          dotnet-sonarscanner begin /k:"mlapaglia_OpenAlprWebhookProcessor" /o:"openalprwebhookprocessor" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" /d:sonar.javascript.lcov.reportPaths="openalprwebhookprocessor.client/coverage/lcov.info"
+      
+      - name: Build and Test Backend
+        run: |
           dotnet restore
           dotnet build --no-restore
           dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --results-directory ./coverage
-          dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
+      - name: Build and Test Frontend
+        run: |
+          npm ci
+          npm run test
+
+      - name: End Analysis
+        run: |
+          dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      
   front-end-lint:
     runs-on: ubuntu-latest
     steps:
