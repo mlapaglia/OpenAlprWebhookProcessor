@@ -177,6 +177,8 @@ namespace OpenAlprWebhookProcessor.Server
 
             services.AddSingleton(mapper.CreateMapper());
 
+            services.AddHttpClient();
+
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()

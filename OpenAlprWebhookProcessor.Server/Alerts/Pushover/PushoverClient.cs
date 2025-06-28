@@ -16,14 +16,16 @@ namespace OpenAlprWebhookProcessor.Server.Alerts.Pushover
 
         private const string VerifyCredentialsUrl = "https://api.pushover.net/1/users/validate.json?token={0}&user={1}";
 
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         private readonly IServiceProvider _serviceProvider;
 
-        public PushoverClient(IServiceProvider serviceProvider)
+        public PushoverClient(
+            IServiceProvider serviceProvider,
+            IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient();
             _serviceProvider = serviceProvider;
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task SendAlertAsync(
@@ -65,17 +67,21 @@ namespace OpenAlprWebhookProcessor.Server.Alerts.Pushover
 
                         try
                         {
-                            var response = await _httpClient.PostAsync(
-                                PushOverApiUrl,
-                                content,
-                                cancellationToken);
-
-                            if (!response.IsSuccessStatusCode)
+                            using (var httpClient = _httpClientFactory.CreateClient())
                             {
-                                var result = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                                logger.LogError("Failed to send alert via Pushover: {result}", result);
-                                throw new InvalidOperationException("failed");
+                                var response = await httpClient.PostAsync(
+                                    PushOverApiUrl,
+                                    content,
+                                    cancellationToken);
+
+                                if (!response.IsSuccessStatusCode)
+                                {
+                                    var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                                    logger.LogError("Failed to send alert via Pushover: {result}", result);
+                                    throw new InvalidOperationException("failed");
+                                }
                             }
 
                             logger.LogInformation("Alert sent via Pushover.");
@@ -124,16 +130,19 @@ namespace OpenAlprWebhookProcessor.Server.Alerts.Pushover
 
                 try
                 {
-                    var result = await _httpClient.PostAsync(VerifyCredentialsUrl
+                    using (var httpClient = _httpClientFactory.CreateClient())
+                    {
+                        var result = await httpClient.PostAsync(VerifyCredentialsUrl
                         .Replace("{0}", clientSettings.ApiToken)
                         .Replace("{1}", clientSettings.UserKey),
                         null,
                         cancellationToken);
 
-                    if (!result.IsSuccessStatusCode)
-                    {
-                        var message = await result.Content.ReadAsStringAsync(cancellationToken);
-                        logger.LogError("Pushover credential check failed: {message}", message);
+                        if (!result.IsSuccessStatusCode)
+                        {
+                            var message = await result.Content.ReadAsStringAsync(cancellationToken);
+                            logger.LogError("Pushover credential check failed: {message}", message);
+                        }
                     }
 
                     logger.LogInformation("Pushover credentials are valid.");

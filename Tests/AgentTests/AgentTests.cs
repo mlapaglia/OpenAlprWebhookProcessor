@@ -1,6 +1,6 @@
 using OpenAlprWebhookProcessor.Server.Settings.GetAgent;
 
-namespace Tests
+namespace Tests.AgentTests
 {
     public class AgentTests
     {
