@@ -42,7 +42,12 @@ jobs:
 
       - name: Start Analysis
         run: |
-          dotnet-sonarscanner begin /k:"mlapaglia_OpenAlprWebhookProcessor" /o:"openalprwebhookprocessor" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" /d:sonar.javascript.lcov.reportPaths="openalprwebhookprocessor.client/coverage/lcov.info"
+          dotnet-sonarscanner begin \
+          /k:"mlapaglia_OpenAlprWebhookProcessor" \
+          /o:"openalprwebhookprocessor" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" \
+          /d:sonar.javascript.lcov.reportPaths="openalprwebhookprocessor.client/coverage/lcov.info"
       
       - name: Build and Test Backend
         run: |
@@ -50,7 +55,8 @@ jobs:
           dotnet build --no-restore
           dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --results-directory ./coverage
 
-      - name: Build and Test Frontend
+      - name: Build and Test Frontend\
+        working-directory: ./openalprwebhookprocessor.client
         run: |
           npm ci
           npm run test
