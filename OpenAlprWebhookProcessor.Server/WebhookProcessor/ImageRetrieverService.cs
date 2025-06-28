@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 {
-    public class ImageRetrieverService : IHostedService
+    public class ImageRetrieverService : IHostedService, IImageRetrieverService
     {
         private readonly BlockingCollection<string> _imageRequestsToProcess = new BlockingCollection<string>();
 

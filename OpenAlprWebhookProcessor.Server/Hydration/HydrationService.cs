@@ -119,9 +119,26 @@ namespace OpenAlprWebhookProcessor.Server.Hydration
                         try
                         {
                             var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
+                            using var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                            await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
-                            await scraper.ScrapeAgentImagesAsync(_cancellationTokenSource.Token);
+                            var plateGroupIds = await processorContext.PlateGroups
+                                .AsNoTracking()
+                                .Where(x => x.AgentImageScrapeOccurredOn == null)
+                                .Select(x => x.OpenAlprUuid)
+                                .ToListAsync(_cancellationTokenSource.Token);
+
+                            logger.LogInformation("Found {count} plates to query the Agent for.", plateGroupIds.Count);
+
+                            var agent = await processorContext.Agents.FirstOrDefaultAsync(_cancellationTokenSource.Token);
+
+                            await scraper.ScrapeAgentAsync(
+                                agent.LastSuccessfulScrapeEpoch,
+                                agent.EndpointUrl,
+                                _cancellationTokenSource.Token);
+
+                            await scraper.ScrapeAgentImagesAsync(
+                                plateGroupIds,
+                                _cancellationTokenSource.Token);
 
                             await _processorHub.Clients.All.ScrapeFinished();
                         }
