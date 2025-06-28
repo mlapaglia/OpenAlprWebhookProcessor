@@ -12,6 +12,10 @@ using System.IO;
 
 namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 {
+    /// <summary>
+    /// Maintains a web socket connection with the OpenALPR agent. Allows for simultaneous
+    /// requests to be sent and processes responses in an async manner.
+    /// </summary>
     public partial class OpenAlprWebsocketClient
     {
         private readonly ConcurrentDictionary<Guid, string> _availableResponses;
@@ -39,26 +43,30 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
             var receiveResult = await _webSocket.ReceiveAsync(
                 new ArraySegment<byte>(buffer), cancellationToken);
 
-            var inFlightResponse = string.Empty;
+            var inFlightResponse = new StringBuilder();
 
             while (!receiveResult.CloseStatus.HasValue)
             {
-                inFlightResponse += Encoding.UTF8.GetString(buffer.ToArray(), 0, Array.FindLastIndex(buffer, b => b != 0) + 1);
+                inFlightResponse.Append(
+                    Encoding.UTF8.GetString(
+                        buffer.ToArray(),
+                        0,
+                        Array.FindLastIndex(buffer, b => b != 0) + 1));
 
                 if (receiveResult.EndOfMessage)
                 {
-                    var transactionMatch = TransactionIdRegex().Match(inFlightResponse);
+                    var transactionMatch = TransactionIdRegex().Match(inFlightResponse.ToString());
 
                     if (transactionMatch.Success)
                     {
-                        _availableResponses.TryAdd(Guid.Parse(transactionMatch.Groups[1].Value), inFlightResponse);
+                        _availableResponses.TryAdd(Guid.Parse(transactionMatch.Groups[1].Value), inFlightResponse.ToString());
                     }
                     else
                     {
-                        _logger.LogError("End of message but no transaction id found {response}", inFlightResponse);
+                        _logger.LogError("End of message but no transaction id found {Response}", inFlightResponse.ToString());
                     }
 
-                    inFlightResponse = string.Empty;
+                    inFlightResponse.Clear();
                 }
 
                 Array.Clear(buffer, 0, buffer.Length);

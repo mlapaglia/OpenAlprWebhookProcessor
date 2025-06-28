@@ -17,7 +17,7 @@ jobs:
       - name: Run build
         run: docker build . --file ./OpenAlprWebhookProcessor.Server/Dockerfile
   
-  back-end-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 17
@@ -74,16 +74,6 @@ jobs:
         run: |
           npm ci
           npm run lint
-
-  front-end-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run frontend tests
-        working-directory: ./openalprwebhookprocessor.client
-        run: |
-          npm ci
-          npm run test:prod
 
   windows-build-push:
     needs: build

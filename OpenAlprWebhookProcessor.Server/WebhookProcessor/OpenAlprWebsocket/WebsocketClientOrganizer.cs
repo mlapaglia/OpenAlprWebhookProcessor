@@ -33,11 +33,11 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {message}", ex.Message);
+                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {Message}", ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unknown error occurred, stopping websockets: {message}", ex.Message);
+                _logger.LogError(ex, "Unknown error occurred, stopping websockets: {Message}", ex.Message);
             }
             finally
             {
@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Unable to close connection: {message}", ex.Message);
+                    _logger.LogError(ex, "Unable to close connection: {Message}", ex.Message);
                 }
             }
 
@@ -76,7 +76,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
             }
             else
             {
-                _logger.LogError("Unable to add agent: {agentID}", agentId);
+                _logger.LogError("Unable to add agent: {AgentID}", agentId);
             }
 
             return result;
@@ -105,7 +105,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return null;
             }
 

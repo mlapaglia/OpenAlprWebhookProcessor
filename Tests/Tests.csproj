@@ -36,4 +36,8 @@
     <ProjectReference Include="..\OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ImageRelay\" />
+  </ItemGroup>
+
 </Project>
