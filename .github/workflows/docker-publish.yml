@@ -47,7 +47,7 @@ jobs:
           /o:"openalprwebhookprocessor" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" \
-          /d:sonar.javascript.lcov.reportPaths="openalprwebhookprocessor.client/coverage/lcov.info"
+          /d:sonar.javascript.lcov.reportPaths="**/lcov.info"
       
       - name: Build and Test Backend
         run: |
@@ -61,23 +61,8 @@ jobs:
           npm ci
           npm run test:prod
 
-      - name: Debug Coverage Directory
-        run: |
-          echo "Root directory contents:"
-          ls -la
-
-          echo "Backend coverage directory contents:"
-          ls -la coverage/
-
-          echo "Frontend coverage directory contents:"
-          ls -la openalprwebhookprocessor.client/coverage/
-
       - name: End SonarQube Analysis
         run: |
-          echo "Working dir before Sonar end:"
-          pwd
-          echo "Listing all lcov.info:"
-          find . -name lcov.info
           dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       
   front-end-lint:
