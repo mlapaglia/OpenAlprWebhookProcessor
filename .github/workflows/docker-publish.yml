@@ -74,6 +74,10 @@ jobs:
 
       - name: End SonarQube Analysis
         run: |
+          echo "Working dir before Sonar end:"
+          pwd
+          echo "Listing all lcov.info:"
+          find . -name lcov.info
           dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       
   front-end-lint:
