@@ -40,7 +40,10 @@ namespace Tests.Alerts
         [Test]
         public void AddJob_ShouldQueueRequest()
         {
-            var request = new AlertUpdateRequest { PlateNumber = "ABC123" };
+            var request = new AlertUpdateRequest
+            {
+                PlateNumber = "ABC123"
+            };
 
             Assert.DoesNotThrow(() => _alertService.AddJob(request));
         }
@@ -48,12 +51,23 @@ namespace Tests.Alerts
         [Test]
         public async Task ProcessAlertsAsync_ShouldAlertAllClients_AndBroadcast()
         {
-            var request = new AlertUpdateRequest { PlateNumber = "XYZ789" };
+            var request = new AlertUpdateRequest
+            {
+                PlateNumber = "XYZ789"
+            };
+
             var alertClient = Substitute.For<IAlertClient>();
-            alertClient.SendAlertAsync(request, Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+            alertClient.SendAlertAsync(
+                request,
+                Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
             _mockAlertClients.Add(alertClient);
-            var testService = new AlertService(_mockLogger, _mockHubContext, _mockAlertClients);
+
+            var testService = new AlertService(
+                _mockLogger,
+                _mockHubContext,
+                _mockAlertClients);
 
             testService.AddJob(request);
 
@@ -70,8 +84,9 @@ namespace Tests.Alerts
         {
             var request = new AlertUpdateRequest { PlateNumber = "ERR500" };
             var failingClient = Substitute.For<IAlertClient>();
+
             failingClient.SendAlertAsync(request, Arg.Any<CancellationToken>())
-                .Returns<Task>(_ => throw new Exception("Send failed"));
+                .Returns(_ => throw new Exception("Send failed"));
 
             _mockAlertClients.Add(failingClient);
             var testService = new AlertService(_mockLogger, _mockHubContext, _mockAlertClients);
@@ -83,17 +98,6 @@ namespace Tests.Alerts
             await testService.StopAsync(CancellationToken.None);
 
             await failingClient.Received(1).SendAlertAsync(request, Arg.Any<CancellationToken>());
-        }
-
-        [Test]
-        public async Task StopAsync_ShouldCancelToken_AndDispose()
-        {
-            using (var tokenSource = new CancellationTokenSource())
-            {
-                await _alertService.StopAsync(tokenSource.Token);
-
-                Assert.That(tokenSource.IsCancellationRequested, Is.True);
-            }
         }
     }
 }

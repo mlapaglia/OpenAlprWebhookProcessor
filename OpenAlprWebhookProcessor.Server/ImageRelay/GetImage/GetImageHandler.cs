@@ -34,16 +34,20 @@ namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
 
             if (plateGroup.VehicleImage == null)
             {
+                var image = await GetImageFromAgentAsync(
+                    processorContext,
+                    imageId,
+                    cancellationToken);
+
                 plateGroup.VehicleImage = new VehicleImage()
                 {
-                    Jpeg = await GetImageFromAgentAsync(
-                        processorContext,
-                        imageId,
-                        cancellationToken),
+                    Jpeg = image.ToArray(),
                     IsCompressed = isImageCompressionEnabled,
                 };
 
                 await processorContext.SaveChangesAsync(cancellationToken);
+
+                return image;
             }
 
             return new MemoryStream(plateGroup.VehicleImage.Jpeg);
@@ -71,14 +75,14 @@ namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
 
             if (plateGroup.PlateImage == null)
             {
-                var image = await GetCropImageFromAgentAsync(
+                using var image = await GetCropImageFromAgentAsync(
                     processorContext,
                     imageId + "?" + plateGroup.PlateCoordinates,
                     cancellationToken);
 
                 plateGroup.PlateImage = new PlateImage()
                 {
-                    Jpeg = image,
+                    Jpeg = image.ToArray(),
                     IsCompressed = isImageCompressionEnabled,
                 };
 
@@ -88,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
             return new MemoryStream(plateGroup.PlateImage.Jpeg);
         }
 
-        public async static Task<byte[]> GetImageFromAgentAsync(
+        public async static Task<MemoryStream> GetImageFromAgentAsync(
             ProcessorContext processorContext,
             string imageId,
             CancellationToken cancellationToken)
@@ -102,26 +106,32 @@ namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
                 throw new ArgumentException("agent not configured");
             }
 
-            var httpClient = new HttpClient();
-
-            var result = await httpClient.GetAsync(
-                Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    "/img/",
-                    imageId),
-                cancellationToken);
-
-            if (!result.IsSuccessStatusCode)
+            using (var httpClient = new HttpClient())
             {
-                throw new ArgumentException("Image not found for that id.");
+                var result = await httpClient.GetAsync(
+                    Flurl.Url.Combine(
+                        agent.EndpointUrl,
+                        "/img/",
+                        imageId),
+                    cancellationToken);
+
+                if (!result.IsSuccessStatusCode)
+                {
+                    throw new ArgumentException("Image not found for that id.");
+                }
+
+                var imageStream = (MemoryStream) await result.Content.ReadAsStreamAsync(cancellationToken);
+
+                if(agent.IsImageCompressionEnabled)
+                {
+                    CompressImage(imageStream);
+                }
+                
+                return imageStream;
             }
-
-            var imageBytes = await result.Content.ReadAsByteArrayAsync(cancellationToken);
-
-            return agent.IsImageCompressionEnabled ? CompressImage(imageBytes) : imageBytes;
         }
 
-        public async static Task<byte[]> GetCropImageFromAgentAsync(
+        public async static Task<MemoryStream> GetCropImageFromAgentAsync(
             ProcessorContext processorContext,
             string imageId,
             CancellationToken cancellationToken)
@@ -135,41 +145,41 @@ namespace OpenAlprWebhookProcessor.Server.ImageRelay.GetImage
                 throw new ArgumentException("agent not configured");
             }
 
-            var httpClient = new HttpClient();
-
-            var result = await httpClient.GetAsync(
-                Flurl.Url.Combine(
-                    agent.EndpointUrl,
-                    "/crop/",
-                    imageId),
-                cancellationToken);
-
-            if (!result.IsSuccessStatusCode)
+            using (var httpClient = new HttpClient())
             {
-                throw new ArgumentException("Image not found for that id.");
+                var result = await httpClient.GetAsync(
+                    Flurl.Url.Combine(
+                        agent.EndpointUrl,
+                        "/crop/",
+                        imageId),
+                    cancellationToken);
+
+                if (!result.IsSuccessStatusCode)
+                {
+                    throw new ArgumentException("Image not found for that id.");
+                }
+
+                var imageStream = (MemoryStream) await result.Content.ReadAsStreamAsync(cancellationToken);
+
+                if (agent.IsImageCompressionEnabled) {
+                    CompressImage(imageStream);
+                }
+
+                return imageStream;
             }
-
-            var imageBytes = await result.Content.ReadAsByteArrayAsync(cancellationToken);
-
-            return agent.IsImageCompressionEnabled ? CompressImage(imageBytes) : imageBytes;
         }
 
-        public static byte[] CompressImage(byte[] rawImage)
+        public static void CompressImage(MemoryStream stream)
         {
             var optimizer = new ImageOptimizer();
 
             try
             {
-                using (var stream = new MemoryStream(rawImage))
-                {
-                    optimizer.Compress(stream);
-
-                    return stream.ToArray();
-                }
+                optimizer.Compress(stream);
             }
-            catch (Exception ex)
+            catch
             {
-                return null;
+                // do nothing
             }
         }
     }

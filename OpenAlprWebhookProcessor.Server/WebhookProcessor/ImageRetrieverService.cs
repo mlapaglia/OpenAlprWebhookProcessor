@@ -7,6 +7,7 @@ using OpenAlprWebhookProcessor.Server.ImageRelay.GetImage;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,13 +135,13 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 
                             plateGroup.PlateImage = new PlateImage()
                             {
-                                Jpeg = cropImage,
+                                Jpeg = cropImage.ToArray(),
                                 IsCompressed = isImageCompressionEnabled,
                             };
 
                             plateGroup.VehicleImage = new VehicleImage()
                             {
-                                Jpeg = image,
+                                Jpeg = image.ToArray(),
                                 IsCompressed = isImageCompressionEnabled,
                             };
                         }
@@ -213,14 +214,23 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                         {
                             if (!plateGroup.VehicleImage.IsCompressed && plateGroup.VehicleImage.Jpeg != null)
                             {
-                                plateGroup.VehicleImage.Jpeg = GetImageHandler.CompressImage(plateGroup.VehicleImage.Jpeg);
-                                plateGroup.VehicleImage.IsCompressed = true;
+                                using (var stream = new MemoryStream(plateGroup.VehicleImage.Jpeg))
+                                {
+                                    GetImageHandler.CompressImage(stream);
+                                    plateGroup.VehicleImage.Jpeg = stream.ToArray();
+                                    plateGroup.VehicleImage.IsCompressed = true;
+                                }
                             }
 
                             if (!plateGroup.PlateImage.IsCompressed && plateGroup.PlateImage.Jpeg != null)
                             {
-                                plateGroup.PlateImage.Jpeg = GetImageHandler.CompressImage(plateGroup.PlateImage.Jpeg);
-                                plateGroup.PlateImage.IsCompressed = true;
+                                using (var stream = new MemoryStream(plateGroup.PlateImage.Jpeg))
+                                {
+                                    GetImageHandler.CompressImage(stream);
+
+                                    plateGroup.PlateImage.Jpeg = stream.ToArray();
+                                    plateGroup.PlateImage.IsCompressed = true;
+                                }
                             }
                         }
 
