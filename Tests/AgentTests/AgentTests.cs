@@ -4,12 +4,12 @@ namespace Tests.AgentTests
 {
     public class AgentTests
     {
-        private EfContextCreator _contextCreator;
+        private ProcessorContextCreator _contextCreator;
 
         [SetUp]
         public void Setup()
         {
-            _contextCreator = new EfContextCreator();
+            _contextCreator = new ProcessorContextCreator();
         }
 
         [Test]

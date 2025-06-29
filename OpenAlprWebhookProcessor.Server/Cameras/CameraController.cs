@@ -71,15 +71,23 @@ namespace OpenAlprWebhookProcessor.Server.Cameras
         }
 
         [HttpPost]
-        public async Task UpsertCamera([FromBody] Camera camera)
+        public async Task UpsertCamera(
+            [FromBody] Camera camera,
+            CancellationToken cancellationToken)
         {
-            await _upsertCameraHandler.UpsertCameraAsync(camera);
+            await _upsertCameraHandler.UpsertCameraAsync(
+                camera,
+                cancellationToken);
         }
 
         [HttpPost("{cameraId}/delete")]
-        public async Task DeleteCamera(Guid cameraId)
+        public async Task DeleteCamera(
+            Guid cameraId,
+            CancellationToken cancellationToken)
         {
-            await _deleteCameraHandler.HandleAsync(cameraId);
+            await _deleteCameraHandler.HandleAsync(
+                cameraId,
+                cancellationToken);
         }
 
         [HttpPost("{cameraId}/test/overlay")]

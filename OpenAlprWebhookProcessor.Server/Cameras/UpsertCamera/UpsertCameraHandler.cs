@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Server.Cameras;
 using OpenAlprWebhookProcessor.Server.Data;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertCamera
@@ -19,10 +20,14 @@ namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertCamera
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task UpsertCameraAsync(Camera camera)
+        public async Task UpsertCameraAsync(
+            Camera camera,
+            CancellationToken cancellationToken)
         {
             var existingCamera = await _processorContext.Cameras
-                .FirstOrDefaultAsync(x => x.Id == camera.Id);
+                .FirstOrDefaultAsync(
+                x => x.Id == camera.Id,
+                cancellationToken);
 
             if (existingCamera == null)
             {
@@ -78,15 +83,17 @@ namespace OpenAlprWebhookProcessor.Server.Cameras.UpsertCamera
                 existingCamera.TimezoneOffset = camera.TimezoneOffset;
             }
 
-            await _processorContext.SaveChangesAsync();
+            await _processorContext.SaveChangesAsync(cancellationToken);
 
             if (existingCamera.UpdateDayNightModeEnabled)
             {
-                await _cameraUpdateService.ScheduleDayNightTaskAsync();
+                await _cameraUpdateService.ScheduleDayNightTaskAsync(cancellationToken);
             }
             else
             {
-                await _cameraUpdateService.DeleteSunriseSunsetAsync(existingCamera.Id);
+                await _cameraUpdateService.DeleteSunriseSunsetAsync(
+                    existingCamera.Id,
+                    cancellationToken);
             }
         }
     }

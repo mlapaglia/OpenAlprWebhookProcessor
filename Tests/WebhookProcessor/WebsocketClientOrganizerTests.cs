@@ -53,6 +53,7 @@ namespace Tests.WebhookProcessor
         {
             var agentId = Guid.NewGuid().ToString();
             var websocketClient = Substitute.For<IOpenAlprWebsocketClient>();
+
             await _websocketClientOrganizer.AddAgentAsync(
                 agentId,
                 websocketClient,

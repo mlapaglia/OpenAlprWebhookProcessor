@@ -4,13 +4,18 @@ using OpenAlprWebhookProcessor.Server.Data;
 
 namespace Tests
 {
-    public class EfContextCreator
+    /// <summary>
+    /// Creates an in-memory SQLite database for testing.
+    /// Once instantiated, all calls to <see cref="CreateContext()" /> will use the same
+    /// in-memory database.
+    /// </summary>
+    public class ProcessorContextCreator
     {
         readonly SqliteConnection _connection;
 
         readonly DbContextOptions<ProcessorContext> _contextOptions;
 
-        public EfContextCreator()
+        public ProcessorContextCreator()
         {
             _connection = new SqliteConnection("Filename=:memory:");
             _connection.Open();

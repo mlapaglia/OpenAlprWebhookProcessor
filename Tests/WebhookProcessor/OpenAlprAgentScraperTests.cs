@@ -30,16 +30,14 @@ namespace Tests.WebhookProcessorTests
         }
 
         [Test]
-        public async Task ScrapeAgentImagesAsync_AddsJobsForMissingImages()
+        public void ScrapeAgentImagesAsync_AddsJobsForMissingImages()
         {
             var plateGroupIds = new List<string>()
             {
                 Guid.NewGuid().ToString(),
             };
 
-            await _scraper.ScrapeAgentImagesAsync(
-                plateGroupIds,
-                CancellationToken.None);
+            _scraper.ScheduleAgentImageScraping(plateGroupIds);
 
             _imageRetrieverSub.Received(1).TryAddJob(plateGroupIds[0]);
         }

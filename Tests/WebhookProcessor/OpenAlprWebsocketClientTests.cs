@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using OpenAlprWebhookProcessor.Server.WebhookProcessor.OpenAlprWebsocket;
 using System.Net.WebSockets;
 using System.Text;
@@ -98,7 +99,9 @@ namespace Tests.WebhookProcessor
 
             await _client.ConsumeMessagesAsync(CancellationToken.None);
 
-            var result = _client.TryGetImageDownloadResponse(transactionId, out var downloadedImage);
+            var result = _client.TryGetImageDownloadResponse(
+                transactionId,
+                out var downloadedImage);
 
             Assert.That(result, Is.True);
             Assert.That(downloadedImage, Is.Not.Null);
@@ -109,11 +112,22 @@ namespace Tests.WebhookProcessor
         //{
         //}
 
-        //[Test]
-        //public async Task SendGetAgentStatusRequestAsync_SendsCorrectPayload()
-        //{
-        //   
-        //}
+        [Test]
+        public async Task SendGetAgentStatusRequestAsync_SendsCorrectPayload()
+        {
+            var transactionId = Guid.NewGuid();
+
+            await _client.SendGetAgentStatusRequestAsync(
+                transactionId,
+                CancellationToken.None);
+
+            await _webSocket.Received().SendAsync(
+                Arg.Is<ArraySegment<byte>>(segment =>
+                    Encoding.UTF8.GetString(segment)!.Contains(transactionId.ToString())),
+                WebSocketMessageType.Binary,
+                true,
+                default);
+        }
 
         //[Test]
         //public void TryGetAgentResponse_ReturnsTrue_WhenValidResponseExists()

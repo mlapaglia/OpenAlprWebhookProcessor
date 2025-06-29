@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 {
-    public class CameraUpdateService : IHostedService
+    public class CameraUpdateService : IHostedService, ICameraUpdateService
     {
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -34,17 +34,17 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
             _backgroundJobClient = backgroundJobClient;
         }
 
-        public async Task ForceSunriseSunsetAsync()
+        public async Task ForceSunriseSunsetAsync(CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var agent = await processorContext.Agents.FirstOrDefaultAsync();
+                var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
                 var camerasToUpdate = await processorContext.Cameras
                     .Where(x => x.UpdateDayNightModeEnabled)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 foreach (var camera in camerasToUpdate)
                 {
@@ -61,27 +61,30 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
             }
         }
 
-        public async Task DeleteSunriseSunsetAsync(Guid cameraId)
+        public async Task DeleteSunriseSunsetAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                var cameraToUpdate = await processorContext.Cameras
-                    .Where(x => x.Id == cameraId)
-                    .FirstOrDefaultAsync();
-
-                if (cameraToUpdate == null)
+                using (var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>())
                 {
-                    throw new ArgumentException("Camera not found");
-                }
+                    var cameraToUpdate = await processorContext.Cameras
+                        .Where(x => x.Id == cameraId)
+                        .FirstOrDefaultAsync(cancellationToken);
 
-                if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextDayNightScheduleId))
-                {
-                    _backgroundJobClient.Delete(cameraToUpdate.NextDayNightScheduleId);
+                    if (cameraToUpdate == null)
+                    {
+                        throw new ArgumentException("Camera not found");
+                    }
 
-                    cameraToUpdate.NextDayNightScheduleId = string.Empty;
-                    await processorContext.SaveChangesAsync();
+                    if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextDayNightScheduleId))
+                    {
+                        _backgroundJobClient.Delete(cameraToUpdate.NextDayNightScheduleId);
+
+                        cameraToUpdate.NextDayNightScheduleId = string.Empty;
+                        await processorContext.SaveChangesAsync(cancellationToken);
+                    }
                 }
             }
         }
@@ -93,48 +96,49 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                _logger.LogInformation("setting {sunriseSunset} for {cameraId}", sunriseSunset, cameraId);
-
-                try
+                using (var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>())
                 {
-                    var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
+                    _logger.LogInformation("Setting {SunriseSunset} for {CameraId}", sunriseSunset, cameraId);
 
-                    if (cameraToUpdate == null)
+                    try
                     {
-                        _logger.LogError("Unable to find camera with OpenAlprId: {cameraId}, check your configuration.", cameraId);
-                        return;
+                        var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
+
+                        if (cameraToUpdate == null)
+                        {
+                            _logger.LogError("Unable to find camera with OpenAlprId: {CameraId}, check your configuration.", cameraId);
+                            return;
+                        }
+
+                        var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                        await camera.TriggerDayNightModeAsync(
+                            sunriseSunset,
+                            _cancellationTokenSource.Token);
+
+                        await TriggerZoomAndFocusAsync(
+                            sunriseSunset,
+                            cameraToUpdate,
+                            camera);
+
+                        if (scheduleNextJob)
+                        {
+                            _logger.LogInformation("Scheduling next job for {CameraId}", cameraId);
+
+                            var agent = await processorContext.Agents.FirstOrDefaultAsync();
+
+                            CameraScheduling.ScheduleDayNightTask(
+                                this,
+                                _backgroundJobClient,
+                                agent,
+                                cameraToUpdate);
+
+                            await processorContext.SaveChangesAsync();
+                        }
                     }
-
-                    var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
-                    await camera.TriggerDayNightModeAsync(
-                        sunriseSunset,
-                        _cancellationTokenSource.Token);
-
-                    await TriggerZoomAndFocusAsync(
-                        sunriseSunset,
-                        cameraToUpdate,
-                        camera);
-
-                    if (scheduleNextJob)
+                    catch (Exception ex)
                     {
-                        _logger.LogInformation("Scheduling next job for {cameraId}", cameraId);
-
-                        var agent = await processorContext.Agents.FirstOrDefaultAsync();
-
-                        CameraScheduling.ScheduleDayNightTask(
-                            this,
-                            _backgroundJobClient,
-                            agent,
-                            cameraToUpdate);
-
-                        await processorContext.SaveChangesAsync();
+                        _logger.LogError(ex, ex.Message);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message);
                 }
             }
         }
@@ -143,12 +147,13 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
         {
             Task.Run(async () =>
             {
-                await ForceSunriseSunsetAsync();
+                await ForceSunriseSunsetAsync(cancellationToken);
 
                 await CameraScheduling.ScheduleDayNightTasksAsync(
                     this,
                     _serviceProvider,
-                    _backgroundJobClient);
+                    _backgroundJobClient,
+                    cancellationToken);
 
                 await ForceClearOverlaysAsync();
             }, cancellationToken);
@@ -158,17 +163,19 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
+            await _cancellationTokenSource.CancelAsync();
+            _cancellationTokenSource.Dispose();
 
             await ForceClearOverlaysAsync();
         }
 
-        public async Task ScheduleDayNightTaskAsync()
+        public async Task ScheduleDayNightTaskAsync(CancellationToken cancellationToken)
         {
             await CameraScheduling.ScheduleDayNightTasksAsync(
                 this,
                 _serviceProvider,
-                _backgroundJobClient);
+                _backgroundJobClient,
+                cancellationToken);
         }
 
         public void EnqueueDayNight(
@@ -193,7 +200,7 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                _logger.LogInformation("processing job for plate: {plateNumber}", cameraUpdateRequest.LicensePlate);
+                _logger.LogInformation("Processing job for plate: {PlateNumber}", cameraUpdateRequest.LicensePlate);
 
                 try
                 {
@@ -201,13 +208,13 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 
                     if (cameraToUpdate == null)
                     {
-                        _logger.LogError("Unable to find camera with OpenAlprId: {cameraId}, check your configuration.", cameraUpdateRequest.Id);
+                        _logger.LogError("Unable to find camera with OpenAlprId: {CameraId}, check your configuration.", cameraUpdateRequest.Id);
                         throw new ArgumentException($"unknown camera Id: {cameraUpdateRequest.Id}");
                     }
 
                     if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextClearOverlayScheduleId))
                     {
-                        _logger.LogInformation("cancelling redundant clear overlay job: {jobId}", cameraToUpdate.NextClearOverlayScheduleId);
+                        _logger.LogInformation("cancelling redundant clear overlay job: {JobId}", cameraToUpdate.NextClearOverlayScheduleId);
                         _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
                     }
 
@@ -233,7 +240,7 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex.Message);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
         }
@@ -246,7 +253,7 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
 
                 var cameraToUpdate = await processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
 
-                _logger.LogInformation("clearing expired overlay for: {cameraID}", cameraToUpdate.OpenAlprCameraId);
+                _logger.LogInformation("clearing expired overlay for: {CameraID}", cameraToUpdate.OpenAlprCameraId);
 
                 var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
@@ -328,11 +335,13 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                foreach (var cameraToUpdate in await processorContext.Cameras.ToListAsync())
+                foreach (var cameraToUpdate in await processorContext.Cameras.ToListAsync(_cancellationTokenSource.Token))
                 {
-                    _logger.LogInformation("force clearing overlay for: {cameraId}", cameraToUpdate.OpenAlprCameraId);
+                    _logger.LogInformation("force clearing overlay for: {CameraId}", cameraToUpdate.OpenAlprCameraId);
 
-                    var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                    var camera = CameraFactory.Create(
+                        cameraToUpdate.Manufacturer,
+                        cameraToUpdate);
 
                     await camera.ClearCameraTextAsync(
                         _cancellationTokenSource.Token);
@@ -340,7 +349,7 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
                     cameraToUpdate.NextClearOverlayScheduleId = string.Empty;
                 }
 
-                await processorContext.SaveChangesAsync();
+                await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
             }
         }
 

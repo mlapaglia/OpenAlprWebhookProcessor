@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Server.Data;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Server.Cameras.DeleteCamera
@@ -19,11 +20,15 @@ namespace OpenAlprWebhookProcessor.Server.Cameras.DeleteCamera
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task HandleAsync(Guid cameraId)
+        public async Task HandleAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken)
         {
             var camera = await _processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
 
-            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
+            await _cameraUpdateService.DeleteSunriseSunsetAsync(
+                camera.Id,
+                cancellationToken);
 
             _processorContext.Remove(camera);
             await _processorContext.SaveChangesAsync();

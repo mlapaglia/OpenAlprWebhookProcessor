@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
         private readonly ProcessorContext _processorContext;
 
         public SinglePlateWebhookHandler(
-            ILogger<GroupWebhookHandler> logger,
+            ILogger<SinglePlateWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
             ProcessorContext processorContext)
         {
@@ -82,7 +82,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                        _logger.LogError(ex, "failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
                     }
                 }
             }

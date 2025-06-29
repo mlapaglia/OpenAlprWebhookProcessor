@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Server.Data;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
@@ -14,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
         public static void ExecuteSingleDayNightTask(
             SunriseSunset sunriseSunset,
             Guid cameraId,
-            CameraUpdateService cameraUpdateService,
+            ICameraUpdateService cameraUpdateService,
             IBackgroundJobClient backgroundJobClient)
         {
             backgroundJobClient.Enqueue(
@@ -25,17 +26,18 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
         }
 
         public static async Task ScheduleDayNightTasksAsync(
-            CameraUpdateService cameraUpdateService,
+            ICameraUpdateService cameraUpdateService,
             IServiceProvider serviceProvider,
-            IBackgroundJobClient backgroundJobClient)
+            IBackgroundJobClient backgroundJobClient,
+            CancellationToken cancellationToken)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
-                var camerasToUpdate = await processorContext.Cameras.ToListAsync();
+                var camerasToUpdate = await processorContext.Cameras.ToListAsync(cancellationToken);
 
-                var agent = await processorContext.Agents.FirstOrDefaultAsync();
+                var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 
                 foreach (var camera in camerasToUpdate.Where(x => x.UpdateDayNightModeEnabled))
                 {
@@ -46,12 +48,12 @@ namespace OpenAlprWebhookProcessor.Server.CameraUpdateService
                         camera);
                 }
 
-                await processorContext.SaveChangesAsync();
+                await processorContext.SaveChangesAsync(cancellationToken);
             }
         }
 
         public static void ScheduleDayNightTask(
-            CameraUpdateService cameraUpdateService,
+            ICameraUpdateService cameraUpdateService,
             IBackgroundJobClient backgroundJobClient,
             Agent agent,
             Camera camera)

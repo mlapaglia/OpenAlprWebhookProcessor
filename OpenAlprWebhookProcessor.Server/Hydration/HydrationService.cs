@@ -43,14 +43,8 @@ namespace OpenAlprWebhookProcessor.Server.Hydration
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-                var agent = await processorContext.Agents
-                    .FirstOrDefaultAsync(cancellationToken);
+            await ScheduleHydrationAsync(cancellationToken);
 
-                await ScheduleHydrationAsync(cancellationToken);
-            }
             _ = Task.Run(() => StartHydrationAsync(), cancellationToken);
         }
 
@@ -127,7 +121,7 @@ namespace OpenAlprWebhookProcessor.Server.Hydration
                                 .Select(x => x.OpenAlprUuid)
                                 .ToListAsync(_cancellationTokenSource.Token);
 
-                            logger.LogInformation("Found {count} plates to query the Agent for.", plateGroupIds.Count);
+                            logger.LogInformation("Found {Count} plates to query the Agent for.", plateGroupIds.Count);
 
                             var agent = await processorContext.Agents.FirstOrDefaultAsync(_cancellationTokenSource.Token);
 
@@ -136,9 +130,7 @@ namespace OpenAlprWebhookProcessor.Server.Hydration
                                 agent.EndpointUrl,
                                 _cancellationTokenSource.Token);
 
-                            await scraper.ScrapeAgentImagesAsync(
-                                plateGroupIds,
-                                _cancellationTokenSource.Token);
+                            scraper.ScheduleAgentImageScraping(plateGroupIds);
 
                             await _processorHub.Clients.All.ScrapeFinished();
                         }

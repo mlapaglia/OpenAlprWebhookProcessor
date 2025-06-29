@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
 
         private readonly HashSet<string> _imageRequestsToProcessList = new();
 
-        private readonly object _imageRequestsToProcessGate = new();
+        private readonly Lock _imageRequestsToProcessLock = new();
 
         private readonly BlockingCollection<string> _imageCompressionRequestsToProcess = new();
 
@@ -61,20 +61,20 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
             using (var scope = _serviceProvider.CreateScope())
             {
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
-                logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
+                logger.LogInformation("adding job for image: {ImageId}", openAlprImageId);
 
-                lock (_imageRequestsToProcessGate)
+                lock (_imageRequestsToProcessLock)
                 {
                     if (_imageRequestsToProcessList.Contains(openAlprImageId))
                     {
-                        logger.LogInformation("image is already queued for processing: {imageId}", openAlprImageId);
+                        logger.LogInformation("image is already queued for processing: {ImageId}", openAlprImageId);
                         return false;
                     }
                     else
                     {
                         if (!_imageRequestsToProcess.TryAdd(openAlprImageId))
                         {
-                            logger.LogError("Unable to queue image for processing: {imageId}", openAlprImageId);
+                            logger.LogError("Unable to queue image for processing: {ImageId}", openAlprImageId);
                             return false;
                         }
 
@@ -97,7 +97,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
-                    logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
+                    logger.LogInformation("{NumberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
 
                     var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
@@ -116,7 +116,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                     {
                         if (plateGroup == null)
                         {
-                            logger.LogError("Unable to find openalpr group id: {groupId}", job);
+                            logger.LogError("Unable to find openalpr group id: {GroupId}", job);
                             continue;
                         }
 
@@ -146,19 +146,19 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
+                            logger.LogError(ex, "Unable to retrieve image from Agent: {ImageId}", job);
                         }
 
                         plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
 
-                        lock (_imageRequestsToProcessGate)
+                        lock (_imageRequestsToProcessLock)
                         {
                             _imageRequestsToProcessList.Remove(job);
                         }
                     }
 
-                    logger.LogInformation("finished job for image: {imageId}", job);
+                    logger.LogInformation("finished job for image: {ImageId}", job);
                 }
             }
         }
@@ -207,7 +207,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                             lastReceivedOnEpoch = plateGroups.First().ReceivedOnEpoch;
                         }
 
-                        logger.LogInformation("Searcing for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, plateGroups.Count);
+                        logger.LogInformation("Searcing for images newer than {Epoch}: {NumberOfRequests} images queued for compression", lastReceivedOnEpoch, plateGroups.Count);
 
                         foreach (var plateGroup in plateGroups)
                         {

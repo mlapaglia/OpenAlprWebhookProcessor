@@ -39,7 +39,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("request received from: {ipAddress}", Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("request received from: {IpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
 
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
@@ -99,7 +99,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
                 }
                 else
                 {
-                    _logger.LogInformation("Unknown payload received, ignoring: {rawWebhook}", rawWebhook);
+                    _logger.LogInformation("Unknown payload received, ignoring: {RawWebhook}", rawWebhook);
                 }
             }
 
@@ -109,7 +109,7 @@ namespace OpenAlprWebhookProcessor.Server.WebhookProcessor
         [HttpGet]
         public ActionResult Get()
         {
-            _logger.LogInformation("test succeeded from: {remoteIpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("test succeeded from: {RemoteIpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
             return Ok("Webhook Processor");
         }
     }
