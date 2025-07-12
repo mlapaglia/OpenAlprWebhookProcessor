@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts

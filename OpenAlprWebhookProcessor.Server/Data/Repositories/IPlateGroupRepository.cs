@@ -1,4 +1,4 @@
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -52,5 +52,9 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             CancellationToken cancellationToken = default);
 
         Task<PlateGroup?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
+
+        Task<(List<long> seenPlates, List<long> seenPossiblePlates)> GetPlateStatisticsEpochsAsync(
+            string plateNumber, 
+            CancellationToken cancellationToken = default);
     }
 } 

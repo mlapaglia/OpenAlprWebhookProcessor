@@ -36,14 +36,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Middleware
         {
             context.Response.ContentType = "application/json";
 
-            var response = new
-            {
-                error = new
-                {
-                    message = exception.Message,
-                    details = exception.InnerException?.Message
-                }
-            };
+            object response;
 
             switch (exception)
             {
@@ -60,16 +53,28 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Middleware
                     break;
 
                 case ArgumentException:
-                case ArgumentNullException:
-                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    break;
-
                 case UnauthorizedAccessException:
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    response = new
+                    {
+                        error = new
+                        {
+                            message = exception.Message,
+                            details = exception.InnerException?.Message
+                        }
+                    };
                     break;
 
                 case NotImplementedException:
                     context.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
+                    response = new
+                    {
+                        error = new
+                        {
+                            message = exception.Message,
+                            details = exception.InnerException?.Message
+                        }
+                    };
                     break;
 
                 default:
@@ -79,7 +84,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Middleware
                         error = new
                         {
                             message = "An internal server error occurred",
-                            details = (string?)null
+                            details = exception.InnerException?.Message
                         }
                     };
                     break;

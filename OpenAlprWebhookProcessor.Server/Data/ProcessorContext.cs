@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using System.Reflection;
 
 namespace OpenAlprWebhookProcessor.Data

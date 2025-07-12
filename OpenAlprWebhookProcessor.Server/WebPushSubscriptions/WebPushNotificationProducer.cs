@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
 using System.Collections.Generic;
-using Flurl;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {

@@ -8,8 +8,6 @@ using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Infrastructure.Behaviors;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
 using OpenAlprWebhookProcessor.Users.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
@@ -19,6 +17,8 @@ using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Hydrator;
 using Lib.Net.Http.WebPush;
 using System.Reflection;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {

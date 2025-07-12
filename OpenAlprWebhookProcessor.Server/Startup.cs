@@ -1,23 +1,17 @@
-using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.SystemLogs;
 using OpenAlprWebhookProcessor.Users;
 using OpenAlprWebhookProcessor.Users.Data;
-using OpenAlprWebhookProcessor.Users.Register;
 using Serilog;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor

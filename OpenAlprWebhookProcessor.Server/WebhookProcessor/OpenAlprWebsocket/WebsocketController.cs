@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
-using System.Linq;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {

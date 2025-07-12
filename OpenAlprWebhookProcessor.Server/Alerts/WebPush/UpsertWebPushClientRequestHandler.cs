@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts.WebPush

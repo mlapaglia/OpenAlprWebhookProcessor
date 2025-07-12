@@ -9,9 +9,7 @@ using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.IO;
-using System.Collections;
 using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket.OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {

@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.SearchLicensePlates;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using System.Threading;
 using System.Threading.Tasks;

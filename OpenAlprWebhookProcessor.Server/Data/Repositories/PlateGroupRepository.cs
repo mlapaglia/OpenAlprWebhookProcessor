@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.LicensePlates.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -147,6 +147,27 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             return await _dbSet
                 .Include(x => x.PossibleNumbers)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
+        public async Task<(List<long> seenPlates, List<long> seenPossiblePlates)> GetPlateStatisticsEpochsAsync(
+            string plateNumber, 
+            CancellationToken cancellationToken = default)
+        {
+            // Get all plates where BestNumber matches the plate number
+            var seenPlates = await _dbSet
+                .AsNoTracking()
+                .Where(x => x.BestNumber == plateNumber)
+                .Select(x => x.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
+
+            // Get all plates from PlateGroupPossibleNumbers where Number matches the plate number
+            var seenPossiblePlates = await _context.PlateGroupPossibleNumbers
+                .AsNoTracking()
+                .Where(x => x.Number == plateNumber)
+                .Select(x => x.PlateGroup.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
+
+            return (seenPlates, seenPossiblePlates);
         }
 
         private IQueryable<PlateGroup> BuildSearchQuery(

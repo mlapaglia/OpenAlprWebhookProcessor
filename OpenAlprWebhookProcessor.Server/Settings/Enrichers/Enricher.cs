@@ -1,6 +1,5 @@
-﻿using OpenAlprWebhookProcessor.LicensePlates.Enricher;
+﻿using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate;
 using System;
-using System.Text.Json.Serialization;
 
 namespace OpenAlprWebhookProcessor.Settings.Enrichers
 {

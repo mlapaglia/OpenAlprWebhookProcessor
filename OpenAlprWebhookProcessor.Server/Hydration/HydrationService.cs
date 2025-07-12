@@ -13,7 +13,6 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.Storage;
-using System.Linq.Expressions;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {

@@ -3,11 +3,6 @@ using NSubstitute;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
-using OpenAlprWebhookProcessor.LicensePlates;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.Features.LicensePlates.Queries
 {

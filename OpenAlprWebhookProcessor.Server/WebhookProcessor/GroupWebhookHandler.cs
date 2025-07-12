@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Hangfire.States;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,6 @@ using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Utilities;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {

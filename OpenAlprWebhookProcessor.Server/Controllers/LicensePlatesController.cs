@@ -1,10 +1,19 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.UpsertPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilters;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
-using OpenAlprWebhookProcessor.LicensePlates;
-using OpenAlprWebhookProcessor.LicensePlates.SearchLicensePlates;
+using OpenAlprWebhookProcessor.Server.Features;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetMostSeenPlates;
+using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.SearchLicensePlates;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +50,7 @@ namespace OpenAlprWebhookProcessor.Controllers
                 VehicleModel = request.VehicleModel,
                 VehicleType = request.VehicleType,
                 VehicleRegion = request.VehicleRegion,
-                FilterPlatesSeenLessThan = request.FilterPlatesSeenLessThan,
+                FilterPlatesSeenLessThan = request.FilterPlatesSeenLessThan ?? 0,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
@@ -55,25 +64,10 @@ namespace OpenAlprWebhookProcessor.Controllers
             [FromBody] LicensePlate licensePlate,
             CancellationToken cancellationToken)
         {
-            var command = new UpsertPlateCommand
+            var command = new EditPlateCommand
             {
                 Id = licensePlate.Id,
                 PlateNumber = licensePlate.PlateNumber,
-                Description = licensePlate.Description,
-                IsAlert = licensePlate.IsAlert,
-                IsIgnore = licensePlate.IsIgnore,
-                VehicleColor = licensePlate.VehicleColor,
-                VehicleMake = licensePlate.VehicleMake,
-                VehicleModel = licensePlate.VehicleModel,
-                VehicleType = licensePlate.VehicleType,
-                VehicleRegion = licensePlate.VehicleRegion,
-                Latitude = licensePlate.Latitude,
-                Longitude = licensePlate.Longitude,
-                ReceivedOnEpoch = licensePlate.ReceivedOnEpoch,
-                IsStrictMatch = licensePlate.IsStrictMatch,
-                IsPatternMatch = licensePlate.IsPatternMatch,
-                IsEnriched = licensePlate.IsEnriched,
-                EnrichedData = licensePlate.EnrichedData,
                 Notes = licensePlate.Notes
             };
 
@@ -81,13 +75,81 @@ namespace OpenAlprWebhookProcessor.Controllers
             return Ok();
         }
 
-        // TODO: Add other endpoints using MediatR pattern
-        // - GetPlate
-        // - GetLicensePlateCounts
-        // - GetMostSeenPlates
-        // - GetStatistics
-        // - GetPlateFilters
-        // - DeletePlate
-        // - EnrichPlate
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<LicensePlate?>> GetPlate(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetPlateQuery(id);
+            var result = await _mediator.Send(query, cancellationToken);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
+        [HttpGet("counts")]
+        public async Task<ActionResult<GetLicensePlateCountsResponse>> GetLicensePlateCounts(
+            [FromQuery] DateTimeOffset startDate,
+            [FromQuery] DateTimeOffset endDate,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetLicensePlateCountsQuery(startDate, endDate);
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("most-seen")]
+        public async Task<ActionResult<GetMostSeenPlatesResponse>> GetMostSeenPlates(
+            [FromQuery] DateTimeOffset? startDate,
+            [FromQuery] DateTimeOffset? endDate,
+            CancellationToken cancellationToken,
+            [FromQuery] int limit = 10)
+        {
+            var query = new GetMostSeenPlatesQuery(startDate, endDate, limit);
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("statistics/{plateNumber}")]
+        public async Task<ActionResult> GetStatistics(
+            string plateNumber,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetStatisticsQuery(plateNumber);
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("filters")]
+        public async Task<ActionResult> GetPlateFilters(CancellationToken cancellationToken)
+        {
+            var query = new GetPlateFiltersQuery();
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> DeletePlate(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var command = new DeletePlateCommand(id);
+            await _mediator.Send(command, cancellationToken);
+            return Ok();
+        }
+
+        [HttpPost("{id:guid}/enrich")]
+        public async Task<ActionResult> EnrichPlate(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var command = new EnrichPlateCommand(id);
+            await _mediator.Send(command, cancellationToken);
+            return Ok();
+        }
     }
 } 
