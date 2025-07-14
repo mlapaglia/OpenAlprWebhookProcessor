@@ -41,10 +41,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
             // Migrate UsersContext
             var usersContext = services.GetRequiredService<UsersContext>();
-            if ((await usersContext.Database.GetPendingMigrationsAsync()).Any())
-            {
-                await usersContext.Database.MigrateAsync();
-            }
+            await usersContext.Database.MigrateAsync();
 
             return app;
         }

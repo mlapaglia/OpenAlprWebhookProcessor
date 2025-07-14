@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -19,6 +20,10 @@ using Lib.Net.Http.WebPush;
 using System.Reflection;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -55,6 +60,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddScoped<IRepository<Data.Alert>, Repository<Data.Alert>>();
             services.AddScoped<IRepository<Ignore>, Repository<Ignore>>();
             services.AddScoped<IRepository<Camera>, Repository<Camera>>();
+            services.AddScoped<IRepository<CameraMask>, Repository<CameraMask>>();
             services.AddScoped<IRepository<Enricher>, Repository<Enricher>>();
             services.AddScoped<IRepository<WebhookForward>, Repository<WebhookForward>>();
             services.AddScoped<IRepository<Pushover>, Repository<Pushover>>();
@@ -91,6 +97,8 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
+            services.AddScoped<GroupWebhookHandler>();
+            services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<OpenAlprAgentScraper>();
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
             services.AddSingleton<IAlertClient, PushoverClient>();
@@ -105,7 +113,6 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            // Note: JWT key setup will be handled during startup
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
@@ -115,8 +122,23 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
-                // Token validation parameters will be configured during startup
+                x.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (string.IsNullOrWhiteSpace(context.Token)
+                            && context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
+                        {
+                            context.Token = context.Request.Cookies["jwtToken"];
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
+
+            // Configure JWT options using the service provider
+            services.ConfigureOptions<JwtBearerPostConfigureOptions>();
 
             return services;
         }
@@ -132,6 +154,35 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
             services.AddSingleton(mapper.CreateMapper());
             return services;
+        }
+    }
+
+    public class JwtBearerPostConfigureOptions : Microsoft.Extensions.Options.IPostConfigureOptions<JwtBearerOptions>
+    {
+        private readonly IServiceProvider _serviceProvider;
+
+        public JwtBearerPostConfigureOptions(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        public void PostConfigure(string name, JwtBearerOptions options)
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+                {
+                    // Get the signing key from the database
+                    using var scope = _serviceProvider.CreateScope();
+                    var userService = scope.ServiceProvider.GetRequiredService<Users.IUserService>();
+                    var key = userService.GetJwtSecretKeyAsync().Result;
+                    return new[] { new SymmetricSecurityKey(key) };
+                },
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            };
         }
     }
 } 

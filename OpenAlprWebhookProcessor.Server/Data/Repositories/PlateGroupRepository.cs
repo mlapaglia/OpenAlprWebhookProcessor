@@ -129,17 +129,13 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             var startEpochMs = startDate.ToUnixTimeMilliseconds();
             var endEpochMs = endDate.ToUnixTimeMilliseconds();
 
-            var query = _dbSet
+            var results = await _context.PlateGroups
+                .AsNoTracking()
                 .Where(x => x.ReceivedOnEpoch >= startEpochMs && x.ReceivedOnEpoch <= endEpochMs)
-                .GroupBy(x => new { Date = DateTimeOffset.FromUnixTimeMilliseconds(x.ReceivedOnEpoch).Date })
-                .Select(g => new DayCount
-                {
-                    Date = g.Key.Date,
-                    Count = g.Count()
-                })
-                .OrderBy(x => x.Date);
+                .Select(y => y.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
 
-            return await query.ToListAsync(cancellationToken);
+            return GroupByDay(results);
         }
 
         public async Task<PlateGroup?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
@@ -168,6 +164,23 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 .ToListAsync(cancellationToken);
 
             return (seenPlates, seenPossiblePlates);
+        }
+
+        private static List<DayCount> GroupByDay(List<long> plateCounts)
+        {
+            var groupedResults = plateCounts.GroupBy(x => DateTimeOffset.FromUnixTimeMilliseconds(x).Date);
+            var parsedResults = new List<DayCount>();
+
+            foreach (var date in groupedResults)
+            {
+                parsedResults.Add(new DayCount()
+                {
+                    Count = date.Count(),
+                    Date = date.Key,
+                });
+            }
+
+            return parsedResults;
         }
 
         private IQueryable<PlateGroup> BuildSearchQuery(

@@ -1,5 +1,4 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
 {

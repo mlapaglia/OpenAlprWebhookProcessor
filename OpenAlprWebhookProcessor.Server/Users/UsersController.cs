@@ -64,6 +64,7 @@ namespace OpenAlprWebhookProcessor.Users
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpPost("revoke-token")]
         public async Task<IActionResult> RevokeToken(
             [FromBody] RevokeTokenRequest model,

@@ -1,10 +1,8 @@
 using Hangfire;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.SystemLogs;
@@ -67,9 +65,6 @@ namespace OpenAlprWebhookProcessor
 
         public void Configure(IApplicationBuilder app)
         {
-            // Configure JWT authentication with actual key
-            ConfigureJwtAuthentication(app);
-
             app.EnsureDatabasesCreatedAsync().Wait();
 
             app.UseSerilogRequestLogging();
@@ -109,37 +104,6 @@ namespace OpenAlprWebhookProcessor
             });
 
             ConfigureLogging(app);
-        }
-
-        private static void ConfigureJwtAuthentication(IApplicationBuilder app)
-        {
-            using var scope = app.ApplicationServices.CreateScope();
-            using var usersContext = scope.ServiceProvider.GetRequiredService<UsersContext>();
-            var userService = new UserService(usersContext);
-            var secretKey = userService.GetJwtSecretKeyAsync().Result;
-
-            var jwtOptions = app.ApplicationServices.GetRequiredService<Microsoft.Extensions.Options.IOptionsMonitor<JwtBearerOptions>>();
-            jwtOptions.CurrentValue.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ClockSkew = TimeSpan.Zero
-            };
-            jwtOptions.CurrentValue.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    if (string.IsNullOrWhiteSpace(context.Token)
-                        && context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
-                    {
-                        context.Token = context.Request.Cookies["jwtToken"];
-                    }
-
-                    return Task.CompletedTask;
-                }
-            };
         }
 
         private static void ConfigureLogging(IApplicationBuilder app)

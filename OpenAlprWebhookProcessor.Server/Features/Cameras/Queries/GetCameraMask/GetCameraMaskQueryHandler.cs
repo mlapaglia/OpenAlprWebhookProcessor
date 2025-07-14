@@ -1,8 +1,6 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,28 +9,24 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask
 {
     public class GetCameraMaskQueryHandler : IRequestHandler<GetCameraMaskQuery, List<MaskCoordinate>>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetCameraMaskQueryHandler(ProcessorContext processorContext)
+        public GetCameraMaskQueryHandler(IUnitOfWork unitOfWork)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<MaskCoordinate>> Handle(GetCameraMaskQuery request, CancellationToken cancellationToken)
         {
-            var maskCoordinates = await _processorContext.CameraMasks
-                .AsNoTracking()
-                .Where(x => x.CameraId == request.CameraId)
-                .Select(x => x.Coordinates)
-                .FirstOrDefaultAsync(cancellationToken);
+            var cameraMask = await _unitOfWork.CameraMasks.FirstOrDefaultAsync(x => x.CameraId == request.CameraId, cancellationToken);
 
-            if (maskCoordinates == null)
+            if (cameraMask?.Coordinates == null)
             {
                 return new List<MaskCoordinate>();
             }
             else
             {
-                return JsonSerializer.Deserialize<List<MaskCoordinate>>(maskCoordinates);
+                return JsonSerializer.Deserialize<List<MaskCoordinate>>(cameraMask.Coordinates);
             }
         }
     }

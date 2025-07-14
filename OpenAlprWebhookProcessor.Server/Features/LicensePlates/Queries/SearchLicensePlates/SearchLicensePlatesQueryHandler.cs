@@ -1,7 +1,5 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features;
-using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

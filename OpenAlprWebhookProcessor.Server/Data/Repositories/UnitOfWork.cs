@@ -14,6 +14,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         private IRepository<Alert>? _alerts;
         private IRepository<Ignore>? _ignores;
         private IRepository<Camera>? _cameras;
+        private IRepository<CameraMask>? _cameraMasks;
         private IRepository<Enricher>? _enrichers;
         private IRepository<WebhookForward>? _webhookForwards;
         private IRepository<Pushover>? _pushoverAlertClients;
@@ -30,6 +31,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         public IRepository<Alert> Alerts => _alerts ??= new Repository<Alert>(_context);
         public IRepository<Ignore> Ignores => _ignores ??= new Repository<Ignore>(_context);
         public IRepository<Camera> Cameras => _cameras ??= new Repository<Camera>(_context);
+        public IRepository<CameraMask> CameraMasks => _cameraMasks ??= new Repository<CameraMask>(_context);
         public IRepository<Enricher> Enrichers => _enrichers ??= new Repository<Enricher>(_context);
         public IRepository<WebhookForward> WebhookForwards => _webhookForwards ??= new Repository<WebhookForward>(_context);
         public IRepository<Pushover> PushoverAlertClients => _pushoverAlertClients ??= new Repository<Pushover>(_context);

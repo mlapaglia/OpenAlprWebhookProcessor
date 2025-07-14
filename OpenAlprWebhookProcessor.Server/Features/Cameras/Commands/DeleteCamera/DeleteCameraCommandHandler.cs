@@ -1,6 +1,5 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,25 +7,28 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
 {
     public class DeleteCameraCommandHandler : IRequestHandler<DeleteCameraCommand>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
         public DeleteCameraCommandHandler(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             CameraUpdateService.CameraUpdateService cameraUpdateService)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _cameraUpdateService = cameraUpdateService;
         }
 
         public async Task Handle(DeleteCameraCommand request, CancellationToken cancellationToken)
         {
-            var camera = await _processorContext.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
+            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
 
-            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
+            if (camera != null)
+            {
+                await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
 
-            _processorContext.Remove(camera);
-            await _processorContext.SaveChangesAsync(cancellationToken);
+                _unitOfWork.Cameras.Delete(camera);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 } 

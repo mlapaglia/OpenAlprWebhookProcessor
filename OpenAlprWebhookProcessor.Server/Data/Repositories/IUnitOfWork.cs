@@ -11,6 +11,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         IRepository<Alert> Alerts { get; }
         IRepository<Ignore> Ignores { get; }
         IRepository<Camera> Cameras { get; }
+        IRepository<CameraMask> CameraMasks { get; }
         IRepository<Enricher> Enrichers { get; }
         IRepository<WebhookForward> WebhookForwards { get; }
         IRepository<Pushover> PushoverAlertClients { get; }

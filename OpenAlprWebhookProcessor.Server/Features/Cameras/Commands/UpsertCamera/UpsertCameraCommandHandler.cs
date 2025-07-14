@@ -1,6 +1,5 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,14 +7,14 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
 {
     public class UpsertCameraCommandHandler : IRequestHandler<UpsertCameraCommand>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
         public UpsertCameraCommandHandler(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             CameraUpdateService.CameraUpdateService cameraUpdateService)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _cameraUpdateService = cameraUpdateService;
         }
 
@@ -23,8 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
         {
             var camera = request.Camera;
 
-            var existingCamera = await _processorContext.Cameras
-                .FirstOrDefaultAsync(x => x.Id == camera.Id, cancellationToken);
+            var existingCamera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == camera.Id, cancellationToken);
 
             if (existingCamera == null)
             {
@@ -53,7 +51,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
                     TimezoneOffset = camera.TimezoneOffset,
                 };
 
-                _processorContext.Add(existingCamera);
+                await _unitOfWork.Cameras.AddAsync(existingCamera, cancellationToken);
             }
             else
             {
@@ -78,9 +76,11 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
                 existingCamera.SunriseOffset = camera.SunriseOffset;
                 existingCamera.SunsetOffset = camera.SunsetOffset;
                 existingCamera.TimezoneOffset = camera.TimezoneOffset;
+                
+                _unitOfWork.Cameras.Update(existingCamera);
             }
 
-            await _processorContext.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             if (existingCamera.UpdateDayNightModeEnabled)
             {

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;

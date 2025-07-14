@@ -1,6 +1,5 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

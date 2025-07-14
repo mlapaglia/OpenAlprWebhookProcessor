@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using System.Linq;
 using System.Text.Json;
@@ -11,14 +11,14 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
 {
     public class UpsertCameraMaskCommandHandler : IRequestHandler<UpsertCameraMaskCommand, bool>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly WebsocketClientOrganizer _websocketClientOrganizer;
 
         public UpsertCameraMaskCommandHandler(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             WebsocketClientOrganizer websocketClientOrganizer)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
@@ -26,20 +26,32 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
         {
             var cameraMask = request.CameraMask;
 
-            var agentUid = await _processorContext.Agents
-                .Select(x => x.Uid)
-                .FirstOrDefaultAsync(cancellationToken);
+            var agent = await _unitOfWork.Agents.FirstOrDefaultAsync(x => true, cancellationToken);
+            var agentUid = agent?.Uid;
 
-            var camera = await _processorContext.Cameras
+            var camera = await _unitOfWork.Cameras.GetQueryable()
                 .Include(x => x.Mask)
                 .FirstOrDefaultAsync(x => x.Id == cameraMask.CameraId, cancellationToken);
 
+            if (camera == null)
+            {
+                return false;
+            }
+
             if (cameraMask.Coordinates.Any())
             {
-                camera.Mask = new Data.CameraMask()
+                if (camera.Mask == null)
                 {
-                    Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
-                };
+                    camera.Mask = new Data.CameraMask()
+                    {
+                        CameraId = camera.Id,
+                        Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
+                    };
+                }
+                else
+                {
+                    camera.Mask.Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates);
+                }
             }
             else
             {
@@ -52,7 +64,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
                 camera.OpenAlprName,
                 cancellationToken);
 
-            await _processorContext.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return result;
         }

@@ -1,8 +1,8 @@
 using Hangfire;
 using Hangfire.Storage.Monitoring;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -12,14 +12,14 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 {
     public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<CameraUpdateService.Camera>>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly JobStorage _jobStorage;
 
         public GetCamerasQueryHandler(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             JobStorage jobStorage)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _jobStorage = jobStorage;
         }
 
@@ -29,9 +29,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 
             var monitoringApi = _jobStorage.GetMonitoringApi();
 
-            var agent = await _processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+            var agent = await _unitOfWork.Agents.FirstOrDefaultAsync(x => true, cancellationToken);
 
-            foreach (var camera in await _processorContext.Cameras.ToListAsync(cancellationToken))
+            foreach (var camera in await _unitOfWork.Cameras.GetAllAsync(cancellationToken))
             {
                 JobDetailsDto nextDayNightCommand = null;
 
@@ -78,9 +78,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
         {
             if (camera.UpdateOverlayEnabled)
             {
-                var agent = await _processorContext.Agents.FirstOrDefaultAsync();
+                var agent = await _unitOfWork.Agents.FirstOrDefaultAsync(x => true, default);
 
-                if (string.IsNullOrEmpty(camera.LatestProcessedPlateUuid) || string.IsNullOrEmpty(agent.EndpointUrl))
+                if (string.IsNullOrEmpty(camera.LatestProcessedPlateUuid) || string.IsNullOrEmpty(agent?.EndpointUrl))
                 {
                     return null;
                 }

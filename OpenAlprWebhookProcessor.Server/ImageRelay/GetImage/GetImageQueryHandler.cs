@@ -1,6 +1,5 @@
 using ImageMagick;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;

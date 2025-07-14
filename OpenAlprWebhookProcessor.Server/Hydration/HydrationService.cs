@@ -59,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                using var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                 var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
 

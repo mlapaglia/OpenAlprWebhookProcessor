@@ -5,10 +5,6 @@ using NSubstitute;
 using OpenAlprWebhookProcessor.ImageRelay;
 using OpenAlprWebhookProcessor.ImageRelay.GetImage;
 using OpenAlprWebhookProcessor.ImageRelay.SnapshotRelay;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.ImageRelay
 {

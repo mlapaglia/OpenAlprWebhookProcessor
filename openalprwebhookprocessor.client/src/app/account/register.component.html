@@ -26,7 +26,8 @@
                     </mat-form-field>
                 </p>
                 <div>
-                    <button mat-button [disabled]="loading">Register</button>
+                    <button mat-button type="submit" [disabled]="loading">Register</button>
+                    <button mat-button type="button" (click)="onSubmit()">Debug Test</button>
                     <button mat-button routerLink="../login">Cancel</button>
                 </div>
             </form>

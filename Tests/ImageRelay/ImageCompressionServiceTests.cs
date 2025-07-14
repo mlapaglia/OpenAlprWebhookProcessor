@@ -2,11 +2,7 @@ using FluentAssertions;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.ImageRelay.ImageCompression;
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.ImageRelay
 {
