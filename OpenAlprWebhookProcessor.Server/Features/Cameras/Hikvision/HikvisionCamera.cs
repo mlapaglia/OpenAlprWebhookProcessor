@@ -8,10 +8,8 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
-using OpenAlprWebhookProcessor.Server.Features.Cameras;
 
-namespace OpenAlprWebhookProcessor.Server.Features.Cameras.Hikvision
+namespace OpenAlprWebhookProcessor.Features.Cameras.Hikvision
 {
     public class HikvisionCamera : ICamera
     {

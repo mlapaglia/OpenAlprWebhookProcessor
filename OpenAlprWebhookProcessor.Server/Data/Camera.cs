@@ -1,4 +1,4 @@
-﻿using OpenAlprWebhookProcessor.Server.Features.Cameras.Configuration;
+﻿using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using System;
 
 namespace OpenAlprWebhookProcessor.Data

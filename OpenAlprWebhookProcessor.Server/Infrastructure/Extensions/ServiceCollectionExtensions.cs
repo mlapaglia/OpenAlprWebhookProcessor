@@ -17,8 +17,8 @@ using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Hydrator;
 using Lib.Net.Http.WebPush;
 using System.Reflection;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {

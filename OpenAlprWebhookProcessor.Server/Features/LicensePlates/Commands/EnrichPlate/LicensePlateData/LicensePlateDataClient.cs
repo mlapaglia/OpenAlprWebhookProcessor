@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData
+namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData
 {
     public class LicensePlateDataClient : ILicensePlateEnricherClient
     {

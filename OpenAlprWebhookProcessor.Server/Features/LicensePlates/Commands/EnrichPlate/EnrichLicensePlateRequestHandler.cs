@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate
+namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 {
     public class EnrichLicensePlateRequestHandler
     {

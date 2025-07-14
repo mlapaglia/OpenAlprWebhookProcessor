@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus

@@ -1,6 +1,5 @@
-﻿using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
-using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Server.Features.Cameras;
+﻿using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Features.Cameras;
 using System;
 using System.IO;
 using System.Net;

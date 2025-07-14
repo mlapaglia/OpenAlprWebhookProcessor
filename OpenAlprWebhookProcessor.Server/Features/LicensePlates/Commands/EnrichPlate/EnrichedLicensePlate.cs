@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate
+﻿namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 {
     public class EnrichedLicensePlate
     {

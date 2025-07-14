@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts
+namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts
 {
     public class DayCount
     {

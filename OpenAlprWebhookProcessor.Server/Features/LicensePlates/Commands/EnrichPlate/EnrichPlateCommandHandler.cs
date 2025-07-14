@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

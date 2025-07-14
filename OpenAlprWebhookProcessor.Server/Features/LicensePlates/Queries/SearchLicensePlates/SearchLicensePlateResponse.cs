@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.SearchLicensePlates
+namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates
 {
     public class SearchLicensePlateResponse
     {

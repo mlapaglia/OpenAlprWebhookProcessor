@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetPlateFilters;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilters;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

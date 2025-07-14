@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.Cameras;
+using OpenAlprWebhookProcessor.Features.Cameras;
 using System;
 using System.IO;
 using System.Linq;

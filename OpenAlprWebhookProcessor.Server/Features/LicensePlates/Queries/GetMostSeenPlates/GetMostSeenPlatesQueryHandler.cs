@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetMostSeenPlates;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

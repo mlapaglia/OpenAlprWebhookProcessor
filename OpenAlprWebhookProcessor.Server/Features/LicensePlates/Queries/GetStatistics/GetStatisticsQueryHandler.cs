@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetStatistics;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
 using System;
 using System.Linq;
 using System.Threading;

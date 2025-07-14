@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;

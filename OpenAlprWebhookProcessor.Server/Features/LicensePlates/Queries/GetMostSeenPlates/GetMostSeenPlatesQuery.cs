@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetMostSeenPlates;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates

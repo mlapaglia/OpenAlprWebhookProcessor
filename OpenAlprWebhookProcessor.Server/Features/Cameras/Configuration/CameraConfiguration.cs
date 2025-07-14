@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Server.Features.Cameras.Configuration
+namespace OpenAlprWebhookProcessor.Features.Cameras.Configuration
 {
     public class CameraConfiguration
     {

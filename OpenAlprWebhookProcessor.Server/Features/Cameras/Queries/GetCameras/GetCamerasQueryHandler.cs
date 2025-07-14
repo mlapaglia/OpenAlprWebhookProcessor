@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 {
-    public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<Server.Features.Cameras.Camera>>
+    public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<Camera>>
     {
         private readonly ProcessorContext _processorContext;
         private readonly JobStorage _jobStorage;
@@ -23,9 +23,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
             _jobStorage = jobStorage;
         }
 
-        public async Task<List<Server.Features.Cameras.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken)
+        public async Task<List<Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken)
         {
-            var cameras = new List<Server.Features.Cameras.Camera>();
+            var cameras = new List<Camera>();
 
             var monitoringApi = _jobStorage.GetMonitoringApi();
 
@@ -40,7 +40,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
                     nextDayNightCommand = monitoringApi.JobDetails(camera.NextDayNightScheduleId);
                 }
 
-                cameras.Add(new OpenAlprWebhookProcessor.Cameras.Camera()
+                cameras.Add(new Camera()
                 {
                     Id = camera.Id,
                     CameraPassword = camera.CameraPassword,

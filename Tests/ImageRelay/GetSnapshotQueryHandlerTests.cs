@@ -2,14 +2,8 @@ using FluentAssertions;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.ImageRelay.SnapshotRelay;
-using OpenAlprWebhookProcessor.Server.Features.Cameras;
-using OpenAlprWebhookProcessor.Server.Features.Cameras.Configuration;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using OpenAlprWebhookProcessor.Features.Cameras;
+using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using DataCamera = OpenAlprWebhookProcessor.Data.Camera;
 
 namespace Tests.ImageRelay

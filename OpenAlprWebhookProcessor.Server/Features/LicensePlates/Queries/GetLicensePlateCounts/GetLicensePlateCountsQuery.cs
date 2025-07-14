@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts

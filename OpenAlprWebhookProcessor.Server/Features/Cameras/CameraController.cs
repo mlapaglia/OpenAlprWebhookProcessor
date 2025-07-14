@@ -13,15 +13,14 @@ using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
-using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.Features.Cameras;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 
-namespace OpenAlprWebhookProcessor.Server.Features.Cameras
+namespace OpenAlprWebhookProcessor.Features.Cameras
 {
     [Authorize]
     [ApiController]

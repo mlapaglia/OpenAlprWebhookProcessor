@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Server.Features.Cameras;
+using OpenAlprWebhookProcessor.Features.Cameras;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace OpenAlprWebhookProcessor.Server.Features.Cameras.Hikvision
+namespace OpenAlprWebhookProcessor.Features.Cameras.Hikvision
 {
 	[XmlRoot(ElementName = "TextOverlayList")]
 	public class TextOverlayList

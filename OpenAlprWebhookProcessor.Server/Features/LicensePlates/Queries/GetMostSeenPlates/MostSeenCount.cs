@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetMostSeenPlates
+﻿namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates
 {
     public class MostSeenCount
     {

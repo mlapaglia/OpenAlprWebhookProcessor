@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetMostSeenPlates
+namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates
 {
     public class GetMostSeenPlatesResponse
     {

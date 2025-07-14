@@ -1,10 +1,9 @@
-﻿using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
-using OpenAlprWebhookProcessor.CameraUpdateService;
+﻿using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Server.Features.Cameras
+namespace OpenAlprWebhookProcessor.Features.Cameras
 {
     public interface ICamera
     {

@@ -1,9 +1,9 @@
-﻿using OpenAlprWebhookProcessor.Cameras.Configuration;
+﻿using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.Cameras
+namespace OpenAlprWebhookProcessor.Features.Cameras
 {
     public class Camera
     {

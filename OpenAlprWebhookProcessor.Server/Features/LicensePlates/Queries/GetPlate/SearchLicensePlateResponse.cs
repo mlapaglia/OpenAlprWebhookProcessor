@@ -1,4 +1,4 @@
-﻿namespace OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetPlate
+﻿namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
 {
     public class GetPlateResponse
     {

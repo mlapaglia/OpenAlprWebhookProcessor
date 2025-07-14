@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

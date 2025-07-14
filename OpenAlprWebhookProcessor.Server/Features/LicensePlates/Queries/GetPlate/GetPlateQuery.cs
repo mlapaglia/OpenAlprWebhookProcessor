@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Server.Features;
+using OpenAlprWebhookProcessor.Features;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate

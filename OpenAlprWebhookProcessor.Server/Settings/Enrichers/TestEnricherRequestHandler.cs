@@ -1,4 +1,4 @@
-﻿using OpenAlprWebhookProcessor.Server.Features.LicensePlates.Commands.EnrichPlate;
+﻿using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using System.Threading;
 using System.Threading.Tasks;
 

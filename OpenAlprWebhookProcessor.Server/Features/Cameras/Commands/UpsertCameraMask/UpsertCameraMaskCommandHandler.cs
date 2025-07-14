@@ -36,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
 
             if (cameraMask.Coordinates.Any())
             {
-                camera.Mask = new CameraMask()
+                camera.Mask = new Data.CameraMask()
                 {
                     Coordinates = JsonSerializer.Serialize(cameraMask.Coordinates),
                 };

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OpenAlprWebhookProcessor.Server.Features
+namespace OpenAlprWebhookProcessor.Features
 {
     public class LicensePlate
     {

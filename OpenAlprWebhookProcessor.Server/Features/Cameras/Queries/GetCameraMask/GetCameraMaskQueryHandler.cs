@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Cameras.UpsertMasks;
 using OpenAlprWebhookProcessor.Data;
 using System.Collections.Generic;
 using System.Linq;
