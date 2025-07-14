@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Features.Cameras
+namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public interface ICamera
     {

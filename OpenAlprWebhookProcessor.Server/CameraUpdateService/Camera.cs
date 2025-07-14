@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
-namespace OpenAlprWebhookProcessor.Features.Cameras
+namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public class Camera
     {

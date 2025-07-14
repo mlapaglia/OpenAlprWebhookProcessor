@@ -54,7 +54,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             CameraUpdateService cameraUpdateService,
             IBackgroundJobClient backgroundJobClient,
             Agent agent,
-            Camera camera)
+            Data.Camera camera)
         {
             var timeZoneOffset = camera.TimezoneOffset ?? agent.TimeZoneOffset;
             var latitude = camera.Latitude ?? agent.Latitude;

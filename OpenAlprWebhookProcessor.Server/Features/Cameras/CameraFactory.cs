@@ -1,6 +1,7 @@
 ﻿using OpenAlprWebhookProcessor.Cameras;
+using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
-using OpenAlprWebhookProcessor.Features.Cameras.Hikvision;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras

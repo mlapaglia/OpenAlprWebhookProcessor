@@ -2,9 +2,9 @@ using FluentAssertions;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.ImageRelay.SnapshotRelay;
-using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using DataCamera = OpenAlprWebhookProcessor.Data.Camera;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace Tests.ImageRelay
 {

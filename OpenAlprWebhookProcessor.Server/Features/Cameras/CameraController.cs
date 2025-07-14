@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras

@@ -7,9 +7,8 @@ using System.IO;
 using System.Threading;
 using System.Collections.Generic;
 using System.Net;
-using OpenAlprWebhookProcessor.CameraUpdateService;
 
-namespace OpenAlprWebhookProcessor.Features.Cameras.Hikvision
+namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 {
     public class HikvisionCamera : ICamera
     {
