@@ -42,20 +42,16 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-                var agent = await processorContext.Agents
-                    .FirstOrDefaultAsync(cancellationToken);
+            await ScheduleHydrationAsync(cancellationToken);
 
-                await ScheduleHydrationAsync(cancellationToken);
-            }
             _ = Task.Run(() => StartHydrationAsync(), cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+
             return Task.CompletedTask;
         }
 

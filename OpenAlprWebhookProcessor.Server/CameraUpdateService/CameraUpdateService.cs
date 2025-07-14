@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.Cameras.ZoomAndFocus;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Server.Features.Cameras;
 using System;
 using System.Linq;
 using System.Threading;
@@ -158,7 +158,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
+            await _cancellationTokenSource.CancelAsync();
+            _cancellationTokenSource.Dispose();
 
             await ForceClearOverlaysAsync();
         }

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.ImageRelay;
+using OpenAlprWebhookProcessor.ImageRelay.ImageCompression;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -125,13 +125,16 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                         try
                         {
-                            var image = await GetImageHandler.GetImageFromAgentAsync(
-                                processorContext,
+                            var imageCompressionService = scope.ServiceProvider.GetRequiredService<ImageCompressionService>();
+                            var agent = await processorContext.Agents.FirstOrDefaultAsync();
+
+                            var image = await imageCompressionService.GetImageFromAgentAsync(
+                                agent,
                                 job,
                                 _cancellationTokenSource.Token);
 
-                            var cropImage = await GetImageHandler.GetCropImageFromAgentAsync(
-                                processorContext,
+                            var cropImage = await imageCompressionService.GetCropImageFromAgentAsync(
+                                agent,
                                 job + "?" + plateGroup.PlateCoordinates,
                                 _cancellationTokenSource.Token);
 
@@ -216,13 +219,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         {
                             if (!plateGroup.VehicleImage.IsCompressed && plateGroup.VehicleImage.Jpeg != null)
                             {
-                                plateGroup.VehicleImage.Jpeg = GetImageHandler.CompressImage(plateGroup.VehicleImage.Jpeg);
+                                plateGroup.VehicleImage.Jpeg = ImageCompressionService.CompressImage(plateGroup.VehicleImage.Jpeg);
                                 plateGroup.VehicleImage.IsCompressed = true;
                             }
 
                             if (!plateGroup.PlateImage.IsCompressed && plateGroup.PlateImage.Jpeg != null)
                             {
-                                plateGroup.PlateImage.Jpeg = GetImageHandler.CompressImage(plateGroup.PlateImage.Jpeg);
+                                plateGroup.PlateImage.Jpeg = ImageCompressionService.CompressImage(plateGroup.PlateImage.Jpeg);
                                 plateGroup.PlateImage.IsCompressed = true;
                             }
                         }

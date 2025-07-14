@@ -97,6 +97,8 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
             services.AddHttpClient<PushServiceClient>();
+            services.AddHttpClient();
+            services.AddScoped<ImageRelay.ImageCompression.ImageCompressionService>();
 
             return services;
         }

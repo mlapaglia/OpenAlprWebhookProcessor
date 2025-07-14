@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.ImageRelay.GetImage;
+using OpenAlprWebhookProcessor.ImageRelay.SnapshotRelay;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,16 +14,11 @@ namespace OpenAlprWebhookProcessor.ImageRelay
     [Route("api/images")]
     public class ImageRelayController : ControllerBase
     {
-        private readonly GetSnapshotHandler _getSnapshotHandler;
+        private readonly IMediator _mediator;
 
-        private readonly ProcessorContext _processorContext;
-
-        public ImageRelayController(
-            ProcessorContext processorContext,
-            GetSnapshotHandler getSnapshotHandler)
+        public ImageRelayController(IMediator mediator)
         {
-            _processorContext = processorContext;
-            _getSnapshotHandler = getSnapshotHandler;
+            _mediator = mediator;
         }
 
         [HttpGet("{imageId}")]
@@ -31,10 +28,8 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         {
             try
             {
-                var image = await GetImageHandler.GetImageFromLocalAsync(
-                    _processorContext,
-                    imageId,
-                    cancellationToken);
+                var query = new GetImageQuery(imageId);
+                var image = await _mediator.Send(query, cancellationToken);
 
                 return File(image, "image/jpeg");
             }
@@ -51,10 +46,8 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         {
             try
             {
-                var cropImage = await GetImageHandler.GetCropImageFromLocalAsync(
-                    _processorContext,
-                    imageId,
-                    cancellationToken);
+                var query = new GetCropImageQuery(imageId);
+                var cropImage = await _mediator.Send(query, cancellationToken);
 
                 return File(cropImage, "image/jpeg");
             }
@@ -71,9 +64,8 @@ namespace OpenAlprWebhookProcessor.ImageRelay
         {
             try
             {
-                var snapshot = await _getSnapshotHandler.GetSnapshotAsync(
-                    cameraId,
-                    cancellationToken);
+                var query = new GetSnapshotQuery(cameraId);
+                var snapshot = await _mediator.Send(query, cancellationToken);
 
                 return File(snapshot, "image/jpeg");
             }

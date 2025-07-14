@@ -37,28 +37,20 @@ namespace OpenAlprWebhookProcessor
             services.AddControllers();
             services.AddSignalR();
 
-            // Add application services with MediatR and validation
             services.AddApplicationServices(Configuration);
 
-            // Add data access services
             services.AddDataServices(Configuration);
 
-            // Add JWT authentication
             services.AddJwtAuthentication(Configuration);
 
-            // Add user services
             services.AddScoped<IUserService, UserService>();
 
-            // Add external services
             services.AddExternalServices();
 
-            // Add background services
             services.AddBackgroundServices();
 
-            // Add AutoMapper
             services.AddAutoMapper();
 
-            // Add Hangfire
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
@@ -78,7 +70,6 @@ namespace OpenAlprWebhookProcessor
             // Configure JWT authentication with actual key
             ConfigureJwtAuthentication(app);
 
-            // Ensure databases are created and seeded
             app.EnsureDatabasesCreatedAsync().Wait();
 
             app.UseSerilogRequestLogging();
@@ -93,7 +84,6 @@ namespace OpenAlprWebhookProcessor
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-            // Use centralized exception handling
             app.UseExceptionHandling();
 
             app.UseMiddleware<JwtMiddleware>();
@@ -121,10 +111,10 @@ namespace OpenAlprWebhookProcessor
             ConfigureLogging(app);
         }
 
-        private void ConfigureJwtAuthentication(IApplicationBuilder app)
+        private static void ConfigureJwtAuthentication(IApplicationBuilder app)
         {
             using var scope = app.ApplicationServices.CreateScope();
-            var usersContext = scope.ServiceProvider.GetRequiredService<UsersContext>();
+            using var usersContext = scope.ServiceProvider.GetRequiredService<UsersContext>();
             var userService = new UserService(usersContext);
             var secretKey = userService.GetJwtSecretKeyAsync().Result;
 
@@ -152,7 +142,7 @@ namespace OpenAlprWebhookProcessor
             };
         }
 
-        private void ConfigureLogging(IApplicationBuilder app)
+        private static void ConfigureLogging(IApplicationBuilder app)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)

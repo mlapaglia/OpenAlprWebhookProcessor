@@ -31,7 +31,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             using (var scope = serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                using var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
 
                 var camerasToUpdate = await processorContext.Cameras.ToListAsync();
 
