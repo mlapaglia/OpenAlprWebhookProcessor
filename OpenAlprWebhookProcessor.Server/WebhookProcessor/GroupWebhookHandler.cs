@@ -15,7 +15,7 @@ using OpenAlprWebhookProcessor.Utilities;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class GroupWebhookHandler
+    public class GroupWebhookHandler : IGroupWebhookHandler
     {
         private readonly ILogger _logger;
 

@@ -114,7 +114,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                         try
                         {
-                            var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
+                            var scraper = scope.ServiceProvider.GetRequiredService<IOpenAlprAgentScraper>();
 
                             await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
                             await scraper.ScrapeAgentImagesAsync(_cancellationTokenSource.Token);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -8,41 +9,69 @@ namespace Tests.TestHelpers
 {
     public class TestHttpMessageHandler : HttpMessageHandler
     {
-        private HttpResponseMessage _responseMessage;
+        private readonly Queue<HttpResponseMessage> _responseMessages = new();
         private Exception _exception;
 
         public Uri LastRequestUri { get; private set; }
         public HttpMethod LastRequestMethod { get; private set; }
         public HttpContent LastRequestContent { get; private set; }
+        public List<string> RequestLog { get; } = new();
 
         public void SetupResponse(HttpStatusCode statusCode, byte[] content = null)
         {
-            _responseMessage = new HttpResponseMessage(statusCode);
+            var responseMessage = new HttpResponseMessage(statusCode);
             if (content != null)
             {
-                _responseMessage.Content = new ByteArrayContent(content);
+                responseMessage.Content = new ByteArrayContent(content);
             }
+            _responseMessages.Enqueue(responseMessage);
             _exception = null;
         }
 
         public void SetupException(Exception exception)
         {
             _exception = exception;
-            _responseMessage = null;
+            _responseMessages.Clear();
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             LastRequestUri = request.RequestUri;
             LastRequestMethod = request.Method;
             LastRequestContent = request.Content;
+
+            var requestInfo = $"{request.Method} {request.RequestUri}";
+            RequestLog.Add(requestInfo);
 
             if (_exception != null)
             {
                 throw _exception;
             }
 
-            return Task.FromResult(_responseMessage ?? new HttpResponseMessage(HttpStatusCode.OK));
+            HttpResponseMessage response;
+            if (_responseMessages.Count > 0)
+            {
+                response = _responseMessages.Dequeue();
+            }
+            else
+            {
+                response = new HttpResponseMessage(HttpStatusCode.OK);
+            }
+
+            // Log response details for debugging
+            if (response.Content != null)
+            {
+                var contentStr = await response.Content.ReadAsStringAsync();
+                RequestLog.Add($"Response: {response.StatusCode}, Content: {contentStr}");
+                // Reset content for actual consumption
+                response.Content = new StringContent(contentStr);
+            }
+            else
+            {
+                RequestLog.Add($"Response: {response.StatusCode}, Content: null");
+            }
+
+            return response;
         }
     }
 } 

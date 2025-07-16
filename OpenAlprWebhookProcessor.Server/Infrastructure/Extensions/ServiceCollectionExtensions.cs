@@ -100,9 +100,11 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
-            services.AddScoped<GroupWebhookHandler>();
+            services.AddScoped<IGroupWebhookHandler, GroupWebhookHandler>();
             services.AddScoped<SinglePlateWebhookHandler>();
-            services.AddScoped<OpenAlprAgentScraper>();
+            services.AddScoped<IOpenAlprAgentScraper, OpenAlprAgentScraper>();
+            services.AddScoped<IImageRetrieverService, ImageRetrieverService>();
+            services.AddScoped<ITimeService, TimeService>();
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
             services.AddSingleton<IAlertClient, PushoverClient>();
             services.AddSingleton<IAlertClient, WebPushNotificationProducer>();

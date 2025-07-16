@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 {
-    public class OpenAlprAgentScraper
+    public class OpenAlprAgentScraper : IOpenAlprAgentScraper
     {
         private const long millisecondsToScrape = 86400000;
 
@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private const string metadataUrl = "/meta/{0}";
 
-        private readonly GroupWebhookHandler _groupWebhookHandler;
+        private readonly IGroupWebhookHandler _groupWebhookHandler;
 
         private readonly HttpClient _httpClient;
 
@@ -30,19 +30,24 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private readonly ILogger<OpenAlprAgentScraper> _logger;
 
-        private readonly ImageRetrieverService _imageRetriever;
+        private readonly IImageRetrieverService _imageRetriever;
+
+        private readonly ITimeService _timeService;
 
         public OpenAlprAgentScraper(
-            GroupWebhookHandler groupWebhookHandler,
+            IGroupWebhookHandler groupWebhookHandler,
             ProcessorContext processorContext,
             ILogger<OpenAlprAgentScraper> logger,
-            ImageRetrieverService imageRetriever)
+            IImageRetrieverService imageRetriever,
+            HttpClient httpClient,
+            ITimeService timeService)
         {
             _groupWebhookHandler = groupWebhookHandler;
             _processorContext = processorContext;
             _logger = logger;
-            _httpClient = new HttpClient();
+            _httpClient = httpClient;
             _imageRetriever = imageRetriever;
+            _timeService = timeService;
         }
 
         public async Task ScrapeAgentAsync(CancellationToken cancellationToken)
@@ -56,112 +61,10 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     cancellationToken);
             }
 
-            var startDate = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var startDate = _timeService.UtcNowMilliseconds;
             while (startDate > agent.LastSuccessfulScrapeEpoch)
             {
-                _logger.LogInformation("Scraping between {startTime} and {endTime}",
-                    agent.LastSuccessfulScrapeEpoch,
-                    agent.LastSuccessfulScrapeEpoch += millisecondsToScrape);
-
-                var timer = new Stopwatch();
-                timer.Start();
-
-                var scrapeResults = await _httpClient.GetAsync(
-                    agent.EndpointUrl
-                    + scrapeUrl
-                        .Replace("{0}", agent.LastSuccessfulScrapeEpoch.ToString())
-                        .Replace("{1}", (agent.LastSuccessfulScrapeEpoch + millisecondsToScrape).ToString()),
-                    cancellationToken);     
-
-                timer.Stop();
-                _logger.LogInformation("Scraping took {seconds} seconds", timer.Elapsed.Seconds);
-
-                if (!scrapeResults.IsSuccessStatusCode)
-                {
-                    var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
-                    _logger.LogError("no metadata found for given date range: {error}", error);
-                    agent.LastSuccessfulScrapeEpoch = agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
-                    continue;
-                }
-
-                var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
-
-                var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
-
-                _logger.LogInformation("Found {count} entries for: {date}",
-                    metaDatasToQuery.Count,
-                    agent.LastSuccessfulScrapeEpoch.ToString());
-
-                foreach (var metadata in metaDatasToQuery)
-                {
-                    _logger.LogDebug("querying key: {key}", metadata.Key);
-
-                    timer.Reset();
-                    timer.Start();
-
-                    var newGroup = await _httpClient.GetAsync(
-                        agent.EndpointUrl + metadataUrl.Replace("{0}", metadata.Key),
-                        cancellationToken);
-
-                    timer.Stop();
-                    _logger.LogDebug("Took {seconds} to query", timer.Elapsed.TotalSeconds);
-
-                    if (!newGroup.IsSuccessStatusCode)
-                    {
-                        _logger.LogError("Bad response received from Agent: {statusCode} {reasonPhrase}", newGroup.StatusCode, newGroup.ReasonPhrase);
-                        continue;
-                    }
-
-                    Group group;
-
-                    try
-                    {
-                        timer.Reset();
-                        timer.Start();
-                        _logger.LogDebug("deserializing key: {key}", metadata.Key);
-                        group = await JsonSerializer.DeserializeAsync<Group>(
-                            await newGroup.Content.ReadAsStreamAsync(cancellationToken),
-                            cancellationToken: cancellationToken);
-                        timer.Stop();
-                        _logger.LogDebug("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Unable to deserialize response from Agent for meta id: {metadatakey}", metadata.Key);
-                        continue;
-                    }
-
-                    try
-                    {
-                        _logger.LogInformation("date: {date} querying: {key}", DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString(), metadata.Key);
-
-                        timer.Reset();
-                        timer.Start();
-                        await _groupWebhookHandler.HandleWebhookAsync(
-                            new Webhook
-                            {
-                                Group = group,
-                            },
-                            true,
-                            cancellationToken);
-                        timer.Stop();
-                        _logger.LogDebug("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
-                    }
-                    catch
-                    {
-                        _logger.LogError("Failed to parse bulk import request.");
-                    }
-
-                    timer.Reset();
-                    timer.Start();
-                    _logger.LogDebug("Saving agent status, last scrape {scrapeEpoch}", group.EpochStart);
-
-                    agent.LastSuccessfulScrapeEpoch = group.EpochStart;
-                    await _processorContext.SaveChangesAsync(cancellationToken);
-                    timer.Stop();
-                    _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
-                }
-
+                await ScrapeDataForTimeRange(agent, cancellationToken);
                 agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
             }
 
@@ -172,6 +75,130 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             await _processorContext.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Finished OpenALPR Agent scrape.");
+        }
+
+        private async Task ScrapeDataForTimeRange(Agent agent, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Scraping between {startTime} and {endTime}",
+                agent.LastSuccessfulScrapeEpoch,
+                agent.LastSuccessfulScrapeEpoch += millisecondsToScrape);
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var scrapeResults = await _httpClient.GetAsync(
+                BuildScrapeUrl(agent.EndpointUrl, agent.LastSuccessfulScrapeEpoch, agent.LastSuccessfulScrapeEpoch + millisecondsToScrape),
+                cancellationToken);
+
+            timer.Stop();
+            _logger.LogInformation("Scraping took {seconds} seconds", timer.Elapsed.Seconds);
+
+            if (!scrapeResults.IsSuccessStatusCode)
+            {
+                var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("no metadata found for given date range: {error}", error);
+                agent.LastSuccessfulScrapeEpoch = agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
+                return;
+            }
+
+            var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
+            var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
+
+            _logger.LogInformation("Found {count} entries for: {date}",
+                metaDatasToQuery.Count,
+                agent.LastSuccessfulScrapeEpoch.ToString());
+
+            foreach (var metadata in metaDatasToQuery)
+            {
+                await ProcessMetadata(agent, metadata, cancellationToken);
+            }
+        }
+
+        private async Task ProcessMetadata(Agent agent, ScrapeMetadata metadata, CancellationToken cancellationToken)
+        {
+            _logger.LogDebug("querying key: {key}", metadata.Key);
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var newGroup = await _httpClient.GetAsync(
+                BuildMetadataUrl(agent.EndpointUrl, metadata.Key),
+                cancellationToken);
+
+            timer.Stop();
+            _logger.LogDebug("Took {seconds} to query", timer.Elapsed.TotalSeconds);
+
+            if (!newGroup.IsSuccessStatusCode)
+            {
+                _logger.LogError("Bad response received from Agent: {statusCode} {reasonPhrase}", newGroup.StatusCode, newGroup.ReasonPhrase);
+                return;
+            }
+
+            Group group;
+            try
+            {
+                timer.Reset();
+                timer.Start();
+                _logger.LogDebug("deserializing key: {key}", metadata.Key);
+                group = await JsonSerializer.DeserializeAsync<Group>(
+                    await newGroup.Content.ReadAsStreamAsync(cancellationToken),
+                    cancellationToken: cancellationToken);
+                timer.Stop();
+                _logger.LogDebug("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unable to deserialize response from Agent for meta id: {metadatakey}", metadata.Key);
+                return;
+            }
+
+            await ProcessGroup(agent, group, metadata.Key, cancellationToken);
+        }
+
+        private async Task ProcessGroup(Agent agent, Group group, string metadataKey, CancellationToken cancellationToken)
+        {
+            var timer = new Stopwatch();
+
+            try
+            {
+                _logger.LogInformation("date: {date} querying: {key}", DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString(), metadataKey);
+
+                timer.Start();
+                await _groupWebhookHandler.HandleWebhookAsync(
+                    new Webhook
+                    {
+                        Group = group,
+                    },
+                    true,
+                    cancellationToken);
+                timer.Stop();
+                _logger.LogDebug("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
+            }
+            catch
+            {
+                _logger.LogError("Failed to parse bulk import request.");
+            }
+
+            timer.Reset();
+            timer.Start();
+            _logger.LogDebug("Saving agent status, last scrape {scrapeEpoch}", group.EpochStart);
+
+            agent.LastSuccessfulScrapeEpoch = group.EpochStart;
+            await _processorContext.SaveChangesAsync(cancellationToken);
+            timer.Stop();
+            _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
+        }
+
+        private string BuildScrapeUrl(string endpointUrl, long startEpoch, long endEpoch)
+        {
+            return endpointUrl + scrapeUrl
+                .Replace("{0}", startEpoch.ToString())
+                .Replace("{1}", endEpoch.ToString());
+        }
+
+        private string BuildMetadataUrl(string endpointUrl, string key)
+        {
+            return endpointUrl + metadataUrl.Replace("{0}", key);
         }
 
         public async Task ScrapeAgentImagesAsync(CancellationToken cancellationToken)
