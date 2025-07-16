@@ -49,7 +49,8 @@ jobs:
           /o:"openalprwebhookprocessor" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" \
-          /d:sonar.javascript.lcov.reportPaths="**/lcov.info"
+          /d:sonar.javascript.lcov.reportPaths="**/lcov.info" \
+          /d:sonar.exclusions="**/Features/Users/Data/Migrations/**"
       
       - name: Build and Test Backend
         run: |
