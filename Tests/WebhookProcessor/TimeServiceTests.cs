@@ -1,7 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.WebhookProcessor;
-using System;
 
 namespace Tests.WebhookProcessor
 {

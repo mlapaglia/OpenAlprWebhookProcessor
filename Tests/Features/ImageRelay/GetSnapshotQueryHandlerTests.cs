@@ -1,17 +1,7 @@
 using FluentAssertions;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay

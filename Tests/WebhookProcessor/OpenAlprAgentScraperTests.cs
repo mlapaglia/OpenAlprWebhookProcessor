@@ -4,19 +4,12 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor

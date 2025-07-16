@@ -8,10 +8,8 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.Storage;
 

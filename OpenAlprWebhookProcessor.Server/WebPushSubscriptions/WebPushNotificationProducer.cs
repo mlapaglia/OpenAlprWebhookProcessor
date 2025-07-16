@@ -2,7 +2,6 @@
 using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
@@ -10,8 +9,6 @@ using System;
 using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 using System.Collections.Generic;
 using System.Linq;
 

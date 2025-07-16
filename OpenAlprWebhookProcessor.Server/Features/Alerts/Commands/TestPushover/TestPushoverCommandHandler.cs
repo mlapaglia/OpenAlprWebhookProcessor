@@ -1,7 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

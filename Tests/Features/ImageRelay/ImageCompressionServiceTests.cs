@@ -1,13 +1,8 @@
 using FluentAssertions;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay

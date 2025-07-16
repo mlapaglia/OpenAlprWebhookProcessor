@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 

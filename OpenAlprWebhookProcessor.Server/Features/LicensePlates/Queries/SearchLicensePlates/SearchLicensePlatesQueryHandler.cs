@@ -18,7 +18,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
 
         public async Task<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken)
         {
-            var platesToIgnore = await GetPlatesToIgnoreAsync(request.FilterIgnoredPlates, cancellationToken);
+            var ignoredPlates = await GetIgnoredPlatesAsync(cancellationToken);
+            var platesToIgnoreForFiltering = request.FilterIgnoredPlates ? ignoredPlates : new List<string>();
             
             var plates = await _unitOfWork.PlateGroups.SearchPlatesAsync(
                 request.PlateNumber,
@@ -26,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
                 request.RegexSearchEnabled,
                 request.StartSearchOn,
                 request.EndSearchOn,
-                platesToIgnore,
+                platesToIgnoreForFiltering,
                 request.VehicleColor,
                 request.VehicleMake,
                 request.VehicleModel,
@@ -43,7 +44,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
                 request.RegexSearchEnabled,
                 request.StartSearchOn,
                 request.EndSearchOn,
-                platesToIgnore,
+                platesToIgnoreForFiltering,
                 request.VehicleColor,
                 request.VehicleMake,
                 request.VehicleModel,
@@ -59,7 +60,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
             {
                 licensePlates.Add(PlateMapper.MapPlate(
                     plate,
-                    platesToIgnore,
+                    ignoredPlates,
                     platesToAlert));
             }
 
@@ -76,13 +77,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
             };
         }
 
-        private async Task<List<string>> GetPlatesToIgnoreAsync(bool filterIgnoredPlates, CancellationToken cancellationToken)
+        private async Task<List<string>> GetIgnoredPlatesAsync(CancellationToken cancellationToken)
         {
-            if (filterIgnoredPlates)
-            {
-                return new List<string>();
-            }
-
             var ignores = await _unitOfWork.Ignores.GetAllAsync(cancellationToken);
             return ignores.Select(x => x.PlateNumber).ToList();
         }

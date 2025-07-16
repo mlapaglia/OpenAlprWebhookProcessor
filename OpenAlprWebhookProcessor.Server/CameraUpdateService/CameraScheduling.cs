@@ -1,11 +1,9 @@
 ﻿using CoordinateSharp;
 using Hangfire;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService

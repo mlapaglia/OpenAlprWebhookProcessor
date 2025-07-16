@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using MediatR;
 using NUnit.Framework;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.TestHelpers
 {

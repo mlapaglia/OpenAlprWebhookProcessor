@@ -4,9 +4,6 @@ using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.SystemLogs;
 using OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

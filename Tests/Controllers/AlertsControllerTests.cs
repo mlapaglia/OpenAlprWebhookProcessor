@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Alerts;
@@ -15,9 +14,6 @@ using OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush;
 using OpenAlprWebhookProcessor.Features.Alerts.Queries.GetAlerts;
 using OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover;
 using OpenAlprWebhookProcessor.Features.Alerts.Queries.GetWebPush;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

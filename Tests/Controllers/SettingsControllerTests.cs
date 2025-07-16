@@ -19,10 +19,6 @@ using OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

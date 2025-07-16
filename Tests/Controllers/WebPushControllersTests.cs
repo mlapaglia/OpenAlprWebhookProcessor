@@ -7,9 +7,6 @@ using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWebPushSubscription;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.DeleteWebPushSubscription;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Queries.GetWebPushPublicKey;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

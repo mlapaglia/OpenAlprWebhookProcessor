@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+﻿using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
 using System.Threading;

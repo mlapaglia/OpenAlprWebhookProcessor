@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
+﻿using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts

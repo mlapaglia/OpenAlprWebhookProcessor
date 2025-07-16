@@ -1,9 +1,6 @@
-using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users;
-using System;
-using System.Collections.Generic;
 
 namespace Tests.TestHelpers
 {
@@ -498,6 +495,33 @@ namespace Tests.TestHelpers
         public static byte[] CreateTestJpegBytes()
         {
             return new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 };
+        }
+
+        public static OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.EnrichedLicensePlate CreateTestEnrichedLicensePlate()
+        {
+            return new OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.EnrichedLicensePlate
+            {
+                Make = "Toyota",
+                Style = "Sedan"
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.Ignore CreateTestIgnoreEntity(string plateNumber = "IGNORE123")
+        {
+            return new OpenAlprWebhookProcessor.Data.Ignore
+            {
+                Id = Guid.NewGuid(),
+                PlateNumber = plateNumber
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.Alert CreateTestAlertEntity(string plateNumber = "ALERT123")
+        {
+            return new OpenAlprWebhookProcessor.Data.Alert
+            {
+                Id = Guid.NewGuid(),
+                PlateNumber = plateNumber
+            };
         }
     }
 } 

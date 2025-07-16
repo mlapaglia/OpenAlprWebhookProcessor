@@ -6,10 +6,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.ImageRelay;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

@@ -1,8 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Alerts.Queries.GetAlerts;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Queries

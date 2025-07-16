@@ -1,10 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertAlerts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Commands

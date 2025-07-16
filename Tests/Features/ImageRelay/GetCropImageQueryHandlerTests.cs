@@ -5,14 +5,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay

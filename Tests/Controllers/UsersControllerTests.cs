@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users;
@@ -17,10 +16,6 @@ using OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetRefreshTokens;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetUserById;
-using OpenAlprWebhookProcessor.Features.Users.Register;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

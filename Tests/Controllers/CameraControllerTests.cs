@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
@@ -16,10 +15,6 @@ using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

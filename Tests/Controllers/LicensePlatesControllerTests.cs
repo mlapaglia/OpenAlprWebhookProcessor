@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features;
@@ -13,10 +12,6 @@ using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilters;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers
