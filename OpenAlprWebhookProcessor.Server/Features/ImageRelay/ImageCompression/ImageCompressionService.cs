@@ -8,7 +8,14 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
 {
-    public class ImageCompressionService
+    public interface IImageCompressionService
+    {
+        Task<byte[]> GetImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken);
+        Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken);
+        Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, string plateCoordinates, CancellationToken cancellationToken);
+    }
+
+    public class ImageCompressionService : IImageCompressionService
     {
         private readonly IHttpClientFactory _httpClientFactory;
 

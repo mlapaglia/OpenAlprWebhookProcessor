@@ -109,7 +109,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
             services.AddHttpClient<PushServiceClient>();
             services.AddHttpClient();
-            services.AddScoped<ImageCompressionService>();
+            services.AddScoped<IImageCompressionService, ImageCompressionService>();
 
             return services;
         }

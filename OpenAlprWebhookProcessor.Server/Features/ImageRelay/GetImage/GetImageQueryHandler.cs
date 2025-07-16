@@ -13,9 +13,9 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
     public class GetImageQueryHandler : IRequestHandler<GetImageQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ImageCompressionService _imageCompressionService;
+        private readonly IImageCompressionService _imageCompressionService;
 
-        public GetImageQueryHandler(IUnitOfWork unitOfWork, ImageCompressionService imageCompressionService)
+        public GetImageQueryHandler(IUnitOfWork unitOfWork, IImageCompressionService imageCompressionService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _imageCompressionService = imageCompressionService ?? throw new ArgumentNullException(nameof(imageCompressionService));

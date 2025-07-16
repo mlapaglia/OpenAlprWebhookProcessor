@@ -396,5 +396,108 @@ namespace Tests.TestHelpers
                 }
             };
         }
+
+        // ImageRelay test data factory methods
+        public static OpenAlprWebhookProcessor.Data.Agent CreateTestAgentWithCompression(string? endpointUrl = "https://test-agent.local", bool isImageCompressionEnabled = false)
+        {
+            return new OpenAlprWebhookProcessor.Data.Agent
+            {
+                Id = Guid.NewGuid(),
+                EndpointUrl = endpointUrl,
+                IsImageCompressionEnabled = isImageCompressionEnabled,
+                Uid = "test-agent-uid",
+                Hostname = "test-hostname"
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.Camera CreateTestCamera(OpenAlprWebhookProcessor.Features.Cameras.Configuration.CameraManufacturer? manufacturer = null, Guid? id = null, long? openAlprCameraId = null)
+        {
+            return new OpenAlprWebhookProcessor.Data.Camera
+            {
+                Id = id ?? Guid.NewGuid(),
+                Manufacturer = manufacturer ?? OpenAlprWebhookProcessor.Features.Cameras.Configuration.CameraManufacturer.Hikvision,
+                IpAddress = "192.168.1.100",
+                OpenAlprCameraId = openAlprCameraId ?? 1,
+                PlatesSeen = 10,
+                ModelNumber = "Test Model",
+                OpenAlprName = "Test Camera",
+                CameraUsername = "admin",
+                CameraPassword = "password123",
+                UpdateOverlayTextUrl = "http://192.168.1.100/overlay",
+                UpdateOverlayEnabled = true,
+                UpdateDayNightModeEnabled = false,
+                OpenAlprEnabled = true
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.PlateGroup CreateTestPlateGroupForImageRelay(string? openAlprUuid = null, string? plateCoordinates = null)
+        {
+            return new OpenAlprWebhookProcessor.Data.PlateGroup
+            {
+                Id = Guid.NewGuid(),
+                OpenAlprUuid = openAlprUuid ?? "test-uuid-123",
+                PlateCoordinates = plateCoordinates ?? "x=100,y=200,w=300,h=400",
+                BestNumber = "ABC123",
+                OpenAlprCameraId = 1,
+                ReceivedOnEpoch = 1234567890,
+                VehicleRegion = "us-ca",
+                VehicleColor = "Red",
+                VehicleMake = "Toyota",
+                VehicleMakeModel = "Camry",
+                VehicleType = "Car",
+                VehicleYear = "2023",
+                Direction = 90.0,
+                OpenAlprProcessingTimeMs = 150.5,
+                Confidence = 95.8,
+                IsAlert = false,
+                AlertDescription = "",
+                Notes = "Test notes",
+                IsEnriched = false,
+                VehicleImage = null,
+                PlateImage = null
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.VehicleImage CreateTestVehicleImage(bool isCompressed = false)
+        {
+            return new OpenAlprWebhookProcessor.Data.VehicleImage
+            {
+                Id = Guid.NewGuid(),
+                Jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 }, // JPEG header
+                IsCompressed = isCompressed
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.PlateImage CreateTestPlateImage(bool isCompressed = false)
+        {
+            return new OpenAlprWebhookProcessor.Data.PlateImage
+            {
+                Id = Guid.NewGuid(),
+                Jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 }, // JPEG header
+                IsCompressed = isCompressed
+            };
+        }
+
+        public static OpenAlprWebhookProcessor.Data.PlateGroup CreateTestPlateGroupWithImages(string? openAlprUuid = null, bool withVehicleImage = true, bool withPlateImage = true)
+        {
+            var plateGroup = CreateTestPlateGroupForImageRelay(openAlprUuid);
+            
+            if (withVehicleImage)
+            {
+                plateGroup.VehicleImage = CreateTestVehicleImage();
+            }
+            
+            if (withPlateImage)
+            {
+                plateGroup.PlateImage = CreateTestPlateImage();
+            }
+            
+            return plateGroup;
+        }
+
+        public static byte[] CreateTestJpegBytes()
+        {
+            return new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 };
+        }
     }
 } 
