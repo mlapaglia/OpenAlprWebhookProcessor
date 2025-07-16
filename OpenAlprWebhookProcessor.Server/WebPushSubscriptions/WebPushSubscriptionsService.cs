@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
         public WebPushSubscriptionsService(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public List<Lib.Net.Http.WebPush.PushSubscription> GetAll()
@@ -30,16 +30,23 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
                 var pushSubscriptions = new List<Lib.Net.Http.WebPush.PushSubscription>();
 
-                foreach (var subscription in subscriptions.Where(x => x.Keys != null))
+                foreach (var subscription in subscriptions.Where(x => x.Keys != null && x.Keys.Any()))
                 {
+                    var authKey = subscription.Keys.FirstOrDefault(x => x.Key == "auth");
+                    var p256dhKey = subscription.Keys.FirstOrDefault(x => x.Key == "p256dh");
+                    
+                    // Skip subscriptions that don't have the required keys
+                    if (authKey == null || p256dhKey == null)
+                        continue;
+
                     var newPushSubscription = new Lib.Net.Http.WebPush.PushSubscription()
                     {
                         Endpoint = subscription.Endpoint,
                         Keys = new Dictionary<string, string>(),
                     };
 
-                    newPushSubscription.SetKey(PushEncryptionKeyName.Auth, subscription.Keys.First(x => x.Key == "auth").Value);
-                    newPushSubscription.SetKey(PushEncryptionKeyName.P256DH, subscription.Keys.First(x => x.Key == "p256dh").Value);
+                    newPushSubscription.SetKey(PushEncryptionKeyName.Auth, authKey.Value);
+                    newPushSubscription.SetKey(PushEncryptionKeyName.P256DH, p256dhKey.Value);
 
                     pushSubscriptions.Add(newPushSubscription);
                 }
@@ -66,13 +73,16 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         Keys = new List<WebPushSubscriptionKey>(),
                     };
 
-                    foreach (var key in subscription.Keys)
+                    if (subscription.Keys != null)
                     {
-                        pushSubscription.Keys.Add(new WebPushSubscriptionKey()
+                        foreach (var key in subscription.Keys)
                         {
-                            Key = key.Key,
-                            Value = key.Value,
-                        });
+                            pushSubscription.Keys.Add(new WebPushSubscriptionKey()
+                            {
+                                Key = key.Key,
+                                Value = key.Value,
+                            });
+                        }
                     }
 
                     unitOfWork.WebPushSubscriptions.AddAsync(pushSubscription).GetAwaiter().GetResult();
