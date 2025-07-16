@@ -12,10 +12,12 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
     public class GetSnapshotQueryHandler : IRequestHandler<GetSnapshotQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICameraFactory _cameraFactory;
 
-        public GetSnapshotQueryHandler(IUnitOfWork unitOfWork)
+        public GetSnapshotQueryHandler(IUnitOfWork unitOfWork, ICameraFactory cameraFactory)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _cameraFactory = cameraFactory ?? throw new ArgumentNullException(nameof(cameraFactory));
         }
 
         public async Task<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
                 throw new ArgumentException("Camera not found.");
             }
 
-            var camera = CameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+            var camera = _cameraFactory.Create(dbCamera.Manufacturer, dbCamera);
 
             const int timeout = 5000;
             var task = camera.GetSnapshotAsync(cancellationToken);

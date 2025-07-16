@@ -6,9 +6,9 @@ using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras
 {
-    public static class CameraFactory
+    public class CameraFactory : ICameraFactory
     {
-        public static ICamera Create(
+        public ICamera Create(
             CameraManufacturer cameraManufacturer,
             Data.Camera camera)
         {

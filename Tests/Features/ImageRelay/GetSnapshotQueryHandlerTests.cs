@@ -1,7 +1,15 @@
 using FluentAssertions;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay
@@ -10,12 +18,14 @@ namespace Tests.Features.ImageRelay
     public class GetSnapshotQueryHandlerTests : TestBase
     {
         private GetSnapshotQueryHandler _handler;
+        private MockCameraFactory _mockCameraFactory;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            _handler = new GetSnapshotQueryHandler(UnitOfWork);
+            _mockCameraFactory = new MockCameraFactory();
+            _handler = new GetSnapshotQueryHandler(UnitOfWork, _mockCameraFactory);
         }
 
         [Test]
@@ -31,15 +41,22 @@ namespace Tests.Features.ImageRelay
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
+            var expectedImageBytes = TestDataFactory.CreateTestJpegBytes();
+            _mockCameraFactory.MockCamera.GetSnapshotAsync(Arg.Any<CancellationToken>())
+                .Returns(new MemoryStream(expectedImageBytes));
+
             var query = new GetSnapshotQuery(cameraId);
             var cancellationToken = GetCancellationToken();
 
-            // Act & Assert
-            // Note: This test will actually try to create a real camera and call GetSnapshotAsync
-            // Since we're testing the handler logic, we expect this to fail in a controlled way
-            // In a real scenario, this would connect to an actual camera
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<Exception>(); // Will fail due to no actual camera connection
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
+            var memoryStream = result as MemoryStream;
+            memoryStream.ToArray().Should().BeEquivalentTo(expectedImageBytes);
         }
 
         [Test]
@@ -87,16 +104,11 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act
-            try
-            {
-                await _handler.Handle(query, cancellationToken);
-            }
-            catch
-            {
-                // Expected to fail due to no actual camera connection
-            }
+            var result = await _handler.Handle(query, cancellationToken);
 
             // Assert
+            result.Should().NotBeNull();
+            
             var cameras = await UnitOfWork.Cameras.GetAllAsync(cancellationToken);
             cameras.Should().HaveCount(1);
             cameras.First().Id.Should().Be(cameraId);
@@ -119,11 +131,15 @@ namespace Tests.Features.ImageRelay
             var query = new GetSnapshotQuery(cameraId);
             var cancellationToken = GetCancellationToken();
 
-            // Act & Assert
-            // This test verifies the handler attempts to create a Hikvision camera
-            // The actual creation will fail due to no network connection, but we can verify the logic
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<Exception>(); // Will fail due to no actual camera connection
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
+            // Verify that the factory was called with the correct manufacturer
+            _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
         }
 
         [Test]
@@ -143,11 +159,15 @@ namespace Tests.Features.ImageRelay
             var query = new GetSnapshotQuery(cameraId);
             var cancellationToken = GetCancellationToken();
 
-            // Act & Assert
-            // This test verifies the handler attempts to create a Dahua camera
-            // The actual creation will fail due to no network connection, but we can verify the logic
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<Exception>(); // Will fail due to no actual camera connection
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
+            // Verify that the factory was called with the correct manufacturer
+            _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
         }
 
         [Test]
@@ -173,16 +193,12 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act
-            try
-            {
-                await _handler.Handle(query, cancellationToken);
-            }
-            catch
-            {
-                // Expected to fail due to no actual camera connection
-            }
+            var result = await _handler.Handle(query, cancellationToken);
 
             // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
             var cameras = await UnitOfWork.Cameras.GetAllAsync(cancellationToken);
             cameras.Should().HaveCount(2);
             
@@ -195,9 +211,18 @@ namespace Tests.Features.ImageRelay
         public void Handle_NullUnitOfWork_ThrowsArgumentNullException()
         {
             // Act & Assert
-            FluentActions.Invoking(() => new GetSnapshotQueryHandler(null))
+            FluentActions.Invoking(() => new GetSnapshotQueryHandler(null, _mockCameraFactory))
                 .Should().Throw<ArgumentNullException>()
                 .WithMessage("Value cannot be null. (Parameter 'unitOfWork')");
+        }
+
+        [Test]
+        public void Handle_NullCameraFactory_ThrowsArgumentNullException()
+        {
+            // Act & Assert
+            FluentActions.Invoking(() => new GetSnapshotQueryHandler(UnitOfWork, null))
+                .Should().Throw<ArgumentNullException>()
+                .WithMessage("Value cannot be null. (Parameter 'cameraFactory')");
         }
 
         [Test]
@@ -239,16 +264,12 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act
-            try
-            {
-                await _handler.Handle(query, cancellationToken);
-            }
-            catch
-            {
-                // Expected to fail due to no actual camera connection
-            }
+            var result = await _handler.Handle(query, cancellationToken);
 
             // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
             var cameras = await UnitOfWork.Cameras.GetAllAsync(cancellationToken);
             var matchingCamera = cameras.FirstOrDefault(x => x.Id == expectedCameraId);
             matchingCamera.Should().NotBeNull();
@@ -278,16 +299,12 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act
-            try
-            {
-                await _handler.Handle(query, cancellationToken);
-            }
-            catch
-            {
-                // Expected to fail due to no actual camera connection
-            }
+            var result = await _handler.Handle(query, cancellationToken);
 
             // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<MemoryStream>();
+            
             var allCameras = await UnitOfWork.Cameras.GetAllAsync(cancellationToken);
             allCameras.Should().HaveCount(4);
             
@@ -297,24 +314,58 @@ namespace Tests.Features.ImageRelay
         }
 
         [Test]
-        public void Handle_TimeoutScenario_HasCorrectTimeoutValue()
+        public async Task Handle_CameraGetSnapshotThrowsException_PropagatesException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();
+            var camera = TestDataFactory.CreateTestCamera(
+                CameraManufacturer.Hikvision, 
+                cameraId, 
+                1);
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _mockCameraFactory.MockCamera.GetSnapshotAsync(Arg.Any<CancellationToken>())
+                .ThrowsAsync(new Exception("Camera connection failed"));
+
             var query = new GetSnapshotQuery(cameraId);
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            // This test verifies that the handler has a timeout mechanism
-            // The actual timeout value is hardcoded to 5000ms in the handler
-            // We can't easily test the timeout behavior without mocking the camera
-            // but we can verify the handler code structure expects this timeout
-            
-            // Since we can't easily mock the static CameraFactory, we'll just ensure
-            // the handler throws an exception when no camera is found
-            FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
-                .WithMessage("Camera not found.");
+            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
+                .Should().ThrowAsync<Exception>()
+                .WithMessage("Camera connection failed");
+        }
+
+        [Test]
+        public async Task Handle_CameraGetSnapshotTimesOut_ThrowsTimeoutException()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var camera = TestDataFactory.CreateTestCamera(
+                CameraManufacturer.Hikvision, 
+                cameraId, 
+                1);
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            // Configure mock to delay longer than the timeout
+            _mockCameraFactory.MockCamera.GetSnapshotAsync(Arg.Any<CancellationToken>())
+                .Returns(Task.Run(async () =>
+                {
+                    await Task.Delay(6000); // 6 seconds, longer than 5 second timeout
+                    return new MemoryStream(TestDataFactory.CreateTestJpegBytes()) as Stream;
+                }));
+
+            var query = new GetSnapshotQuery(cameraId);
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
+                .Should().ThrowAsync<TimeoutException>()
+                .WithMessage("Unable to get image from camera");
         }
     }
 } 

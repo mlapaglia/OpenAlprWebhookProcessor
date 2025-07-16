@@ -20,15 +20,19 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly ILogger _logger;
 
+        private readonly ICameraFactory _cameraFactory;
+
         public CameraUpdateService(
             IServiceProvider serviceProvider,
             ILogger<CameraUpdateService> logger,
-            IBackgroundJobClient backgroundJobClient)
+            IBackgroundJobClient backgroundJobClient,
+            ICameraFactory cameraFactory)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             _backgroundJobClient = backgroundJobClient;
+            _cameraFactory = cameraFactory ?? throw new ArgumentNullException(nameof(cameraFactory));
         }
 
         public async Task ForceSunriseSunsetAsync()
@@ -114,7 +118,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         cameraToUpdate.NextDayNightScheduleId = string.Empty;
                     }
 
-                    var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                    var camera = _cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
                     await camera.TriggerDayNightModeAsync(
                         sunriseSunset,
@@ -203,7 +207,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
                     }
 
-                    var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                    var camera = _cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
                     await camera.SetCameraTextAsync(
                         cameraUpdateRequest,
@@ -250,7 +254,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 try
                 {
-                    var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                    var camera = _cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
                     await camera.ClearCameraTextAsync(_cancellationTokenSource.Token);
 
@@ -282,7 +286,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     throw new ArgumentException("Camera not found");
                 }
 
-                var camera = CameraFactory.Create(
+                var camera = _cameraFactory.Create(
                     dbCamera.Manufacturer,
                     dbCamera);
 
@@ -308,7 +312,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     throw new ArgumentException("Camera not found");
                 }
 
-                var camera = CameraFactory.Create(
+                var camera = _cameraFactory.Create(
                     dbCamera.Manufacturer,
                     dbCamera);
 
@@ -333,7 +337,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     throw new ArgumentException("Camera not found");
                 }
 
-                var camera = CameraFactory.Create(
+                var camera = _cameraFactory.Create(
                     dbCamera.Manufacturer,
                     dbCamera);
 
@@ -353,7 +357,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 {
                     try
                     {
-                        var camera = CameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+                        var camera = _cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
                         await camera.ClearCameraTextAsync(_cancellationTokenSource.Token);
 

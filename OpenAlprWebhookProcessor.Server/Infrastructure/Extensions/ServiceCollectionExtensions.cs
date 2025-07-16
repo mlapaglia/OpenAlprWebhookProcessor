@@ -112,6 +112,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddHttpClient<PushServiceClient>();
             services.AddHttpClient();
             services.AddScoped<IImageCompressionService, ImageCompressionService>();
+            services.AddScoped<OpenAlprWebhookProcessor.Features.Cameras.ICameraFactory, OpenAlprWebhookProcessor.Features.Cameras.CameraFactory>();
 
             return services;
         }
