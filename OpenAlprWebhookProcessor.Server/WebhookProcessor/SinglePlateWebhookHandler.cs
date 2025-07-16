@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -16,26 +17,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
         public SinglePlateWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
-            ProcessorContext processorContext)
+            IUnitOfWork unitOfWork)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task HandleWebhookAsync(
             SinglePlate webhook,
             CancellationToken cancellationToken)
         {
-            var camera = await _processorContext.Cameras
-                .AsNoTracking()
-                .Where(x => x.OpenAlprCameraId == webhook.CameraId)
-                .FirstOrDefaultAsync(cancellationToken);
+            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(
+                x => x.OpenAlprCameraId == webhook.CameraId,
+                cancellationToken);
 
             if (camera == null)
             {
@@ -64,9 +64,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
             }
 
-            var forwards = await _processorContext.WebhookForwards
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            var forwards = await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken);
 
             foreach (var forward in forwards)
             {

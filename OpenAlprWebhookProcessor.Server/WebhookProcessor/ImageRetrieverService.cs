@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.ImageRelay.ImageCompression;
+using OpenAlprWebhookProcessor.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -52,39 +53,31 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _imageCompressionRequestsToProcess.CompleteAdding();
-            _imageRequestsToProcess.CompleteAdding();
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
 
             return Task.CompletedTask;
         }
 
-        public bool TryAddJob(string openAlprImageId)
+        public void AddImageRetrievalJob(string uuid)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            if (string.IsNullOrWhiteSpace(uuid))
+                return;
+
+            lock (_imageRequestsToProcessGate)
             {
-                var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
-                logger.LogInformation("adding job for image: {imageId}", openAlprImageId);
-
-                lock (_imageRequestsToProcessGate)
+                if (_imageRequestsToProcessList.Add(uuid))
                 {
-                    if (_imageRequestsToProcessList.Contains(openAlprImageId))
-                    {
-                        logger.LogInformation("image is already queued for processing: {imageId}", openAlprImageId);
-                        return false;
-                    }
-                    else
-                    {
-                        if (!_imageRequestsToProcess.TryAdd(openAlprImageId))
-                        {
-                            logger.LogError("Unable to queue image for processing: {imageId}", openAlprImageId);
-                            return false;
-                        }
-
-                        _imageRequestsToProcessList.Add(openAlprImageId);
-                        return true;
-                    }
+                    _imageRequestsToProcess.Add(uuid);
                 }
+            }
+        }
+
+        public void AddImageCompressionJob(string ignoreThisParameter)
+        {
+            if (_imageCompressionRequestsToProcessList.Add(ignoreThisParameter))
+            {
+                _imageCompressionRequestsToProcess.Add(ignoreThisParameter);
             }
         }
 
@@ -102,18 +95,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
                     logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
 
-                    var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                    var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                    var plateGroups = await processorContext.PlateGroups
+                    var plateGroups = await unitOfWork.PlateGroups.GetQueryable()
                         .Include(x => x.PlateImage)
                         .Include(x => x.VehicleImage)
                         .Where(x => x.OpenAlprUuid == job)
                         .ToListAsync(_cancellationTokenSource.Token);
 
-                    var isImageCompressionEnabled = await processorContext.Agents
-                        .AsNoTracking()
-                        .Select(x => x.IsImageCompressionEnabled)
-                        .FirstOrDefaultAsync();
+                    var agent = await unitOfWork.Agents.GetFirstAgentAsync(_cancellationTokenSource.Token);
+
+                    var isImageCompressionEnabled = agent?.IsImageCompressionEnabled ?? false;
 
                     foreach (var plateGroup in plateGroups)
                     {
@@ -126,7 +118,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         try
                         {
                             var imageCompressionService = scope.ServiceProvider.GetRequiredService<ImageCompressionService>();
-                            var agent = await processorContext.Agents.FirstOrDefaultAsync();
 
                             var image = await imageCompressionService.GetImageFromAgentAsync(
                                 agent,
@@ -156,7 +147,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
 
                         plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                        await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
+                        await unitOfWork.SaveChangesAsync(_cancellationTokenSource.Token);
 
                         lock (_imageRequestsToProcessGate)
                         {
@@ -180,13 +171,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
                     while (keepPaging)
                     {
-                        var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
 
-                        var isImageCompressionEnabled = await processorContext.Agents
-                            .AsNoTracking()
-                            .Select(x => x.IsImageCompressionEnabled)
-                            .FirstOrDefaultAsync();
+                        var agent = await unitOfWork.Agents.GetFirstAgentAsync(_cancellationTokenSource.Token);
+                        var isImageCompressionEnabled = agent?.IsImageCompressionEnabled ?? false;
 
                         if (!isImageCompressionEnabled)
                         {
@@ -194,7 +183,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                             break;
                         }
 
-                        var plateGroups = await processorContext.PlateGroups
+                        var orderedGroups = await unitOfWork.PlateGroups.GetQueryable()
                             .Include(x => x.PlateImage)
                             .Include(x => x.VehicleImage)
                             .OrderBy(x => x.ReceivedOnEpoch)
@@ -204,18 +193,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                             .Take(25)
                             .ToListAsync(_cancellationTokenSource.Token);
 
-                        if (!plateGroups.Any())
+                        if (!orderedGroups.Any())
                         {
                             keepPaging = false;
                         }
                         else
                         {
-                            lastReceivedOnEpoch = plateGroups.First().ReceivedOnEpoch;
+                            lastReceivedOnEpoch = orderedGroups.First().ReceivedOnEpoch;
                         }
 
-                        logger.LogInformation("Searcing for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, plateGroups.Count);
+                        logger.LogInformation("Searching for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, orderedGroups.Count);
 
-                        foreach (var plateGroup in plateGroups)
+                        foreach (var plateGroup in orderedGroups)
                         {
                             if (!plateGroup.VehicleImage.IsCompressed && plateGroup.VehicleImage.Jpeg != null)
                             {
@@ -230,7 +219,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                             }
                         }
 
-                        await processorContext.SaveChangesAsync(_cancellationTokenSource.Token);
+                        await unitOfWork.SaveChangesAsync(_cancellationTokenSource.Token);
                     }
                 }
             }

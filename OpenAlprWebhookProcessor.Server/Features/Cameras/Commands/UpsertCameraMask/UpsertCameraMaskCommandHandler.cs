@@ -12,11 +12,11 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
     public class UpsertCameraMaskCommandHandler : IRequestHandler<UpsertCameraMaskCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly WebsocketClientOrganizer _websocketClientOrganizer;
+        private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
 
         public UpsertCameraMaskCommandHandler(
             IUnitOfWork unitOfWork,
-            WebsocketClientOrganizer websocketClientOrganizer)
+            IWebsocketClientOrganizer websocketClientOrganizer)
         {
             _unitOfWork = unitOfWork;
             _websocketClientOrganizer = websocketClientOrganizer;

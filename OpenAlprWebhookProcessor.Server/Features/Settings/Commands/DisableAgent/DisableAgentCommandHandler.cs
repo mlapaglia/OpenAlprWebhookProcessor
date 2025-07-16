@@ -9,11 +9,11 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent
     public class DisableAgentCommandHandler : IRequestHandler<DisableAgentCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly WebsocketClientOrganizer _websocketClientOrganizer;
+        private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
 
         public DisableAgentCommandHandler(
             IUnitOfWork unitOfWork,
-            WebsocketClientOrganizer websocketClientOrganizer)
+            IWebsocketClientOrganizer websocketClientOrganizer)
         {
             _unitOfWork = unitOfWork;
             _websocketClientOrganizer = websocketClientOrganizer;

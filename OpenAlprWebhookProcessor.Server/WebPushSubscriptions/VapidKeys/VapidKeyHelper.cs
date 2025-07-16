@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,15 +28,16 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
         }
 
         public static async Task<VapidDetails> GetVapidKeysAsync(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             CancellationToken cancellationToken)
         {
-            var pushSettings = await processorContext.WebPushSettings.FirstOrDefaultAsync(cancellationToken);
+            var pushSettingsList = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
+            var pushSettings = pushSettingsList.FirstOrDefault();
 
             if (pushSettings == null || string.IsNullOrWhiteSpace(pushSettings.PublicKey))
             {
-                pushSettings = AddVapidKeys(processorContext);
-                await processorContext.SaveChangesAsync(cancellationToken);
+                pushSettings = await AddVapidKeysAsync(unitOfWork, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
             return new VapidDetails()
@@ -56,6 +58,23 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
             };
 
             processorContext.WebPushSettings.Add(pushSettings);
+
+            return pushSettings;
+        }
+
+        public static async Task<WebPushSettings> AddVapidKeysAsync(
+            IUnitOfWork unitOfWork,
+            CancellationToken cancellationToken)
+        {
+            var vapidKeys = VapidKeyGenerator.GenerateVapidKeys();
+
+            var pushSettings = new WebPushSettings()
+            {
+                PublicKey = vapidKeys.PublicKey,
+                PrivateKey = vapidKeys.PrivateKey,
+            };
+
+            await unitOfWork.WebPushSettings.AddAsync(pushSettings, cancellationToken);
 
             return pushSettings;
         }

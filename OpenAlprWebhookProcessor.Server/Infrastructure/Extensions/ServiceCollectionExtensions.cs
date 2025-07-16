@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Infrastructure.Behaviors;
-using OpenAlprWebhookProcessor.Users.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
@@ -24,6 +22,10 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
+using OpenAlprWebhookProcessor.Features.Users;
+using OpenAlprWebhookProcessor.Features.Users.Data;
+using OpenAlprWebhookProcessor.Features.Users.Register;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -78,6 +80,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
 
             services.AddSingleton<WebsocketClientOrganizer>();
+            services.AddSingleton<IWebsocketClientOrganizer>(p => p.GetService<WebsocketClientOrganizer>());
             services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
@@ -106,7 +109,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
             services.AddHttpClient<PushServiceClient>();
             services.AddHttpClient();
-            services.AddScoped<ImageRelay.ImageCompression.ImageCompressionService>();
+            services.AddScoped<ImageCompressionService>();
 
             return services;
         }
@@ -147,9 +150,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
         {
             var mapper = new AutoMapper.MapperConfiguration(mc =>
             {
-                mc.CreateMap<Users.User, Users.UserModel>();
-                mc.CreateMap<Users.Register.RegisterModel, Users.User>();
-                mc.CreateMap<Users.UpdateModel, Users.User>();
+                mc.CreateMap<User, UserModel>();
+                mc.CreateMap<RegisterModel, User>();
+                mc.CreateMap<UpdateModel, User>();
             });
 
             services.AddSingleton(mapper.CreateMapper());
@@ -175,7 +178,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
                 {
                     // Get the signing key from the database
                     using var scope = _serviceProvider.CreateScope();
-                    var userService = scope.ServiceProvider.GetRequiredService<Users.IUserService>();
+                    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                     var key = userService.GetJwtSecretKeyAsync().Result;
                     return new[] { new SymmetricSecurityKey(key) };
                 },

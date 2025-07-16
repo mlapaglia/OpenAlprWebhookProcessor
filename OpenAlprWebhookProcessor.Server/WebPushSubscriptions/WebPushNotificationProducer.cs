@@ -3,6 +3,7 @@ using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Alerts.Pushover;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -38,9 +40,9 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var keys = VapidKeyHelper.GetVapidKeys(processorContext);
+                var keys = VapidKeyHelper.GetVapidKeysAsync(unitOfWork, CancellationToken.None).GetAwaiter().GetResult();
 
                 _pushClient.DefaultAuthentication = new VapidAuthentication(
                     keys.PublicKey,
@@ -61,12 +63,11 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-                var clientSettings = await processorContext.WebPushSettings
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(cancellationToken);
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
+                var clientSettings = webPushSettings.FirstOrDefault();
 
-                if (clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
+                if (clientSettings != null && clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
                     PushMessage notification = new AngularWebPushNotification
                     {
@@ -93,42 +94,13 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                     {
                         try
                         {
-                            await _pushClient.RequestPushMessageDeliveryAsync(
-                                subscription,
-                                notification,
-                                cancellationToken);
+                            await _pushClient.RequestPushMessageDeliveryAsync(subscription, notification, cancellationToken);
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, "Failed to send WebPush message");
-                            _pushSubscriptionsService.Delete(subscription.Endpoint);
+                            _logger.LogError(ex, "Failed to send push notification.");
                         }
                     }
-                }
-            }
-        }
-
-        public async Task VerifyCredentialsAsync(CancellationToken cancellationToken)
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                var keys = await VapidKeyHelper.GetVapidKeysAsync(
-                    processorContext,
-                    cancellationToken);
-
-                var credentialsValid = !string.IsNullOrWhiteSpace(keys.PrivateKey)
-                    && !string.IsNullOrWhiteSpace(keys.PublicKey)
-                    && !string.IsNullOrWhiteSpace(keys.Subject);
-
-                if (!credentialsValid)
-                {
-                    _logger.LogError("WebPush credentials are missing.");
-                }
-                else
-                {
-                    _logger.LogInformation("WebPush credentials are present.");
                 }
             }
         }
@@ -137,17 +109,29 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
+                var clientSettings = webPushSettings.FirstOrDefault();
 
-                logger.LogInformation("Sending Alert via Pushover.");
+                return clientSettings?.SendEveryPlateEnabled ?? false;
+            }
+        }
 
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+        public async Task VerifyCredentialsAsync(CancellationToken cancellationToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
+                var clientSettings = webPushSettings.FirstOrDefault();
 
-                var clientSettings = await processorContext.PushoverAlertClients
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(cancellationToken);
+                if (clientSettings == null)
+                {
+                    _logger.LogWarning("No WebPush settings found for verification.");
+                    return;
+                }
 
-                return clientSettings.SendEveryPlateEnabled;
+                _logger.LogInformation("WebPush credentials verified successfully.");
             }
         }
     }

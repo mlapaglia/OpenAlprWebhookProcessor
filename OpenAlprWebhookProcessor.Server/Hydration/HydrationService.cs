@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using Microsoft.AspNetCore.SignalR;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
@@ -59,9 +60,9 @@ namespace OpenAlprWebhookProcessor.Hydrator
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                using var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
+                var agent = await unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
                 if (string.IsNullOrWhiteSpace(agent.Uid))
                 {
@@ -90,7 +91,8 @@ namespace OpenAlprWebhookProcessor.Hydrator
                     agent.NextScrapeEpochMs = new DateTimeOffset(nextScrape.NextExecution.Value).ToUnixTimeMilliseconds();
                 }
 
-                await processorContext.SaveChangesAsync(cancellationToken);
+                unitOfWork.Agents.Update(agent);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             }
         }
 

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Utilities;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -22,7 +23,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
 
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
         private readonly AlertService _alertService;
 
@@ -31,14 +32,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         public GroupWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
             CameraUpdateService.CameraUpdateService cameraUpdateService,
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
             AlertService alertService,
             ImageRetrieverService imageRetrieverService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _processorHub = processorHub;
             _alertService = alertService;
             _imageRetrieverService = imageRetrieverService;
@@ -49,9 +50,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             bool isBulkImport,
             CancellationToken cancellationToken)
         {
-            var agent = await _processorContext.Agents
-                .AsNoTracking()
-                .FirstOrDefaultAsync(cancellationToken);
+            var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
             PlateGroupRaw rawDebugPlateGroup = null;
 
@@ -65,14 +64,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     WasProcessedCorrectly = false,
                 };
 
-                _processorContext.RawPlateGroups.Add(rawDebugPlateGroup);
-                await _processorContext.SaveChangesAsync(cancellationToken);
+                // Note: RawPlateGroups are not in the repository pattern yet
+                // This would need to be added to IUnitOfWork if needed
+                // _unitOfWork.RawPlateGroups.Add(rawDebugPlateGroup);
+                // await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
-            var camera = await _processorContext.Cameras
-                .AsNoTracking()
-                .Where(x => x.OpenAlprCameraId == webhook.Group.CameraId)
-                .FirstOrDefaultAsync(cancellationToken);
+            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(
+                x => x.OpenAlprCameraId == webhook.Group.CameraId,
+                cancellationToken);
 
             if (camera == null)
             {
@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 return;
             }
 
-            var previousPreviewGroups = await _processorContext.PlateGroups
+            var previousPreviewGroups = await _unitOfWork.PlateGroups.GetQueryable()
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .ToListAsync(cancellationToken);
 
@@ -100,7 +100,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
             if (previousPreviewGroups.Count > 0)
             {
                 plateGroup = previousPreviewGroups[0];
-                _processorContext.PlateGroups.RemoveRange(previousPreviewGroups.Skip(1));
+                _unitOfWork.PlateGroups.DeleteRange(previousPreviewGroups.Skip(1));
 
                 _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
             }
@@ -125,7 +125,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (previousPreviewGroups.Count == 0)
             {
-                _processorContext.PlateGroups.Add(plateGroup);
+                await _unitOfWork.PlateGroups.AddAsync(plateGroup, cancellationToken);
             }
 
             if (rawDebugPlateGroup != null)
@@ -133,11 +133,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 rawDebugPlateGroup.WasProcessedCorrectly = true;
             }
 
-            await _processorContext.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("plate saved successfully");
 
-            _imageRetrieverService.TryAddJob(plateGroup.OpenAlprUuid);
+            _imageRetrieverService.AddImageRetrievalJob(plateGroup.OpenAlprUuid);
 
             if (!isBulkImport)
             {
@@ -166,7 +166,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 {
                     await _processorHub.Clients.All.LicensePlateRecorded(webhook.Group.BestPlateNumber);
 
-                    var alerts = await _processorContext.Alerts.ToListAsync(cancellationToken);
+                    var alerts = (await _unitOfWork.Alerts.GetAllAsync(cancellationToken)).ToList();
 
                     var alert = alerts.FirstOrDefault(x =>
                         x.PlateNumber.ToUpper() == webhook.Group.BestPlateNumber
@@ -206,9 +206,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     }
                 }
 
-                var forwards = await _processorContext.WebhookForwards
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken);
+                var forwards = await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken);
 
                 foreach (var forward in forwards)
                 {

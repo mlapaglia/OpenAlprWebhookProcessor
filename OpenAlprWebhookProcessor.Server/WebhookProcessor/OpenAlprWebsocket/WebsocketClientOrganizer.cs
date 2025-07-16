@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
-    public class WebsocketClientOrganizer : BackgroundService
+    public class WebsocketClientOrganizer : BackgroundService, IWebsocketClientOrganizer
     {
         private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients;
 

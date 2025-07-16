@@ -9,11 +9,11 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus
     public class GetAgentStatusQueryHandler : IRequestHandler<GetAgentStatusQuery, AgentStatusDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly WebsocketClientOrganizer _websocketClientOrganizer;
+        private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
 
         public GetAgentStatusQueryHandler(
             IUnitOfWork unitOfWork,
-            WebsocketClientOrganizer websocketClientOrganizer)
+            IWebsocketClientOrganizer websocketClientOrganizer)
         {
             _unitOfWork = unitOfWork;
             _websocketClientOrganizer = websocketClientOrganizer;

@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,13 +32,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             using (var scope = serviceProvider.CreateScope())
             {
-                using var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var camerasToUpdate = await processorContext.Cameras.ToListAsync();
+                var camerasToUpdate = await unitOfWork.Cameras.FindAsync(x => x.UpdateDayNightModeEnabled);
 
-                var agent = await processorContext.Agents.FirstOrDefaultAsync();
+                var agent = await unitOfWork.Agents.GetFirstAgentAsync();
 
-                foreach (var camera in camerasToUpdate.Where(x => x.UpdateDayNightModeEnabled))
+                foreach (var camera in camerasToUpdate)
                 {
                     ScheduleDayNightTask(
                         cameraUpdateService,
@@ -46,7 +47,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                         camera);
                 }
 
-                await processorContext.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync();
             }
         }
 

@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             private readonly ProcessorContext _processorContext;
 
-            private readonly WebsocketClientOrganizer _websocketClientOrganizer;
+            private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
 
             private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 ILogger<WebsocketController> logger,
                 IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
                 ProcessorContext processorContext,
-                WebsocketClientOrganizer websocketClientOrganizer)
+                IWebsocketClientOrganizer websocketClientOrganizer)
             {
                 _logger = logger;
                 _processorContext = processorContext;

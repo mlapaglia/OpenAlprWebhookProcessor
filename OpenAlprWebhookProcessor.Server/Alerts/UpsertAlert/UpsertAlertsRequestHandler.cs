@@ -1,55 +1,53 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts
 {
     public class UpsertAlertsRequestHandler
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UpsertAlertsRequestHandler(ProcessorContext processorContext)
+        public UpsertAlertsRequestHandler(IUnitOfWork unitOfWork)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task AddAlertAsync(Alert alert)
         {
-            var dbIgnores = await _processorContext.Alerts
-                .Where(x => x.PlateNumber == alert.PlateNumber.ToUpper())
-                .ToListAsync();
+            var existingAlerts = await _unitOfWork.Alerts.FindAsync(
+                x => x.PlateNumber == alert.PlateNumber.ToUpper());
 
-            if (dbIgnores != null)
-            {
-                var addedAlert = new Data.Alert()
-                {
-                    Description = alert.Description,
-                    IsStrictMatch = alert.StrictMatch,
-                    PlateNumber = alert.PlateNumber.ToUpper(),
-                };
-
-                _processorContext.Alerts.Add(addedAlert);
-
-                await _processorContext.SaveChangesAsync();
-            }
-            else
+            if (existingAlerts.Any())
             {
                 throw new ArgumentException("alert already exists");
             }
+
+            var addedAlert = new Data.Alert()
+            {
+                Description = alert.Description,
+                IsStrictMatch = alert.StrictMatch,
+                PlateNumber = alert.PlateNumber.ToUpper(),
+            };
+
+            await _unitOfWork.Alerts.AddAsync(addedAlert);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpsertAlertsAsync(List<Alert> alerts)
         {
             alerts = alerts.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
 
-            var dbAlerts = await _processorContext.Alerts.ToListAsync();
+            var dbAlerts = (await _unitOfWork.Alerts.GetAllAsync()).ToList();
 
-            var ignoresToRemove = dbAlerts.Where(p => !alerts.Any(p2 => p2.Id == p.Id));
+            var alertsToRemove = dbAlerts.Where(p => !alerts.Any(p2 => p2.Id == p.Id));
 
-            _processorContext.RemoveRange(ignoresToRemove);
+            _unitOfWork.Alerts.DeleteRange(alertsToRemove);
 
             var alertsToUpdate = dbAlerts.Where(x => alerts.Any(p2 => p2.Id == x.Id));
 
@@ -62,6 +60,8 @@ namespace OpenAlprWebhookProcessor.Alerts
                 alertToUpdate.PlateNumber = updatedAlert.PlateNumber.ToUpper();
             }
 
+            _unitOfWork.Alerts.UpdateRange(alertsToUpdate);
+
             var alertsToAdd = alerts.Where(x => !dbAlerts.Any(p2 => p2.Id == x.Id));
 
             foreach (var alertToAdd in alertsToAdd)
@@ -71,12 +71,12 @@ namespace OpenAlprWebhookProcessor.Alerts
                     Description = alertToAdd.Description,
                     IsStrictMatch = alertToAdd.StrictMatch,
                     PlateNumber = alertToAdd.PlateNumber.ToUpper(),
-            };
+                };
 
-                _processorContext.Alerts.Add(addedAlert);
+                await _unitOfWork.Alerts.AddAsync(addedAlert);
             }
 
-            await _processorContext.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

@@ -9,11 +9,11 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent
     public class EnableAgentCommandHandler : IRequestHandler<EnableAgentCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly WebsocketClientOrganizer _websocketClientOrganizer;
+        private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
 
         public EnableAgentCommandHandler(
             IUnitOfWork unitOfWork,
-            WebsocketClientOrganizer websocketClientOrganizer)
+            IWebsocketClientOrganizer websocketClientOrganizer)
         {
             _unitOfWork = unitOfWork;
             _websocketClientOrganizer = websocketClientOrganizer;

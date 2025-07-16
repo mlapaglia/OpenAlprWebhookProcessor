@@ -2,10 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Infrastructure.Middleware;
-using OpenAlprWebhookProcessor.Users.Data;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions

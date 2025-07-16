@@ -188,7 +188,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             foreach (var plateGroupId in plateGroupIds)
             {
-                _imageRetriever.TryAddJob(plateGroupId);
+                _imageRetriever.AddImageRetrievalJob(plateGroupId);
             }
 
             _logger.LogInformation("Jobs added successfully.");

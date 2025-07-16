@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -21,11 +23,10 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var subscriptions = processorContext.WebPushSubscriptions
+                var subscriptions = unitOfWork.WebPushSubscriptions.GetQueryable()
                     .Include(x => x.Keys)
-                    .AsNoTracking()
                     .ToList();
 
                 var pushSubscriptions = new List<Lib.Net.Http.WebPush.PushSubscription>();
@@ -52,9 +53,9 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var existingSubscription = processorContext.WebPushSubscriptions
+                var existingSubscription = unitOfWork.WebPushSubscriptions.GetQueryable()
                     .Include(x => x.Keys)
                     .FirstOrDefault(x => x.Endpoint == subscription.Endpoint);
 
@@ -75,8 +76,8 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         });
                     }
 
-                    processorContext.WebPushSubscriptions.Add(pushSubscription);
-                    processorContext.SaveChanges();
+                    unitOfWork.WebPushSubscriptions.AddAsync(pushSubscription).GetAwaiter().GetResult();
+                    unitOfWork.SaveChangesAsync().GetAwaiter().GetResult();
                 }
             }
         }
@@ -85,12 +86,14 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var endpointToRemove = processorContext.WebPushSubscriptions.FirstOrDefault(x => x.Endpoint == endpoint);
-                processorContext.WebPushSubscriptions.Remove(endpointToRemove);
-                processorContext.SaveChanges();
-
+                var endpointToRemove = unitOfWork.WebPushSubscriptions.FirstOrDefaultAsync(x => x.Endpoint == endpoint).GetAwaiter().GetResult();
+                if (endpointToRemove != null)
+                {
+                    unitOfWork.WebPushSubscriptions.Delete(endpointToRemove);
+                    unitOfWork.SaveChangesAsync().GetAwaiter().GetResult();
+                }
             }
         }
     }

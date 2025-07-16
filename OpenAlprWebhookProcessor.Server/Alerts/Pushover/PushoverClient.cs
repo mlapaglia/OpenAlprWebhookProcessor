@@ -2,7 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -36,15 +38,14 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 logger.LogInformation("Sending Alert via Pushover.");
 
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var clientSettings = await processorContext.PushoverAlertClients
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(cancellationToken);
+                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
+                var clientSettings = pushoverClients.FirstOrDefault();
 
-                var agent = await processorContext.Agents.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                var agent = await unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
-                if (clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
+                if (clientSettings != null && clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
                     var boundary = Guid.NewGuid().ToString();
                     using (var content = new MultipartFormDataContent(boundary))
@@ -96,15 +97,14 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
             {
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<PushoverClient>>();
 
-                logger.LogInformation("Sending Alert via Pushover.");
+                logger.LogInformation("Checking Pushover settings for all plates.");
 
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var clientSettings = await processorContext.PushoverAlertClients
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(cancellationToken);
+                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
+                var clientSettings = pushoverClients.FirstOrDefault();
 
-                return clientSettings.SendEveryPlateEnabled;
+                return clientSettings?.SendEveryPlateEnabled ?? false;
             }
         }
 
@@ -116,11 +116,16 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 logger.LogInformation("Testing credentials via Pushover.");
 
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var clientSettings = await processorContext.PushoverAlertClients
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(cancellationToken);
+                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
+                var clientSettings = pushoverClients.FirstOrDefault();
+
+                if (clientSettings == null)
+                {
+                    logger.LogError("No Pushover client settings found.");
+                    return;
+                }
 
                 try
                 {
@@ -135,8 +140,10 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         var message = await result.Content.ReadAsStringAsync(cancellationToken);
                         logger.LogError("Pushover credential check failed: {message}", message);
                     }
-
-                    logger.LogInformation("Pushover credentials are valid.");
+                    else
+                    {
+                        logger.LogInformation("Pushover credentials are valid.");
+                    }
                 }
                 catch (Exception ex)
                 {

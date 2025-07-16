@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAlprWebhookProcessor.Features.Users;
+using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.Users.Services;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.SystemLogs;
-using OpenAlprWebhookProcessor.Users;
-using OpenAlprWebhookProcessor.Users.Data;
 using Serilog;
 using System;
-using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -42,6 +42,15 @@ namespace OpenAlprWebhookProcessor
             services.AddJwtAuthentication(Configuration);
 
             services.AddScoped<IUserService, UserService>();
+            
+            // Users repository pattern
+            services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IJwtKeyRepository, JwtKeyRepository>();
+            
+            // Users services
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IPasswordService, PasswordService>();
 
             services.AddExternalServices();
 
