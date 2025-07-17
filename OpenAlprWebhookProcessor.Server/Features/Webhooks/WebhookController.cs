@@ -34,7 +34,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
         [HttpPost]
         public async Task<ActionResult> Post(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("request received from: {ipAddress}", Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("request received from: {IpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
 
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
             {
@@ -83,7 +83,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
                 }
                 else
                 {
-                    _logger.LogInformation("Unknown payload received, ignoring: {rawWebhook}", rawWebhook);
+                    _logger.LogInformation("Unknown payload received, ignoring: {RawWebhook}", rawWebhook);
                 }
             }
 
@@ -93,7 +93,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
         [HttpGet]
         public async Task<ActionResult> Get(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("test succeeded from: {remoteIpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
+            _logger.LogInformation("test succeeded from: {RemoteIpAddress}", Request.HttpContext.Connection.RemoteIpAddress);
             var query = new GetWebhookStatusQuery();
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);

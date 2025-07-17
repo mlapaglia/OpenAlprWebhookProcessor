@@ -7,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraNightMode
 {
     public class TestCameraNightModeCommandHandler : IRequestHandler<TestCameraNightModeCommand>
     {
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
-        public TestCameraNightModeCommandHandler(CameraUpdateService.CameraUpdateService cameraUpdateService)
+        public TestCameraNightModeCommandHandler(ICameraUpdateService cameraUpdateService)
         {
             _cameraUpdateService = cameraUpdateService;
         }

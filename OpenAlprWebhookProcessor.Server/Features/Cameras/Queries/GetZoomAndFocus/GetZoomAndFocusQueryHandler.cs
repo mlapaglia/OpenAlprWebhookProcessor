@@ -7,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus
 {
     public class GetZoomAndFocusQueryHandler : IRequestHandler<GetZoomAndFocusQuery, ZoomFocus>
     {
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
-        public GetZoomAndFocusQueryHandler(CameraUpdateService.CameraUpdateService cameraUpdateService)
+        public GetZoomAndFocusQueryHandler(ICameraUpdateService cameraUpdateService)
         {
             _cameraUpdateService = cameraUpdateService;
         }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Alerts
 {
-    public class AlertService : IHostedService
+    public class AlertService : IHostedService, IAlertService
     {
         private readonly BlockingCollection<AlertUpdateRequest> _alertsToProcess;
 
@@ -59,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Alerts
         {
             foreach (var job in _alertsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
             {
-                _logger.LogInformation("alerting for: {plateNumber}", job.PlateNumber);
+                _logger.LogInformation("alerting for: {PlateNumber}", job.PlateNumber);
                 await _processorHub.Clients.All.LicensePlateAlerted(job.PlateNumber);
 
                 foreach (var alertClient in _alertClients)

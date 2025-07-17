@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -24,24 +24,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
-                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
                 await Task.Delay(Timeout.Infinite, _cancellationTokenSource.Token);
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {message}", ex.Message);
+                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {Message}", ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unknown error occurred {message}, stopping websockets: {message}", ex.Message);
+                _logger.LogError(ex, "Unknown error occurred, stopping websockets: {Message}", ex.Message);
             }
             finally
             {
                 await DisconnectClientsAsync();
+                _cancellationTokenSource.Dispose();
             }
         }
 
@@ -63,8 +64,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     await oldWebSocketClient.CloseConnectionAsync(linkedCancellationToken);
                     result.UpdateWasCleanDisconnect = true;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "unable to disconnect client cleanly");
                 }
             }
 
@@ -74,7 +76,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             }
             else
             {
-                _logger.LogError("Unable to add agent: {agentID}", agentId);
+                _logger.LogError("Unable to add agent: {AgentID}", agentId);
             }
 
             return result;
@@ -103,7 +105,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return null;
             }
 
@@ -141,7 +143,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return null;
             }
 
@@ -177,7 +179,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return false;
             }
 
@@ -218,7 +220,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             if (!agentExists)
             {
-                _logger.LogError("AgentId is not connected: {agentId}", agentId);
+                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
                 return false;
             }
 
@@ -235,7 +237,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
             while (stopwatch.ElapsedMilliseconds < 100000)
             {
-                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var agentStatusResponse))
+                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var _))
                 {
                     return true;
                 }

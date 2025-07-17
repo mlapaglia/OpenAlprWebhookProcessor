@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -136,7 +136,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                     if (!result.IsSuccessStatusCode)
                     {
                         var message = await result.Content.ReadAsStringAsync(cancellationToken);
-                        logger.LogError("Pushover credential check failed: {message}", message);
+                        logger.LogError("Pushover credential check failed: {Message}", message);
                     }
                     else
                     {

@@ -1,4 +1,5 @@
 using MediatR;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
 {
     public class TestCameraOverlayCommandHandler : IRequestHandler<TestCameraOverlayCommand>
     {
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
-        public TestCameraOverlayCommandHandler(CameraUpdateService.CameraUpdateService cameraUpdateService)
+        public TestCameraOverlayCommandHandler(ICameraUpdateService cameraUpdateService)
         {
             _cameraUpdateService = cameraUpdateService;
         }

@@ -493,7 +493,7 @@ namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
         }
 
         [Test]
-        public async Task Handle_RepositoryThrowsException_PropagatesException()
+        public void Handle_RepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var query = new SearchLicensePlatesQuery
@@ -532,7 +532,7 @@ namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
         }
 
         [Test]
-        public async Task Handle_CountRepositoryThrowsException_PropagatesException()
+        public void Handle_CountRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var query = new SearchLicensePlatesQuery

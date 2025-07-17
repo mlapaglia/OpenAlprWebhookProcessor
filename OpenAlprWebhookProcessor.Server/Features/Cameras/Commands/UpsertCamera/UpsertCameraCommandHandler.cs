@@ -1,4 +1,5 @@
 using MediatR;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,11 +9,11 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
     public class UpsertCameraCommandHandler : IRequestHandler<UpsertCameraCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
         public UpsertCameraCommandHandler(
             IUnitOfWork unitOfWork,
-            CameraUpdateService.CameraUpdateService cameraUpdateService)
+            ICameraUpdateService cameraUpdateService)
         {
             _unitOfWork = unitOfWork;
             _cameraUpdateService = cameraUpdateService;

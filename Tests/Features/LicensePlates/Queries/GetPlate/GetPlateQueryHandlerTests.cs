@@ -130,7 +130,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
         }
 
         [Test]
-        public async Task Handle_RepositoryThrowsException_PropagatesException()
+        public void Handle_RepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -149,7 +149,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
         }
 
         [Test]
-        public async Task Handle_IgnoreRepositoryThrowsException_PropagatesException()
+        public void Handle_IgnoreRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -174,7 +174,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
         }
 
         [Test]
-        public async Task Handle_AlertRepositoryThrowsException_PropagatesException()
+        public void Handle_AlertRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();

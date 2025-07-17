@@ -1,4 +1,5 @@
 using MediatR;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TriggerAutofocus
 {
     public class TriggerAutofocusCommandHandler : IRequestHandler<TriggerAutofocusCommand, bool>
     {
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
-        public TriggerAutofocusCommandHandler(CameraUpdateService.CameraUpdateService cameraUpdateService)
+        public TriggerAutofocusCommandHandler(ICameraUpdateService cameraUpdateService)
         {
             _cameraUpdateService = cameraUpdateService;
         }

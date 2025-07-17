@@ -1,4 +1,4 @@
-﻿using Hangfire;
+using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
-    public class CameraUpdateService : IHostedService
+    public class CameraUpdateService : IHostedService, ICameraUpdateService
     {
         private readonly IBackgroundJobClient _backgroundJobClient;
 
@@ -99,7 +99,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                _logger.LogInformation("setting {sunriseSunset} for {cameraId}", sunriseSunset, cameraId);
+                _logger.LogInformation("setting {SunriseSunset} for {CameraId}", sunriseSunset, cameraId);
 
                 try
                 {
@@ -139,7 +139,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error processing sunrise/sunset job for camera {cameraId}", cameraId);
+                    _logger.LogError(ex, "Error processing sunrise/sunset job for camera {CameraId}", cameraId);
                 }
             }
         }
@@ -187,7 +187,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                _logger.LogInformation("processing job for plate: {plateNumber}", cameraUpdateRequest.LicensePlate);
+                _logger.LogInformation("processing job for plate: {PlateNumber}", cameraUpdateRequest.LicensePlate);
 
                 try
                 {
@@ -197,13 +197,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                     if (cameraToUpdate == null)
                     {
-                        _logger.LogError("Unable to find camera with OpenAlprId: {cameraId}, check your configuration.", cameraUpdateRequest.Id);
+                        _logger.LogError("Unable to find camera with OpenAlprId: {CameraId}, check your configuration.", cameraUpdateRequest.Id);
                         throw new ArgumentException($"unknown camera Id: {cameraUpdateRequest.Id}");
                     }
 
                     if (!string.IsNullOrWhiteSpace(cameraToUpdate.NextClearOverlayScheduleId))
                     {
-                        _logger.LogInformation("cancelling redundant clear overlay job: {jobId}", cameraToUpdate.NextClearOverlayScheduleId);
+                        _logger.LogInformation("cancelling redundant clear overlay job: {JobId}", cameraToUpdate.NextClearOverlayScheduleId);
                         _backgroundJobClient.Delete(cameraToUpdate.NextClearOverlayScheduleId);
                     }
 
@@ -229,7 +229,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error processing job for camera {cameraId}", cameraUpdateRequest.Id);
+                    _logger.LogError(ex, "Error processing job for camera {CameraId}", cameraUpdateRequest.Id);
                 }
             }
         }
@@ -246,11 +246,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 if (cameraToUpdate == null)
                 {
-                    _logger.LogError("Unable to find camera with Id: {cameraId}", cameraId);
+                    _logger.LogError("Unable to find camera with Id: {CameraId}", cameraId);
                     return;
                 }
 
-                _logger.LogInformation("clearing expired overlay for: {cameraID}", cameraToUpdate.OpenAlprCameraId);
+                _logger.LogInformation("clearing expired overlay for: {CameraID}", cameraToUpdate.OpenAlprCameraId);
 
                 try
                 {
@@ -264,7 +264,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error clearing overlay for camera {cameraId}", cameraId);
+                    _logger.LogError(ex, "Error clearing overlay for camera {CameraId}", cameraId);
                 }
             }
         }
@@ -365,7 +365,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error clearing overlay for camera {cameraId}", cameraToUpdate.Id);
+                        _logger.LogError(ex, "Error clearing overlay for camera {CameraId}", cameraToUpdate.Id);
                     }
                 }
 

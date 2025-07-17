@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -12,13 +12,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
     {
         private readonly ILogger _logger;
 
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
         private readonly IUnitOfWork _unitOfWork;
 
         public SinglePlateWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
-            CameraUpdateService.CameraUpdateService cameraUpdateService,
+            ICameraUpdateService cameraUpdateService,
             IUnitOfWork unitOfWork)
         {
             _logger = logger;
@@ -77,7 +77,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                        _logger.LogError("failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
                     }
                 }
             }

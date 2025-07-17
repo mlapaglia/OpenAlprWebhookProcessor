@@ -1,4 +1,5 @@
 using MediatR;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.SetZoomAndFocus
 {
     public class SetZoomAndFocusCommandHandler : IRequestHandler<SetZoomAndFocusCommand>
     {
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
-        public SetZoomAndFocusCommandHandler(CameraUpdateService.CameraUpdateService cameraUpdateService)
+        public SetZoomAndFocusCommandHandler(ICameraUpdateService cameraUpdateService)
         {
             _cameraUpdateService = cameraUpdateService;
         }

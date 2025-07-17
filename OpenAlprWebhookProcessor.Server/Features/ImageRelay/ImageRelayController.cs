@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetImage;
@@ -57,7 +57,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay
             }
         }
 
-        [HttpGet("{cameraId}/snapshot")]
+        [HttpGet("{CameraId}/snapshot")]
         public async Task<IActionResult> GetSnapshot(
             Guid cameraId,
             CancellationToken cancellationToken)

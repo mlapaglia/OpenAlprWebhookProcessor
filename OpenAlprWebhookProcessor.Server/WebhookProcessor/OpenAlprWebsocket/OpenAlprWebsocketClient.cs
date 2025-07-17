@@ -1,4 +1,4 @@
-﻿using System.Net.WebSockets;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
@@ -60,7 +60,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                     }
                     else
                     {
-                        _logger.LogError("End of message but no transaction id found {response}", inFlightResponse);
+                        _logger.LogError("End of message but no transaction id found {Response}", inFlightResponse);
                     }
 
                     inFlightResponse = string.Empty;

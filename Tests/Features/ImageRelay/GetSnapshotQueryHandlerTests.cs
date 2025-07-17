@@ -4,12 +4,6 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay
@@ -139,7 +133,7 @@ namespace Tests.Features.ImageRelay
             result.Should().BeOfType<MemoryStream>();
             
             // Verify that the factory was called with the correct manufacturer
-            _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
+            await _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
         }
 
         [Test]
@@ -167,7 +161,7 @@ namespace Tests.Features.ImageRelay
             result.Should().BeOfType<MemoryStream>();
             
             // Verify that the factory was called with the correct manufacturer
-            _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
+            await _mockCameraFactory.MockCamera.Received(1).GetSnapshotAsync(cancellationToken);
         }
 
         [Test]
@@ -239,8 +233,8 @@ namespace Tests.Features.ImageRelay
             await UnitOfWork.SaveChangesAsync();
 
             var query = new GetSnapshotQuery(cameraId);
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.Cancel();
+            using var cancellationTokenSource = new CancellationTokenSource();
+            await cancellationTokenSource.CancelAsync();
 
             // Act & Assert
             await FluentActions.Invoking(() => _handler.Handle(query, cancellationTokenSource.Token))

@@ -110,7 +110,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates
             return Ok(result);
         }
 
-        [HttpGet("statistics/{plateNumber}")]
+        [HttpGet("statistics/{PlateNumber}")]
         public async Task<ActionResult> GetStatistics(
             string plateNumber,
             CancellationToken cancellationToken)

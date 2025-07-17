@@ -86,3 +86,22 @@ csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+
+# Suppress CS8981 for Entity Framework migration files
+[**/Migrations/*.cs]
+dotnet_diagnostic.CS8981.severity = none
+
+# Suppress CS8981 for Users migration files
+[**/Users/Data/Migrations/*.cs]
+dotnet_diagnostic.CS8981.severity = none
+
+# Suppress nullable reference type warnings if not ready for full nullable adoption
+[*.cs]
+dotnet_diagnostic.CS8602.severity = suggestion  # Dereference of possibly null reference
+dotnet_diagnostic.CS8625.severity = suggestion  # Cannot convert null literal to non-nullable reference
+dotnet_diagnostic.CS8632.severity = suggestion  # Nullable annotation in non-nullable context
+dotnet_diagnostic.CS8600.severity = suggestion  # Converting null literal to non-nullable reference
+dotnet_diagnostic.CS8601.severity = suggestion  # Possible null reference assignment
+dotnet_diagnostic.CS8603.severity = suggestion  # Possible null reference return
+dotnet_diagnostic.CS8604.severity = suggestion  # Possible null reference argument
+dotnet_diagnostic.CS8618.severity = suggestion  # Non-nullable field must contain non-null value

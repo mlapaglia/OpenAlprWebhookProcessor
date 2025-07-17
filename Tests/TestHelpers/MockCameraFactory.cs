@@ -2,8 +2,6 @@ using NSubstitute;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
-using System.IO;
-using System.Threading;
 
 namespace Tests.TestHelpers
 {

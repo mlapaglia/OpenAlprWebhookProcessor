@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
@@ -79,7 +79,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private async Task ScrapeDataForTimeRange(Agent agent, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Scraping between {startTime} and {endTime}",
+            _logger.LogInformation("Scraping between {StartTime} and {EndTime}",
                 agent.LastSuccessfulScrapeEpoch,
                 agent.LastSuccessfulScrapeEpoch += millisecondsToScrape);
 
@@ -91,12 +91,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 cancellationToken);
 
             timer.Stop();
-            _logger.LogInformation("Scraping took {seconds} seconds", timer.Elapsed.Seconds);
+            _logger.LogInformation("Scraping took {Seconds} seconds", timer.Elapsed.Seconds);
 
             if (!scrapeResults.IsSuccessStatusCode)
             {
                 var error = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogError("no metadata found for given date range: {error}", error);
+                _logger.LogError("no metadata found for given date range: {Error}", error);
                 agent.LastSuccessfulScrapeEpoch = agent.LastSuccessfulScrapeEpoch += millisecondsToScrape;
                 return;
             }
@@ -104,7 +104,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             var content = await scrapeResults.Content.ReadAsStringAsync(cancellationToken);
             var metaDatasToQuery = JsonSerializer.Deserialize<List<ScrapeMetadata>>(content);
 
-            _logger.LogInformation("Found {count} entries for: {date}",
+            _logger.LogInformation("Found {Count} entries for: {Date}",
                 metaDatasToQuery.Count,
                 agent.LastSuccessfulScrapeEpoch.ToString());
 
@@ -116,7 +116,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
         private async Task ProcessMetadata(Agent agent, ScrapeMetadata metadata, CancellationToken cancellationToken)
         {
-            _logger.LogDebug("querying key: {key}", metadata.Key);
+            _logger.LogDebug("querying key: {Key}", metadata.Key);
 
             var timer = new Stopwatch();
             timer.Start();
@@ -126,11 +126,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 cancellationToken);
 
             timer.Stop();
-            _logger.LogDebug("Took {seconds} to query", timer.Elapsed.TotalSeconds);
+            _logger.LogDebug("Took {Seconds} to query", timer.Elapsed.TotalSeconds);
 
             if (!newGroup.IsSuccessStatusCode)
             {
-                _logger.LogError("Bad response received from Agent: {statusCode} {reasonPhrase}", newGroup.StatusCode, newGroup.ReasonPhrase);
+                _logger.LogError("Bad response received from Agent: {StatusCode} {ReasonPhrase}", newGroup.StatusCode, newGroup.ReasonPhrase);
                 return;
             }
 
@@ -139,16 +139,16 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             {
                 timer.Reset();
                 timer.Start();
-                _logger.LogDebug("deserializing key: {key}", metadata.Key);
+                _logger.LogDebug("deserializing key: {Key}", metadata.Key);
                 group = await JsonSerializer.DeserializeAsync<Group>(
                     await newGroup.Content.ReadAsStreamAsync(cancellationToken),
                     cancellationToken: cancellationToken);
                 timer.Stop();
-                _logger.LogDebug("Took {seconds} to deserialize.", timer.Elapsed.TotalSeconds);
+                _logger.LogDebug("Took {Seconds} to deserialize.", timer.Elapsed.TotalSeconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to deserialize response from Agent for meta id: {metadatakey}", metadata.Key);
+                _logger.LogError(ex, "Unable to deserialize response from Agent for meta id: {MetadataKey}", metadata.Key);
                 return;
             }
 
@@ -161,7 +161,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             try
             {
-                _logger.LogInformation("date: {date} querying: {key}", DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString(), metadataKey);
+                _logger.LogInformation("date: {Date} querying: {Key}", DateTimeOffset.FromUnixTimeMilliseconds(group.EpochStart).ToString(), metadataKey);
 
                 timer.Start();
                 await _groupWebhookHandler.HandleWebhookAsync(
@@ -172,7 +172,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                     true,
                     cancellationToken);
                 timer.Stop();
-                _logger.LogDebug("Took {seconds} to process.", timer.Elapsed.TotalSeconds);
+                _logger.LogDebug("Took {Seconds} to process.", timer.Elapsed.TotalSeconds);
             }
             catch
             {
@@ -181,12 +181,12 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             timer.Reset();
             timer.Start();
-            _logger.LogDebug("Saving agent status, last scrape {scrapeEpoch}", group.EpochStart);
+            _logger.LogDebug("Saving agent status, last scrape {ScrapeEpoch}", group.EpochStart);
 
             agent.LastSuccessfulScrapeEpoch = group.EpochStart;
             await _processorContext.SaveChangesAsync(cancellationToken);
             timer.Stop();
-            _logger.LogDebug("Took {seconds} to update agent status.", timer.Elapsed.TotalSeconds);
+            _logger.LogDebug("Took {Seconds} to update agent status.", timer.Elapsed.TotalSeconds);
         }
 
         private string BuildScrapeUrl(string endpointUrl, long startEpoch, long endEpoch)
@@ -211,7 +211,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 .Select(x => x.OpenAlprUuid)
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Found {count} plates to query the Agent for.", plateGroupIds.Count);
+            _logger.LogInformation("Found {Count} plates to query the Agent for.", plateGroupIds.Count);
 
             foreach (var plateGroupId in plateGroupIds)
             {

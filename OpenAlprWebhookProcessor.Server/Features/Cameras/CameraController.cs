@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera;
@@ -47,14 +47,14 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             await _mediator.Send(command);
         }
 
-        [HttpPost("{cameraId}/delete")]
+        [HttpPost("{CameraId}/delete")]
         public async Task DeleteCamera(Guid cameraId)
         {
             var command = new DeleteCameraCommand(cameraId);
             await _mediator.Send(command);
         }
 
-        [HttpPost("{cameraId}/test/overlay")]
+        [HttpPost("{CameraId}/test/overlay")]
         public async Task<IActionResult> TestOverlay(Guid cameraId)
         {
             var command = new TestCameraOverlayCommand(cameraId);
@@ -62,7 +62,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return Ok();
         }
 
-        [HttpPost("{cameraId}/test/night")]
+        [HttpPost("{CameraId}/test/night")]
         public async Task<IActionResult> TestNightMode(Guid cameraId)
         {
             var command = new TestCameraNightModeCommand(cameraId);
@@ -70,7 +70,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return Ok();
         }
 
-        [HttpPost("{cameraId}/test/day")]
+        [HttpPost("{CameraId}/test/day")]
         public async Task<IActionResult> TestDayMode(Guid cameraId)
         {
             var command = new TestCameraDayModeCommand(cameraId);
@@ -78,7 +78,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return Ok();
         }
 
-        [HttpGet("{cameraId}/zoomAndFocus")]
+        [HttpGet("{CameraId}/zoomAndFocus")]
         public async Task<ZoomFocus> GetZoomAndFocus(
             Guid cameraId,
             CancellationToken cancellationToken)
@@ -87,7 +87,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return await _mediator.Send(query, cancellationToken);
         }
 
-        [HttpPost("{cameraId}/zoomAndFocus")]
+        [HttpPost("{CameraId}/zoomAndFocus")]
         public async Task SetZoomAndFocus(
             Guid cameraId,
             [FromBody] ZoomFocus zoomAndFocus,
@@ -97,7 +97,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             await _mediator.Send(command, cancellationToken);
         }
 
-        [HttpPost("{cameraId}/triggerAutofocus")]
+        [HttpPost("{CameraId}/triggerAutofocus")]
         public async Task<bool> TriggerAutofocus(
             Guid cameraId,
             CancellationToken cancellationToken)
@@ -106,7 +106,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [HttpPost("{cameraId}/mask")]
+        [HttpPost("{CameraId}/mask")]
         public async Task<bool> UpsertImageMask(
             CameraMask cameraMask,
             CancellationToken cancellationToken)
@@ -115,7 +115,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return await _mediator.Send(command, cancellationToken);
         }
 
-        [HttpGet("{cameraId}/mask/coordinates")]
+        [HttpGet("{CameraId}/mask/coordinates")]
         public async Task<List<MaskCoordinate>> GetImageMaskCoordinates(
             Guid cameraId,
             CancellationToken cancellationToken)
@@ -124,7 +124,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras
             return await _mediator.Send(query, cancellationToken);
         }
 
-        [HttpGet("{cameraId}/plateCaptures")]
+        [HttpGet("{CameraId}/plateCaptures")]
         public async Task<List<string>> GetPlateCaptures(
             Guid cameraId,
             CancellationToken cancellationToken)

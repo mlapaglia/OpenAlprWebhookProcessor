@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenAlprWebhookProcessor.Alerts;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Infrastructure.Behaviors;
@@ -61,7 +62,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddScoped<IAgentRepository, AgentRepository>();
             services.AddScoped<IRepository<Data.Alert>, Repository<Data.Alert>>();
             services.AddScoped<IRepository<Ignore>, Repository<Ignore>>();
-            services.AddScoped<IRepository<Camera>, Repository<Camera>>();
+            services.AddScoped<IRepository<Data.Camera>, Repository<Data.Camera>>();
             services.AddScoped<IRepository<CameraMask>, Repository<CameraMask>>();
             services.AddScoped<IRepository<Enricher>, Repository<Enricher>>();
             services.AddScoped<IRepository<WebhookForward>, Repository<WebhookForward>>();
@@ -84,12 +85,14 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
 
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
+            services.AddSingleton<ICameraUpdateService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
 
             services.AddSingleton<HydrationService>();
             services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
 
             services.AddSingleton<AlertService>();
+            services.AddSingleton<IAlertService>(p => p.GetService<AlertService>());
             services.AddSingleton<IHostedService>(p => p.GetService<AlertService>());
 
             services.AddSingleton<ImageRetrieverService>();

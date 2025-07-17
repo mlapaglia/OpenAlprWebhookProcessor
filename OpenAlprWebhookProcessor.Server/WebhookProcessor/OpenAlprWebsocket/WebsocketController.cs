@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -77,13 +77,13 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
                     if (!addResult.WasAdded)
                     {
-                        _logger.LogError("Unable to disconnect client: {agentId}", agent.Uid);
+                        _logger.LogError("Unable to disconnect client: {AgentId}", agent.Uid);
                         return;
                     }
 
                     if (addResult.WasUpdated)
                     {
-                        _logger.LogWarning("Multiple websocket connections for the same agent, previous agent disconnected: {agentId}.", agent.Uid);
+                        _logger.LogWarning("Multiple websocket connections for the same agent, previous agent disconnected: {AgentId}.", agent.Uid);
                     }
 
                     await _processorHub.Clients.All.OpenAlprAgentConnected(agent.Uid, HttpContext.Connection.RemoteIpAddress.ToString());
@@ -94,7 +94,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
                         await _websocketClientOrganizer.RemoveAgentAsync(agent.Uid, cancellationToken);
 
-                        _logger.LogInformation("Websocket connection closed: {agentId}", agent.Uid);
+                        _logger.LogInformation("Websocket connection closed: {AgentId}", agent.Uid);
                     }
                     catch (Exception ex)
                     {

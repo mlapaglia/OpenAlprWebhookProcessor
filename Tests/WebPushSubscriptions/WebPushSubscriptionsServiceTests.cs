@@ -7,9 +7,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Tests.TestHelpers;
 
 namespace Tests.WebPushSubscriptions

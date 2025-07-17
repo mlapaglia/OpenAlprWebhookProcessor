@@ -183,7 +183,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
         }
 
         [Test]
-        public async Task Handle_SaveChangesThrowsException_PropagatesException()
+        public void Handle_SaveChangesThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();

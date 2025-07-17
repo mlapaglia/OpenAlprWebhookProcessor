@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -21,21 +21,21 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
 
-        private readonly CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private readonly ICameraUpdateService _cameraUpdateService;
 
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly AlertService _alertService;
+        private readonly IAlertService _alertService;
 
-        private readonly ImageRetrieverService _imageRetrieverService;
+        private readonly IImageRetrieverService _imageRetrieverService;
 
         public GroupWebhookHandler(
             ILogger<GroupWebhookHandler> logger,
-            CameraUpdateService.CameraUpdateService cameraUpdateService,
+            ICameraUpdateService cameraUpdateService,
             IUnitOfWork unitOfWork,
             IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            AlertService alertService,
-            ImageRetrieverService imageRetrieverService)
+            IAlertService alertService,
+            IImageRetrieverService imageRetrieverService)
         {
             _logger = logger;
             _cameraUpdateService = cameraUpdateService;
@@ -76,7 +76,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (camera == null)
             {
-                _logger.LogError("unknown camera: {cameraId}, skipping.", webhook.Group.CameraId);
+                _logger.LogError("unknown camera: {CameraId}, skipping.", webhook.Group.CameraId);
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
             if (webhook.Group.IsParked)
             {
-                _logger.LogInformation("parked car: {plateNumber}, ignoring.", webhook.Group.BestPlateNumber);
+                _logger.LogInformation("parked car: {PlateNumber}, ignoring.", webhook.Group.BestPlateNumber);
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 plateGroup = previousPreviewGroups[0];
                 _unitOfWork.PlateGroups.DeleteRange(previousPreviewGroups.Skip(1));
 
-                _logger.LogInformation("Previous preview plate exists: {plateNumber}, overwriting", plateGroup.BestNumber);
+                _logger.LogInformation("Previous preview plate exists: {PlateNumber}, overwriting", plateGroup.BestNumber);
             }
             else
             {
@@ -222,7 +222,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("failed to forward webhook to: {url}, error: {error}", forward.FowardingDestination, ex.Message);
+                            _logger.LogError("failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
                         }
                     }
                 }
