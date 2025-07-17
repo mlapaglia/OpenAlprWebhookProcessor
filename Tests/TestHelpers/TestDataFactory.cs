@@ -1,6 +1,7 @@
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users;
+using System.Threading;
 
 namespace Tests.TestHelpers
 {
@@ -93,12 +94,15 @@ namespace Tests.TestHelpers
             };
         }
 
+        private static int _userIdCounter = 1;
+
         public static User CreateTestUser(string? username = null, string? firstName = null, string? lastName = null)
         {
+            var id = Interlocked.Increment(ref _userIdCounter);
             return new User
             {
-                Id = 1,
-                Username = username ?? "testuser",
+                Id = id,
+                Username = username ?? $"testuser{id}",
                 FirstName = firstName ?? "Test",
                 LastName = lastName ?? "User",
                 PasswordHash = new byte[] { 1, 2, 3 },
