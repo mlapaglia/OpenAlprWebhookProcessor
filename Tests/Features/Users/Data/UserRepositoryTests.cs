@@ -3,11 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Data

@@ -6,8 +6,6 @@ using OpenAlprWebhookProcessor.Features.Users.Commands.UpdateUser;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Commands

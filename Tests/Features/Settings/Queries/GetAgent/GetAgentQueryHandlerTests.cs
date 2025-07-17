@@ -1,8 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetAgent

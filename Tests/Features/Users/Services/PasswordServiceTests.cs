@@ -1,10 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Services;
-using System;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Tests.Features.Users.Services
 {

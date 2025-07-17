@@ -5,9 +5,6 @@ using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.WebhookProcessor;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertAgent

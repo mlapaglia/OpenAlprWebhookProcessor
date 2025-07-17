@@ -3,8 +3,6 @@ using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape;
 using OpenAlprWebhookProcessor.Hydrator;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.AgentScrape

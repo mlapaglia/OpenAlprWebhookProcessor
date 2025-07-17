@@ -4,8 +4,6 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.TestEnrichers

@@ -1,7 +1,6 @@
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users;
-using System.Threading;
 
 namespace Tests.TestHelpers
 {

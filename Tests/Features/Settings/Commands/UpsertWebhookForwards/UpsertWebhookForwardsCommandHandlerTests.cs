@@ -2,10 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwards;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertWebhookForwards

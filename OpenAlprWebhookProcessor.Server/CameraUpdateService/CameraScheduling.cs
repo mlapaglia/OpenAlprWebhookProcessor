@@ -1,5 +1,4 @@
 ﻿using CoordinateSharp;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -10,12 +9,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public class CameraScheduling : ICameraScheduling
     {
-        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IServiceProvider _serviceProvider;
 
-        public CameraScheduling(IBackgroundJobClient backgroundJobClient, IServiceProvider serviceProvider)
+        public CameraScheduling(IServiceProvider serviceProvider)
         {
-            _backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 

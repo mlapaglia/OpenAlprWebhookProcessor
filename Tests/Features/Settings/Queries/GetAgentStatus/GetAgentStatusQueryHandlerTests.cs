@@ -4,8 +4,6 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetAgentStatus

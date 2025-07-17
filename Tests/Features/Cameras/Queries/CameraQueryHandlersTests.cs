@@ -1,13 +1,8 @@
 using FluentAssertions;
-using Hangfire;
-using Hangfire.Storage;
-using Hangfire.Storage.Monitoring;
-using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Features.Cameras;
-using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures;
@@ -17,47 +12,20 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Cameras.Queries
 {
-    // Create a testable JobStorage that can be mocked
-    public class TestableJobStorage : JobStorage
-    {
-        private readonly IMonitoringApi _monitoringApi;
-        
-        public TestableJobStorage(IMonitoringApi monitoringApi)
-        {
-            _monitoringApi = monitoringApi;
-        }
-        
-        public override IMonitoringApi GetMonitoringApi()
-        {
-            return _monitoringApi;
-        }
-        
-        // Minimal implementation for required abstract methods
-        public override IStorageConnection GetConnection()
-        {
-            throw new NotImplementedException("Not needed for testing");
-        }
-    }
-
     [TestFixture]
     public class GetCamerasQueryHandlerTests : TestBase
     {
-        private TestableJobStorage _jobStorage;
-        private IMonitoringApi _monitoringApi;
-
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            _monitoringApi = Substitute.For<IMonitoringApi>();
-            _jobStorage = new TestableJobStorage(_monitoringApi);
         }
 
         [Test]
         public async Task GetCamerasQueryHandler_WithCameras_ReturnsAllCameras()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             var camera1 = TestDataFactory.CreateTestCamera("Camera 1", 1);
             var camera2 = TestDataFactory.CreateTestCamera("Camera 2", 2);
@@ -82,7 +50,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_NoCameras_ReturnsEmptyList()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             await UnitOfWork.Agents.AddAsync(agent);
             await UnitOfWork.SaveChangesAsync();
@@ -97,10 +65,10 @@ namespace Tests.Features.Cameras.Queries
         }
 
         [Test]
-        public async Task GetCamerasQueryHandler_WithScheduledJob_ReturnsScheduledInfo()
+        public async Task GetCamerasQueryHandler_WithScheduledJob_ReturnsNullScheduledInfo()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.NextDayNightScheduleId = "job-123";
@@ -109,22 +77,6 @@ namespace Tests.Features.Cameras.Queries
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
-            var jobDetails = new JobDetailsDto
-            {
-                History = new List<StateHistoryDto>
-                {
-                    new StateHistoryDto
-                    {
-                        Data = new Dictionary<string, string>
-                        {
-                            ["EnqueueAt"] = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeMilliseconds().ToString()
-                        }
-                    }
-                }
-            };
-
-            _monitoringApi.JobDetails("job-123").Returns(jobDetails);
-
             var query = new GetCamerasQuery();
 
             // Act
@@ -132,14 +84,15 @@ namespace Tests.Features.Cameras.Queries
 
             // Assert
             result.Should().HaveCount(1);
-            result.First().DayNightNextScheduledCommand.Should().NotBeNull();
+            // With the new timer-based system, scheduled job info is not tracked
+            result.First().DayNightNextScheduledCommand.Should().BeNull();
         }
 
         [Test]
         public async Task GetCamerasQueryHandler_WithoutScheduledJob_ReturnsNullScheduledInfo()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.NextDayNightScheduleId = null;
@@ -162,7 +115,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithLatestPlateUuid_ReturnsSampleImageUrl()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.UpdateOverlayEnabled = true;
@@ -186,7 +139,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithoutLatestPlateUuid_ReturnsSnapshotUrl()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork, _jobStorage);
+            var handler = new GetCamerasQueryHandler(UnitOfWork);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.UpdateOverlayEnabled = true;

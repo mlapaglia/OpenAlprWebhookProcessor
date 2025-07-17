@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using Tests.TestHelpers;

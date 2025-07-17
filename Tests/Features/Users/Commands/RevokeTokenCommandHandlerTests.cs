@@ -5,9 +5,6 @@ using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Commands

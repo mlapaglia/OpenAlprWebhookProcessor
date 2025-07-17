@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         public UnitOfWork(ProcessorContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public IPlateGroupRepository PlateGroups => _plateGroups ??= new PlateGroupRepository(_context);

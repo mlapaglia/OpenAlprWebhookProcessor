@@ -9,9 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using Microsoft.AspNetCore.SignalR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using System.Linq;
-using Hangfire;
-using Hangfire.Storage;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
@@ -25,18 +22,18 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
 
-        private readonly JobStorage _jobStorage;
+        private Timer _scheduledScrapeTimer;
+
+        private readonly object _timerLock = new object();
 
         public HydrationService(
             IServiceProvider serviceProvider,
-            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub,
-            JobStorage jobStorage)
+            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub)
         {
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _processorHub = processorHub ?? throw new ArgumentNullException(nameof(processorHub));
             _cancellationTokenSource = new CancellationTokenSource();
-            _serviceProvider = serviceProvider;
-            _processorHub = processorHub;
             _hydrationRequestsToProcess = new BlockingCollection<string>();
-            _jobStorage = jobStorage;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -48,7 +45,17 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
+            if (!_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                _cancellationTokenSource.Cancel();
+            }
+            
+            lock (_timerLock)
+            {
+                _scheduledScrapeTimer?.Dispose();
+                _scheduledScrapeTimer = null;
+            }
+            
             _cancellationTokenSource.Dispose();
 
             return Task.CompletedTask;
@@ -69,28 +76,69 @@ namespace OpenAlprWebhookProcessor.Hydrator
                     return;
                 }
 
-                if (agent.ScheduledScrapingIntervalMinutes == null)
+                lock (_timerLock)
                 {
-                    RecurringJob.RemoveIfExists(agent.Uid);
-                    agent.NextScrapeEpochMs = null;
-                }
-                else
-                {
-                    RecurringJob
-                        .AddOrUpdate(agent.Uid,
-                            () => StartHydration(agent.Uid),
-                        $"*/{agent.ScheduledScrapingIntervalMinutes} * * * *");
+                    // Dispose existing timer if it exists
+                    _scheduledScrapeTimer?.Dispose();
+                    _scheduledScrapeTimer = null;
 
-                    var nextScrape = _jobStorage
-                        .GetConnection()
-                        .GetRecurringJobs()
-                        .Single(x => x.Id == agent.Uid);
+                    if (agent.ScheduledScrapingIntervalMinutes == null)
+                    {
+                        agent.NextScrapeEpochMs = null;
+                    }
+                    else
+                    {
+                        // Calculate next execution time
+                        var intervalMs = agent.ScheduledScrapingIntervalMinutes.Value * 60 * 1000;
+                        var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
+                        
+                        agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
 
-                    agent.NextScrapeEpochMs = new DateTimeOffset(nextScrape.NextExecution.Value).ToUnixTimeMilliseconds();
+                        // Create recurring timer
+                        _scheduledScrapeTimer = new Timer(
+                            async _ =>
+                            {
+                                if (!_cancellationTokenSource.Token.IsCancellationRequested)
+                                {
+                                    StartHydration(agent.Uid);
+                                    await UpdateNextScrapeTimeAsync(agent.Uid, agent.ScheduledScrapingIntervalMinutes.Value);
+                                }
+                            },
+                            null,
+                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value),
+                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value)
+                        );
+                    }
                 }
 
                 unitOfWork.Agents.Update(agent);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        private async Task UpdateNextScrapeTimeAsync(string agentUid, int intervalMinutes)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                
+                var agent = await unitOfWork.Agents.GetFirstAgentAsync();
+                if (agent != null && agent.Uid == agentUid)
+                {
+                    var nextExecution = DateTime.UtcNow.AddMinutes(intervalMinutes);
+                    agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
+                    
+                    unitOfWork.Agents.Update(agent);
+                    await unitOfWork.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't throw - this is just updating the next scrape time
+                using var scope = _serviceProvider.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                logger.LogError(ex, "Error updating next scrape time for agent {AgentUid}", agentUid);
             }
         }
 

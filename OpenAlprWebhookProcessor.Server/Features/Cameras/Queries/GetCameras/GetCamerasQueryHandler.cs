@@ -1,5 +1,3 @@
-using Hangfire;
-using Hangfire.Storage.Monitoring;
 using MediatR;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -13,33 +11,20 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
     public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<CameraUpdateService.Camera>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly JobStorage _jobStorage;
 
-        public GetCamerasQueryHandler(
-            IUnitOfWork unitOfWork,
-            JobStorage jobStorage)
+        public GetCamerasQueryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _jobStorage = jobStorage;
         }
 
         public async Task<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken)
         {
             var cameras = new List<CameraUpdateService.Camera>();
 
-            var monitoringApi = _jobStorage.GetMonitoringApi();
-
             var agent = await _unitOfWork.Agents.FirstOrDefaultAsync(x => true, cancellationToken);
 
             foreach (var camera in await _unitOfWork.Cameras.GetAllAsync(cancellationToken))
             {
-                JobDetailsDto nextDayNightCommand = null;
-
-                if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
-                {
-                    nextDayNightCommand = monitoringApi.JobDetails(camera.NextDayNightScheduleId);
-                }
-
                 cameras.Add(new CameraUpdateService.Camera()
                 {
                     Id = camera.Id,
@@ -47,7 +32,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
                     CameraUsername = camera.CameraUsername,
                     DayNightModeUrl = camera.UpdateDayNightModeUrl,
                     DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
-                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera, nextDayNightCommand),
+                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera),
                     IpAddress = camera.IpAddress,
                     Latitude = camera.Latitude ?? agent?.Latitude ?? null,
                     Longitude = camera.Longitude ?? agent?.Longitude ?? null,
@@ -95,17 +80,12 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 
         private static DateTimeOffset? GetNextScheduledExecutionDate(
             Agent agent,
-            Data.Camera camera,
-            JobDetailsDto dateToEnqueueAt)
+            Data.Camera camera)
         {
-            if (dateToEnqueueAt == null || !dateToEnqueueAt.History[0].Data.ContainsKey("EnqueueAt"))
-            {
-                return null;
-            }
-
-            return DateTimeOffset.FromUnixTimeMilliseconds(
-                Convert.ToInt64(dateToEnqueueAt.History[0].Data["EnqueueAt"]))
-                .ToOffset(TimeSpan.FromHours(camera.TimezoneOffset ?? agent.TimeZoneOffset));
+            // Since we're using a timer-based system now, we don't track individual job schedules
+            // This could be enhanced to track next execution times if needed
+            // For now, return null to indicate no specific scheduled time is available
+            return null;
         }
     }
 } 

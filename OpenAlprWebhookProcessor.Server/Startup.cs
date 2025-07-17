@@ -1,4 +1,3 @@
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
@@ -58,17 +57,6 @@ namespace OpenAlprWebhookProcessor
 
             services.AddAutoMapper();
 
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseInMemoryStorage());
-
-            services.AddHangfireServer(options =>
-            {
-                options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
-            });
-
             services.AddMemoryCache();
         }
 
@@ -80,8 +68,6 @@ namespace OpenAlprWebhookProcessor
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
-
-            app.UseHangfireDashboard();
 
             app.UseCors(x => x
                 .AllowAnyOrigin()

@@ -1,15 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using Tests.TestHelpers;
 
@@ -36,17 +28,7 @@ namespace Tests.CameraUpdateService
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
             // Create service under test
-            _cameraScheduling = new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(
-                Substitute.For<IBackgroundJobClient>(),
-                _serviceProvider);
-        }
-
-        [Test]
-        public void Constructor_WithNullBackgroundJobClient_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(null, _serviceProvider));
+            _cameraScheduling = new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(_serviceProvider);
         }
 
         [Test]
@@ -54,7 +36,7 @@ namespace Tests.CameraUpdateService
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(Substitute.For<IBackgroundJobClient>(), null));
+                new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(null));
         }
 
         [Test]

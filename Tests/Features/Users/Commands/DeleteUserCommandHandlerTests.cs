@@ -1,11 +1,8 @@
-using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Commands

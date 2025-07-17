@@ -7,16 +7,10 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 using System.Security.Cryptography;
-using System.Threading;
 
 namespace Tests.Features.Users
 {

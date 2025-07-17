@@ -21,6 +21,9 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
 
         public async Task<string> GenerateJwtTokenAsync(User user, CancellationToken cancellationToken = default)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
             var jwtSecretKey = await GetJwtSecretKeyAsync(cancellationToken);
 
             var tokenHandler = new JwtSecurityTokenHandler();

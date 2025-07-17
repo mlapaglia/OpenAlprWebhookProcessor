@@ -2,9 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.AddIgnore

@@ -2,8 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetEnrichers

@@ -3,9 +3,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertEnrichers
