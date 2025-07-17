@@ -54,6 +54,21 @@ namespace Tests.Controllers
         }
 
         [Test]
+        public async Task GetCameras_EmptyResult_ReturnsEmptyList()
+        {
+            // Arrange
+            Mediator.Send(Arg.Any<GetCamerasQuery>())
+                .Returns(new List<Camera>());
+
+            // Act
+            var result = await _controller.GetCameras();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
+
+        [Test]
         public async Task UpsertCamera_ValidCamera_CallsCorrectCommand()
         {
             // Arrange
@@ -70,6 +85,20 @@ namespace Tests.Controllers
         }
 
         [Test]
+        public async Task UpsertCamera_NullCamera_CallsCommandWithNullCamera()
+        {
+            // Arrange
+            Camera nullCamera = null;
+
+            // Act
+            await _controller.UpsertCamera(nullCamera);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<UpsertCameraCommand>(cmd => cmd.Camera == null));
+        }
+
+        [Test]
         public async Task DeleteCamera_ValidId_CallsCorrectCommand()
         {
             // Arrange
@@ -81,6 +110,20 @@ namespace Tests.Controllers
             // Assert
             await Mediator.Received(1).Send(
                 Arg.Is<DeleteCameraCommand>(cmd => cmd.CameraId == cameraId));
+        }
+
+        [Test]
+        public async Task DeleteCamera_EmptyGuid_CallsCommandWithEmptyGuid()
+        {
+            // Arrange
+            var emptyGuid = Guid.Empty;
+
+            // Act
+            await _controller.DeleteCamera(emptyGuid);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<DeleteCameraCommand>(cmd => cmd.CameraId == emptyGuid));
         }
 
         [Test]
@@ -157,6 +200,23 @@ namespace Tests.Controllers
         }
 
         [Test]
+        public async Task GetZoomAndFocus_ReturnsNull_ReturnsNull()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetZoomAndFocusQuery>(), cancellationToken)
+                .Returns((ZoomFocus)null);
+
+            // Act
+            var result = await _controller.GetZoomAndFocus(cameraId, cancellationToken);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [Test]
         public async Task SetZoomAndFocus_ValidData_CallsCorrectCommand()
         {
             // Arrange
@@ -173,6 +233,25 @@ namespace Tests.Controllers
                     cmd.CameraId == cameraId && 
                     cmd.ZoomAndFocus.Zoom == 1.5m && 
                     cmd.ZoomAndFocus.Focus == 2.0m), 
+                cancellationToken);
+        }
+
+        [Test]
+        public async Task SetZoomAndFocus_NullZoomFocus_CallsCommandWithNull()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            ZoomFocus nullZoomFocus = null;
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _controller.SetZoomAndFocus(cameraId, nullZoomFocus, cancellationToken);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<SetZoomAndFocusCommand>(cmd => 
+                    cmd.CameraId == cameraId && 
+                    cmd.ZoomAndFocus == null), 
                 cancellationToken);
         }
 
@@ -194,6 +273,23 @@ namespace Tests.Controllers
             await Mediator.Received(1).Send(
                 Arg.Is<TriggerAutofocusCommand>(cmd => cmd.CameraId == cameraId), 
                 cancellationToken);
+        }
+
+        [Test]
+        public async Task TriggerAutofocus_ReturnsFalse_ReturnsFalse()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<TriggerAutofocusCommand>(), cancellationToken)
+                .Returns(false);
+
+            // Act
+            var result = await _controller.TriggerAutofocus(cameraId, cancellationToken);
+
+            // Assert
+            result.Should().BeFalse();
         }
 
         [Test]
@@ -222,6 +318,47 @@ namespace Tests.Controllers
             await Mediator.Received(1).Send(
                 Arg.Is<UpsertCameraMaskCommand>(cmd => 
                     cmd.CameraMask.CameraId == cameraMask.CameraId), 
+                cancellationToken);
+        }
+
+        [Test]
+        public async Task UpsertImageMask_ReturnsFalse_ReturnsFalse()
+        {
+            // Arrange
+            var cameraMask = new CameraMask
+            {
+                CameraId = Guid.NewGuid(),
+                Coordinates = new List<MaskCoordinate>()
+            };
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<UpsertCameraMaskCommand>(), cancellationToken)
+                .Returns(false);
+
+            // Act
+            var result = await _controller.UpsertImageMask(cameraMask, cancellationToken);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task UpsertImageMask_NullMask_CallsCommandWithNull()
+        {
+            // Arrange
+            CameraMask nullMask = null;
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<UpsertCameraMaskCommand>(), cancellationToken)
+                .Returns(false);
+
+            // Act
+            var result = await _controller.UpsertImageMask(nullMask, cancellationToken);
+
+            // Assert
+            result.Should().BeFalse();
+            await Mediator.Received(1).Send(
+                Arg.Is<UpsertCameraMaskCommand>(cmd => cmd.CameraMask == null), 
                 cancellationToken);
         }
 
@@ -256,6 +393,24 @@ namespace Tests.Controllers
         }
 
         [Test]
+        public async Task GetImageMaskCoordinates_EmptyResult_ReturnsEmptyList()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetCameraMaskQuery>(), cancellationToken)
+                .Returns(new List<MaskCoordinate>());
+
+            // Act
+            var result = await _controller.GetImageMaskCoordinates(cameraId, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
+
+        [Test]
         public async Task GetPlateCaptures_ValidId_ReturnsCorrectResult()
         {
             // Arrange
@@ -278,6 +433,41 @@ namespace Tests.Controllers
             await Mediator.Received(1).Send(
                 Arg.Is<GetPlateCapturesQuery>(q => q.CameraId == cameraId), 
                 cancellationToken);
+        }
+
+        [Test]
+        public async Task GetPlateCaptures_EmptyResult_ReturnsEmptyList()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetPlateCapturesQuery>(), cancellationToken)
+                .Returns(new List<string>());
+
+            // Act
+            var result = await _controller.GetPlateCaptures(cameraId, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task GetPlateCaptures_NullResult_ReturnsNull()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetPlateCapturesQuery>(), cancellationToken)
+                .Returns((List<string>)null);
+
+            // Act
+            var result = await _controller.GetPlateCaptures(cameraId, cancellationToken);
+
+            // Assert
+            result.Should().BeNull();
         }
     }
 } 
