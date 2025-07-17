@@ -15,7 +15,7 @@ using Hangfire.Storage;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
-    public class HydrationService : IHostedService
+    public class HydrationService : IHostedService, IHydrationService
     {
         private readonly BlockingCollection<string> _hydrationRequestsToProcess;
 

@@ -7,9 +7,9 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
 {
     public class AgentScrapeCommandHandler : IRequestHandler<AgentScrapeCommand>
     {
-        private readonly HydrationService _hydrationService;
+        private readonly IHydrationService _hydrationService;
 
-        public AgentScrapeCommandHandler(HydrationService hydrationService)
+        public AgentScrapeCommandHandler(IHydrationService hydrationService)
         {
             _hydrationService = hydrationService;
         }

@@ -10,13 +10,13 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
     public class UpsertAgentCommandHandler : IRequestHandler<UpsertAgentCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ImageRetrieverService _imageRetrieverService;
-        private readonly HydrationService _hydrationService;
+        private readonly IImageRetrieverService _imageRetrieverService;
+        private readonly IHydrationService _hydrationService;
 
         public UpsertAgentCommandHandler(
             IUnitOfWork unitOfWork,
-            ImageRetrieverService imageRetrieverService,
-            HydrationService hydrationService)
+            IImageRetrieverService imageRetrieverService,
+            IHydrationService hydrationService)
         {
             _unitOfWork = unitOfWork;
             _imageRetrieverService = imageRetrieverService;
