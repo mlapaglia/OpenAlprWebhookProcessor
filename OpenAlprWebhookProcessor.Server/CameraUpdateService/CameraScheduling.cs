@@ -8,27 +8,38 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
-    public static class CameraScheduling
+    public class CameraScheduling : ICameraScheduling
     {
-        public static void ExecuteSingleDayNightTask(
-            SunriseSunset sunriseSunset,
-            Guid cameraId,
-            CameraUpdateService cameraUpdateService,
-            IBackgroundJobClient backgroundJobClient)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IServiceProvider _serviceProvider;
+
+        public CameraScheduling(IBackgroundJobClient backgroundJobClient, IServiceProvider serviceProvider)
         {
-            backgroundJobClient.Enqueue(
-                () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
-                    cameraId,
-                    sunriseSunset,
-                    false));
+            _backgroundJobClient = backgroundJobClient ?? throw new ArgumentNullException(nameof(backgroundJobClient));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public static async Task ScheduleDayNightTasksAsync(
-            CameraUpdateService cameraUpdateService,
-            IServiceProvider serviceProvider,
-            IBackgroundJobClient backgroundJobClient)
+        public void ExecuteSingleDayNightTask(
+            SunriseSunset sunriseSunset,
+            Guid cameraId,
+            IBackgroundJobService backgroundJobService)
         {
-            using (var scope = serviceProvider.CreateScope())
+            if (backgroundJobService == null)
+                throw new ArgumentNullException(nameof(backgroundJobService));
+
+            backgroundJobService.EnqueueProcessSunriseSunsetJob(
+                cameraId,
+                sunriseSunset,
+                false);
+        }
+
+        public async Task ScheduleDayNightTasksAsync(
+            IBackgroundJobService backgroundJobService)
+        {
+            if (backgroundJobService == null)
+                throw new ArgumentNullException(nameof(backgroundJobService));
+
+            using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -39,8 +50,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 foreach (var camera in camerasToUpdate)
                 {
                     ScheduleDayNightTask(
-                        cameraUpdateService,
-                        backgroundJobClient,
+                        backgroundJobService,
                         agent,
                         camera);
                 }
@@ -49,12 +59,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public static void ScheduleDayNightTask(
-            CameraUpdateService cameraUpdateService,
-            IBackgroundJobClient backgroundJobClient,
+        public void ScheduleDayNightTask(
+            IBackgroundJobService backgroundJobService,
             Agent agent,
             Data.Camera camera)
         {
+            if (backgroundJobService == null)
+                throw new ArgumentNullException(nameof(backgroundJobService));
+            if (agent == null)
+                throw new ArgumentNullException(nameof(agent));
+            if (camera == null)
+                throw new ArgumentNullException(nameof(camera));
+
             var timeZoneOffset = camera.TimezoneOffset ?? agent.TimeZoneOffset;
             var latitude = camera.Latitude ?? agent.Latitude;
             var longitude = camera.Longitude ?? agent.Longitude;
@@ -84,20 +100,17 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             if (!string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
             {
-                backgroundJobClient.Delete(camera.NextDayNightScheduleId);
+                backgroundJobService.DeleteJob(camera.NextDayNightScheduleId);
             }
 
-            camera.NextDayNightScheduleId = backgroundJobClient.Schedule(
-                () => cameraUpdateService.ProcessSunriseSunsetJobAsync(
-                    camera.Id,
-                    isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
-                    true),
+            camera.NextDayNightScheduleId = backgroundJobService.ScheduleProcessSunriseSunsetJob(
+                camera.Id,
+                isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
+                true,
                 isSunUp ? cameraSunsetAt : cameraSunriseAt);
         }
 
-        public static bool IsSunUp(
-            double latitude,
-            double longitude)
+        public bool IsSunUp(double latitude, double longitude)
         {
             var cameraCoordinate = new Coordinate(
                 latitude,

@@ -1,5 +1,4 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebhookProcessor;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,14 +7,11 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessPlateGroupW
 {
     public class ProcessPlateGroupWebhookCommandHandler : IRequestHandler<ProcessPlateGroupWebhookCommand>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly GroupWebhookHandler _groupWebhookHandler;
+        private readonly IGroupWebhookHandler _groupWebhookHandler;
 
         public ProcessPlateGroupWebhookCommandHandler(
-            IUnitOfWork unitOfWork,
-            GroupWebhookHandler groupWebhookHandler)
+            IGroupWebhookHandler groupWebhookHandler)
         {
-            _unitOfWork = unitOfWork;
             _groupWebhookHandler = groupWebhookHandler;
         }
 

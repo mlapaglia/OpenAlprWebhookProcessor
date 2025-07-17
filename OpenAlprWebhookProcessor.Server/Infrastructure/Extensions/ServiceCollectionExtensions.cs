@@ -87,6 +87,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<CameraUpdateService.CameraUpdateService>();
             services.AddSingleton<ICameraUpdateService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
+            
+            services.AddScoped<ICameraScheduling, CameraUpdateService.CameraScheduling>();
+            services.AddScoped<IBackgroundJobService, CameraUpdateService.BackgroundJobService>();
 
             services.AddSingleton<HydrationService>();
             services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());

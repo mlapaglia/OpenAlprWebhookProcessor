@@ -8,14 +8,12 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessAlertWebhoo
 {
     public class ProcessAlertWebhookCommandHandler : IRequestHandler<ProcessAlertWebhookCommand>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly GroupWebhookHandler _groupWebhookHandler;
+        private readonly IGroupWebhookHandler _groupWebhookHandler;
 
         public ProcessAlertWebhookCommandHandler(
             IUnitOfWork unitOfWork,
-            GroupWebhookHandler groupWebhookHandler)
+            IGroupWebhookHandler groupWebhookHandler)
         {
-            _unitOfWork = unitOfWork;
             _groupWebhookHandler = groupWebhookHandler;
         }
 
