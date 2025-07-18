@@ -13,6 +13,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
     namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     {
+        /// <summary>
+        /// Handles the web socket traffic to the OpenAlpr Agent. Not to be
+        /// confused with <see cref="ProcessorHub.ProcessorHub"/> which
+        /// communicated with the web frontend.
+        /// </summary>
         [ApiController]
         public class WebsocketController : ControllerBase
         {

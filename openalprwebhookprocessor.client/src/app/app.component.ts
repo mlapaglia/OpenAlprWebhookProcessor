@@ -49,6 +49,14 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor() {
     this.accountService.user.subscribe((x) => {
       this.topBarVisible = x.id !== undefined
+
+      // Start SignalR connection when user is authenticated
+      if (x.id !== undefined && x.jwtToken) {
+        this.signalRService.startConnection()
+      } else {
+        // Stop SignalR connection when user is not authenticated
+        this.signalRService.stopConnection()
+      }
     })
 
     this.swUpdate.unrecoverable.subscribe(() => {
@@ -76,7 +84,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     this.subscribeForUpdates()
-    this.signalRService.startConnection()
     this.pushSubscriberService.subscribe()
   }
 

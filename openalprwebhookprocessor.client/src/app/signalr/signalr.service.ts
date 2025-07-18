@@ -3,12 +3,15 @@ import { SnackbarService } from 'app/snackbar/snackbar.service'
 import { SnackBarType } from 'app/snackbar/snackbartype'
 import * as signalR from '@microsoft/signalr'
 import { Subject } from 'rxjs'
+import { RealtimeActivity } from 'app/home/analytics.models'
+import { AccountService } from 'app/_services'
 
 @Injectable({
   providedIn: 'root',
 })
 export class SignalrService {
   private snackbarService = inject(SnackbarService)
+  private accountService = inject(AccountService)
 
   private hubConnection: signalR.HubConnection
 
@@ -20,9 +23,37 @@ export class SignalrService {
   public isConnected: boolean
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>()
 
+  // Analytics subjects
+  public realtimeActivityUpdated = new Subject<RealtimeActivity>()
+  public peakActivityHoursUpdated = new Subject<any>()
+  public weeklyActivityPatternsUpdated = new Subject<any>()
+  public monthlyTrendsUpdated = new Subject<any>()
+
   public startConnection() {
+    // Only start connection if user is authenticated
+    const user = this.accountService.userValue
+    if (!user || !user.jwtToken) {
+      console.log('SignalR: User not authenticated, skipping connection')
+      return
+    }
+
+        // Don't start if already connected or connecting
+    if (this.hubConnection &&
+        (this.hubConnection.state === signalR.HubConnectionState.Connected ||
+         this.hubConnection.state === signalR.HubConnectionState.Connecting)) {
+      console.log('SignalR: Already connected or connecting, skipping')
+      return
+    }
+
+    // Stop existing connection if it exists
+    if (this.hubConnection) {
+      this.hubConnection.stop()
+    }
+
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('/api/processorhub')
+      .withUrl('/api/processorHub', {
+        accessTokenFactory: () => user.jwtToken
+      })
       .withAutomaticReconnect()
       .build()
 
@@ -66,6 +97,23 @@ export class SignalrService {
       this.snackbarService.create(`Alert! Plate Number: ${plateNumber}`, SnackBarType.Alert)
     })
 
+    // Analytics event handlers
+    this.hubConnection.on('RealtimeActivityUpdated', (activity: RealtimeActivity) => {
+      this.realtimeActivityUpdated.next(activity)
+    })
+
+    this.hubConnection.on('PeakActivityHoursUpdated', (peakHours: any) => {
+      this.peakActivityHoursUpdated.next(peakHours)
+    })
+
+    this.hubConnection.on('WeeklyActivityPatternsUpdated', (weeklyPatterns: any) => {
+      this.weeklyActivityPatternsUpdated.next(weeklyPatterns)
+    })
+
+    this.hubConnection.on('MonthlyTrendsUpdated', (monthlyTrends: any) => {
+      this.monthlyTrendsUpdated.next(monthlyTrends)
+    })
+
     this.hubConnection.onreconnected(() => {
       console.log('Connection reconnected')
       this.snackbarService.create('Reconnected to server!', SnackBarType.Connected)
@@ -91,12 +139,17 @@ export class SignalrService {
   }
 
   public stopConnection() {
-    this.hubConnection
-      .stop()
-      .then(() => {
-        this.snackbarService.create('Connection closed', SnackBarType.Disconnected)
-        this.triggerConnectionStatusChange(false)
-      })
+    if (this.hubConnection) {
+      this.hubConnection
+        .stop()
+        .then(() => {
+          this.snackbarService.create('Connection closed', SnackBarType.Disconnected)
+          this.triggerConnectionStatusChange(false)
+        })
+        .catch((err) => {
+          console.log('Error stopping SignalR connection: ' + err)
+        })
+    }
   }
 
   public triggerConnectionStatusChange(isConencted: boolean) {

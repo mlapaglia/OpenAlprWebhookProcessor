@@ -22,14 +22,11 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             using var scope = app.ApplicationServices.CreateScope();
             var services = scope.ServiceProvider;
 
-            // Ensure directories exist
             Directory.CreateDirectory("config");
 
-            // Migrate ProcessorContext
             var processorContext = services.GetRequiredService<ProcessorContext>();
             await processorContext.Database.MigrateAsync();
 
-            // Ensure default agent exists
             var agent = await processorContext.Agents.FirstOrDefaultAsync();
             if (agent == null)
             {
@@ -38,7 +35,6 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
                 await processorContext.SaveChangesAsync();
             }
 
-            // Migrate UsersContext
             var usersContext = services.GetRequiredService<UsersContext>();
             await usersContext.Database.MigrateAsync();
 

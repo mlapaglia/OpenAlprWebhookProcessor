@@ -32,7 +32,10 @@ namespace OpenAlprWebhookProcessor
         {
             services.AddCors();
             services.AddControllers();
-            services.AddSignalR();
+            services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
 
             services.AddApplicationServices(Configuration);
 
@@ -42,12 +45,10 @@ namespace OpenAlprWebhookProcessor
 
             services.AddScoped<IUserService, UserService>();
             
-            // Users repository pattern
             services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IJwtKeyRepository, JwtKeyRepository>();
-            
-            // Users services
+
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IPasswordService, PasswordService>();
 
@@ -70,13 +71,12 @@ namespace OpenAlprWebhookProcessor
             app.UseStaticFiles();
 
             app.UseCors(x => x
-                .AllowAnyOrigin()
+                .WithOrigins("https://localhost:4200", "http://localhost:4200")
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader()
+                .AllowCredentials());
 
             app.UseExceptionHandling();
-
-            app.UseMiddleware<JwtMiddleware>();
 
             var webSocketOptions = new WebSocketOptions
             {
@@ -84,6 +84,8 @@ namespace OpenAlprWebhookProcessor
             };
 
             app.UseWebSockets(webSocketOptions);
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseAuthentication();
 

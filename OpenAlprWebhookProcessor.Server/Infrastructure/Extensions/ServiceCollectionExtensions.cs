@@ -46,7 +46,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
         public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
         {
             var processorConnectionString = configuration.GetConnectionString("ProcessorConnection") 
-                ?? "Data Source=config/processor.db;foreign keys=true;";
+                ?? "Data Source=F:/processor.db;foreign keys=true;";
             
             var usersConnectionString = configuration.GetConnectionString("UsersConnection")
                 ?? "Data Source=config/users.db";
@@ -88,7 +88,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<ICameraUpdateService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
             services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
             
-            services.AddScoped<ICameraScheduling, CameraUpdateService.CameraScheduling>();
+            services.AddSingleton<ICameraScheduling, CameraUpdateService.CameraScheduling>();
             services.AddSingleton<IBackgroundJobService, CameraUpdateService.TimerBasedBackgroundJobService>();
 
             services.AddSingleton<HydrationService>();
@@ -119,7 +119,14 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddHttpClient<PushServiceClient>();
             services.AddHttpClient();
             services.AddScoped<IImageCompressionService, ImageCompressionService>();
-            services.AddScoped<OpenAlprWebhookProcessor.Features.Cameras.ICameraFactory, OpenAlprWebhookProcessor.Features.Cameras.CameraFactory>();
+            
+            services.AddSingleton<Features.Cameras.ICameraFactory, Features.Cameras.CameraFactory>();
+
+            services.AddScoped<Alerts.WebPush.GetWebPushClientRequestHandler>();
+            services.AddScoped<Alerts.WebPush.UpsertWebPushClientRequestHandler>();
+            services.AddScoped<Alerts.WebPush.TestWebPushClientRequestHandler>();
+
+            services.AddScoped<TestPushoverClientRequestHandler>();
 
             return services;
         }
@@ -128,21 +135,31 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
         {
             services.AddAuthentication(x =>
             {
-                x.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
-                x.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                x.Events = new JwtBearerEvents
                 {
                     OnMessageReceived = context =>
                     {
-                        if (string.IsNullOrWhiteSpace(context.Token)
-                            && context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
+                        if (string.IsNullOrWhiteSpace(context.Token))
                         {
-                            context.Token = context.Request.Cookies["jwtToken"];
+                            // Handle SignalR connections via query string
+                            var accessToken = context.HttpContext.Request.Query["access_token"];
+                            if (!string.IsNullOrEmpty(accessToken) && 
+                                context.HttpContext.Request.Path.StartsWithSegments("/api/processorHub", StringComparison.OrdinalIgnoreCase))
+                            {
+                                context.Token = accessToken;
+                            }
+                            // Handle image requests via cookies
+                            else if (context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
+                            {
+                                context.Token = context.Request.Cookies["jwtToken"];
+                            }
                         }
 
                         return Task.CompletedTask;
@@ -150,7 +167,6 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
                 };
             });
 
-            // Configure JWT options using the service provider
             services.ConfigureOptions<JwtBearerPostConfigureOptions>();
 
             return services;
@@ -186,7 +202,6 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
                 {
-                    // Get the signing key from the database
                     using var scope = _serviceProvider.CreateScope();
                     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                     var key = userService.GetJwtSecretKeyAsync().Result;
