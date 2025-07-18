@@ -13,6 +13,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
     public class GetCropImageQueryHandler : IRequestHandler<GetCropImageQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
+
         private readonly IImageCompressionService _imageCompressionService;
 
         public GetCropImageQueryHandler(IUnitOfWork unitOfWork, IImageCompressionService imageCompressionService)
@@ -31,30 +32,31 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             {
                 throw new ArgumentException("No image found with that id.");
             }
-
-            // Get the full plate group with plate image
-            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id, cancellationToken);
+            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
+                plateGroup.Id,
+                cancellationToken);
             
             var agents = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
             var agent = agents.FirstOrDefault();
 
             if (fullPlateGroup?.PlateImage == null)
             {
-                var imageBytes = await _imageCompressionService.GetCropImageFromAgentAsync(agent, request.ImageId, fullPlateGroup.PlateCoordinates, cancellationToken);
-                
-                var plateImage = new PlateImage()
+                var imageBytes = await _imageCompressionService.GetCropImageFromAgentAsync(
+                    agent,
+                    request.ImageId,
+                    fullPlateGroup.PlateCoordinates,
+                    cancellationToken);
+
+                fullPlateGroup.PlateImage = new PlateImage()
                 {
                     Jpeg = imageBytes,
                     IsCompressed = agent?.IsImageCompressionEnabled ?? false,
                 };
 
-                fullPlateGroup.PlateImage = plateImage;
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
             return new MemoryStream(fullPlateGroup.PlateImage.Jpeg);
         }
-
-
     }
 } 

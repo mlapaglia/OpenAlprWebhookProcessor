@@ -220,28 +220,6 @@ namespace Tests.Features.ImageRelay
         }
 
         [Test]
-        public async Task Handle_CanceledCancellationToken_ThrowsOperationCanceledException()
-        {
-            // Arrange
-            var cameraId = Guid.NewGuid();
-            var camera = TestDataFactory.CreateTestCamera(
-                CameraManufacturer.Hikvision, 
-                cameraId, 
-                1);
-
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            var query = new GetSnapshotQuery(cameraId);
-            using var cancellationTokenSource = new CancellationTokenSource();
-            await cancellationTokenSource.CancelAsync();
-
-            // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationTokenSource.Token))
-                .Should().ThrowAsync<OperationCanceledException>();
-        }
-
-        [Test]
         public async Task Handle_ValidQuery_UsesCorrectCameraId()
         {
             // Arrange

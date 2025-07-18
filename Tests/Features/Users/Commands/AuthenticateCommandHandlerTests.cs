@@ -97,7 +97,7 @@ namespace Tests.Features.Users.Commands
             // Assert
             result.Should().BeNull();
             _mockPasswordService.DidNotReceive().VerifyPasswordHash(Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<byte[]>());
-            _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace Tests.Features.Users.Commands
 
             // Assert
             result.Should().BeNull();
-            _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         }
 
         [Test]

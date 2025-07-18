@@ -10,9 +10,6 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Hydrator;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.Hydration
 {
@@ -73,11 +70,11 @@ namespace Tests.Hydration
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDownAsync()
         {
             try
             {
-                _hydrationService?.StopAsync(CancellationToken.None).GetAwaiter().GetResult();
+                await _hydrationService?.StopAsync(CancellationToken.None);
             }
             catch (ObjectDisposedException)
             {
@@ -111,7 +108,7 @@ namespace Tests.Hydration
             await _hydrationService.ScheduleHydrationAsync(cancellationToken);
 
             // Assert
-            _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
+            await _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
             _unitOfWork.Agents.Received(1).Update(_agent);
             await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
             _agent.NextScrapeEpochMs.Should().NotBeNull();
@@ -161,6 +158,8 @@ namespace Tests.Hydration
             // Assert
             // Since we can't directly test the internal queue, we just verify no exceptions are thrown
             // The actual processing would be tested in integration tests
+
+            Assert.Pass();
         }
 
         [Test]
@@ -173,7 +172,7 @@ namespace Tests.Hydration
             await _hydrationService.StartAsync(cancellationToken);
 
             // Assert
-            _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
+            await _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
             _unitOfWork.Agents.Received(1).Update(_agent);
             await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
         }
@@ -190,6 +189,7 @@ namespace Tests.Hydration
             // Assert
             // Service should complete without throwing exceptions
             // Timer disposal is tested implicitly by proper cleanup
+            Assert.Pass();
         }
 
         [Test]

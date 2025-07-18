@@ -5,9 +5,6 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tests.CameraUpdateService
 {

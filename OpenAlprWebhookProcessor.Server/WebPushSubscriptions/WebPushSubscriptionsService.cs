@@ -6,6 +6,8 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -18,28 +20,27 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public List<Lib.Net.Http.WebPush.PushSubscription> GetAll()
+        public async Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var subscriptions = unitOfWork.WebPushSubscriptions.GetQueryable()
+                var subscriptions = await unitOfWork.WebPushSubscriptions.GetQueryable()
                     .Include(x => x.Keys)
-                    .ToList();
+                    .ToListAsync(cancellationToken);
 
-                var pushSubscriptions = new List<Lib.Net.Http.WebPush.PushSubscription>();
+                var pushSubscriptions = new List<PushSubscription>();
 
                 foreach (var subscription in subscriptions.Where(x => x.Keys != null && x.Keys.Any()))
                 {
                     var authKey = subscription.Keys.FirstOrDefault(x => x.Key == "auth");
                     var p256dhKey = subscription.Keys.FirstOrDefault(x => x.Key == "p256dh");
                     
-                    // Skip subscriptions that don't have the required keys
                     if (authKey == null || p256dhKey == null)
                         continue;
 
-                    var newPushSubscription = new Lib.Net.Http.WebPush.PushSubscription()
+                    var newPushSubscription = new PushSubscription()
                     {
                         Endpoint = subscription.Endpoint,
                         Keys = new Dictionary<string, string>(),
@@ -55,15 +56,17 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             }  
         }
 
-        public void Insert(Lib.Net.Http.WebPush.PushSubscription subscription)
+        public async Task InsertAsync(
+            PushSubscription subscription,
+            CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var existingSubscription = unitOfWork.WebPushSubscriptions.GetQueryable()
+                var existingSubscription = await unitOfWork.WebPushSubscriptions.GetQueryable()
                     .Include(x => x.Keys)
-                    .FirstOrDefault(x => x.Endpoint == subscription.Endpoint);
+                    .FirstOrDefaultAsync(x => x.Endpoint == subscription.Endpoint, cancellationToken);
 
                 if (existingSubscription == null)
                 {
@@ -85,25 +88,33 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         }
                     }
 
-                    unitOfWork.WebPushSubscriptions.AddAsync(pushSubscription).GetAwaiter().GetResult();
-                    unitOfWork.SaveChangesAsync().GetAwaiter().GetResult();
+                    await unitOfWork.WebPushSubscriptions.AddAsync(
+                        pushSubscription,
+                        cancellationToken);
+
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
                 }
             }
         }
 
-        public void Delete(string endpoint)
+        public async Task DeleteAsync(string endpoint, CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var endpointToRemove = unitOfWork.WebPushSubscriptions.FirstOrDefaultAsync(x => x.Endpoint == endpoint).GetAwaiter().GetResult();
+                var endpointToRemove = await unitOfWork.WebPushSubscriptions.FirstOrDefaultAsync(x => x.Endpoint == endpoint, cancellationToken);
                 if (endpointToRemove != null)
                 {
                     unitOfWork.WebPushSubscriptions.Delete(endpointToRemove);
-                    unitOfWork.SaveChangesAsync().GetAwaiter().GetResult();
+                    await unitOfWork.SaveChangesAsync(cancellationToken);
                 }
             }
+        }
+
+        internal async Task GetAllAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

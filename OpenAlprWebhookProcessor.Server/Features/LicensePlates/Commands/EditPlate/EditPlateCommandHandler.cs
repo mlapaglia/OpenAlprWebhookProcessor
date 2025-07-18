@@ -20,7 +20,6 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate
             
             if (existingPlate != null)
             {
-                // Update existing plate
                 existingPlate.BestNumber = request.PlateNumber;
                 
                 _unitOfWork.PlateGroups.Update(existingPlate);

@@ -3,7 +3,6 @@ import { SnackbarService } from 'app/snackbar/snackbar.service'
 import { SnackBarType } from 'app/snackbar/snackbartype'
 import * as signalR from '@microsoft/signalr'
 import { Subject } from 'rxjs'
-import { RealtimeActivity } from 'app/home/analytics.models'
 import { AccountService } from 'app/_services'
 
 @Injectable({
@@ -22,12 +21,6 @@ export class SignalrService {
   public openAlprAgentConnectionStatusChanged = new Subject<boolean>()
   public isConnected: boolean
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>()
-
-  // Analytics subjects
-  public realtimeActivityUpdated = new Subject<RealtimeActivity>()
-  public peakActivityHoursUpdated = new Subject<any>()
-  public weeklyActivityPatternsUpdated = new Subject<any>()
-  public monthlyTrendsUpdated = new Subject<any>()
 
   public startConnection() {
     // Only start connection if user is authenticated
@@ -95,23 +88,6 @@ export class SignalrService {
 
     this.hubConnection.on('LicensePlateAlerted', (plateNumber) => {
       this.snackbarService.create(`Alert! Plate Number: ${plateNumber}`, SnackBarType.Alert)
-    })
-
-    // Analytics event handlers
-    this.hubConnection.on('RealtimeActivityUpdated', (activity: RealtimeActivity) => {
-      this.realtimeActivityUpdated.next(activity)
-    })
-
-    this.hubConnection.on('PeakActivityHoursUpdated', (peakHours: any) => {
-      this.peakActivityHoursUpdated.next(peakHours)
-    })
-
-    this.hubConnection.on('WeeklyActivityPatternsUpdated', (weeklyPatterns: any) => {
-      this.weeklyActivityPatternsUpdated.next(weeklyPatterns)
-    })
-
-    this.hubConnection.on('MonthlyTrendsUpdated', (monthlyTrends: any) => {
-      this.monthlyTrendsUpdated.next(monthlyTrends)
     })
 
     this.hubConnection.onreconnected(() => {

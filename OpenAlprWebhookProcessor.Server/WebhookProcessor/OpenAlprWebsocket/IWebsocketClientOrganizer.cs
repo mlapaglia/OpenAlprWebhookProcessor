@@ -1,4 +1,3 @@
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,11 +12,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         Task RemoveAgentAsync(
             string agentId,
-            CancellationToken cancellationToken);
-
-        Task<Stream> GetCameraImageAsync(
-            string agentId,
-            long cameraId,
             CancellationToken cancellationToken);
 
         Task<AgentStatusResponse> GetAgentStatusAsync(

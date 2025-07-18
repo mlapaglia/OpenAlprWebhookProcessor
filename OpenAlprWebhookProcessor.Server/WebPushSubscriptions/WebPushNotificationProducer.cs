@@ -87,7 +87,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         }
                     }.ToPushMessage();
 
-                    foreach (PushSubscription subscription in _pushSubscriptionsService.GetAll())
+                    foreach (PushSubscription subscription in await _pushSubscriptionsService.GetAllAsync(cancellationToken))
                     {
                         try
                         {

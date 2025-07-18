@@ -141,6 +141,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         public async Task<PlateGroup?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return await _dbSet
+                .Include(x => x.PlateImage)
+                .Include(x => x.VehicleImage)
                 .Include(x => x.PossibleNumbers)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }

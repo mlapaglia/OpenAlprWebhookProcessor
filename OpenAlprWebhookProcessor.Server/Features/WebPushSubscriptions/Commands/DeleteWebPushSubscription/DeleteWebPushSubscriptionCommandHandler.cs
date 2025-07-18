@@ -14,9 +14,11 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.Delete
             _pushSubscriptionsService = pushSubscriptionsService;
         }
 
-        public async Task Handle(DeleteWebPushSubscriptionCommand request, CancellationToken cancellationToken)
+        public async Task Handle(
+            DeleteWebPushSubscriptionCommand request,
+            CancellationToken cancellationToken)
         {
-            _pushSubscriptionsService.Delete(request.Endpoint);
+            await _pushSubscriptionsService.DeleteAsync(request.Endpoint, cancellationToken);
         }
     }
 } 

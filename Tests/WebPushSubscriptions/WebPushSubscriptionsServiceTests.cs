@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using Tests.TestHelpers;
 
@@ -20,10 +19,9 @@ namespace Tests.WebPushSubscriptions
         public override void SetUp()
         {
             base.SetUp();
-            
-            // Create a proper service collection and build a real service provider
+
             var services = new ServiceCollection();
-            services.AddScoped<IUnitOfWork>(provider => UnitOfWork);
+            services.AddScoped(provider => UnitOfWork);
             var serviceProvider = services.BuildServiceProvider();
             
             _service = new WebPushSubscriptionsService(serviceProvider);
@@ -38,10 +36,10 @@ namespace Tests.WebPushSubscriptions
         #region GetAll Tests
 
         [Test]
-        public void GetAll_WhenNoSubscriptions_ReturnsEmptyList()
+        public async Task GetAll_WhenNoSubscriptions_ReturnsEmptyList()
         {
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -49,16 +47,16 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenSubscriptionsExistWithoutKeys_ReturnsEmptyList()
+        public async Task GetAll_WhenSubscriptionsExistWithoutKeys_ReturnsEmptyList()
         {
             // Arrange
             var subscription = CreateTestDbSubscription();
             subscription.Keys = null;
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -66,16 +64,16 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenSubscriptionsExistWithEmptyKeys_ReturnsEmptyList()
+        public async Task GetAll_WhenSubscriptionsExistWithEmptyKeys_ReturnsEmptyList()
         {
             // Arrange
             var subscription = CreateTestDbSubscription();
             subscription.Keys = new List<WebPushSubscriptionKey>();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -83,15 +81,15 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenSingleSubscriptionWithKeys_ReturnsSingleSubscription()
+        public async Task GetAll_WhenSingleSubscriptionWithKeys_ReturnsSingleSubscription()
         {
             // Arrange
             var subscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -107,17 +105,17 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenMultipleSubscriptionsWithKeys_ReturnsAllSubscriptions()
+        public async Task GetAll_WhenMultipleSubscriptionsWithKeys_ReturnsAllSubscriptions()
         {
             // Arrange
             var subscription1 = CreateTestDbSubscriptionWithKeys("endpoint1");
             var subscription2 = CreateTestDbSubscriptionWithKeys("endpoint2");
             
             Context.WebPushSubscriptions.AddRange(subscription1, subscription2);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -129,7 +127,7 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenMixedSubscriptionsWithAndWithoutKeys_ReturnsOnlySubscriptionsWithKeys()
+        public async Task GetAll_WhenMixedSubscriptionsWithAndWithoutKeys_ReturnsOnlySubscriptionsWithKeys()
         {
             // Arrange
             var subscriptionWithKeys = CreateTestDbSubscriptionWithKeys("endpoint1");
@@ -137,10 +135,10 @@ namespace Tests.WebPushSubscriptions
             subscriptionWithoutKeys.Keys = null;
             
             Context.WebPushSubscriptions.AddRange(subscriptionWithKeys, subscriptionWithoutKeys);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync(default);
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -149,7 +147,7 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenSubscriptionHasIncompleteKeys_SkipsSubscription()
+        public async Task GetAll_WhenSubscriptionHasIncompleteKeys_SkipsSubscription()
         {
             // Arrange
             var subscription = CreateTestDbSubscription();
@@ -159,10 +157,10 @@ namespace Tests.WebPushSubscriptions
                 // Missing p256dh key
             };
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            var result = _service.GetAll();
+            var result = await _service.GetAllAsync(default);
 
             // Assert
             result.Should().NotBeNull();
@@ -174,20 +172,20 @@ namespace Tests.WebPushSubscriptions
         #region Insert Tests
 
         [Test]
-        public void Insert_WhenNewSubscription_AddsSubscriptionToDatabase()
+        public async Task Insert_WhenNewSubscription_AddsSubscriptionToDatabaseAsync()
         {
             // Arrange
             var pushSubscription = CreateTestPushSubscription();
 
             // Act
-            _service.Insert(pushSubscription);
+            await _service.InsertAsync(pushSubscription, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var dbSubscription = newContext.WebPushSubscriptions
+                var dbSubscription = await newContext.WebPushSubscriptions
                     .Include(s => s.Keys)
-                    .FirstOrDefault(s => s.Endpoint == pushSubscription.Endpoint);
+                    .FirstOrDefaultAsync(s => s.Endpoint == pushSubscription.Endpoint);
                 
                 dbSubscription.Should().NotBeNull();
                 dbSubscription.Endpoint.Should().Be(pushSubscription.Endpoint);
@@ -204,29 +202,29 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void Insert_WhenSubscriptionAlreadyExists_DoesNotAddDuplicate()
+        public async Task Insert_WhenSubscriptionAlreadyExists_DoesNotAddDuplicateAsync()
         {
             // Arrange
             var existingSubscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(existingSubscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             var pushSubscription = CreateTestPushSubscription(existingSubscription.Endpoint);
 
             // Act
-            _service.Insert(pushSubscription);
+            await _service.InsertAsync(pushSubscription, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var subscriptions = newContext.WebPushSubscriptions.ToList();
+                var subscriptions = await newContext.WebPushSubscriptions.ToListAsync();
                 subscriptions.Should().HaveCount(1);
                 subscriptions.First().Endpoint.Should().Be(existingSubscription.Endpoint);
             }
         }
 
         [Test]
-        public void Insert_WhenSubscriptionWithoutKeys_AddsSubscriptionWithEmptyKeys()
+        public async Task Insert_WhenSubscriptionWithoutKeys_AddsSubscriptionWithEmptyKeysAsync()
         {
             // Arrange
             var pushSubscription = new PushSubscription
@@ -235,14 +233,14 @@ namespace Tests.WebPushSubscriptions
             };
 
             // Act
-            _service.Insert(pushSubscription);
+            await _service.InsertAsync(pushSubscription, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var dbSubscription = newContext.WebPushSubscriptions
+                var dbSubscription = await newContext.WebPushSubscriptions
                     .Include(s => s.Keys)
-                    .FirstOrDefault(s => s.Endpoint == pushSubscription.Endpoint);
+                    .FirstOrDefaultAsync(s => s.Endpoint == pushSubscription.Endpoint);
                 
                 dbSubscription.Should().NotBeNull();
                 dbSubscription.Endpoint.Should().Be(pushSubscription.Endpoint);
@@ -251,7 +249,7 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void Insert_WhenSubscriptionWithCustomKeys_AddsAllKeys()
+        public async Task Insert_WhenSubscriptionWithCustomKeys_AddsAllKeysAsync()
         {
             // Arrange
             var pushSubscription = new PushSubscription
@@ -266,14 +264,14 @@ namespace Tests.WebPushSubscriptions
             };
 
             // Act
-            _service.Insert(pushSubscription);
+            await _service.InsertAsync(pushSubscription, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var dbSubscription = newContext.WebPushSubscriptions
+                var dbSubscription = await newContext.WebPushSubscriptions
                     .Include(s => s.Keys)
-                    .FirstOrDefault(s => s.Endpoint == pushSubscription.Endpoint);
+                    .FirstOrDefaultAsync(s => s.Endpoint == pushSubscription.Endpoint);
                 
                 dbSubscription.Should().NotBeNull();
                 dbSubscription.Keys.Should().HaveCount(3);
@@ -289,7 +287,7 @@ namespace Tests.WebPushSubscriptions
         public void Insert_WhenNullSubscription_ThrowsException()
         {
             // Act & Assert
-            Assert.Throws<InvalidOperationException>(() => _service.Insert(null));
+            Assert.ThrowsAsync<InvalidOperationException>(() => _service.InsertAsync(null, default));
         }
 
         #endregion
@@ -297,129 +295,129 @@ namespace Tests.WebPushSubscriptions
         #region Delete Tests
 
         [Test]
-        public void Delete_WhenSubscriptionExists_RemovesSubscriptionFromDatabase()
+        public async Task Delete_WhenSubscriptionExists_RemovesSubscriptionFromDatabase()
         {
             // Arrange
             var subscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            _service.Delete(subscription.Endpoint);
+            await _service.DeleteAsync(subscription.Endpoint, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var deletedSubscription = newContext.WebPushSubscriptions
-                    .FirstOrDefault(s => s.Endpoint == subscription.Endpoint);
+                var deletedSubscription = await newContext.WebPushSubscriptions
+                    .FirstOrDefaultAsync(s => s.Endpoint == subscription.Endpoint);
                 deletedSubscription.Should().BeNull();
             }
         }
 
         [Test]
-        public void Delete_WhenSubscriptionDoesNotExist_DoesNothing()
+        public async Task Delete_WhenSubscriptionDoesNotExist_DoesNothing()
         {
             // Arrange
             var nonExistentEndpoint = "https://non-existent.endpoint.com";
 
             // Act
-            _service.Delete(nonExistentEndpoint);
+            await _service.DeleteAsync(nonExistentEndpoint, default);
 
             // Assert
             // Should not throw any exception
             using (var newContext = ContextCreator.CreateContext())
             {
-                var subscriptions = newContext.WebPushSubscriptions.ToList();
+                var subscriptions = await newContext.WebPushSubscriptions.ToListAsync();
                 subscriptions.Should().BeEmpty();
             }
         }
 
         [Test]
-        public void Delete_WhenSubscriptionExistsWithKeys_RemovesSubscriptionAndKeys()
+        public async Task Delete_WhenSubscriptionExistsWithKeys_RemovesSubscriptionAndKeys()
         {
             // Arrange
             var subscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             using (var checkContext = ContextCreator.CreateContext())
             {
-                var keyCount = checkContext.WebPushSubscriptionKeys.Count();
+                var keyCount = await checkContext.WebPushSubscriptionKeys.CountAsync();
                 keyCount.Should().Be(2);
             }
 
             // Act
-            _service.Delete(subscription.Endpoint);
+            await _service.DeleteAsync(subscription.Endpoint, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var deletedSubscription = newContext.WebPushSubscriptions
-                    .FirstOrDefault(s => s.Endpoint == subscription.Endpoint);
+                var deletedSubscription = await newContext.WebPushSubscriptions
+                    .FirstOrDefaultAsync(s => s.Endpoint == subscription.Endpoint);
                 deletedSubscription.Should().BeNull();
 
                 // Keys should be cascade deleted
-                var remainingKeys = newContext.WebPushSubscriptionKeys.ToList();
+                var remainingKeys = await newContext.WebPushSubscriptionKeys.ToListAsync();
                 remainingKeys.Should().BeEmpty();
             }
         }
 
         [Test]
-        public void Delete_WhenMultipleSubscriptionsExist_RemovesOnlySpecifiedSubscription()
+        public async Task Delete_WhenMultipleSubscriptionsExist_RemovesOnlySpecifiedSubscription()
         {
             // Arrange
             var subscription1 = CreateTestDbSubscriptionWithKeys("endpoint1");
             var subscription2 = CreateTestDbSubscriptionWithKeys("endpoint2");
             
             Context.WebPushSubscriptions.AddRange(subscription1, subscription2);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            _service.Delete("endpoint1");
+            await _service.DeleteAsync("endpoint1", default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var remainingSubscriptions = newContext.WebPushSubscriptions.ToList();
+                var remainingSubscriptions = await newContext.WebPushSubscriptions.ToListAsync();
                 remainingSubscriptions.Should().HaveCount(1);
                 remainingSubscriptions.First().Endpoint.Should().Be("endpoint2");
             }
         }
 
         [Test]
-        public void Delete_WhenNullEndpoint_DoesNothing()
+        public async Task Delete_WhenNullEndpoint_DoesNothingAsync()
         {
             // Arrange
             var subscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            _service.Delete(null);
+            await _service.DeleteAsync(null, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var subscriptions = newContext.WebPushSubscriptions.ToList();
+                var subscriptions = await newContext.WebPushSubscriptions.ToListAsync();
                 subscriptions.Should().HaveCount(1);
             }
         }
 
         [Test]
-        public void Delete_WhenEmptyEndpoint_DoesNothing()
+        public async Task Delete_WhenEmptyEndpoint_DoesNothingAsync()
         {
             // Arrange
             var subscription = CreateTestDbSubscriptionWithKeys();
             Context.WebPushSubscriptions.Add(subscription);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
 
             // Act
-            _service.Delete(string.Empty);
+            await _service.DeleteAsync(string.Empty, default);
 
             // Assert
             using (var newContext = ContextCreator.CreateContext())
             {
-                var subscriptions = newContext.WebPushSubscriptions.ToList();
+                var subscriptions = await newContext.WebPushSubscriptions.ToListAsync();
                 subscriptions.Should().HaveCount(1);
             }
         }
@@ -437,22 +435,6 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenServiceProviderThrowsException_PropagatesException()
-        {
-            // Arrange
-            var badServiceProvider = Substitute.For<IServiceProvider>();
-            var scopeFactory = Substitute.For<IServiceScopeFactory>();
-            badServiceProvider.GetService(typeof(IServiceScopeFactory)).Returns(scopeFactory);
-            scopeFactory.CreateScope().Returns(x => throw new InvalidOperationException("Service provider error"));
-            
-            var serviceWithBadProvider = new WebPushSubscriptionsService(badServiceProvider);
-
-            // Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => serviceWithBadProvider.GetAll());
-            ex.Message.Should().Be("Service provider error");
-        }
-
-        [Test]
         public void Insert_WhenServiceProviderThrowsException_PropagatesException()
         {
             // Arrange
@@ -465,7 +447,7 @@ namespace Tests.WebPushSubscriptions
             var pushSubscription = CreateTestPushSubscription();
 
             // Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => serviceWithBadProvider.Insert(pushSubscription));
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.InsertAsync(pushSubscription, default));
             ex.Message.Should().Be("Service provider error");
         }
 
@@ -481,7 +463,7 @@ namespace Tests.WebPushSubscriptions
             var serviceWithBadProvider = new WebPushSubscriptionsService(badServiceProvider);
 
             // Act & Assert
-            var ex = Assert.Throws<InvalidOperationException>(() => serviceWithBadProvider.Delete("endpoint"));
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.DeleteAsync("endpoint", default));
             ex.Message.Should().Be("Service provider error");
         }
 

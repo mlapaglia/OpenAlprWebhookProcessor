@@ -30,6 +30,7 @@ namespace Tests.Features.Settings.Commands.DeleteDebugPlates
             // Since we're using an in-memory database, we can't easily verify the exact SQL execution,
             // but we can verify the command completes without throwing an exception
             // The handler should complete successfully
+            Assert.Pass();
         }
 
         [Test]

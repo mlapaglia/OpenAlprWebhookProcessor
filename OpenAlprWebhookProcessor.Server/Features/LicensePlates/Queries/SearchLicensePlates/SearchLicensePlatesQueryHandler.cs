@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
         public async Task<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken)
         {
             var ignoredPlates = await GetIgnoredPlatesAsync(cancellationToken);
-            var platesToIgnoreForFiltering = request.FilterIgnoredPlates ? ignoredPlates : new List<string>();
+            var platesToIgnoreForFiltering = request.FilterIgnoredPlates ? new List<string>() : ignoredPlates;
             
             var plates = await _unitOfWork.PlateGroups.SearchPlatesAsync(
                 request.PlateNumber,

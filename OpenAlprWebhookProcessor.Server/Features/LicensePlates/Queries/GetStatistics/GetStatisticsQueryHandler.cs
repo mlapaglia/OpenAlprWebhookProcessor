@@ -16,16 +16,16 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PlateStatistics> Handle(GetStatisticsQuery request, CancellationToken cancellationToken)
+        public async Task<PlateStatistics> Handle(
+            GetStatisticsQuery request,
+            CancellationToken cancellationToken)
         {
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
             var plateNumber = request.PlateNumber;
 
-            // Get all plate epochs from both BestNumber and PossibleNumbers
             var (seenPlates, seenPossiblePlates) = await _unitOfWork.PlateGroups.GetPlateStatisticsEpochsAsync(
                 plateNumber, cancellationToken);
 
-            // Combine and sort the epochs
             seenPlates.AddRange(seenPossiblePlates);
             seenPlates = seenPlates.OrderBy(x => x).ToList();
 

@@ -8,13 +8,6 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
 {
-    public interface IImageCompressionService
-    {
-        Task<byte[]> GetImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken);
-        Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken);
-        Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, string plateCoordinates, CancellationToken cancellationToken);
-    }
-
     public class ImageCompressionService : IImageCompressionService
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -24,7 +17,10 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
-        public async Task<byte[]> GetImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken)
+        public async Task<byte[]> GetImageFromAgentAsync(
+            Agent agent,
+            string imageId,
+            CancellationToken cancellationToken)
         {
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -46,12 +42,23 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
             return agent.IsImageCompressionEnabled ? CompressImage(imageBytes) : imageBytes;
         }
 
-        public async Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, CancellationToken cancellationToken)
+        public async Task<byte[]> GetCropImageFromAgentAsync(
+            Agent agent,
+            string imageId,
+            CancellationToken cancellationToken)
         {
-            return await GetCropImageFromAgentAsync(agent, imageId, null, cancellationToken);
+            return await GetCropImageFromAgentAsync(
+                agent,
+                imageId,
+                null,
+                cancellationToken);
         }
 
-        public async Task<byte[]> GetCropImageFromAgentAsync(Agent agent, string imageId, string plateCoordinates, CancellationToken cancellationToken)
+        public async Task<byte[]> GetCropImageFromAgentAsync(
+            Agent agent,
+            string imageId,
+            string plateCoordinates,
+            CancellationToken cancellationToken)
         {
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -66,7 +73,9 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
                 imageUrl += "?" + plateCoordinates;
             }
             
-            using var response = await httpClient.GetAsync(imageUrl, cancellationToken);
+            using var response = await httpClient.GetAsync(
+                imageUrl,
+                cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -90,7 +99,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
             }
             catch
             {
-                return rawImage; // Return original if compression fails
+                return rawImage;
             }
         }
     }

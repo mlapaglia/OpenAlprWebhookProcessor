@@ -13,6 +13,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
     public class GetImageQueryHandler : IRequestHandler<GetImageQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
+
         private readonly IImageCompressionService _imageCompressionService;
 
         public GetImageQueryHandler(IUnitOfWork unitOfWork, IImageCompressionService imageCompressionService)
@@ -21,7 +22,9 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             _imageCompressionService = imageCompressionService ?? throw new ArgumentNullException(nameof(imageCompressionService));
         }
 
-        public async Task<Stream> Handle(GetImageQuery request, CancellationToken cancellationToken)
+        public async Task<Stream> Handle(
+            GetImageQuery request,
+            CancellationToken cancellationToken)
         {
             var plateGroups = await _unitOfWork.PlateGroups.GetAllAsync(cancellationToken);
             var plateGroup = plateGroups
@@ -32,15 +35,19 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
                 throw new ArgumentException("No image found with that id.");
             }
 
-            // Get the full plate group with vehicle image
-            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id, cancellationToken);
+            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
+                plateGroup.Id,
+                cancellationToken);
             
             var agents = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
             var agent = agents.FirstOrDefault();
 
             if (fullPlateGroup?.VehicleImage == null)
             {
-                var imageBytes = await _imageCompressionService.GetImageFromAgentAsync(agent, request.ImageId, cancellationToken);
+                var imageBytes = await _imageCompressionService.GetImageFromAgentAsync(
+                    agent,
+                    request.ImageId,
+                    cancellationToken);
                 
                 var vehicleImage = new VehicleImage()
                 {
