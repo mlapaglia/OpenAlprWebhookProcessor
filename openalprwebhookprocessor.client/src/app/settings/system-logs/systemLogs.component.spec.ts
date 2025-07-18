@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { SystemLogsComponent } from './system-logs.component'
 import { SystemLogsService } from './system-logs.service'
 import { of } from 'rxjs'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe(SystemLogsComponent.name, () => {
   let component: SystemLogsComponent
@@ -13,6 +15,8 @@ describe(SystemLogsComponent.name, () => {
       imports: [SystemLogsComponent],
       providers: [
         { provide: SystemLogsService, useValue: systemLogsServiceSpy },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
   })

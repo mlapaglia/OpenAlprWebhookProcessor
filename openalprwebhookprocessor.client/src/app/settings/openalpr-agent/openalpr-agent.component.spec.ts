@@ -1,11 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { OpenalprAgentComponent } from './openalpr-agent.component'
 import { SettingsService } from '../settings.service'
 import { of } from 'rxjs'
 import { Agent } from './agent'
 import { AgentStatus } from './agentStatus'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 describe(OpenalprAgentComponent.name, () => {
   let component: OpenalprAgentComponent
@@ -17,6 +18,8 @@ describe(OpenalprAgentComponent.name, () => {
       imports: [OpenalprAgentComponent, BrowserAnimationsModule],
       providers: [
         { provide: SettingsService, useValue: settingsServiceSpy },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
       ],
     }).compileComponents()
   })
