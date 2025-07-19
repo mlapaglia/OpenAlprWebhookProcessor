@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
@@ -10,9 +9,7 @@ namespace Tests.CameraUpdateService
     [TestFixture]
     public class CameraSchedulingTests : TestBase
     {
-        private OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling _cameraScheduling;
         private IBackgroundJobService _backgroundJobService;
-        private IServiceProvider _serviceProvider;
 
         [SetUp]
         public override void SetUp()
@@ -21,22 +18,6 @@ namespace Tests.CameraUpdateService
 
             // Create mocks
             _backgroundJobService = Substitute.For<IBackgroundJobService>();
-            
-            // Create a simple service provider that returns our test UnitOfWork
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(UnitOfWork);
-            _serviceProvider = serviceCollection.BuildServiceProvider();
-
-            // Create service under test
-            _cameraScheduling = new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(_serviceProvider);
-        }
-
-        [Test]
-        public void Constructor_WithNullServiceProvider_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraScheduling(null));
         }
 
         [Test]
@@ -47,10 +28,16 @@ namespace Tests.CameraUpdateService
             var cameraId = Guid.NewGuid();
 
             // Act
-            _cameraScheduling.ExecuteSingleDayNightTask(sunriseSunset, cameraId, _backgroundJobService);
+            CameraScheduling.ExecuteSingleDayNightTask(
+                sunriseSunset,
+                cameraId,
+                _backgroundJobService);
 
             // Assert
-            _backgroundJobService.Received(1).EnqueueProcessSunriseSunsetJob(cameraId, sunriseSunset, false);
+            _backgroundJobService.Received(1).EnqueueProcessSunriseSunsetJob(
+                cameraId,
+                sunriseSunset,
+                false);
         }
 
         [Test]
@@ -77,7 +64,7 @@ namespace Tests.CameraUpdateService
             await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _cameraScheduling.ScheduleDayNightTasksAsync(_backgroundJobService);
+            await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService, default);
 
             // Assert
             _backgroundJobService.Received(2).ScheduleProcessSunriseSunsetJob(
@@ -107,7 +94,7 @@ namespace Tests.CameraUpdateService
             await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _cameraScheduling.ScheduleDayNightTasksAsync(_backgroundJobService);
+            await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService);
 
             // Assert
             _backgroundJobService.DidNotReceive().ScheduleProcessSunriseSunsetJob(
@@ -131,7 +118,7 @@ namespace Tests.CameraUpdateService
             camera.Longitude = -74.0060;
 
             // Act
-            _cameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
 
             // Assert
             _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
@@ -157,7 +144,7 @@ namespace Tests.CameraUpdateService
             camera.SunsetOffset = 60;
 
             // Act
-            _cameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
 
             // Assert
             _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
@@ -182,7 +169,7 @@ namespace Tests.CameraUpdateService
             camera.NextDayNightScheduleId = "existing-job-id";
 
             // Act
-            _cameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
 
             // Assert
             _backgroundJobService.Received(1).DeleteJob("existing-job-id");
@@ -201,7 +188,7 @@ namespace Tests.CameraUpdateService
             var longitude = -74.0060;
 
             // Act
-            var result = _cameraScheduling.IsSunUp(latitude, longitude);
+            var result = CameraScheduling.IsSunUp(latitude, longitude);
 
             // Assert
             Assert.That(result, Is.TypeOf<bool>());
@@ -215,7 +202,7 @@ namespace Tests.CameraUpdateService
             var longitude = 151.2093;
 
             // Act
-            var result = _cameraScheduling.IsSunUp(latitude, longitude);
+            var result = CameraScheduling.IsSunUp(latitude, longitude);
 
             // Assert
             Assert.That(result, Is.TypeOf<bool>());
@@ -229,14 +216,7 @@ namespace Tests.CameraUpdateService
             var longitude = -0.1278;
 
             // Act & Assert
-            Assert.DoesNotThrow(() => _cameraScheduling.IsSunUp(latitude, longitude));
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            (_serviceProvider as IDisposable)?.Dispose();
-            base.TearDown();
+            Assert.DoesNotThrow(() => CameraScheduling.IsSunUp(latitude, longitude));
         }
     }
 } 

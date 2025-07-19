@@ -30,22 +30,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public async Task ForceSunriseSunsetAsync()
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var cameraScheduling = scope.ServiceProvider.GetRequiredService<ICameraScheduling>();
-
-                var agent = await unitOfWork.Agents.GetFirstAgentAsync();
-
-                if (agent?.Latitude.HasValue == true && agent?.Longitude.HasValue == true)
-                {
-                    await cameraScheduling.ScheduleDayNightTasksAsync(_backgroundJobService);
-                }
-            }
-        }
-
         public async Task DeleteSunriseSunsetAsync(Guid cameraId)
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -80,7 +64,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var cameraFactory = scope.ServiceProvider.GetRequiredService<ICameraFactory>();
-                var cameraScheduling = scope.ServiceProvider.GetRequiredService<ICameraScheduling>();
 
                 _logger.LogInformation("setting {SunriseSunset} for {CameraId}", sunriseSunset, cameraId);
 
@@ -114,7 +97,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 if (scheduleNextJob)
                 {
                     _logger.LogInformation("Scheduling additional sunrise/sunset tasks after completing task for {CameraId}", cameraId);
-                    await cameraScheduling.ScheduleDayNightTasksAsync(_backgroundJobService);
+                    await CameraScheduling.ScheduleDayNightTasksAsync(unitOfWork, _backgroundJobService);
                 }
             }
         }
@@ -170,8 +153,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var cameraScheduling = scope.ServiceProvider.GetRequiredService<ICameraScheduling>();
-                await cameraScheduling.ScheduleDayNightTasksAsync(_backgroundJobService);
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                await CameraScheduling.ScheduleDayNightTasksAsync(unitOfWork, _backgroundJobService);
             }
         }
 
@@ -179,14 +162,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             Guid cameraId,
             SunriseSunset sunriseSunset)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var cameraScheduling = scope.ServiceProvider.GetRequiredService<ICameraScheduling>();
-                cameraScheduling.ExecuteSingleDayNightTask(
-                    sunriseSunset,
-                    cameraId,
-                    _backgroundJobService);
-            }
+            CameraScheduling.ExecuteSingleDayNightTask(
+                sunriseSunset,
+                cameraId,
+                _backgroundJobService);
         }
 
         public void ScheduleOverlayRequest(CameraUpdateRequest cameraUpdateRequest)

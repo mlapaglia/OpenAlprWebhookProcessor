@@ -1,28 +1,20 @@
 ﻿using CoordinateSharp;
-using Microsoft.Extensions.DependencyInjection;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
-    public class CameraScheduling : ICameraScheduling
+    public static class CameraScheduling
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        public CameraScheduling(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        }
-
-        public void ExecuteSingleDayNightTask(
+        public static void ExecuteSingleDayNightTask(
             SunriseSunset sunriseSunset,
             Guid cameraId,
             IBackgroundJobService backgroundJobService)
         {
-            if (backgroundJobService == null)
-                throw new ArgumentNullException(nameof(backgroundJobService));
+            ArgumentNullException.ThrowIfNull(backgroundJobService);
 
             backgroundJobService.EnqueueProcessSunriseSunsetJob(
                 cameraId,
@@ -30,43 +22,36 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 false);
         }
 
-        public async Task ScheduleDayNightTasksAsync(
-            IBackgroundJobService backgroundJobService)
+        public static async Task ScheduleDayNightTasksAsync(
+            IUnitOfWork unitOfWork,
+            IBackgroundJobService backgroundJobService,
+            CancellationToken cancellationToken = default)
         {
-            if (backgroundJobService == null)
-                throw new ArgumentNullException(nameof(backgroundJobService));
+            ArgumentNullException.ThrowIfNull(backgroundJobService);
 
-            using (var scope = _serviceProvider.CreateScope())
+            var camerasToUpdate = await unitOfWork.Cameras.FindAsync(x => x.UpdateDayNightModeEnabled, cancellationToken);
+
+            var agent = await unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
+
+            foreach (var camera in camerasToUpdate)
             {
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-
-                var camerasToUpdate = await unitOfWork.Cameras.FindAsync(x => x.UpdateDayNightModeEnabled);
-
-                var agent = await unitOfWork.Agents.GetFirstAgentAsync();
-
-                foreach (var camera in camerasToUpdate)
-                {
-                    ScheduleDayNightTask(
-                        backgroundJobService,
-                        agent,
-                        camera);
-                }
-
-                await unitOfWork.SaveChangesAsync();
+                ScheduleDayNightTask(
+                    backgroundJobService,
+                    agent,
+                    camera);
             }
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        public void ScheduleDayNightTask(
+        public static void ScheduleDayNightTask(
             IBackgroundJobService backgroundJobService,
             Agent agent,
             Data.Camera camera)
         {
-            if (backgroundJobService == null)
-                throw new ArgumentNullException(nameof(backgroundJobService));
-            if (agent == null)
-                throw new ArgumentNullException(nameof(agent));
-            if (camera == null)
-                throw new ArgumentNullException(nameof(camera));
+            ArgumentNullException.ThrowIfNull(backgroundJobService);
+            ArgumentNullException.ThrowIfNull(agent);
+            ArgumentNullException.ThrowIfNull(camera);
 
             var timeZoneOffset = camera.TimezoneOffset ?? agent.TimeZoneOffset;
             var latitude = camera.Latitude ?? agent.Latitude;
@@ -107,7 +92,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 isSunUp ? cameraSunsetAt : cameraSunriseAt);
         }
 
-        public bool IsSunUp(double latitude, double longitude)
+        public static bool IsSunUp(
+            double latitude,
+            double longitude)
         {
             var cameraCoordinate = new Coordinate(
                 latitude,

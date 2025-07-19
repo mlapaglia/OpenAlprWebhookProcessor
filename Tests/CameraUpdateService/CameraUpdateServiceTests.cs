@@ -21,7 +21,6 @@ namespace Tests.CameraUpdateService
         private ICameraFactory _cameraFactory;
         private ICamera _mockCamera;
         private IServiceProvider _serviceProvider;
-        private ICameraScheduling _cameraScheduling;
 
         [SetUp]
         public override void SetUp()
@@ -32,12 +31,10 @@ namespace Tests.CameraUpdateService
             _backgroundJobService = Substitute.For<IBackgroundJobService>();
             _cameraFactory = Substitute.For<ICameraFactory>();
             _mockCamera = Substitute.For<ICamera>();
-            _cameraScheduling = Substitute.For<ICameraScheduling>();
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(UnitOfWork);
             serviceCollection.AddSingleton(_cameraFactory);
-            serviceCollection.AddSingleton(_cameraScheduling);
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
             _cameraFactory.Create(Arg.Any<CameraManufacturer>(), Arg.Any<DataCamera>())
@@ -74,46 +71,6 @@ namespace Tests.CameraUpdateService
             Assert.Throws<ArgumentNullException>(() => 
                 new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
                 _serviceProvider, _logger, null));
-        }
-
-        [Test]
-        public async Task ForceSunriseSunsetAsync_WithEnabledCameras_SchedulesJobs()
-        {
-            // Arrange
-            var agent = TestDataFactory.CreateTestAgent();
-            agent.Latitude = 40.7128;
-            agent.Longitude = -74.0060;
-            
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            camera.UpdateDayNightModeEnabled = true;
-            
-            await UnitOfWork.Agents.AddAsync(agent);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            // Act
-            await _cameraUpdateService.ForceSunriseSunsetAsync();
-
-            // Assert
-            await _cameraScheduling.Received(1).ScheduleDayNightTasksAsync(_backgroundJobService);
-        }
-
-        [Test]
-        public async Task ForceSunriseSunsetAsync_WithoutCoordinates_DoesNotScheduleJobs()
-        {
-            // Arrange
-            var agent = TestDataFactory.CreateTestAgent();
-            agent.Latitude = null;
-            agent.Longitude = null;
-            
-            await UnitOfWork.Agents.AddAsync(agent);
-            await UnitOfWork.SaveChangesAsync();
-
-            // Act
-            await _cameraUpdateService.ForceSunriseSunsetAsync();
-
-            // Assert
-            await _cameraScheduling.DidNotReceive().ScheduleDayNightTasksAsync(Arg.Any<IBackgroundJobService>());
         }
 
         [Test]
@@ -190,24 +147,6 @@ namespace Tests.CameraUpdateService
                 _cameraUpdateService.ProcessSunriseSunsetJobAsync(nonExistentCameraId, SunriseSunset.Sunrise, false));
 
             Assert.That(exception.Message, Is.EqualTo("camera not found"));
-        }
-
-        [Test]
-        public async Task ProcessSunriseSunsetJobAsync_WithScheduleNextJobTrue_SchedulesNextJob()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            
-            var agent = TestDataFactory.CreateTestAgent();
-            await UnitOfWork.Agents.AddAsync(agent);
-            await UnitOfWork.SaveChangesAsync();
-
-            // Act
-            await _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, true);
-
-            // Assert
-            await _cameraScheduling.Received(1).ScheduleDayNightTasksAsync(_backgroundJobService);
         }
 
         [Test]
@@ -484,30 +423,6 @@ namespace Tests.CameraUpdateService
                 Arg.Any<object>(),
                 Arg.Any<Exception>(),
                 Arg.Any<Func<object, Exception, string>>());
-        }
-
-        [Test]
-        public async Task ScheduleDayNightTaskAsync_CallsSchedulingMethod()
-        {
-            // Act
-            await _cameraUpdateService.ScheduleDayNightTaskAsync();
-
-            // Assert
-            await _cameraScheduling.Received(1).ScheduleDayNightTasksAsync(_backgroundJobService);
-        }
-
-        [Test]
-        public void EnqueueDayNight_WithValidParameters_CallsScheduling()
-        {
-            // Arrange
-            var cameraId = Guid.NewGuid();
-            var sunriseSunset = SunriseSunset.Sunrise;
-
-            // Act
-            _cameraUpdateService.EnqueueDayNight(cameraId, sunriseSunset);
-
-            // Assert
-            _cameraScheduling.Received(1).ExecuteSingleDayNightTask(sunriseSunset, cameraId, _backgroundJobService);
         }
 
         [Test]
