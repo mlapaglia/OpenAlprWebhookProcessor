@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using MediatR;
 using NUnit.Framework;
@@ -12,25 +13,27 @@ namespace Tests.TestHelpers
     public abstract class TestBase
     {
         protected EfContextCreator ContextCreator { get; private set; }
+
         protected ProcessorContext Context { get; private set; }
+
+        protected UsersContext UsersContext { get; private set; }
+
         protected IUnitOfWork UnitOfWork { get; private set; }
+
         protected IUsersUnitOfWork UsersUnitOfWork { get; private set; }
+
         protected IMediator Mediator { get; private set; }
 
         [SetUp]
         public virtual void SetUp()
         {
-            // Create in-memory database context
             ContextCreator = new EfContextCreator();
             Context = ContextCreator.CreateContext();
+            UsersContext = ContextCreator.CreateUsersContext();
             
-            // Create real unit of work with the test context
             UnitOfWork = new UnitOfWork(Context);
-            
-            // Create mock users unit of work (since users use separate context)
-            UsersUnitOfWork = Substitute.For<IUsersUnitOfWork>();
-            
-            // Create mock mediator
+            UsersUnitOfWork = new UsersUnitOfWork(UsersContext);
+
             Mediator = Substitute.For<IMediator>();
         }
 
@@ -40,6 +43,7 @@ namespace Tests.TestHelpers
             UnitOfWork?.Dispose();
             UsersUnitOfWork?.Dispose();
             Context?.Dispose();
+            UsersContext?.Dispose();
             ContextCreator?.Dispose();
         }
 
@@ -67,12 +71,10 @@ namespace Tests.TestHelpers
         {
             if (result.Value != null)
             {
-                // Value is set, this is equivalent to Ok()
                 Assert.That(result.Value, Is.Not.Null);
             }
             else
             {
-                // Result is set, check if it's Ok
                 AssertOkResult(result.Result);
             }
         }

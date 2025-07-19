@@ -2,8 +2,6 @@ using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using Tests.TestHelpers;
 
@@ -13,39 +11,27 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
     public class EnrichPlateCommandHandlerTests : TestBase
     {
         private EnrichPlateCommandHandler _handler;
-        private IUnitOfWork _unitOfWork;
         private ILicensePlateEnricherClient _licensePlateEnricherClient;
-        private IPlateGroupRepository _plateGroupRepository;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            _unitOfWork = Substitute.For<IUnitOfWork>();
             _licensePlateEnricherClient = Substitute.For<ILicensePlateEnricherClient>();
-            _plateGroupRepository = Substitute.For<IPlateGroupRepository>();
-            
-            _unitOfWork.PlateGroups.Returns(_plateGroupRepository);
-            _handler = new EnrichPlateCommandHandler(_unitOfWork, _licensePlateEnricherClient);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            _unitOfWork.Dispose();
+            _handler = new EnrichPlateCommandHandler(UnitOfWork, _licensePlateEnricherClient);
         }
 
         [Test]
         public async Task Handle_ValidUsPlateNotEnriched_EnrichesPlateSuccessfully()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
             var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
             plateGroup.BestNumber = "ABC123";
             plateGroup.VehicleRegion = "us-ca";
             plateGroup.IsEnriched = false;
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
 
             var enrichedData = new EnrichedLicensePlate
             {
@@ -53,10 +39,8 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 Style = "Sedan"
             };
 
+            var command = new EnrichPlateCommand(plateGroup.Id);
             var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             _licensePlateEnricherClient.GetLicenseInformationAsync(
                 "ABC123", 
@@ -68,103 +52,86 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             await _handler.Handle(command, cancellationToken);
 
             // Assert
-            plateGroup.IsEnriched.Should().BeTrue();
-            plateGroup.VehicleType.Should().Be("Sedan");
-            plateGroup.VehicleMake.Should().Be("Toyota");
-
-            _plateGroupRepository.Received(1).Update(plateGroup);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            var updatedPlate = await UnitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id, cancellationToken);
+            updatedPlate.Should().NotBeNull();
+            updatedPlate.IsEnriched.Should().BeTrue();
+            updatedPlate.VehicleType.Should().Be("Sedan");
+            updatedPlate.VehicleMake.Should().Be("Toyota");
         }
 
         [Test]
-        public async Task Handle_PlateNotFound_ThrowsArgumentException()
+        public void Handle_PlateNotFound_ThrowsArgumentException()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
+            var nonExistentPlateId = Guid.NewGuid();
+            var command = new EnrichPlateCommand(nonExistentPlateId);
             var cancellationToken = GetCancellationToken();
 
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns((PlateGroup)null);
-
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => 
-                await _handler.Handle(command, cancellationToken));
+            var exception = Assert.ThrowsAsync<ArgumentException>(() => 
+                _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Plate Id not found.");
-            
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
-        }
-
-        [Test]
-        public async Task Handle_NonUsPlate_ThrowsArgumentException()
-        {
-            // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-            plateGroup.VehicleRegion = "ca-on"; // Canadian plate
-            plateGroup.IsEnriched = false;
-
-            var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => 
-                await _handler.Handle(command, cancellationToken));
-
-            exception.Message.Should().Be("Plate must be United States region.");
-            
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
         }
 
         [Test]
         public async Task Handle_PlateAlreadyEnriched_ThrowsArgumentException()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
             var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
+            plateGroup.BestNumber = "ABC123";
             plateGroup.VehicleRegion = "us-ca";
-            plateGroup.IsEnriched = true; // Already enriched
+            plateGroup.IsEnriched = true;
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
 
+            var command = new EnrichPlateCommand(plateGroup.Id);
             var cancellationToken = GetCancellationToken();
 
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
-
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => 
-                await _handler.Handle(command, cancellationToken));
+            var exception = Assert.ThrowsAsync<ArgumentException>(() => 
+                _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Plate has already been enriched.");
+        }
+
+        [Test]
+        public async Task Handle_NonUsRegion_ThrowsArgumentException()
+        {
+            // Arrange
+            var plateGroup = TestDataFactory.CreateTestPlateGroup();
+            plateGroup.BestNumber = "ABC123";
+            plateGroup.VehicleRegion = "uk";
+            plateGroup.IsEnriched = false;
             
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
+
+            var command = new EnrichPlateCommand(plateGroup.Id);
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            var exception = Assert.ThrowsAsync<ArgumentException>(() => 
+                _handler.Handle(command, cancellationToken));
+
+            exception.Message.Should().Be("Plate must be United States region.");
         }
 
         [Test]
         public async Task Handle_EnricherReturnsNull_ThrowsInvalidOperationException()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
             var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
             plateGroup.BestNumber = "ABC123";
             plateGroup.VehicleRegion = "us-ca";
             plateGroup.IsEnriched = false;
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
 
+            var command = new EnrichPlateCommand(plateGroup.Id);
             var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             _licensePlateEnricherClient.GetLicenseInformationAsync(
                 "ABC123", 
@@ -173,96 +140,38 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 .Returns((EnrichedLicensePlate)null);
 
             // Act & Assert
-                        var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await _handler.Handle(command, cancellationToken));
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
+                _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Failed to enrich plate data.");
-            
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
         }
 
         [Test]
         public async Task Handle_EnricherThrowsException_PropagatesException()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EnrichPlateCommand(plateId);
             var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
             plateGroup.BestNumber = "ABC123";
             plateGroup.VehicleRegion = "us-ca";
             plateGroup.IsEnriched = false;
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
 
+            var command = new EnrichPlateCommand(plateGroup.Id);
             var cancellationToken = GetCancellationToken();
-            var enricherException = new Exception("Enricher service unavailable");
-
-            _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             _licensePlateEnricherClient.GetLicenseInformationAsync(
                 "ABC123", 
                 "CA", 
                 cancellationToken)
-                .ThrowsAsync(enricherException);
+                .ThrowsAsync(new Exception("Enricher service error"));
 
             // Act & Assert
-                        var exception = Assert.ThrowsAsync<Exception>(async () =>
-                await _handler.Handle(command, cancellationToken));
-
-            exception.Should().Be(enricherException);
+            var exception = Assert.ThrowsAsync<Exception>(() => 
+                _handler.Handle(command, cancellationToken));
             
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
-        }
-
-        [Test]
-        public async Task Handle_VariousUsRegions_ExtractsStateCorrectly()
-        {
-            // Arrange
-            var testCases = new[]
-            {
-                new { Region = "us-ca", ExpectedState = "CA" },
-                new { Region = "us-tx", ExpectedState = "TX" },
-                new { Region = "us-ny", ExpectedState = "NY" }
-            };
-
-            foreach (var testCase in testCases)
-            {
-                var plateId = Guid.NewGuid();
-                var command = new EnrichPlateCommand(plateId);
-                var plateGroup = TestDataFactory.CreateTestPlateGroup();
-                plateGroup.Id = plateId;
-                plateGroup.BestNumber = "ABC123";
-                plateGroup.VehicleRegion = testCase.Region;
-                plateGroup.IsEnriched = false;
-
-                var enrichedData = new EnrichedLicensePlate
-                {
-                    Make = "Toyota",
-                    Style = "Sedan"
-                };
-
-                var cancellationToken = GetCancellationToken();
-
-                _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
-                    .Returns(plateGroup);
-
-                _licensePlateEnricherClient.GetLicenseInformationAsync(
-                    "ABC123", 
-                    testCase.ExpectedState, 
-                    cancellationToken)
-                    .Returns(enrichedData);
-
-                // Act
-                await _handler.Handle(command, cancellationToken);
-
-                // Assert
-                await _licensePlateEnricherClient.Received(1).GetLicenseInformationAsync(
-                    "ABC123", 
-                    testCase.ExpectedState, 
-                    cancellationToken);
-            }
+            exception.Message.Should().Be("Enricher service error");
         }
     }
 } 

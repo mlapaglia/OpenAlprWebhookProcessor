@@ -3,8 +3,6 @@ using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser;
-using OpenAlprWebhookProcessor.Features.Users.Data;
-using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using Tests.TestHelpers;
 
@@ -14,8 +12,6 @@ namespace Tests.Features.Users.Commands
     public class CreateUserCommandHandlerTests : TestBase
     {
         private CreateUserCommandHandler _handler;
-        private IUsersUnitOfWork _mockUsersUnitOfWork;
-        private IUserRepository _mockUserRepository;
         private IPasswordService _mockPasswordService;
 
         [SetUp]
@@ -23,21 +19,11 @@ namespace Tests.Features.Users.Commands
         {
             base.SetUp();
             
-            _mockUsersUnitOfWork = Substitute.For<IUsersUnitOfWork>();
-            _mockUserRepository = Substitute.For<IUserRepository>();
             _mockPasswordService = Substitute.For<IPasswordService>();
             
-            _mockUsersUnitOfWork.Users.Returns(_mockUserRepository);
-            
             _handler = new CreateUserCommandHandler(
-                _mockUsersUnitOfWork,
+                UsersUnitOfWork,
                 _mockPasswordService);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            _mockUsersUnitOfWork.Dispose();
         }
 
         [Test]
@@ -48,8 +34,6 @@ namespace Tests.Features.Users.Commands
             var passwordHash = new byte[] { 1, 2, 3 };
             var passwordSalt = new byte[] { 4, 5, 6 };
             
-            _mockUserRepository.UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(false);
             _mockPasswordService.When(x => x.CreatePasswordHash(command.Password, out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
                 .Do(x => {
                     x[1] = passwordHash;
@@ -57,92 +41,166 @@ namespace Tests.Features.Users.Commands
                 });
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, GetCancellationToken());
 
             // Assert
             result.Should().NotBeNull();
-            result.FirstName.Should().Be(command.FirstName);
-            result.LastName.Should().Be(command.LastName);
-            result.Username.Should().Be(command.Username);
+            result.Id.Should().NotBe(0);
+            result.FirstName.Should().Be("John");
+            result.LastName.Should().Be("Doe");
+            result.Username.Should().Be("johndoe");
             result.PasswordHash.Should().BeEquivalentTo(passwordHash);
             result.PasswordSalt.Should().BeEquivalentTo(passwordSalt);
             result.RefreshTokens.Should().NotBeNull();
             result.RefreshTokens.Should().BeEmpty();
-            
-            await _mockUserRepository.Received(1).AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
-            await _mockUsersUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+
+            // Verify user was saved to database
+            var savedUser = await UsersUnitOfWork.Users.GetByIdAsync(result.Id, GetCancellationToken());
+            savedUser.Should().NotBeNull();
+            savedUser.FirstName.Should().Be("John");
+            savedUser.LastName.Should().Be("Doe");
+            savedUser.Username.Should().Be("johndoe");
+            savedUser.PasswordHash.Should().BeEquivalentTo(passwordHash);
+            savedUser.PasswordSalt.Should().BeEquivalentTo(passwordSalt);
         }
 
         [Test]
-        public async Task Handle_EmptyPassword_ThrowsAppException()
+        public async Task Handle_UsernameAlreadyExists_ThrowsAppException()
+        {
+            // Arrange
+            var existingUser = TestDataFactory.CreateTestUser("existinguser", "Existing", "User");
+            await UsersUnitOfWork.Users.AddAsync(existingUser, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new CreateUserCommand("John", "Doe", "existinguser", "password123");
+
+            // Act & Assert
+            var exception = Assert.ThrowsAsync<AppException>(() => 
+                _handler.Handle(command, GetCancellationToken()));
+
+            exception.Message.Should().Be("Username \"existinguser\" is already taken");
+        }
+
+        [Test]
+        public void Handle_EmptyPassword_ThrowsAppException()
         {
             // Arrange
             var command = new CreateUserCommand("John", "Doe", "johndoe", "");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, CancellationToken.None));
-            
+            var exception = Assert.ThrowsAsync<AppException>(() => 
+                _handler.Handle(command, GetCancellationToken()));
+
             exception.Message.Should().Be("Password is required");
-            await _mockUserRepository.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public async Task Handle_NullPassword_ThrowsAppException()
+        public void Handle_NullPassword_ThrowsAppException()
         {
             // Arrange
             var command = new CreateUserCommand("John", "Doe", "johndoe", null);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, CancellationToken.None));
-            
+            var exception = Assert.ThrowsAsync<AppException>(() => 
+                _handler.Handle(command, GetCancellationToken()));
+
             exception.Message.Should().Be("Password is required");
-            await _mockUserRepository.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public async Task Handle_WhitespacePassword_ThrowsAppException()
+        public void Handle_WhitespacePassword_ThrowsAppException()
         {
             // Arrange
             var command = new CreateUserCommand("John", "Doe", "johndoe", "   ");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, CancellationToken.None));
-            
+            var exception = Assert.ThrowsAsync<AppException>(() => 
+                _handler.Handle(command, GetCancellationToken()));
+
             exception.Message.Should().Be("Password is required");
-            await _mockUserRepository.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public async Task Handle_ExistingUsername_ThrowsAppException()
+        public async Task Handle_EmptyFirstName_CreatesUserWithEmptyFirstName()
         {
             // Arrange
-            var command = new CreateUserCommand("John", "Doe", "existinguser", "password123");
+            var command = new CreateUserCommand("", "Doe", "johndoe", "password123");
+            var passwordHash = new byte[] { 1, 2, 3 };
+            var passwordSalt = new byte[] { 4, 5, 6 };
             
-            _mockUserRepository.UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(true);
+            _mockPasswordService.When(x => x.CreatePasswordHash(command.Password, out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+                .Do(x => {
+                    x[1] = passwordHash;
+                    x[2] = passwordSalt;
+                });
 
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, CancellationToken.None));
+            // Act
+            var result = await _handler.Handle(command, GetCancellationToken());
+
+            // Assert
+            result.FirstName.Should().Be("");
             
-            exception.Message.Should().Be("Username \"existinguser\" is already taken");
-            await _mockUserRepository.DidNotReceive().AddAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            var savedUser = await UsersUnitOfWork.Users.GetByIdAsync(result.Id, GetCancellationToken());
+            savedUser.FirstName.Should().Be("");
         }
 
         [Test]
-        public async Task Handle_ValidUser_CallsPasswordServiceCorrectly()
+        public async Task Handle_EmptyLastName_CreatesUserWithEmptyLastName()
+        {
+            // Arrange
+            var command = new CreateUserCommand("John", "", "johndoe", "password123");
+            var passwordHash = new byte[] { 1, 2, 3 };
+            var passwordSalt = new byte[] { 4, 5, 6 };
+            
+            _mockPasswordService.When(x => x.CreatePasswordHash(command.Password, out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+                .Do(x => {
+                    x[1] = passwordHash;
+                    x[2] = passwordSalt;
+                });
+
+            // Act
+            var result = await _handler.Handle(command, GetCancellationToken());
+
+            // Assert
+            result.LastName.Should().Be("");
+            
+            var savedUser = await UsersUnitOfWork.Users.GetByIdAsync(result.Id, GetCancellationToken());
+            savedUser.LastName.Should().Be("");
+        }
+
+        [Test]
+        public async Task Handle_SameUsernameExactCase_ThrowsAppException()
+        {
+            // Arrange
+            var existingUser = TestDataFactory.CreateTestUser("johndoe", "Existing", "User");
+            await UsersUnitOfWork.Users.AddAsync(existingUser, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new CreateUserCommand("John", "Doe", "johndoe", "password123");
+
+            // Act & Assert
+            var exception = Assert.ThrowsAsync<AppException>(() => 
+                _handler.Handle(command, GetCancellationToken()));
+
+            exception.Message.Should().Be("Username \"johndoe\" is already taken");
+        }
+
+        [Test]
+        public async Task Handle_ValidCommand_CallsPasswordService()
         {
             // Arrange
             var command = new CreateUserCommand("John", "Doe", "johndoe", "password123");
+            var passwordHash = new byte[] { 1, 2, 3 };
+            var passwordSalt = new byte[] { 4, 5, 6 };
             
-            _mockUserRepository.UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(false);
+            _mockPasswordService.When(x => x.CreatePasswordHash(command.Password, out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+                .Do(x => {
+                    x[1] = passwordHash;
+                    x[2] = passwordSalt;
+                });
 
             // Act
-            await _handler.Handle(command, CancellationToken.None);
+            await _handler.Handle(command, GetCancellationToken());
 
             // Assert
             _mockPasswordService.Received(1).CreatePasswordHash(
@@ -152,52 +210,60 @@ namespace Tests.Features.Users.Commands
         }
 
         [Test]
-        public async Task Handle_ValidUser_ChecksUsernameExistence()
+        public async Task Handle_MultipleUsers_CreatesAllUsersSuccessfully()
         {
             // Arrange
-            var command = new CreateUserCommand("John", "Doe", "johndoe", "password123");
+            var passwordHash = new byte[] { 1, 2, 3 };
+            var passwordSalt = new byte[] { 4, 5, 6 };
             
-            _mockUserRepository.UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(false);
+            _mockPasswordService.When(x => x.CreatePasswordHash(Arg.Any<string>(), out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+                .Do(x => {
+                    x[1] = passwordHash;
+                    x[2] = passwordSalt;
+                });
+
+            var command1 = new CreateUserCommand("John", "Doe", "johndoe", "password123");
+            var command2 = new CreateUserCommand("Jane", "Smith", "janesmith", "password456");
 
             // Act
-            await _handler.Handle(command, CancellationToken.None);
+            var result1 = await _handler.Handle(command1, GetCancellationToken());
+            var result2 = await _handler.Handle(command2, GetCancellationToken());
 
             // Assert
-            await _mockUserRepository.Received(1).UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>());
+            result1.Should().NotBeNull();
+            result2.Should().NotBeNull();
+            result1.Id.Should().NotBe(result2.Id);
+            result1.Username.Should().Be("johndoe");
+            result2.Username.Should().Be("janesmith");
+
+            var allUsers = await UsersUnitOfWork.Users.GetAllAsync(GetCancellationToken());
+            allUsers.Should().HaveCount(2);
         }
 
         [Test]
-        public async Task Handle_CreatedUser_HasCorrectProperties()
+        public async Task Handle_WithCancellationToken_UsesTokenCorrectly()
         {
             // Arrange
             var command = new CreateUserCommand("John", "Doe", "johndoe", "password123");
             var passwordHash = new byte[] { 1, 2, 3 };
             var passwordSalt = new byte[] { 4, 5, 6 };
-            User capturedUser = null;
+            var cancellationToken = GetCancellationToken();
             
-            _mockUserRepository.UsernameExistsAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(false);
             _mockPasswordService.When(x => x.CreatePasswordHash(command.Password, out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
                 .Do(x => {
                     x[1] = passwordHash;
                     x[2] = passwordSalt;
                 });
-            
-            await _mockUserRepository.AddAsync(Arg.Do<User>(user => capturedUser = user), Arg.Any<CancellationToken>());
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, cancellationToken);
 
             // Assert
-            capturedUser.Should().NotBeNull();
-            capturedUser.FirstName.Should().Be(command.FirstName);
-            capturedUser.LastName.Should().Be(command.LastName);
-            capturedUser.Username.Should().Be(command.Username);
-            capturedUser.PasswordHash.Should().BeEquivalentTo(passwordHash);
-            capturedUser.PasswordSalt.Should().BeEquivalentTo(passwordSalt);
-            capturedUser.RefreshTokens.Should().NotBeNull();
-            capturedUser.RefreshTokens.Should().BeEmpty();
+            result.Should().NotBeNull();
+            
+            // Verify the user was created successfully with the cancellation token
+            var savedUser = await UsersUnitOfWork.Users.GetByIdAsync(result.Id, cancellationToken);
+            savedUser.Should().NotBeNull();
         }
     }
 } 

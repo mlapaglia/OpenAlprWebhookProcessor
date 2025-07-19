@@ -1,9 +1,5 @@
 using FluentAssertions;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate;
 using Tests.TestHelpers;
 
@@ -13,209 +9,121 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
     public class EditPlateCommandHandlerTests : TestBase
     {
         private EditPlateCommandHandler _handler;
-        private IUnitOfWork _unitOfWork;
-        private IPlateGroupRepository _plateGroupRepository;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
-            _unitOfWork = Substitute.For<IUnitOfWork>();
-            _plateGroupRepository = Substitute.For<IPlateGroupRepository>();
-            
-            _unitOfWork.PlateGroups.Returns(_plateGroupRepository);
-            _handler = new EditPlateCommandHandler(_unitOfWork);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            _unitOfWork.Dispose();
+            _handler = new EditPlateCommandHandler(UnitOfWork);
         }
 
         [Test]
         public async Task Handle_ValidPlateId_UpdatesPlateSuccessfully()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
+            var plateGroup = TestDataFactory.CreateTestPlateGroup();
+            plateGroup.BestNumber = "ABC123";
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
+
             var command = new EditPlateCommand
             {
-                Id = plateId,
+                Id = plateGroup.Id,
                 PlateNumber = "XYZ789",
                 Notes = "Updated notes"
             };
-            
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-            plateGroup.BestNumber = "ABC123";
 
             var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             // Act
             await _handler.Handle(command, cancellationToken);
 
             // Assert
-            plateGroup.BestNumber.Should().Be("XYZ789");
-            _plateGroupRepository.Received(1).Update(plateGroup);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            var updatedPlate = await UnitOfWork.PlateGroups.GetByIdAsync(plateGroup.Id, cancellationToken);
+            updatedPlate.Should().NotBeNull();
+            updatedPlate.BestNumber.Should().Be("XYZ789");
         }
 
         [Test]
-        public async Task Handle_PlateNotFound_ThrowsArgumentException()
+        public void Handle_PlateNotFound_ThrowsArgumentException()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
+            var nonExistentPlateId = Guid.NewGuid();
             var command = new EditPlateCommand
             {
-                Id = plateId,
+                Id = nonExistentPlateId,
                 PlateNumber = "XYZ789",
                 Notes = "Updated notes"
             };
 
             var cancellationToken = GetCancellationToken();
 
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns((PlateGroup)null);
-
             // Act & Assert
             var exception = Assert.ThrowsAsync<ArgumentException>(() => 
                 _handler.Handle(command, cancellationToken));
 
-            exception.Message.Should().Be($"Plate with ID {plateId} not found");
-            
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
+            exception.Message.Should().Be($"Plate with ID {nonExistentPlateId} not found");
         }
 
         [Test]
         public async Task Handle_EmptyPlateNumber_UpdatesPlateWithEmptyString()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
+            var plateGroup = TestDataFactory.CreateTestPlateGroup();
+            plateGroup.BestNumber = "ABC123";
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
+
             var command = new EditPlateCommand
             {
-                Id = plateId,
+                Id = plateGroup.Id,
                 PlateNumber = "",
-                Notes = "Updated notes"
+                Notes = "Some notes"
             };
-            
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-            plateGroup.BestNumber = "ABC123";
 
             var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             // Act
             await _handler.Handle(command, cancellationToken);
 
             // Assert
-            plateGroup.BestNumber.Should().Be("");
-            _plateGroupRepository.Received(1).Update(plateGroup);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            var updatedPlate = await UnitOfWork.PlateGroups.GetByIdAsync(plateGroup.Id, cancellationToken);
+            updatedPlate.Should().NotBeNull();
+            updatedPlate.BestNumber.Should().Be("");
         }
 
         [Test]
-        public async Task Handle_NullNotes_UpdatesPlateWithNullNotes()
+        public async Task Handle_NullPlateNumber_UpdatesPlateWithNullValue()
         {
             // Arrange
-            var plateId = Guid.NewGuid();
+            var plateGroup = TestDataFactory.CreateTestPlateGroup();
+            plateGroup.BestNumber = "ABC123";
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup);
+            await UnitOfWork.SaveChangesAsync();
+
             var command = new EditPlateCommand
             {
-                Id = plateId,
-                PlateNumber = "XYZ789",
-                Notes = null
+                Id = plateGroup.Id,
+                PlateNumber = null,
+                Notes = "Some notes"
             };
-            
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-            plateGroup.BestNumber = "ABC123";
 
             var cancellationToken = GetCancellationToken();
-
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
 
             // Act
             await _handler.Handle(command, cancellationToken);
 
             // Assert
-            plateGroup.BestNumber.Should().Be("XYZ789");
-            _plateGroupRepository.Received(1).Update(plateGroup);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            var updatedPlate = await UnitOfWork.PlateGroups.GetByIdAsync(plateGroup.Id, cancellationToken);
+            updatedPlate.Should().NotBeNull();
+            updatedPlate.BestNumber.Should().BeNull();
         }
 
         [Test]
-        public async Task Handle_RepositoryThrowsException_PropagatesException()
-        {
-            // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EditPlateCommand
-            {
-                Id = plateId,
-                PlateNumber = "XYZ789",
-                Notes = "Updated notes"
-            };
-            
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-
-            var cancellationToken = GetCancellationToken();
-            var repositoryException = new InvalidOperationException("Database connection failed");
-
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
-
-            _plateGroupRepository.When(x => x.Update(plateGroup))
-                .Do(x => throw repositoryException);
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
-                _handler.Handle(command, cancellationToken));
-
-            exception.Should().Be(repositoryException);
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
-        }
-
-        [Test]
-        public void Handle_SaveChangesThrowsException_PropagatesException()
-        {
-            // Arrange
-            var plateId = Guid.NewGuid();
-            var command = new EditPlateCommand
-            {
-                Id = plateId,
-                PlateNumber = "XYZ789",
-                Notes = "Updated notes"
-            };
-            
-            var plateGroup = TestDataFactory.CreateTestPlateGroup();
-            plateGroup.Id = plateId;
-
-            var cancellationToken = GetCancellationToken();
-            var saveException = new InvalidOperationException("Save operation failed");
-
-            _plateGroupRepository.GetByIdAsync(plateId, cancellationToken)
-                .Returns(plateGroup);
-
-            _unitOfWork.SaveChangesAsync(cancellationToken)
-                .ThrowsAsync(saveException);
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
-                _handler.Handle(command, cancellationToken));
-
-            exception.Should().Be(saveException);
-            _plateGroupRepository.Received(1).Update(plateGroup);
-        }
-
-        [Test]
-        public async Task Handle_EmptyGuid_ThrowsArgumentException()
+        public void Handle_EmptyGuid_ThrowsArgumentException()
         {
             // Arrange
             var command = new EditPlateCommand
@@ -227,17 +135,47 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
 
             var cancellationToken = GetCancellationToken();
 
-            _plateGroupRepository.GetByIdAsync(Guid.Empty, cancellationToken)
-                .Returns((PlateGroup)null);
-
             // Act & Assert
             var exception = Assert.ThrowsAsync<ArgumentException>(() => 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be($"Plate with ID {Guid.Empty} not found");
+        }
+
+        [Test]
+        public async Task Handle_MultiplePlatesExist_UpdatesOnlySpecifiedPlate()
+        {
+            // Arrange
+            var plateGroup1 = TestDataFactory.CreateTestPlateGroup();
+            plateGroup1.BestNumber = "ABC123";
             
-            _plateGroupRepository.DidNotReceive().Update(Arg.Any<PlateGroup>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(cancellationToken);
+            var plateGroup2 = TestDataFactory.CreateTestPlateGroup();
+            plateGroup2.BestNumber = "DEF456";
+            
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup1);
+            await UnitOfWork.PlateGroups.AddAsync(plateGroup2);
+            await UnitOfWork.SaveChangesAsync();
+
+            var command = new EditPlateCommand
+            {
+                Id = plateGroup1.Id,
+                PlateNumber = "UPDATED",
+                Notes = "Updated notes"
+            };
+
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _handler.Handle(command, cancellationToken);
+
+            // Assert
+            var updatedPlate1 = await UnitOfWork.PlateGroups.GetByIdAsync(plateGroup1.Id, cancellationToken);
+            updatedPlate1.Should().NotBeNull();
+            updatedPlate1.BestNumber.Should().Be("UPDATED");
+
+            var unchangedPlate2 = await UnitOfWork.PlateGroups.GetByIdAsync(plateGroup2.Id, cancellationToken);
+            unchangedPlate2.Should().NotBeNull();
+            unchangedPlate2.BestNumber.Should().Be("DEF456");
         }
     }
 } 

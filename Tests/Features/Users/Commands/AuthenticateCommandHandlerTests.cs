@@ -1,9 +1,9 @@
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
+using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate;
 using OpenAlprWebhookProcessor.Features.Users.Data;
-using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using Tests.TestHelpers;
 
@@ -13,8 +13,6 @@ namespace Tests.Features.Users.Commands
     public class AuthenticateCommandHandlerTests : TestBase
     {
         private AuthenticateCommandHandler _handler;
-        private IUsersUnitOfWork _mockUsersUnitOfWork;
-        private IUserRepository _mockUserRepository;
         private IJwtService _mockJwtService;
         private IPasswordService _mockPasswordService;
 
@@ -23,51 +21,42 @@ namespace Tests.Features.Users.Commands
         {
             base.SetUp();
             
-            _mockUsersUnitOfWork = Substitute.For<IUsersUnitOfWork>();
-            _mockUserRepository = Substitute.For<IUserRepository>();
             _mockJwtService = Substitute.For<IJwtService>();
             _mockPasswordService = Substitute.For<IPasswordService>();
             
-            _mockUsersUnitOfWork.Users.Returns(_mockUserRepository);
-            
             _handler = new AuthenticateCommandHandler(
-                _mockUsersUnitOfWork,
+                UsersUnitOfWork,
                 _mockJwtService,
                 _mockPasswordService);
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            _mockUsersUnitOfWork.Dispose();
         }
 
         [Test]
         public async Task Handle_ValidCredentials_ReturnsAuthenticateResponse()
         {
             // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
             var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
-            var user = TestDataFactory.CreateTestUser();
-            var expectedToken = "jwt-token";
-            var expectedRefreshToken = new OpenAlprWebhookProcessor.Features.Users.RefreshToken
+            var jwtToken = "test-jwt-token";
+            var refreshToken = new RefreshToken
             {
                 Token = "refresh-token",
-                Expires = System.DateTime.UtcNow.AddDays(7),
-                Created = System.DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow,
                 CreatedByIp = "127.0.0.1"
             };
-            
-            _mockUserRepository.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(user);
+
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
             _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
-                .Returns(expectedToken);
+                .Returns(jwtToken);
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
-                .Returns(expectedRefreshToken);
+                .Returns(refreshToken);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, GetCancellationToken());
 
             // Assert
             result.Should().NotBeNull();
@@ -75,11 +64,13 @@ namespace Tests.Features.Users.Commands
             result.Username.Should().Be(user.Username);
             result.FirstName.Should().Be(user.FirstName);
             result.LastName.Should().Be(user.LastName);
-            result.JwtToken.Should().Be(expectedToken);
-            result.RefreshToken.Should().Be(expectedRefreshToken.Token);
-            
-            _mockUserRepository.Received(1).Update(user);
-            await _mockUsersUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+            result.JwtToken.Should().Be(jwtToken);
+            result.RefreshToken.Should().Be(refreshToken.Token);
+
+            // Verify refresh token was added to user
+            var updatedUser = await UsersUnitOfWork.Users.GetByUsernameAsync("testuser", GetCancellationToken());
+            updatedUser.RefreshTokens.Should().ContainSingle();
+            updatedUser.RefreshTokens.First().Token.Should().Be(refreshToken.Token);
         }
 
         [Test]
@@ -87,12 +78,9 @@ namespace Tests.Features.Users.Commands
         {
             // Arrange
             var command = new AuthenticateCommand("nonexistent", "password123", "127.0.0.1");
-            
-            _mockUserRepository.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns((User)null);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, GetCancellationToken());
 
             // Assert
             result.Should().BeNull();
@@ -104,16 +92,17 @@ namespace Tests.Features.Users.Commands
         public async Task Handle_InvalidPassword_ReturnsNull()
         {
             // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
             var command = new AuthenticateCommand("testuser", "wrongpassword", "127.0.0.1");
-            var user = TestDataFactory.CreateTestUser();
-            
-            _mockUserRepository.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(user);
+
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(false);
 
             // Act
-            var result = await _handler.Handle(command, CancellationToken.None);
+            var result = await _handler.Handle(command, GetCancellationToken());
 
             // Assert
             result.Should().BeNull();
@@ -121,62 +110,171 @@ namespace Tests.Features.Users.Commands
         }
 
         [Test]
+        public async Task Handle_ValidCredentials_CallsPasswordService()
+        {
+            // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
+
+            _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
+                .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+                .Returns("jwt-token");
+            _mockJwtService.GenerateRefreshToken(command.IpAddress)
+                .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
+
+            // Act
+            await _handler.Handle(command, GetCancellationToken());
+
+            // Assert
+            _mockPasswordService.Received(1).VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt);
+        }
+
+        [Test]
+        public async Task Handle_ValidCredentials_CallsJwtService()
+        {
+            // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
+
+            _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
+                .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+                .Returns("jwt-token");
+            _mockJwtService.GenerateRefreshToken(command.IpAddress)
+                .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
+
+            // Act
+            await _handler.Handle(command, GetCancellationToken());
+
+            // Assert
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>());
+            _mockJwtService.Received(1).GenerateRefreshToken(command.IpAddress);
+        }
+
+        [Test]
         public async Task Handle_ValidCredentials_AddsRefreshTokenToUser()
         {
             // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
             var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
-            var user = TestDataFactory.CreateTestUser();
-            var expectedRefreshToken = new OpenAlprWebhookProcessor.Features.Users.RefreshToken
+            var refreshToken = new RefreshToken
             {
                 Token = "refresh-token",
-                Expires = System.DateTime.UtcNow.AddDays(7),
-                Created = System.DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow,
                 CreatedByIp = "127.0.0.1"
             };
-            
-            _mockUserRepository.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(user);
+
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+                .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
-                .Returns(expectedRefreshToken);
+                .Returns(refreshToken);
 
             // Act
-            await _handler.Handle(command, CancellationToken.None);
+            await _handler.Handle(command, GetCancellationToken());
 
             // Assert
-            user.RefreshTokens.Should().Contain(expectedRefreshToken);
+            var updatedUser = await UsersUnitOfWork.Users.GetByUsernameAsync("testuser", GetCancellationToken());
+            updatedUser.RefreshTokens.Should().ContainSingle();
+            updatedUser.RefreshTokens.First().Token.Should().Be(refreshToken.Token);
+            updatedUser.RefreshTokens.First().CreatedByIp.Should().Be("127.0.0.1");
         }
 
         [Test]
         public async Task Handle_UserWithNullRefreshTokens_InitializesRefreshTokensList()
         {
             // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            user.RefreshTokens = null; // Explicitly set to null
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
             var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
-            var user = TestDataFactory.CreateTestUser();
-            user.RefreshTokens = null;
-            
-            var expectedRefreshToken = new OpenAlprWebhookProcessor.Features.Users.RefreshToken
+            var refreshToken = new RefreshToken
             {
                 Token = "refresh-token",
-                Expires = System.DateTime.UtcNow.AddDays(7),
-                Created = System.DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow,
                 CreatedByIp = "127.0.0.1"
             };
-            
-            _mockUserRepository.GetByUsernameAsync(command.Username, Arg.Any<CancellationToken>())
-                .Returns(user);
+
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+                .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
-                .Returns(expectedRefreshToken);
+                .Returns(refreshToken);
 
             // Act
-            await _handler.Handle(command, CancellationToken.None);
+            await _handler.Handle(command, GetCancellationToken());
 
             // Assert
-            user.RefreshTokens.Should().NotBeNull();
-            user.RefreshTokens.Should().Contain(expectedRefreshToken);
+            var updatedUser = await UsersUnitOfWork.Users.GetByUsernameAsync("testuser", GetCancellationToken());
+            updatedUser.RefreshTokens.Should().NotBeNull();
+            updatedUser.RefreshTokens.Should().ContainSingle();
+        }
+
+        [Test]
+        public async Task Handle_WithCancellationToken_UsesTokenCorrectly()
+        {
+            // Arrange
+            var user = TestDataFactory.CreateTestUser("testuser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new AuthenticateCommand("testuser", "password123", "127.0.0.1");
+            var cancellationToken = GetCancellationToken();
+
+            _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
+                .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, cancellationToken)
+                .Returns("jwt-token");
+            _mockJwtService.GenerateRefreshToken(command.IpAddress)
+                .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
+
+            // Act
+            var result = await _handler.Handle(command, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, cancellationToken);
+        }
+
+        [Test]
+        public async Task Handle_CaseSensitiveUsername_FindsCorrectUser()
+        {
+            // Arrange
+            var user = TestDataFactory.CreateTestUser("TestUser", "Test", "User");
+            await UsersUnitOfWork.Users.AddAsync(user, GetCancellationToken());
+            await UsersUnitOfWork.SaveChangesAsync(GetCancellationToken());
+
+            var command = new AuthenticateCommand("TestUser", "password123", "127.0.0.1");
+
+            _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
+                .Returns(true);
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+                .Returns("jwt-token");
+            _mockJwtService.GenerateRefreshToken(command.IpAddress)
+                .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
+
+            // Act
+            var result = await _handler.Handle(command, GetCancellationToken());
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Username.Should().Be("TestUser");
         }
     }
 } 

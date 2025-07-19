@@ -6,7 +6,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
-using System;
 using Tests.TestHelpers;
 using NSubstitute.ExceptionExtensions;
 using DataCamera = OpenAlprWebhookProcessor.Data.Camera;

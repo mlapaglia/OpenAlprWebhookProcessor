@@ -5,8 +5,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using Tests.TestHelpers;
 

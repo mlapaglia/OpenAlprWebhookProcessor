@@ -11,7 +11,6 @@ using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.SystemLogs;
 using Serilog;
 using System;
-using System.Linq;
 
 namespace OpenAlprWebhookProcessor
 {
