@@ -11,6 +11,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         private IDbContextTransaction? _transaction;
 
         private IPlateGroupRepository? _plateGroups;
+        private IRepository<PlateGroupRaw>? _rawPlateGroups;
         private IAgentRepository? _agents;
         private IRepository<Alert>? _alerts;
         private IRepository<Ignore>? _ignores;
@@ -28,6 +29,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         }
 
         public IPlateGroupRepository PlateGroups => _plateGroups ??= new PlateGroupRepository(_context);
+        public IRepository<PlateGroupRaw> RawPlateGroups => _rawPlateGroups ??= new Repository<PlateGroupRaw>(_context);
         public IAgentRepository Agents => _agents ??= new AgentRepository(_context);
         public IRepository<Alert> Alerts => _alerts ??= new Repository<Alert>(_context);
         public IRepository<Ignore> Ignores => _ignores ??= new Repository<Ignore>(_context);

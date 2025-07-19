@@ -1,5 +1,4 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover
 {

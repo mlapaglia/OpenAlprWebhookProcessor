@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
 using System.Threading;
@@ -10,18 +10,17 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates
 {
     public class GetDebugPlatesQueryHandler : IRequestHandler<GetDebugPlatesQuery, string>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetDebugPlatesQueryHandler(ProcessorContext processorContext)
+        public GetDebugPlatesQueryHandler(IUnitOfWork unitOfWork)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<string> Handle(GetDebugPlatesQuery request, CancellationToken cancellationToken)
         {
-            var query = _processorContext.RawPlateGroups
-                .AsNoTracking()
-                .AsQueryable();
+            var query = _unitOfWork.RawPlateGroups.GetQueryable()
+                .AsNoTracking();
 
             var stopEpoch = DateTimeOffset.UtcNow.AddDays(-1).ToUnixTimeMilliseconds();
 

@@ -4,7 +4,6 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,20 +23,16 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 
         public async Task<Stream> Handle(GetCropImageQuery request, CancellationToken cancellationToken)
         {
-            var plateGroups = await _unitOfWork.PlateGroups.GetAllAsync(cancellationToken);
-            var plateGroup = plateGroups
-                .FirstOrDefault(x => x.OpenAlprUuid == request.ImageId);
+            var plateGroup = await _unitOfWork.PlateGroups.FirstOrDefaultAsync(x => x.OpenAlprUuid == request.ImageId, cancellationToken);
 
             if (plateGroup == null)
             {
                 throw new ArgumentException("No image found with that id.");
             }
-            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
-                plateGroup.Id,
-                cancellationToken);
+
+            var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id, cancellationToken);
             
-            var agents = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
-            var agent = agents.FirstOrDefault();
+            var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
             if (fullPlateGroup?.PlateImage == null)
             {

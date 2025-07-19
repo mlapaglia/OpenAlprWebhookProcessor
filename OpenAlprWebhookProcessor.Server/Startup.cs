@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
@@ -10,20 +11,18 @@ using OpenAlprWebhookProcessor.ProcessorHub;
 using OpenAlprWebhookProcessor.SystemLogs;
 using Serilog;
 using System;
+using System.Linq;
 
 namespace OpenAlprWebhookProcessor
 {
     public class Startup
     {
-        private const string configurationDirectory = "config";
+        private readonly IHostEnvironment _environment;
 
-        private readonly string UsersContextConnectionString = $"Data Source={configurationDirectory}/users.db";
-
-        private readonly string ProcessorContextConnectionString = $"Data Source={configurationDirectory}/processor.db;foreign keys=true;";
-
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }

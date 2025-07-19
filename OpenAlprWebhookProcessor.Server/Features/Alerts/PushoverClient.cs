@@ -2,13 +2,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.Alerts.Pushover
+namespace OpenAlprWebhookProcessor.Features.Alerts
 {
     public class PushoverClient : IAlertClient
     {
@@ -38,8 +37,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
-                var clientSettings = pushoverClients.FirstOrDefault();
+                var clientSettings = await unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 
                 var agent = await unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
@@ -73,7 +71,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                             {
                                 var result = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                                logger.LogError("Failed to send alert via Pushover: {result}", result);
+                                logger.LogError("Failed to send alert via Pushover: {Result}", result);
                                 throw new InvalidOperationException("failed");
                             }
 
@@ -81,7 +79,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Failed to send alert via Pushover: {exception}", ex.Message);
+                            logger.LogError(ex, "Failed to send alert via Pushover: {Exception}", ex.Message);
                             throw new InvalidOperationException("failed");
                         }
                     }
@@ -99,8 +97,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
-                var clientSettings = pushoverClients.FirstOrDefault();
+                var clientSettings = await unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 
                 return clientSettings?.SendEveryPlateEnabled ?? false;
             }
@@ -116,8 +113,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
 
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var pushoverClients = await unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
-                var clientSettings = pushoverClients.FirstOrDefault();
+                var clientSettings = await unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 
                 if (clientSettings == null)
                 {
@@ -145,7 +141,7 @@ namespace OpenAlprWebhookProcessor.Alerts.Pushover
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Pushover credential check failed: {exception}", ex.Message);
+                    logger.LogError(ex, "Pushover credential check failed: {Exception}", ex.Message);
                 }
             }
         }

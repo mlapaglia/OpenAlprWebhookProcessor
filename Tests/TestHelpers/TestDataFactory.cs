@@ -6,9 +6,9 @@ namespace Tests.TestHelpers
 {
     public static class TestDataFactory
     {
-        public static OpenAlprWebhookProcessor.Alerts.Alert CreateTestAlert(string? plateNumber = null, string? description = null, bool strictMatch = false)
+        public static OpenAlprWebhookProcessor.Features.Alerts.Alert CreateTestAlert(string? plateNumber = null, string? description = null, bool strictMatch = false)
         {
-            return new OpenAlprWebhookProcessor.Alerts.Alert
+            return new OpenAlprWebhookProcessor.Features.Alerts.Alert
             {
                 Id = Guid.NewGuid(),
                 PlateNumber = plateNumber ?? "ABC123",
@@ -17,9 +17,9 @@ namespace Tests.TestHelpers
             };
         }
 
-        public static OpenAlprWebhookProcessor.Alerts.Alert CreateTestAlertWithPlateNumber(string? plateNumber, string? description = null, bool strictMatch = false)
+        public static OpenAlprWebhookProcessor.Features.Alerts.Alert CreateTestAlertWithPlateNumber(string? plateNumber, string? description = null, bool strictMatch = false)
         {
-            return new OpenAlprWebhookProcessor.Alerts.Alert
+            return new OpenAlprWebhookProcessor.Features.Alerts.Alert
             {
                 Id = Guid.NewGuid(),
                 PlateNumber = plateNumber,

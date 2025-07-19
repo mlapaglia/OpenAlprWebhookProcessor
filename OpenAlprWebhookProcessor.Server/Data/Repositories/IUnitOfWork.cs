@@ -7,6 +7,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
     public interface IUnitOfWork : IDisposable
     {
         IPlateGroupRepository PlateGroups { get; }
+        IRepository<PlateGroupRaw> RawPlateGroups { get; }
         IAgentRepository Agents { get; }
         IRepository<Alert> Alerts { get; }
         IRepository<Ignore> Ignores { get; }

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -13,7 +12,6 @@ using OpenAlprWebhookProcessor.WebhookProcessor;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Hydrator;
 using Lib.Net.Http.WebPush;
 using System.Reflection;
@@ -27,6 +25,7 @@ using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Register;
+using OpenAlprWebhookProcessor.Features.Alerts;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -59,6 +58,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
             services.AddScoped<IRepository<PlateGroup>, Repository<PlateGroup>>();
             services.AddScoped<IPlateGroupRepository, PlateGroupRepository>();
+            services.AddScoped<IRepository<PlateGroupRaw>, Repository<PlateGroupRaw>>();
             services.AddScoped<IAgentRepository, AgentRepository>();
             services.AddScoped<IRepository<Data.Alert>, Repository<Data.Alert>>();
             services.AddScoped<IRepository<Ignore>, Repository<Ignore>>();
@@ -119,14 +119,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddHttpClient<PushServiceClient>();
             services.AddHttpClient();
             services.AddScoped<IImageCompressionService, ImageCompressionService>();
-            
             services.AddSingleton<Features.Cameras.ICameraFactory, Features.Cameras.CameraFactory>();
-
-            services.AddScoped<Alerts.WebPush.GetWebPushClientRequestHandler>();
-            services.AddScoped<Alerts.WebPush.UpsertWebPushClientRequestHandler>();
-            services.AddScoped<Alerts.WebPush.TestWebPushClientRequestHandler>();
-
-            services.AddScoped<TestPushoverClientRequestHandler>();
 
             return services;
         }

@@ -278,7 +278,7 @@ namespace Tests.Features.Users.Data
         #region GetQueryable Tests
 
         [Test]
-        public void GetQueryable_ReturnsQueryableUsers()
+        public async Task GetQueryable_ReturnsQueryableUsers()
         {
             // Arrange
             var users = new List<User>
@@ -288,11 +288,11 @@ namespace Tests.Features.Users.Data
             };
 
             _context.Users.AddRange(users);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             // Act
             var queryable = _repository.GetQueryable();
-            var result = queryable.Where(u => u.FirstName == "John").ToList();
+            var result = await queryable.Where(u => u.FirstName == "John").ToListAsync();
 
             // Assert
             result.Should().HaveCount(1);

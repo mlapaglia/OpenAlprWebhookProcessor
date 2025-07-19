@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
 
         public string JwtToken { get; set; }
 
-        [JsonIgnore] // refresh token is returned in http only cookie
+        [JsonIgnore]
         public string RefreshToken { get; set; }
 
         public AuthenticateResponse(

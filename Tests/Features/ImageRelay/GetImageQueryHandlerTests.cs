@@ -86,13 +86,11 @@ namespace Tests.Features.ImageRelay
             var memoryStream = result as MemoryStream;
             memoryStream.ToArray().Should().BeEquivalentTo(expectedImageBytes);
 
-            // Verify image compression service was called
             await _imageCompressionService.Received(1).GetImageFromAgentAsync(
                 agent, 
                 imageId, 
                 cancellationToken);
 
-            // Verify image was cached in database
             var savedPlateGroup = await UnitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id);
             savedPlateGroup.VehicleImage.Should().NotBeNull();
             savedPlateGroup.VehicleImage.Jpeg.Should().BeEquivalentTo(expectedImageBytes);

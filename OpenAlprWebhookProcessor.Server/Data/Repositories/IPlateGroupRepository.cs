@@ -42,7 +42,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         Task<IEnumerable<PlateGroup>> GetMostSeenPlatesAsync(
             DateTimeOffset? startDate, 
-            DateTimeOffset? endDate, 
+            DateTimeOffset? endDate,
             int limit,
             CancellationToken cancellationToken = default);
 

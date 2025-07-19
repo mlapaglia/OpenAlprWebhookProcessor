@@ -87,10 +87,14 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data.Repositories
             return await _context.SaveChangesAsync(cancellationToken);
         }
 
-        // Custom methods for JwtKey repository
-        public async Task<JwtKey> GetFirstJwtKeyAsync(CancellationToken cancellationToken = default)
+        public async Task<JwtKey> GetFirstAsync(CancellationToken cancellationToken = default)
         {
             return await _context.JwtKeys.FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public virtual async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<JwtKey, TResult>> selector, CancellationToken cancellationToken = default)
+        {
+            return await _context.JwtKeys.Select(selector).ToListAsync(cancellationToken);
         }
     }
 } 

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
+using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertAlerts;
 using Tests.TestHelpers;
 
@@ -21,7 +22,7 @@ namespace Tests.Features.Alerts.Commands
         public async Task Handle_NewAlerts_AddsAlertsToDatabase()
         {
             // Arrange
-            var alerts = new List<OpenAlprWebhookProcessor.Alerts.Alert>
+            var alerts = new List<Alert>
             {
                 TestDataFactory.CreateTestAlert("ALERT1", "Description 1"),
                 TestDataFactory.CreateTestAlert("ALERT2", "Description 2")
@@ -51,7 +52,7 @@ namespace Tests.Features.Alerts.Commands
             var updatedAlert = TestDataFactory.CreateTestAlert("TEST123", "Updated Description", strictMatch: true);
             updatedAlert.Id = existingAlert.Id;
             
-            var command = new UpsertAlertsCommand(new List<OpenAlprWebhookProcessor.Alerts.Alert> { updatedAlert });
+            var command = new UpsertAlertsCommand(new List<Alert> { updatedAlert });
 
             // Act
             await _handler.Handle(command, GetCancellationToken());
@@ -80,7 +81,7 @@ namespace Tests.Features.Alerts.Commands
             var remainingAlert = TestDataFactory.CreateTestAlert("ALERT1", "Description 1");
             remainingAlert.Id = existingAlert1.Id;
             
-            var command = new UpsertAlertsCommand(new List<OpenAlprWebhookProcessor.Alerts.Alert> { remainingAlert });
+            var command = new UpsertAlertsCommand(new List<Alert> { remainingAlert });
 
             // Act
             await _handler.Handle(command, GetCancellationToken());
@@ -101,7 +102,7 @@ namespace Tests.Features.Alerts.Commands
             await UnitOfWork.Alerts.AddAsync(existingAlert2);
             await UnitOfWork.SaveChangesAsync();
 
-            var alerts = new List<OpenAlprWebhookProcessor.Alerts.Alert>
+            var alerts = new List<Alert>
             {
                 // Update existing alert
                 TestDataFactory.CreateTestAlert("EXISTING1", "Updated Description", strictMatch: true),
@@ -134,7 +135,7 @@ namespace Tests.Features.Alerts.Commands
         public async Task Handle_EmptyPlateNumber_FiltersOutAlert()
         {
             // Arrange
-            var alerts = new List<OpenAlprWebhookProcessor.Alerts.Alert>
+            var alerts = new List<Alert>
             {
                 TestDataFactory.CreateTestAlertWithPlateNumber("VALID123", "Valid Description"),
                 TestDataFactory.CreateTestAlertWithPlateNumber("", "Empty Plate Number"),
@@ -155,7 +156,7 @@ namespace Tests.Features.Alerts.Commands
         public async Task Handle_PlateNumberCaseConversion_SavesUpperCase()
         {
             // Arrange
-            var alerts = new List<OpenAlprWebhookProcessor.Alerts.Alert>
+            var alerts = new List<Alert>
             {
                 TestDataFactory.CreateTestAlert("test123", "Test Description")
             };
@@ -179,7 +180,7 @@ namespace Tests.Features.Alerts.Commands
             await UnitOfWork.Alerts.AddAsync(existingAlert2);
             await UnitOfWork.SaveChangesAsync();
 
-            var command = new UpsertAlertsCommand(new List<OpenAlprWebhookProcessor.Alerts.Alert>());
+            var command = new UpsertAlertsCommand(new List<Alert>());
 
             // Act
             await _handler.Handle(command, GetCancellationToken());

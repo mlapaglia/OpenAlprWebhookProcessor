@@ -1,7 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -79,14 +78,12 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
 
         private async Task<List<string>> GetIgnoredPlatesAsync(CancellationToken cancellationToken)
         {
-            var ignores = await _unitOfWork.Ignores.GetAllAsync(cancellationToken);
-            return ignores.Select(x => x.PlateNumber).ToList();
+            return await _unitOfWork.Ignores.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
 
         private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
         {
-            var alerts = await _unitOfWork.Alerts.GetAllAsync(cancellationToken);
-            return alerts.Select(x => x.PlateNumber).ToList();
+            return await _unitOfWork.Alerts.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
     }
 } 

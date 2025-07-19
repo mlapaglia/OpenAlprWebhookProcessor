@@ -32,8 +32,6 @@ namespace Tests.Features.Cameras.Commands
             _websocketClientOrganizer = Substitute.For<IWebsocketClientOrganizer>();
         }
 
-        #region UpsertCameraCommandHandler Tests
-
         [Test]
         public async Task UpsertCameraCommandHandler_NewCamera_CreatesNewCamera()
         {
@@ -107,10 +105,6 @@ namespace Tests.Features.Cameras.Commands
             await _cameraUpdateService.Received(1).DeleteSunriseSunsetAsync(camera.Id);
         }
 
-        #endregion
-
-        #region DeleteCameraCommandHandler Tests
-
         [Test]
         public async Task DeleteCameraCommandHandler_ExistingCamera_DeletesCamera()
         {
@@ -145,10 +139,6 @@ namespace Tests.Features.Cameras.Commands
             // Assert
             await _cameraUpdateService.DidNotReceive().DeleteSunriseSunsetAsync(Arg.Any<Guid>());
         }
-
-        #endregion
-
-        #region UpsertCameraMaskCommandHandler Tests
 
         [Test]
         public async Task UpsertCameraMaskCommandHandler_ExistingCameraWithNewMask_CreatesMask()
@@ -315,10 +305,6 @@ namespace Tests.Features.Cameras.Commands
             result.Should().BeFalse();
         }
 
-        #endregion
-
-        #region TestCameraDayModeCommandHandler Tests
-
         [Test]
         public async Task TestCameraDayModeCommandHandler_ValidCommand_EnqueuesDayMode()
         {
@@ -333,10 +319,6 @@ namespace Tests.Features.Cameras.Commands
             // Assert
             _cameraUpdateService.Received(1).EnqueueDayNight(cameraId, SunriseSunset.Sunrise);
         }
-
-        #endregion
-
-        #region TestCameraNightModeCommandHandler Tests
 
         [Test]
         public async Task TestCameraNightModeCommandHandler_ValidCommand_EnqueuesNightMode()
@@ -353,10 +335,6 @@ namespace Tests.Features.Cameras.Commands
             _cameraUpdateService.Received(1).EnqueueDayNight(cameraId, SunriseSunset.Sunset);
         }
 
-        #endregion
-
-        #region TestCameraOverlayCommandHandler Tests
-
         [Test]
         public async Task TestCameraOverlayCommandHandler_ValidCommand_SchedulesOverlayRequest()
         {
@@ -370,16 +348,12 @@ namespace Tests.Features.Cameras.Commands
 
             // Assert
             _cameraUpdateService.Received(1).ScheduleOverlayRequest(
-                Arg.Is<CameraUpdateRequest>(r => 
-                    r.Id == cameraId && 
-                    r.IsTest == true && 
+                Arg.Is<CameraUpdateRequest>(r =>
+                    r.Id == cameraId &&
+                    r.IsTest == true &&
                     r.LicensePlate == "test" &&
                     r.AlertDescription == "test"));
         }
-
-        #endregion
-
-        #region SetZoomAndFocusCommandHandler Tests
 
         [Test]
         public async Task SetZoomAndFocusCommandHandler_ValidCommand_CallsSetZoomAndFocus()
@@ -397,10 +371,6 @@ namespace Tests.Features.Cameras.Commands
             // Assert
             await _cameraUpdateService.Received(1).SetZoomAndFocusAsync(cameraId, zoomFocus, cancellationToken);
         }
-
-        #endregion
-
-        #region TriggerAutofocusCommandHandler Tests
 
         [Test]
         public async Task TriggerAutofocusCommandHandler_ValidCommand_CallsTriggerAutofocus()
@@ -440,7 +410,5 @@ namespace Tests.Features.Cameras.Commands
             // Assert
             result.Should().BeFalse();
         }
-
-        #endregion
     }
 } 

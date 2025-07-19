@@ -494,7 +494,7 @@ namespace Tests.Data.Repositories
         }
 
         [Test]
-        public async Task MultipleRepositoryAccess_UsesCorrectContext()
+        public void MultipleRepositoryAccess_UsesCorrectContext()
         {
             // Act
             var plateGroupsRepository = _unitOfWork.PlateGroups;

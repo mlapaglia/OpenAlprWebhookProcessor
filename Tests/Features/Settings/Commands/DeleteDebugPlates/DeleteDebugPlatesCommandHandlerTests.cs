@@ -14,7 +14,7 @@ namespace Tests.Features.Settings.Commands.DeleteDebugPlates
         public override void SetUp()
         {
             base.SetUp();
-            _handler = new DeleteDebugPlatesCommandHandler(Context);
+            _handler = new DeleteDebugPlatesCommandHandler(UnitOfWork);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Tests.Features.Settings.Commands.DeleteDebugPlates
         }
 
         [Test]
-        public async Task Handle_ValidCommand_DoesNotThrowException()
+        public void Handle_ValidCommand_DoesNotThrowException()
         {
             // Arrange
             var command = new DeleteDebugPlatesCommand();
@@ -59,7 +59,7 @@ namespace Tests.Features.Settings.Commands.DeleteDebugPlates
         }
 
         [Test]
-        public async Task Handle_WithCancellationToken_PassesToSqlCommand()
+        public void Handle_WithCancellationToken_PassesToSqlCommand()
         {
             // Arrange
             var command = new DeleteDebugPlatesCommand();

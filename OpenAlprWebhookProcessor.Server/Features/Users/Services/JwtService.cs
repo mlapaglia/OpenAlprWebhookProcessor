@@ -46,7 +46,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
 
         public async Task<byte[]> GetJwtSecretKeyAsync(CancellationToken cancellationToken = default)
         {
-            var jwtKey = await _usersUnitOfWork.JwtKeys.GetFirstJwtKeyAsync(cancellationToken);
+            var jwtKey = await _usersUnitOfWork.JwtKeys.GetFirstAsync(cancellationToken);
 
             if (jwtKey == null)
             {

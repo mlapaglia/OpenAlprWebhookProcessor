@@ -14,7 +14,7 @@ namespace Tests.Features.Settings.Queries.GetDebugPlates
         public override void SetUp()
         {
             base.SetUp();
-            _handler = new GetDebugPlatesQueryHandler(Context);
+            _handler = new GetDebugPlatesQueryHandler(UnitOfWork);
         }
 
         [Test]
@@ -106,11 +106,10 @@ namespace Tests.Features.Settings.Queries.GetDebugPlates
             // Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<string>();
-            // The query should limit results to 10 items via Take(10)
         }
 
         [Test]
-        public async Task Handle_PassesCancellationToken()
+        public void Handle_PassesCancellationToken()
         {
             // Arrange
             var query = new GetDebugPlatesQuery(false);
@@ -159,7 +158,7 @@ namespace Tests.Features.Settings.Queries.GetDebugPlates
         }
 
         [Test]
-        public async Task Handle_ValidQuery_DoesNotThrowException()
+        public void Handle_ValidQuery_DoesNotThrowException()
         {
             // Arrange
             var query = new GetDebugPlatesQuery(true);

@@ -74,7 +74,7 @@ namespace Tests.Features.Users.Commands
         }
 
         [Test]
-        public async Task Handle_UserNotFound_ThrowsAppException()
+        public void Handle_UserNotFound_ThrowsAppException()
         {
             // Arrange
             var command = new UpdateUserCommand(999, "Updated", "Name", "updateduser", "newpassword");
@@ -91,7 +91,7 @@ namespace Tests.Features.Users.Commands
         }
 
         [Test]
-        public async Task Handle_UsernameConflict_ThrowsAppException()
+        public void Handle_UsernameConflict_ThrowsAppException()
         {
             // Arrange
             var existingUser = TestDataFactory.CreateTestUser();

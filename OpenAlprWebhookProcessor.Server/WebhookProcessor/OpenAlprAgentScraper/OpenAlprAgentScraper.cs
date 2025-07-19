@@ -110,11 +110,17 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
 
             foreach (var metadata in metaDatasToQuery)
             {
-                await ProcessMetadata(agent, metadata, cancellationToken);
+                await ProcessMetadataAsync(
+                    agent,
+                    metadata,
+                    cancellationToken);
             }
         }
 
-        private async Task ProcessMetadata(Agent agent, ScrapeMetadata metadata, CancellationToken cancellationToken)
+        private async Task ProcessMetadataAsync(
+            Agent agent,
+            ScrapeMetadata metadata,
+            CancellationToken cancellationToken)
         {
             _logger.LogDebug("querying key: {Key}", metadata.Key);
 
@@ -152,10 +158,18 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 return;
             }
 
-            await ProcessGroup(agent, group, metadata.Key, cancellationToken);
+            await ProcessGroupAsync(
+                agent,
+                group,
+                metadata.Key,
+                cancellationToken);
         }
 
-        private async Task ProcessGroup(Agent agent, Group group, string metadataKey, CancellationToken cancellationToken)
+        private async Task ProcessGroupAsync(
+            Agent agent,
+            Group group,
+            string metadataKey,
+            CancellationToken cancellationToken)
         {
             var timer = new Stopwatch();
 
@@ -174,9 +188,9 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
                 timer.Stop();
                 _logger.LogDebug("Took {Seconds} to process.", timer.Elapsed.TotalSeconds);
             }
-            catch
+            catch (Exception ex)
             {
-                _logger.LogError("Failed to parse bulk import request.");
+                _logger.LogError(ex, "Failed to parse bulk import request.");
             }
 
             timer.Reset();
@@ -189,14 +203,14 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper
             _logger.LogDebug("Took {Seconds} to update agent status.", timer.Elapsed.TotalSeconds);
         }
 
-        private string BuildScrapeUrl(string endpointUrl, long startEpoch, long endEpoch)
+        private static string BuildScrapeUrl(string endpointUrl, long startEpoch, long endEpoch)
         {
             return endpointUrl + scrapeUrl
                 .Replace("{0}", startEpoch.ToString())
                 .Replace("{1}", endEpoch.ToString());
         }
 
-        private string BuildMetadataUrl(string endpointUrl, string key)
+        private static string BuildMetadataUrl(string endpointUrl, string key)
         {
             return endpointUrl + metadataUrl.Replace("{0}", key);
         }

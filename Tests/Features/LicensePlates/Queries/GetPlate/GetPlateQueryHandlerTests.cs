@@ -5,6 +5,9 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetPlate
@@ -83,8 +86,8 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
             
             // Verify that PlateMapper was called with correct parameters
             await _plateGroupRepository.Received(1).GetByIdWithDetailsAsync(plateId, cancellationToken);
-            await _ignoreRepository.Received(1).GetAllAsync(cancellationToken);
-            await _alertRepository.Received(1).GetAllAsync(cancellationToken);
+            await _ignoreRepository.Received(1).SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken);
+            await _alertRepository.Received(1).SelectAsync(Arg.Any<Expression<Func<Alert, string>>>(), cancellationToken);
         }
 
         [Test]
@@ -163,7 +166,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
             _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
                 .Returns(plateGroup);
 
-            _ignoreRepository.GetAllAsync(cancellationToken)
+            _ignoreRepository.SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken)
                 .ThrowsAsync(ignoreException);
 
             // Act & Assert
@@ -193,10 +196,10 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
             _plateGroupRepository.GetByIdWithDetailsAsync(plateId, cancellationToken)
                 .Returns(plateGroup);
 
-            _ignoreRepository.GetAllAsync(cancellationToken)
-                .Returns(ignores);
+            _ignoreRepository.SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken)
+                .Returns(new List<string> { "IGNORE1" });
 
-            _alertRepository.GetAllAsync(cancellationToken)
+            _alertRepository.SelectAsync(Arg.Any<Expression<Func<Alert, string>>>(), cancellationToken)
                 .ThrowsAsync(alertException);
 
             // Act & Assert

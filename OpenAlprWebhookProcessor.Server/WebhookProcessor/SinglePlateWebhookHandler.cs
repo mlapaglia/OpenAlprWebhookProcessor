@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
         private readonly IUnitOfWork _unitOfWork;
 
         public SinglePlateWebhookHandler(
-            ILogger<GroupWebhookHandler> logger,
+            ILogger<SinglePlateWebhookHandler> logger,
             ICameraUpdateService cameraUpdateService,
             IUnitOfWork unitOfWork)
         {
@@ -77,7 +77,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
+                        _logger.LogError(ex, "failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
                     }
                 }
             }

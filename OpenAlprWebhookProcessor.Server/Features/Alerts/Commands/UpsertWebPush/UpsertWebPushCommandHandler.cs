@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Alerts.WebPush;
+using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,19 +9,28 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush
     public class UpsertWebPushCommandHandler : IRequestHandler<UpsertWebPushCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UpsertWebPushClientRequestHandler _upsertWebPushClientRequestHandler;
 
-        public UpsertWebPushCommandHandler(
-            IUnitOfWork unitOfWork,
-            UpsertWebPushClientRequestHandler upsertWebPushClientRequestHandler)
+        public UpsertWebPushCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _upsertWebPushClientRequestHandler = upsertWebPushClientRequestHandler;
         }
 
         public async Task Handle(UpsertWebPushCommand request, CancellationToken cancellationToken)
         {
-            await _upsertWebPushClientRequestHandler.HandleAsync(request.Request);
+            var webPushClient = await _unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
+
+            if (webPushClient == null)
+            {
+                webPushClient = new WebPushSettings();
+                await _unitOfWork.WebPushSettings.AddAsync(webPushClient, cancellationToken);
+            }
+
+            webPushClient.IsEnabled = request.Request.IsEnabled;
+            webPushClient.SendEveryPlateEnabled = request.Request.SendEveryPlateEnabled;
+            webPushClient.Subject = request.Request.EmailAddress;
+
+            _unitOfWork.WebPushSettings.Update(webPushClient);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 } 

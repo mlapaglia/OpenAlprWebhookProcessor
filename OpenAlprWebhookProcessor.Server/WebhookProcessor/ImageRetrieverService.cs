@@ -26,8 +26,6 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         private readonly HashSet<string> _imageCompressionRequestsToProcessList = new();
 
-        private readonly object _imageCompressionRequestsToGate = new();
-
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         private readonly IServiceProvider _serviceProvider;
@@ -93,7 +91,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<ImageRetrieverService>>();
-                    logger.LogInformation("{numberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
+                    logger.LogInformation("{NumberOfRequests} images queued for processing", _imageRequestsToProcess.Count);
 
                     var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -111,7 +109,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     {
                         if (plateGroup == null)
                         {
-                            logger.LogError("Unable to find openalpr group id: {groupId}", job);
+                            logger.LogError("Unable to find openalpr group id: {GroupId}", job);
                             continue;
                         }
 
@@ -143,7 +141,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
                         catch (Exception ex)
                         {
-                            logger.LogError(ex, "Unable to retrieve image from Agent: {imageId}", job);
+                            logger.LogError(ex, "Unable to retrieve image from Agent: {ImageId}", job);
                         }
 
                         plateGroup.AgentImageScrapeOccurredOn = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -155,7 +153,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
                     }
 
-                    logger.LogInformation("finished job for image: {imageId}", job);
+                    logger.LogInformation("finished job for image: {ImageId}", job);
                 }
             }
         }
@@ -202,7 +200,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                             lastReceivedOnEpoch = orderedGroups.First().ReceivedOnEpoch;
                         }
 
-                        logger.LogInformation("Searching for images newer than {epoch}: {numberOfRequests} images queued for compression", lastReceivedOnEpoch, orderedGroups.Count);
+                        logger.LogInformation("Searching for images newer than {Epoch}: {NumberOfRequests} images queued for compression", lastReceivedOnEpoch, orderedGroups.Count);
 
                         foreach (var plateGroup in orderedGroups)
                         {

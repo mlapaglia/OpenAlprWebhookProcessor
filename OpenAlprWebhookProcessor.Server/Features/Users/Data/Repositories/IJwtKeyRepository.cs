@@ -6,6 +6,6 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data.Repositories
 {
     public interface IJwtKeyRepository : IRepository<JwtKey>
     {
-        Task<JwtKey> GetFirstJwtKeyAsync(CancellationToken cancellationToken = default);
+        new Task<JwtKey> GetFirstAsync(CancellationToken cancellationToken = default);
     }
 } 

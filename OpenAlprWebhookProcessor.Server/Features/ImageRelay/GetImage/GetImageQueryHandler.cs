@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
@@ -26,9 +27,9 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             GetImageQuery request,
             CancellationToken cancellationToken)
         {
-            var plateGroups = await _unitOfWork.PlateGroups.GetAllAsync(cancellationToken);
-            var plateGroup = plateGroups
-                .FirstOrDefault(x => x.OpenAlprUuid == request.ImageId);
+            var plateGroup = await _unitOfWork.PlateGroups.GetQueryable()
+                .Where(x => x.OpenAlprUuid == request.ImageId)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (plateGroup == null)
             {
@@ -39,8 +40,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
                 plateGroup.Id,
                 cancellationToken);
             
-            var agents = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
-            var agent = agents.FirstOrDefault();
+            var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
             if (fullPlateGroup?.VehicleImage == null)
             {
@@ -61,7 +61,5 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 
             return new MemoryStream(fullPlateGroup.VehicleImage.Jpeg);
         }
-
-
     }
 } 

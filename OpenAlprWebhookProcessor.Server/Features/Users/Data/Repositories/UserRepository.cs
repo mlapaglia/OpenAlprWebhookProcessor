@@ -37,6 +37,11 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data.Repositories
             return await _context.Users.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
+        public async Task<User> GetFirstAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Users.FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task<bool> AnyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _context.Users.AnyAsync(predicate, cancellationToken);
@@ -119,6 +124,11 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data.Repositories
         public async Task<bool> UsernameExistsAsync(string username, CancellationToken cancellationToken = default)
         {
             return await _context.Users.AnyAsync(u => u.Username == username, cancellationToken);
+        }
+
+        public virtual async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<User, TResult>> selector, CancellationToken cancellationToken = default)
+        {
+            return await _context.Users.Select(selector).ToListAsync(cancellationToken);
         }
     }
 } 

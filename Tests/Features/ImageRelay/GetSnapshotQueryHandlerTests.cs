@@ -242,8 +242,7 @@ namespace Tests.Features.ImageRelay
             result.Should().NotBeNull();
             result.Should().BeOfType<MemoryStream>();
             
-            var cameras = await UnitOfWork.Cameras.GetAllAsync(cancellationToken);
-            var matchingCamera = cameras.FirstOrDefault(x => x.Id == expectedCameraId);
+            var matchingCamera = await UnitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == expectedCameraId, cancellationToken);
             matchingCamera.Should().NotBeNull();
             matchingCamera.Id.Should().Be(expectedCameraId);
         }
@@ -327,7 +326,7 @@ namespace Tests.Features.ImageRelay
             _mockCameraFactory.MockCamera.GetSnapshotAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.Run(async () =>
                 {
-                    await Task.Delay(6000); // 6 seconds, longer than 5 second timeout
+                    await Task.Delay(6000);
                     return new MemoryStream(TestDataFactory.CreateTestJpegBytes()) as Stream;
                 }));
 

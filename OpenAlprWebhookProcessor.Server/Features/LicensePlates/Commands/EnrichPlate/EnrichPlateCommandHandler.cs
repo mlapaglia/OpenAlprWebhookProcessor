@@ -21,7 +21,9 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 
         public async Task Handle(EnrichPlateCommand request, CancellationToken cancellationToken)
         {
-            var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(request.PlateId, cancellationToken);
+            var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
+                request.PlateId,
+                cancellationToken);
 
             if (plateGroup == null)
             {

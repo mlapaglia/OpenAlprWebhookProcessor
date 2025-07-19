@@ -5,6 +5,9 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
@@ -70,8 +73,8 @@ namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
 
             var cancellationToken = GetCancellationToken();
 
-            _ignoreRepository.GetAllAsync(cancellationToken)
-                .Returns(ignores);
+            _ignoreRepository.SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken)
+                .Returns(new List<string> { "IGNORE1" });
 
             _plateGroupRepository.SearchPlatesAsync(
                 query.PlateNumber,
@@ -107,8 +110,11 @@ namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
                 cancellationToken)
                 .Returns(25);
 
-            _alertRepository.GetAllAsync(cancellationToken)
-                .Returns(alerts);
+            _ignoreRepository.SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken)
+                .Returns(new List<string> { "IGNORE1" });
+
+            _alertRepository.SelectAsync(Arg.Any<Expression<Func<Alert, string>>>(), cancellationToken)
+                .Returns(new List<string> { "ALERT1" });
 
             // Act
             var result = await _handler.Handle(query, cancellationToken);
@@ -118,8 +124,8 @@ namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
             result.Plates.Should().HaveCount(2);
             result.TotalCount.Should().Be(25);
 
-            await _ignoreRepository.Received(1).GetAllAsync(cancellationToken);
-            await _alertRepository.Received(1).GetAllAsync(cancellationToken);
+            await _ignoreRepository.Received(1).SelectAsync(Arg.Any<Expression<Func<Ignore, string>>>(), cancellationToken);
+            await _alertRepository.Received(1).SelectAsync(Arg.Any<Expression<Func<Alert, string>>>(), cancellationToken);
         }
 
         [Test]

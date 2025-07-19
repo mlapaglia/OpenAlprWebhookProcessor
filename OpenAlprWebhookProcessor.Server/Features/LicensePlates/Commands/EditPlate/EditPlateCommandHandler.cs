@@ -16,7 +16,9 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate
 
         public async Task Handle(EditPlateCommand request, CancellationToken cancellationToken)
         {
-            var existingPlate = await _unitOfWork.PlateGroups.GetByIdAsync(request.Id, cancellationToken);
+            var existingPlate = await _unitOfWork.PlateGroups.GetByIdAsync(
+                request.Id,
+                cancellationToken);
             
             if (existingPlate != null)
             {

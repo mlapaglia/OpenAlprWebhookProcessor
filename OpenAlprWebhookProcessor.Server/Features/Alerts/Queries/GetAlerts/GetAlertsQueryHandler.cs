@@ -1,5 +1,4 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;

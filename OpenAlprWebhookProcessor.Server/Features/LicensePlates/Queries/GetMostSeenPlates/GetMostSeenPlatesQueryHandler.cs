@@ -24,9 +24,6 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
                 request.Limit,
                 cancellationToken);
 
-            var platesToIgnore = await GetPlatesToIgnoreAsync(cancellationToken);
-            var platesToAlert = await GetPlatesToAlertAsync(cancellationToken);
-
             var licensePlates = plateGroups.GroupBy(x => x.BestNumber)
                 .Select(x => new MostSeenCount
                 {
@@ -42,14 +39,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
 
         private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken)
         {
-            var ignores = await _unitOfWork.Ignores.GetAllAsync(cancellationToken);
-            return ignores.Select(x => x.PlateNumber).ToList();
-        }
-
-        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
-        {
-            var alerts = await _unitOfWork.Alerts.GetAllAsync(cancellationToken);
-            return alerts.Select(x => x.PlateNumber).ToList();
+            return await _unitOfWork.Ignores.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
     }
 } 

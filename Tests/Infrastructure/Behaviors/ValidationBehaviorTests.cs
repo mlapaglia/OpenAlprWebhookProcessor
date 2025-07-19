@@ -118,7 +118,7 @@ namespace Tests.Infrastructure.Behaviors
         }
 
         [Test]
-        public async Task Handle_WithInvalidRequest_ThrowsValidationException()
+        public void Handle_WithInvalidRequest_ThrowsValidationException()
         {
             // Arrange
             var validationFailure = new ValidationFailure("Name", "Name is required");
@@ -139,7 +139,7 @@ namespace Tests.Infrastructure.Behaviors
         }
 
         [Test]
-        public async Task Handle_WithMultipleValidationFailures_ThrowsValidationExceptionWithAllErrors()
+        public void Handle_WithMultipleValidationFailures_ThrowsValidationExceptionWithAllErrors()
         {
             // Arrange
             var validationFailure1 = new ValidationFailure("Name", "Name is required");
@@ -181,7 +181,7 @@ namespace Tests.Infrastructure.Behaviors
         }
 
         [Test]
-        public async Task Handle_WithNullValidationFailure_IgnoresNullFailures()
+        public void Handle_WithNullValidationFailure_IgnoresNullFailures()
         {
             // Arrange
             var validationFailure = new ValidationFailure("Name", "Name is required");
@@ -304,7 +304,7 @@ namespace Tests.Infrastructure.Behaviors
         }
 
         [Test]
-        public async Task Handle_WithMixedValidationResults_OnlyThrowsForFailures()
+        public void Handle_WithMixedValidationResults_OnlyThrowsForFailures()
         {
             // Arrange
             var validationFailure = new ValidationFailure("Name", "Name is required");

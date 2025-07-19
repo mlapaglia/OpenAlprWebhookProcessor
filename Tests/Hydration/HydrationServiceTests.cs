@@ -156,9 +156,6 @@ namespace Tests.Hydration
             _hydrationService.StartHydration(request);
 
             // Assert
-            // Since we can't directly test the internal queue, we just verify no exceptions are thrown
-            // The actual processing would be tested in integration tests
-
             Assert.Pass();
         }
 
@@ -187,8 +184,6 @@ namespace Tests.Hydration
             await _hydrationService.StopAsync(cancellationToken);
 
             // Assert
-            // Service should complete without throwing exceptions
-            // Timer disposal is tested implicitly by proper cleanup
             Assert.Pass();
         }
 

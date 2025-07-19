@@ -1,5 +1,4 @@
 using MediatR;
-using OpenAlprWebhookProcessor.Alerts;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
 {

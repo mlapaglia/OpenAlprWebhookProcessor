@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -5,6 +6,7 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
+using System;
 using Tests.TestHelpers;
 using NSubstitute.ExceptionExtensions;
 using DataCamera = OpenAlprWebhookProcessor.Data.Camera;
@@ -27,29 +29,25 @@ namespace Tests.CameraUpdateService
         {
             base.SetUp();
 
-            // Create mocks
             _logger = Substitute.For<ILogger<OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService>>();
             _backgroundJobService = Substitute.For<IBackgroundJobService>();
             _cameraFactory = Substitute.For<ICameraFactory>();
             _mockCamera = Substitute.For<ICamera>();
             _cameraScheduling = Substitute.For<ICameraScheduling>();
 
-            // Create a simple service provider that returns our test UnitOfWork
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(UnitOfWork);
+            serviceCollection.AddSingleton(_cameraFactory);
+            serviceCollection.AddSingleton(_cameraScheduling);
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // Configure camera factory to return mock camera
             _cameraFactory.Create(Arg.Any<CameraManufacturer>(), Arg.Any<DataCamera>())
                 .Returns(_mockCamera);
 
-            // Create service under test
             _cameraUpdateService = new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
                 _serviceProvider,
                 _logger,
-                _backgroundJobService,
-                _cameraFactory,
-                _cameraScheduling);
+                _backgroundJobService);
         }
 
         [Test]
@@ -58,7 +56,7 @@ namespace Tests.CameraUpdateService
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
                 new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                    null, _logger, _backgroundJobService, _cameraFactory, _cameraScheduling));
+                null, _logger, _backgroundJobService));
         }
 
         [Test]
@@ -67,7 +65,7 @@ namespace Tests.CameraUpdateService
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
                 new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                    _serviceProvider, null, _backgroundJobService, _cameraFactory, _cameraScheduling));
+                _serviceProvider, null, _backgroundJobService));
         }
 
         [Test]
@@ -76,25 +74,7 @@ namespace Tests.CameraUpdateService
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => 
                 new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                    _serviceProvider, _logger, null, _cameraFactory, _cameraScheduling));
-        }
-
-        [Test]
-        public void Constructor_WithNullCameraFactory_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                    _serviceProvider, _logger, _backgroundJobService, null, _cameraScheduling));
-        }
-
-        [Test]
-        public void Constructor_WithNullCameraScheduling_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                    _serviceProvider, _logger, _backgroundJobService, _cameraFactory, null));
+                _serviceProvider, _logger, null));
         }
 
         [Test]
@@ -197,7 +177,7 @@ namespace Tests.CameraUpdateService
             await _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, false);
 
             // Assert
-            await _mockCamera.Received(1).TriggerDayNightModeAsync(SunriseSunset.Sunrise, Arg.Any<CancellationToken>());
+            await _mockCamera.Received(1).SetCameraTextAsync(Arg.Any<CameraUpdateRequest>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -210,7 +190,7 @@ namespace Tests.CameraUpdateService
             var exception = Assert.ThrowsAsync<ArgumentException>(() =>
                 _cameraUpdateService.ProcessSunriseSunsetJobAsync(nonExistentCameraId, SunriseSunset.Sunrise, false));
 
-            Assert.That(exception.Message, Contains.Substring("Camera not found"));
+            Assert.That(exception.Message, Is.EqualTo("camera not found"));
         }
 
         [Test]
@@ -228,7 +208,7 @@ namespace Tests.CameraUpdateService
             await _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, true);
 
             // Assert
-            _cameraScheduling.Received(1).ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            await _cameraScheduling.Received(1).ScheduleDayNightTasksAsync(_backgroundJobService);
         }
 
         [Test]
@@ -242,19 +222,14 @@ namespace Tests.CameraUpdateService
             await UnitOfWork.Agents.AddAsync(agent);
             await UnitOfWork.SaveChangesAsync();
 
-            _mockCamera.TriggerDayNightModeAsync(Arg.Any<SunriseSunset>(), Arg.Any<CancellationToken>())
+            _mockCamera.SetCameraTextAsync(Arg.Any<CameraUpdateRequest>(), Arg.Any<CancellationToken>())
                 .Throws(new InvalidOperationException("Camera error"));
 
-            // Act
-            await _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, false);
-
-            // Assert
-            _logger.Received(1).Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Any<object>(),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>());
+            // Act & Assert
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(() =>
+                _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, false));
+            
+            exception.Message.Should().Be("Camera error");
         }
 
         [Test]
@@ -324,30 +299,6 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ProcessJobAsync_WithCameraException_LogsError()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            var request = new CameraUpdateRequest { Id = camera.Id };
-            _mockCamera.SetCameraTextAsync(Arg.Any<CameraUpdateRequest>(), Arg.Any<CancellationToken>())
-                .Throws(new InvalidOperationException("Camera error"));
-
-            // Act
-            await _cameraUpdateService.ProcessJobAsync(request);
-
-            // Assert
-            _logger.Received(1).Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Any<object>(),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>());
-        }
-
-        [Test]
         public async Task ClearExpiredOverlayAsync_WithValidCamera_ClearsOverlay()
         {
             // Arrange
@@ -370,16 +321,8 @@ namespace Tests.CameraUpdateService
             // Arrange
             var nonExistentCameraId = Guid.NewGuid();
 
-            // Act
-            await _cameraUpdateService.ClearExpiredOverlayAsync(nonExistentCameraId);
-
-            // Assert
-            _logger.Received(1).Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Any<object>(),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>());
+            // Act & Assert
+            Assert.ThrowsAsync<ArgumentException>(() => _cameraUpdateService.ClearExpiredOverlayAsync(nonExistentCameraId));
         }
 
         [Test]

@@ -1,7 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,8 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWe
 
         public async Task Handle(ProcessHeartbeatWebhookCommand request, CancellationToken cancellationToken)
         {
-            var agents = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
-            var agent = agents.FirstOrDefault();
+            var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
             if (agent != null)
             {

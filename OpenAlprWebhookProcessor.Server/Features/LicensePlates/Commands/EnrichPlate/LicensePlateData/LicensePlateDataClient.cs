@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data;
+﻿using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -21,14 +20,14 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
         private readonly HttpClient _httpClient;
 
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
         public LicensePlateDataClient(
-            ProcessorContext processorContext,
+            IUnitOfWork unitOfWork,
             ILogger<LicensePlateDataClient> logger)
         {
             _httpClient = new HttpClient();
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
@@ -86,7 +85,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("An error occurred while testing LicensePlateData API: " + await response.Content.ReadAsStringAsync(cancellationToken));
+                _logger.LogError("An error occurred while testing LicensePlateData API: {Message}", await response.Content.ReadAsStringAsync(cancellationToken));
                 return false;
             }
 
@@ -96,7 +95,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
             if (parsed.Error)
             {
-                _logger.LogError("An error occurred while testing LicensePlateData API: " + parsed.Message);
+                _logger.LogError("An error occurred while testing LicensePlateData API: {Message}", parsed.Message);
                 return false;
             }
 
@@ -105,7 +104,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
         private async Task<string> GetApiKeyAsync(CancellationToken cancellationToken)
         {
-            var enricher = await _processorContext.Enrichers.FirstOrDefaultAsync(cancellationToken);
+            var enricher = await _unitOfWork.Enrichers.GetFirstAsync(cancellationToken);
             return enricher.ApiKey;
         }
     }

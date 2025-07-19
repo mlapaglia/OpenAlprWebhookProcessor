@@ -7,7 +7,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
 {
-    public class VapidKeyGenerator
+    public static class VapidKeyGenerator
     {
         public static VapidDetails GenerateVapidKeys()
         {

@@ -1,8 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.TestPushover;

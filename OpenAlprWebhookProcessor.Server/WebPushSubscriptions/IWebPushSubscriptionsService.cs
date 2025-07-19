@@ -7,10 +7,13 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
     public interface IWebPushSubscriptionsService
     {
-        Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken);
+        Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken = default);
 
-        Task InsertAsync(PushSubscription subscription, CancellationToken cancellationToken);
+        Task InsertAsync(PushSubscription subscription, 
+            CancellationToken cancellationToken = default);
 
-        Task DeleteAsync(string endpoint, CancellationToken cancellationToken);
+        Task DeleteAsync(
+            string endpoint,
+            CancellationToken cancellationToken = default);
     }
 }

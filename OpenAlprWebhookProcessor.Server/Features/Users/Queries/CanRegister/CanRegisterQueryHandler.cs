@@ -1,6 +1,5 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,8 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister
 
         public async Task<bool> Handle(CanRegisterQuery request, CancellationToken cancellationToken)
         {
-            var users = await _usersUnitOfWork.Users.GetAllAsync(cancellationToken);
-            return users.Count() == 0;
+            return !await _usersUnitOfWork.Users.AnyAsync(x => true, cancellationToken);
         }
     }
 } 

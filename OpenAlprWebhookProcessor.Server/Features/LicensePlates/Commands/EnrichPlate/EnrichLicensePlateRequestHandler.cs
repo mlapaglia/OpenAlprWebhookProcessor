@@ -1,30 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 {
     public class EnrichLicensePlateRequestHandler
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
         private readonly ILicensePlateEnricherClient _licensePlateEnricherClient;
+        
         public EnrichLicensePlateRequestHandler(
             ILicensePlateEnricherClient licensePlateEnricherClient,
-            ProcessorContext processorContext)
+            IUnitOfWork unitOfWork)
         {
             _licensePlateEnricherClient = licensePlateEnricherClient;
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task HandleAsync(Guid plateId)
+        public async Task HandleAsync(Guid plateId, CancellationToken cancellationToken = default)
         {
-            var plateGroup = await _processorContext.PlateGroups
+            var plateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .AsNoTracking()
                 .Where(x => x.Id == plateId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (plateGroup == null)
             {
@@ -44,7 +46,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
             var enrichResult = await _licensePlateEnricherClient.GetLicenseInformationAsync(
                 plateGroup.BestNumber,
                 plateGroup.VehicleRegion.Replace("us-", "").ToUpper(),
-                default);
+                cancellationToken);
 
             plateGroup.VehicleType = enrichResult.Style;
             plateGroup.VehicleMake = enrichResult.Make;
@@ -52,7 +54,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
             plateGroup.VehicleYear = enrichResult.Year;
             plateGroup.IsEnriched = true;
 
-            await _processorContext.SaveChangesAsync();
+            _unitOfWork.PlateGroups.Update(plateGroup);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

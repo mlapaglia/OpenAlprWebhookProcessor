@@ -4,6 +4,8 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister;
+using System;
+using System.Linq.Expressions;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Queries
@@ -41,8 +43,8 @@ namespace Tests.Features.Users.Queries
             var emptyUsers = new List<User>();
             var query = new CanRegisterQuery();
             
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(emptyUsers);
+            _mockUserRepository.AnyAsync(x => true, Arg.Any<CancellationToken>())
+                .Returns(false);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
@@ -55,15 +57,10 @@ namespace Tests.Features.Users.Queries
         public async Task Handle_ExistingUsers_ReturnsFalse()
         {
             // Arrange
-            var users = new List<User>
-            {
-                TestDataFactory.CreateTestUser("user1", "First1", "Last1"),
-                TestDataFactory.CreateTestUser("user2", "First2", "Last2")
-            };
             var query = new CanRegisterQuery();
             
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(users);
+            _mockUserRepository.AnyAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
+                .Returns(true);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);
@@ -76,94 +73,10 @@ namespace Tests.Features.Users.Queries
         public async Task Handle_SingleUser_ReturnsFalse()
         {
             // Arrange
-            var users = new List<User>
-            {
-                TestDataFactory.CreateTestUser("user1", "First1", "Last1")
-            };
             var query = new CanRegisterQuery();
-            
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(users);
 
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [Test]
-        public async Task Handle_ValidQuery_CallsCorrectRepositoryMethod()
-        {
-            // Arrange
-            var users = new List<User> { TestDataFactory.CreateTestUser() };
-            var query = new CanRegisterQuery();
-            
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(users);
-
-            // Act
-            await _handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            await _mockUserRepository.Received(1).GetAllAsync(Arg.Any<CancellationToken>());
-        }
-
-        [Test]
-        public async Task Handle_ValidQuery_PassesCancellationToken()
-        {
-            // Arrange
-            var users = new List<User>();
-            var query = new CanRegisterQuery();
-            var cancellationToken = new CancellationToken();
-            
-            _mockUserRepository.GetAllAsync(cancellationToken)
-                .Returns(users);
-
-            // Act
-            await _handler.Handle(query, cancellationToken);
-
-            // Assert
-            await _mockUserRepository.Received(1).GetAllAsync(cancellationToken);
-        }
-
-        [Test]
-        public async Task Handle_MultipleUsers_ReturnsFalse()
-        {
-            // Arrange
-            var users = new List<User>
-            {
-                TestDataFactory.CreateTestUser("user1", "First1", "Last1"),
-                TestDataFactory.CreateTestUser("user2", "First2", "Last2"),
-                TestDataFactory.CreateTestUser("user3", "First3", "Last3"),
-                TestDataFactory.CreateTestUser("user4", "First4", "Last4")
-            };
-            var query = new CanRegisterQuery();
-            
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(users);
-
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            result.Should().BeFalse();
-        }
-
-        [Test]
-        public async Task Handle_UsesEnumerableCount_WorksCorrectly()
-        {
-            // Arrange
-            var users = new List<User>
-            {
-                TestDataFactory.CreateTestUser("user1", "First1", "Last1"),
-                TestDataFactory.CreateTestUser("user2", "First2", "Last2")
-            };
-            var query = new CanRegisterQuery();
-            
-            // Return as IEnumerable to test that .Count() works
-            _mockUserRepository.GetAllAsync(Arg.Any<CancellationToken>())
-                .Returns(users.AsEnumerable());
+            _mockUserRepository.AnyAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
+                .Returns(true);
 
             // Act
             var result = await _handler.Handle(query, CancellationToken.None);

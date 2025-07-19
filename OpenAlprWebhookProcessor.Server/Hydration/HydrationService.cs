@@ -24,7 +24,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private Timer _scheduledScrapeTimer;
 
-        private readonly object _timerLock = new object();
+        private readonly Lock _timerLock = new Lock();
 
         public HydrationService(
             IServiceProvider serviceProvider,
@@ -78,8 +78,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                 lock (_timerLock)
                 {
-                    // Dispose existing timer if it exists
-                    _scheduledScrapeTimer?.Dispose();
+                    _scheduledScrapeTimer?.DisposeAsync();
                     _scheduledScrapeTimer = null;
 
                     if (agent.ScheduledScrapingIntervalMinutes == null)
@@ -88,13 +87,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
                     }
                     else
                     {
-                        // Calculate next execution time
-                        var intervalMs = agent.ScheduledScrapingIntervalMinutes.Value * 60 * 1000;
                         var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
                         
                         agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
 
-                        // Create recurring timer
                         _scheduledScrapeTimer = new Timer(
                             async _ =>
                             {
@@ -116,7 +112,9 @@ namespace OpenAlprWebhookProcessor.Hydrator
             }
         }
 
-        private async Task UpdateNextScrapeTimeAsync(string agentUid, int intervalMinutes)
+        private async Task UpdateNextScrapeTimeAsync(
+            string agentUid,
+            int intervalMinutes)
         {
             try
             {
@@ -135,16 +133,15 @@ namespace OpenAlprWebhookProcessor.Hydrator
             }
             catch (Exception ex)
             {
-                // Log error but don't throw - this is just updating the next scrape time
                 using var scope = _serviceProvider.CreateScope();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
                 logger.LogError(ex, "Error updating next scrape time for agent {AgentUid}", agentUid);
             }
         }
 
-        public void StartHydration(string request)
+        public void StartHydration(string name)
         {
-            _hydrationRequestsToProcess.Add(request);
+            _hydrationRequestsToProcess.Add(name);
         }
 
         private async Task StartHydrationAsync()

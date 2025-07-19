@@ -33,7 +33,9 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
                 throw new ArgumentException("Camera not found.");
             }
 
-            var camera = _cameraFactory.Create(dbCamera.Manufacturer, dbCamera);
+            var camera = _cameraFactory.Create(
+                dbCamera.Manufacturer,
+                dbCamera);
 
             const int timeout = 5000;
             var task = camera.GetSnapshotAsync(cancellationToken);

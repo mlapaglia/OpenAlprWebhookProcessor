@@ -1,6 +1,5 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,8 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertPushover
 
         public async Task Handle(UpsertPushoverCommand request, CancellationToken cancellationToken)
         {
-            var pushoverClients = await _unitOfWork.PushoverAlertClients.GetAllAsync(cancellationToken);
-            var pushoverClient = pushoverClients.FirstOrDefault();
+            var pushoverClient = await _unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 
             if (pushoverClient == null)
             {

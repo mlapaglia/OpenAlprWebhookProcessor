@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Alerts;
+using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.ProcessorHub;
 
 namespace Tests.Alerts
@@ -84,7 +84,7 @@ namespace Tests.Alerts
             await _alertService.StartAsync(cancellationToken);
 
             // Assert
-            // The method should complete without throwing an exception
+            Assert.Pass();
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace Tests.Alerts
             await _alertService.StopAsync(cancellationToken);
 
             // Assert
-            // The method should complete without throwing an exception
+            Assert.Pass();
         }
 
         [Test]

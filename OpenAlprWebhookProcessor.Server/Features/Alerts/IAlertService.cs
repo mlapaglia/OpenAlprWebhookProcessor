@@ -1,4 +1,4 @@
-namespace OpenAlprWebhookProcessor.Alerts
+namespace OpenAlprWebhookProcessor.Features.Alerts
 {
     public interface IAlertService
     {

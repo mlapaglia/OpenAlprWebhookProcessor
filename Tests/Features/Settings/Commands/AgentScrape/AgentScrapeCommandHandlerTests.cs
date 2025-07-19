@@ -35,7 +35,7 @@ namespace Tests.Features.Settings.Commands.AgentScrape
         }
 
         [Test]
-        public async Task Handle_ValidCommand_CompletesSuccessfully()
+        public void Handle_ValidCommand_CompletesSuccessfully()
         {
             // Arrange
             var command = new AgentScrapeCommand();
@@ -50,7 +50,7 @@ namespace Tests.Features.Settings.Commands.AgentScrape
         }
 
         [Test]
-        public async Task Handle_HydrationServiceThrowsException_ExceptionBubbles()
+        public void Handle_HydrationServiceThrowsException_ExceptionBubbles()
         {
             // Arrange
             var command = new AgentScrapeCommand();

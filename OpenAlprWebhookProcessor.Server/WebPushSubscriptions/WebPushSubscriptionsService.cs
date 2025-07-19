@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public async Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<PushSubscription>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
         public async Task InsertAsync(
             PushSubscription subscription,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
                 var existingSubscription = await unitOfWork.WebPushSubscriptions.GetQueryable()
                     .Include(x => x.Keys)
-                    .FirstOrDefaultAsync(x => x.Endpoint == subscription.Endpoint, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.Endpoint == subscription.Endpoint);
 
                 if (existingSubscription == null)
                 {
@@ -88,16 +88,15 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         }
                     }
 
-                    await unitOfWork.WebPushSubscriptions.AddAsync(
-                        pushSubscription,
-                        cancellationToken);
-
+                    await unitOfWork.WebPushSubscriptions.AddAsync(pushSubscription, cancellationToken);
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                 }
             }
         }
 
-        public async Task DeleteAsync(string endpoint, CancellationToken cancellationToken)
+        public async Task DeleteAsync(
+            string endpoint,
+            CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -110,11 +109,6 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                 }
             }
-        }
-
-        internal async Task GetAllAsync()
-        {
-            throw new NotImplementedException();
         }
     }
 }

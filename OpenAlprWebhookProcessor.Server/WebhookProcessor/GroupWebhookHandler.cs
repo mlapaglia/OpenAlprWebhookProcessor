@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Alerts;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Utilities;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
@@ -64,10 +64,11 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     WasProcessedCorrectly = false,
                 };
 
-                // Note: RawPlateGroups are not in the repository pattern yet
-                // This would need to be added to IUnitOfWork if needed
-                // _unitOfWork.RawPlateGroups.Add(rawDebugPlateGroup);
-                // await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.RawPlateGroups.AddAsync(
+                    rawDebugPlateGroup,
+                    cancellationToken);
+
+                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
             var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(
@@ -222,7 +223,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
+                            _logger.LogError(ex, "failed to forward webhook to: {Url}, error: {Error}", forward.FowardingDestination, ex.Message);
                         }
                     }
                 }

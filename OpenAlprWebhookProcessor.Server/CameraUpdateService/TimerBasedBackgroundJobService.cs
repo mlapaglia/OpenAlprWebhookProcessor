@@ -85,7 +85,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
                 finally
                 {
-                    // Clean up the job
                     if (_scheduledJobs.TryRemove(jobId, out var timerToDispose))
                     {
                         timerToDispose?.Dispose();
@@ -108,7 +107,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var delay = scheduleAt - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
-                // If scheduled time is in the past, execute immediately
                 EnqueueProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob);
                 return null;
             }
@@ -133,7 +131,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 }
                 finally
                 {
-                    // Clean up the job
                     if (_scheduledJobs.TryRemove(jobId, out var timerToDispose))
                     {
                         timerToDispose?.Dispose();
@@ -169,7 +166,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             if (_disposed) return;
 
-            // Cancel all jobs
             foreach (var kvp in _jobCancellationTokens)
             {
                 kvp.Value?.Cancel();
@@ -177,7 +173,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
             _jobCancellationTokens.Clear();
 
-            // Dispose all timers
             foreach (var kvp in _scheduledJobs)
             {
                 kvp.Value?.Dispose();

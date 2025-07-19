@@ -69,7 +69,7 @@ namespace Tests.Features.Settings.Commands.TestEnrichers
         }
 
         [Test]
-        public async Task Handle_EnricherClientThrowsException_ExceptionBubbles()
+        public void Handle_EnricherClientThrowsException_ExceptionBubbles()
         {
             // Arrange
             var command = new TestEnrichersCommand();

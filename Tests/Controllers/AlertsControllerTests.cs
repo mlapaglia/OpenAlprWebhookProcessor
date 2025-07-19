@@ -1,8 +1,6 @@
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
 using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert;

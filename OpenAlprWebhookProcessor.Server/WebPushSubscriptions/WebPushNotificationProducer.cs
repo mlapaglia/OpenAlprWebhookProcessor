@@ -6,11 +6,10 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
-using OpenAlprWebhookProcessor.Alerts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
+using OpenAlprWebhookProcessor.Features.Alerts;
 
 namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 {
@@ -34,12 +33,16 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             _pushClient = pushClient;
             _serviceProvider = serviceProvider;
             _logger = logger;
+        }
 
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
-                var keys = VapidKeyHelper.GetVapidKeysAsync(unitOfWork, CancellationToken.None).GetAwaiter().GetResult();
+                var keys = await VapidKeyHelper.GetVapidKeysAsync(
+                    unitOfWork, stoppingToken);
 
                 _pushClient.DefaultAuthentication = new VapidAuthentication(
                     keys.PublicKey,
@@ -50,10 +53,6 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             }
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-        }
-
         public async Task SendAlertAsync(
             AlertUpdateRequest alert,
             CancellationToken cancellationToken)
@@ -61,8 +60,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
-                var clientSettings = webPushSettings.FirstOrDefault();
+                var clientSettings = await unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 
                 if (clientSettings != null && clientSettings.IsEnabled && (alert.IsUrgent || clientSettings.SendEveryPlateEnabled))
                 {
@@ -87,7 +85,8 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
                         }
                     }.ToPushMessage();
 
-                    foreach (PushSubscription subscription in await _pushSubscriptionsService.GetAllAsync(cancellationToken))
+                    var subscriptions = await _pushSubscriptionsService.GetAllAsync(cancellationToken);
+                    foreach (PushSubscription subscription in subscriptions)
                     {
                         try
                         {
@@ -107,8 +106,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
-                var clientSettings = webPushSettings.FirstOrDefault();
+                var clientSettings = await unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 
                 return clientSettings?.SendEveryPlateEnabled ?? false;
             }
@@ -119,8 +117,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             using (var scope = _serviceProvider.CreateScope())
             {
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var webPushSettings = await unitOfWork.WebPushSettings.GetAllAsync(cancellationToken);
-                var clientSettings = webPushSettings.FirstOrDefault();
+                var clientSettings = await unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 
                 if (clientSettings == null)
                 {

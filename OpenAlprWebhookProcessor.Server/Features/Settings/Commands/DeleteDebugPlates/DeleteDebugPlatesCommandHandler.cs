@@ -1,6 +1,5 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,16 +7,18 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates
 {
     public class DeleteDebugPlatesCommandHandler : IRequestHandler<DeleteDebugPlatesCommand>
     {
-        private readonly ProcessorContext _processorContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteDebugPlatesCommandHandler(ProcessorContext processorContext)
+        public DeleteDebugPlatesCommandHandler(IUnitOfWork unitOfWork)
         {
-            _processorContext = processorContext;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(DeleteDebugPlatesCommand request, CancellationToken cancellationToken)
         {
-            await _processorContext.Database.ExecuteSqlRawAsync("DELETE FROM RawPlateGroups;", cancellationToken);
+            var allRawPlateGroups = await _unitOfWork.RawPlateGroups.GetAllAsync(cancellationToken);
+            _unitOfWork.RawPlateGroups.DeleteRange(allRawPlateGroups);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 } 

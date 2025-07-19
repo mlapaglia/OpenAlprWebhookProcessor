@@ -42,7 +42,7 @@ namespace Tests.Features.Users.Services
             };
 
             _usersUnitOfWork.JwtKeys.Returns(_jwtKeyRepository);
-            _jwtKeyRepository.GetFirstJwtKeyAsync(Arg.Any<CancellationToken>()).Returns(_jwtKey);
+            _jwtKeyRepository.GetFirstAsync(Arg.Any<CancellationToken>()).Returns(_jwtKey);
 
             _jwtService = new JwtService(_usersUnitOfWork);
         }
@@ -121,11 +121,11 @@ namespace Tests.Features.Users.Services
             await _jwtService.GenerateJwtTokenAsync(_user, cancellationToken);
 
             // Assert
-            await _jwtKeyRepository.Received(1).GetFirstJwtKeyAsync(cancellationToken);
+            await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
         }
 
         [Test]
-        public async Task GenerateJwtTokenAsync_WithNullUser_ThrowsArgumentNullException()
+        public void GenerateJwtTokenAsync_WithNullUser_ThrowsArgumentNullException()
         {
             // Arrange
             User nullUser = null;
@@ -150,7 +150,7 @@ namespace Tests.Features.Users.Services
 
             // Assert
             result.Should().BeEquivalentTo(expectedKey);
-            await _jwtKeyRepository.Received(1).GetFirstJwtKeyAsync(cancellationToken);
+            await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
             await _jwtKeyRepository.DidNotReceive().AddAsync(Arg.Any<JwtKey>(), Arg.Any<CancellationToken>());
             await _usersUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
@@ -160,7 +160,7 @@ namespace Tests.Features.Users.Services
         {
             // Arrange
             var cancellationToken = new CancellationToken();
-            _jwtKeyRepository.GetFirstJwtKeyAsync(cancellationToken).Returns((JwtKey)null);
+            _jwtKeyRepository.GetFirstAsync(cancellationToken).Returns((JwtKey)null);
 
             // Act
             var result = await _jwtService.GetJwtSecretKeyAsync(cancellationToken);
@@ -168,7 +168,7 @@ namespace Tests.Features.Users.Services
             // Assert
             result.Should().NotBeNull();
             result.Length.Should().Be(128);
-            await _jwtKeyRepository.Received(1).GetFirstJwtKeyAsync(cancellationToken);
+            await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
             await _jwtKeyRepository.Received(1).AddAsync(Arg.Any<JwtKey>(), cancellationToken);
             await _usersUnitOfWork.Received(1).SaveChangesAsync(cancellationToken);
         }
@@ -188,7 +188,7 @@ namespace Tests.Features.Users.Services
             // Assert
             result.Should().NotBeNull();
             result.Length.Should().Be(128);
-            await _jwtKeyRepository.Received(1).GetFirstJwtKeyAsync(cancellationToken);
+            await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
             await _jwtKeyRepository.DidNotReceive().AddAsync(Arg.Any<JwtKey>(), Arg.Any<CancellationToken>());
             await _usersUnitOfWork.Received(1).SaveChangesAsync(cancellationToken);
         }
@@ -207,18 +207,18 @@ namespace Tests.Features.Users.Services
 
             // Assert
             result.Should().BeEquivalentTo(exactLengthKey);
-            await _jwtKeyRepository.Received(1).GetFirstJwtKeyAsync(cancellationToken);
+            await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
             await _jwtKeyRepository.DidNotReceive().AddAsync(Arg.Any<JwtKey>(), Arg.Any<CancellationToken>());
             await _usersUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public async Task GetJwtSecretKeyAsync_WithRepositoryException_ThrowsException()
+        public void GetJwtSecretKeyAsync_WithRepositoryException_ThrowsException()
         {
             // Arrange
             var cancellationToken = new CancellationToken();
             var exception = new InvalidOperationException("Database error");
-            _jwtKeyRepository.GetFirstJwtKeyAsync(cancellationToken).ThrowsAsync(exception);
+            _jwtKeyRepository.GetFirstAsync(cancellationToken).ThrowsAsync(exception);
 
             // Act & Assert
             var thrownException = Assert.ThrowsAsync<InvalidOperationException>(() => 
@@ -389,11 +389,11 @@ namespace Tests.Features.Users.Services
         }
 
         [Test]
-        public async Task GetJwtSecretKeyAsync_WithSaveChangesException_ThrowsException()
+        public void GetJwtSecretKeyAsync_WithSaveChangesException_ThrowsException()
         {
             // Arrange
             var cancellationToken = new CancellationToken();
-            _jwtKeyRepository.GetFirstJwtKeyAsync(cancellationToken).Returns((JwtKey)null);
+            _jwtKeyRepository.GetFirstAsync(cancellationToken).Returns((JwtKey)null);
             var exception = new InvalidOperationException("Save failed");
             _usersUnitOfWork.SaveChangesAsync(cancellationToken).ThrowsAsync(exception);
 

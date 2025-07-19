@@ -39,6 +39,11 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
         }
 
+        public virtual async Task<T?> GetFirstAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.FirstOrDefaultAsync(cancellationToken);
+        }
+
         public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbSet.AnyAsync(predicate, cancellationToken);
@@ -47,6 +52,11 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         public virtual async Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
             return await _dbSet.CountAsync(predicate, cancellationToken);
+        }
+
+        public virtual async Task<List<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.Select(selector).ToListAsync(cancellationToken);
         }
 
         public virtual IQueryable<T> GetQueryable()
