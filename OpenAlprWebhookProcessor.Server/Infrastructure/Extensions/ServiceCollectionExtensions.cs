@@ -116,6 +116,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
             services.AddHttpClient<PushServiceClient>();
+            services.AddScoped<IPushServiceClientWrapper, PushServiceClientWrapper>();
             services.AddHttpClient();
             services.AddScoped<IImageCompressionService, ImageCompressionService>();
             services.AddSingleton<Features.Cameras.ICameraFactory, Features.Cameras.CameraFactory>();

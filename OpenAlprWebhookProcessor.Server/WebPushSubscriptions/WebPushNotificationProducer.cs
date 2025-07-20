@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
     {
         private readonly IWebPushSubscriptionsService _pushSubscriptionsService;
 
-        private readonly PushServiceClient _pushClient;
+        private readonly IPushServiceClientWrapper _pushClient;
 
         private readonly IServiceProvider _serviceProvider;
 
@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
             IWebPushSubscriptionsService pushSubscriptionsService,
             IServiceProvider serviceProvider,
             ILogger<WebPushNotificationProducer> logger,
-            PushServiceClient pushClient)
+            IPushServiceClientWrapper pushClient)
         {
             _pushSubscriptionsService = pushSubscriptionsService;
             _pushClient = pushClient;

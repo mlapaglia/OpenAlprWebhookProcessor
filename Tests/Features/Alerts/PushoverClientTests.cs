@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
@@ -28,8 +27,6 @@ namespace Tests.Features.Alerts
         public override void SetUp()
         {
             base.SetUp();
-            
-            // Set up HTTP client factory and test handler
             _httpMessageHandler = new TestHttpMessageHandler();
             _httpClient = new HttpClient(_httpMessageHandler);
             _httpClientFactory = Substitute.For<IHttpClientFactory>();
@@ -360,6 +357,7 @@ namespace Tests.Features.Alerts
             // Assert
             _httpMessageHandler.RequestsSent.Should().BeEmpty();
         }
+
         private static Pushover CreateTestPushoverSettings(
             bool isEnabled = true,
             string apiToken = "test-api-token",
@@ -475,7 +473,9 @@ namespace Tests.Features.Alerts
     public class RequestInfo
     {
         public HttpMethod Method { get; set; }
+
         public Uri RequestUri { get; set; }
+
         public string Content { get; set; }
     }
 }
