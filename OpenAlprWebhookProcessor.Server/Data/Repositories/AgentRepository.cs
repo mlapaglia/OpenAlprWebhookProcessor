@@ -14,19 +14,5 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         {
             return await _dbSet.FirstOrDefaultAsync(cancellationToken);
         }
-
-        public async Task<Agent> GetOrCreateAgentAsync(CancellationToken cancellationToken = default)
-        {
-            var agent = await GetFirstAgentAsync(cancellationToken);
-            
-            if (agent == null)
-            {
-                agent = new Agent();
-                await AddAsync(agent, cancellationToken);
-                await SaveChangesAsync(cancellationToken);
-            }
-
-            return agent;
-        }
     }
 } 

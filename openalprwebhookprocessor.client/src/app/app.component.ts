@@ -53,7 +53,8 @@ export class AppComponent implements OnInit, OnDestroy {
       // Start SignalR connection when user is authenticated
       if (x.id !== undefined && x.jwtToken) {
         this.signalRService.startConnection()
-      } else {
+      }
+      else {
         // Stop SignalR connection when user is not authenticated
         this.signalRService.stopConnection()
       }

@@ -30,10 +30,10 @@ export class SignalrService {
       return
     }
 
-        // Don't start if already connected or connecting
-    if (this.hubConnection &&
-        (this.hubConnection.state === signalR.HubConnectionState.Connected ||
-         this.hubConnection.state === signalR.HubConnectionState.Connecting)) {
+    // Don't start if already connected or connecting
+    if (this.hubConnection
+      && (this.hubConnection.state === signalR.HubConnectionState.Connected
+        || this.hubConnection.state === signalR.HubConnectionState.Connecting)) {
       console.log('SignalR: Already connected or connecting, skipping')
       return
     }
@@ -45,7 +45,7 @@ export class SignalrService {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('/api/processorHub', {
-        accessTokenFactory: () => user.jwtToken
+        accessTokenFactory: () => user.jwtToken,
       })
       .withAutomaticReconnect()
       .build()
