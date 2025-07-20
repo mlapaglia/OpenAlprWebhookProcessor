@@ -46,8 +46,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 vehicleModel,
                 vehicleType,
                 vehicleRegion,
-                filterPlatesSeenLessThan,
-                cancellationToken);
+                filterPlatesSeenLessThan);
 
             var results = await query
                 .Include(x => x.PossibleNumbers)
@@ -86,8 +85,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 vehicleModel,
                 vehicleType,
                 vehicleRegion,
-                filterPlatesSeenLessThan,
-                cancellationToken);
+                filterPlatesSeenLessThan);
 
             return await query.CountAsync(cancellationToken);
         }
@@ -197,8 +195,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             string? vehicleModel,
             string? vehicleType,
             string? vehicleRegion,
-            int filterPlatesSeenLessThan,
-            CancellationToken cancellationToken)
+            int filterPlatesSeenLessThan)
         {
             var query = _dbSet.AsQueryable();
 

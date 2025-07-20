@@ -439,7 +439,7 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ScheduleOverlayRequest(request);
 
             // Assert
-            _backgroundJobService.Received(1).EnqueueProcessJob(request);
+            _backgroundJobService.Received(1).EnqueueProcessJobAsync(request);
         }
 
         [Test]

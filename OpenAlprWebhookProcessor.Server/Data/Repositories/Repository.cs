@@ -11,6 +11,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
     public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ProcessorContext _context;
+
         protected readonly DbSet<T> _dbSet;
 
         public Repository(ProcessorContext context)

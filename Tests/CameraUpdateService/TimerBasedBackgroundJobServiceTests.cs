@@ -80,7 +80,7 @@ namespace Tests.CameraUpdateService
             };
 
             // Act
-            _backgroundJobService.EnqueueProcessJob(request);
+            await _backgroundJobService.EnqueueProcessJobAsync(request);
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -93,7 +93,7 @@ namespace Tests.CameraUpdateService
         public void EnqueueProcessJob_WithNullRequest_ShouldNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessJob(null));
+            Assert.DoesNotThrowAsync(() => _backgroundJobService.EnqueueProcessJobAsync(null));
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ProcessJobAsync(request).ThrowsAsync(exception);
 
             // Act & Assert (should not throw)
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessJob(request));
+            Assert.DoesNotThrowAsync(() => _backgroundJobService.EnqueueProcessJobAsync(request));
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -128,7 +128,7 @@ namespace Tests.CameraUpdateService
             var scheduleNextJob = true;
 
             // Act
-            _backgroundJobService.EnqueueProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob);
+            _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -141,7 +141,7 @@ namespace Tests.CameraUpdateService
         public void EnqueueProcessSunriseSunsetJob_WithEmptyGuid_ShouldNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJob(Guid.Empty, SunriseSunset.Sunrise, true));
+            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(Guid.Empty, SunriseSunset.Sunrise, true));
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob).ThrowsAsync(exception);
 
             // Act & Assert (should not throw)
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob));
+            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob));
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -244,7 +244,11 @@ namespace Tests.CameraUpdateService
             var scheduleAt = DateTimeOffset.Now.AddMilliseconds(50);
 
             // Act
-            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
+            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
+                cameraId,
+                sunriseSunset,
+                scheduleNextJob,
+                scheduleAt);
 
             // Assert
             jobId.Should().NotBeNullOrEmpty();
@@ -265,7 +269,7 @@ namespace Tests.CameraUpdateService
             var scheduleAt = DateTimeOffset.Now.AddMilliseconds(-100);
 
             // Act
-            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
+            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
 
             // Assert
             jobId.Should().BeNull(); // Returns null when executed immediately
@@ -277,13 +281,13 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ScheduleProcessSunriseSunsetJob_WithEmptyGuid_ShouldReturnNull()
+        public async Task ScheduleProcessSunriseSunsetJob_WithEmptyGuid_ShouldReturnNullAsync()
         {
             // Arrange
             var scheduleAt = DateTimeOffset.Now.AddMinutes(1);
 
             // Act
-            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(Guid.Empty, SunriseSunset.Sunrise, true, scheduleAt);
+            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(Guid.Empty, SunriseSunset.Sunrise, true, scheduleAt);
 
             // Assert
             jobId.Should().BeNull();
@@ -302,7 +306,11 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob).ThrowsAsync(exception);
 
             // Act
-            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
+            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
+                cameraId,
+                sunriseSunset,
+                scheduleNextJob,
+                scheduleAt);
 
             // Assert
             jobId.Should().NotBeNullOrEmpty();
@@ -311,7 +319,10 @@ namespace Tests.CameraUpdateService
             await Task.Delay(100);
 
             // Verify the service was called (and threw the exception)
-            await _cameraUpdateService.Received(1).ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+            await _cameraUpdateService.Received(1).ProcessSunriseSunsetJobAsync(
+                cameraId,
+                sunriseSunset,
+                scheduleNextJob);
         }
 
         [Test]

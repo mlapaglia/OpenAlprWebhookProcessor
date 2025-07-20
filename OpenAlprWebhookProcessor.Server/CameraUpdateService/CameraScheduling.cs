@@ -9,14 +9,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public static class CameraScheduling
     {
-        public static void ExecuteSingleDayNightTask(
+        public static async Task ExecuteSingleDayNightTaskAsync(
             SunriseSunset sunriseSunset,
             Guid cameraId,
             IBackgroundJobService backgroundJobService)
         {
             ArgumentNullException.ThrowIfNull(backgroundJobService);
 
-            backgroundJobService.EnqueueProcessSunriseSunsetJob(
+            await backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(
                 cameraId,
                 sunriseSunset,
                 false);
@@ -35,19 +35,21 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             foreach (var camera in camerasToUpdate)
             {
-                ScheduleDayNightTask(
+                await ScheduleDayNightTaskAsync(
                     backgroundJobService,
                     agent,
-                    camera);
+                    camera,
+                    cancellationToken);
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        public static void ScheduleDayNightTask(
+        public static async Task ScheduleDayNightTaskAsync(
             IBackgroundJobService backgroundJobService,
             Agent agent,
-            Data.Camera camera)
+            Data.Camera camera,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(backgroundJobService);
             ArgumentNullException.ThrowIfNull(agent);
@@ -85,7 +87,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 backgroundJobService.DeleteJob(camera.NextDayNightScheduleId);
             }
 
-            camera.NextDayNightScheduleId = backgroundJobService.ScheduleProcessSunriseSunsetJob(
+            camera.NextDayNightScheduleId = await backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
                 camera.Id,
                 isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
                 true,

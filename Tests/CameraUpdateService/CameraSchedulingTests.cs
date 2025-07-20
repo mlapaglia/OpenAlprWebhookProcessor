@@ -21,20 +21,20 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ExecuteSingleDayNightTask_WithValidParameters_EnqueuesJob()
+        public async Task ExecuteSingleDayNightTask_WithValidParameters_EnqueuesJobAsync()
         {
             // Arrange
             var sunriseSunset = SunriseSunset.Sunrise;
             var cameraId = Guid.NewGuid();
 
             // Act
-            CameraScheduling.ExecuteSingleDayNightTask(
+            CameraScheduling.ExecuteSingleDayNightTaskAsync(
                 sunriseSunset,
                 cameraId,
                 _backgroundJobService);
 
             // Assert
-            _backgroundJobService.Received(1).EnqueueProcessSunriseSunsetJob(
+            await _backgroundJobService.Received(1).EnqueueProcessSunriseSunsetJobAsync(
                 cameraId,
                 sunriseSunset,
                 false);
@@ -67,7 +67,7 @@ namespace Tests.CameraUpdateService
             await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService, default);
 
             // Assert
-            _backgroundJobService.Received(2).ScheduleProcessSunriseSunsetJob(
+            await _backgroundJobService.Received(2).ScheduleProcessSunriseSunsetJobAsync(
                 Arg.Any<Guid>(),
                 Arg.Any<SunriseSunset>(),
                 Arg.Any<bool>(),
@@ -97,7 +97,7 @@ namespace Tests.CameraUpdateService
             await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService);
 
             // Assert
-            _backgroundJobService.DidNotReceive().ScheduleProcessSunriseSunsetJob(
+            await _backgroundJobService.DidNotReceive().ScheduleProcessSunriseSunsetJobAsync(
                 Arg.Any<Guid>(),
                 Arg.Any<SunriseSunset>(),
                 Arg.Any<bool>(),
@@ -105,7 +105,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ScheduleDayNightTask_WithValidParameters_SchedulesCorrectJob()
+        public async Task ScheduleDayNightTask_WithValidParameters_SchedulesCorrectJobAsync()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
@@ -118,10 +118,13 @@ namespace Tests.CameraUpdateService
             camera.Longitude = -74.0060;
 
             // Act
-            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            await CameraScheduling.ScheduleDayNightTaskAsync(
+                _backgroundJobService,
+                agent,
+                camera);
 
             // Assert
-            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
+            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,
@@ -129,7 +132,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ScheduleDayNightTask_WithCameraSpecificSettings_UsesCameraSettings()
+        public async Task ScheduleDayNightTask_WithCameraSpecificSettings_UsesCameraSettingsAsync()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
@@ -144,10 +147,13 @@ namespace Tests.CameraUpdateService
             camera.SunsetOffset = 60;
 
             // Act
-            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            await CameraScheduling.ScheduleDayNightTaskAsync(
+                _backgroundJobService,
+                agent,
+                camera);
 
             // Assert
-            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
+            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,
@@ -155,7 +161,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ScheduleDayNightTask_WithExistingScheduledJob_DeletesOldJob()
+        public async Task ScheduleDayNightTask_WithExistingScheduledJob_DeletesOldJobAsync()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
@@ -169,11 +175,11 @@ namespace Tests.CameraUpdateService
             camera.NextDayNightScheduleId = "existing-job-id";
 
             // Act
-            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
+            await CameraScheduling.ScheduleDayNightTaskAsync(_backgroundJobService, agent, camera);
 
             // Assert
             _backgroundJobService.Received(1).DeleteJob("existing-job-id");
-            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
+            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,

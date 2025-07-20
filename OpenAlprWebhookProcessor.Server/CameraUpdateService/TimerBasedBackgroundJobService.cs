@@ -10,9 +10,13 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
     public class TimerBasedBackgroundJobService : IBackgroundJobService, IDisposable
     {
         private readonly IServiceProvider _serviceProvider;
+
         private readonly ILogger<TimerBasedBackgroundJobService> _logger;
+
         private readonly ConcurrentDictionary<string, Timer> _scheduledJobs = new();
+
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _jobCancellationTokens = new();
+
         private bool _disposed = false;
 
         public TimerBasedBackgroundJobService(
@@ -23,42 +27,36 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void EnqueueProcessJob(CameraUpdateRequest request)
+        public async Task EnqueueProcessJobAsync(CameraUpdateRequest request)
         {
             if (request == null) return;
 
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    using var scope = _serviceProvider.CreateScope();
-                    var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
-                    await cameraUpdateService.ProcessJobAsync(request);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error processing camera update job for camera {CameraId}", request.Id);
-                }
-            });
+                using var scope = _serviceProvider.CreateScope();
+                var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
+                await cameraUpdateService.ProcessJobAsync(request);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing camera update job for camera {CameraId}", request.Id);
+            }
         }
 
-        public void EnqueueProcessSunriseSunsetJob(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob)
+        public async Task EnqueueProcessSunriseSunsetJobAsync(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob)
         {
             if (cameraId == Guid.Empty) return;
 
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    using var scope = _serviceProvider.CreateScope();
-                    var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
-                    await cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error processing sunrise/sunset job for camera {CameraId}", cameraId);
-                }
-            });
+                using var scope = _serviceProvider.CreateScope();
+                var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
+                await cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing sunrise/sunset job for camera {CameraId}", cameraId);
+            }
         }
 
         public string ScheduleClearOverlayJob(Guid cameraId, TimeSpan delay)
@@ -100,14 +98,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             return jobId;
         }
 
-        public string ScheduleProcessSunriseSunsetJob(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob, DateTimeOffset scheduleAt)
+        public async Task<string> ScheduleProcessSunriseSunsetJobAsync(
+            Guid cameraId,
+            SunriseSunset sunriseSunset,
+            bool scheduleNextJob,
+            DateTimeOffset scheduleAt)
         {
             if (cameraId == Guid.Empty) return null;
 
             var delay = scheduleAt - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
-                EnqueueProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob);
+                await EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
                 return null;
             }
 

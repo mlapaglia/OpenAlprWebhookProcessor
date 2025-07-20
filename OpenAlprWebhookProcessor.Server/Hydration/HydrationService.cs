@@ -26,6 +26,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private readonly Lock _timerLock = new Lock();
 
+        // Track current configuration to avoid unnecessary timer recreation
+        private int? _currentIntervalMinutes;
+        private string _currentAgentUid;
+
         public HydrationService(
             IServiceProvider serviceProvider,
             IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub)
@@ -54,6 +58,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
             {
                 _scheduledScrapeTimer?.Dispose();
                 _scheduledScrapeTimer = null;
+                
+                // Reset tracking fields
+                _currentIntervalMinutes = null;
+                _currentAgentUid = null;
             }
             
             _cancellationTokenSource.Dispose();
@@ -78,32 +86,46 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
                 lock (_timerLock)
                 {
-                    _scheduledScrapeTimer?.DisposeAsync();
-                    _scheduledScrapeTimer = null;
+                    var configurationChanged = _currentIntervalMinutes != agent.ScheduledScrapingIntervalMinutes
+                        || _currentAgentUid != agent.Uid;
 
-                    if (agent.ScheduledScrapingIntervalMinutes == null)
+                    if (configurationChanged)
                     {
-                        agent.NextScrapeEpochMs = null;
+                        _scheduledScrapeTimer?.Dispose();
+                        _scheduledScrapeTimer = null;
+
+                        _currentIntervalMinutes = agent.ScheduledScrapingIntervalMinutes;
+                        _currentAgentUid = agent.Uid;
+
+                        if (agent.ScheduledScrapingIntervalMinutes == null)
+                        {
+                            agent.NextScrapeEpochMs = null;
+                        }
+                        else
+                        {
+                            var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
+                            
+                            agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
+
+                            _scheduledScrapeTimer = new Timer(
+                                async _ =>
+                                {
+                                    if (!_cancellationTokenSource.Token.IsCancellationRequested)
+                                    {
+                                        StartHydration(agent.Uid);
+                                        await UpdateNextScrapeTimeAsync(agent.Uid, agent.ScheduledScrapingIntervalMinutes.Value);
+                                    }
+                                },
+                                null,
+                                TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value),
+                                TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value)
+                            );
+                        }
                     }
-                    else
+                    else if (_scheduledScrapeTimer != null)
                     {
                         var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
-                        
                         agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
-
-                        _scheduledScrapeTimer = new Timer(
-                            async _ =>
-                            {
-                                if (!_cancellationTokenSource.Token.IsCancellationRequested)
-                                {
-                                    StartHydration(agent.Uid);
-                                    await UpdateNextScrapeTimeAsync(agent.Uid, agent.ScheduledScrapingIntervalMinutes.Value);
-                                }
-                            },
-                            null,
-                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value),
-                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value)
-                        );
                     }
                 }
 

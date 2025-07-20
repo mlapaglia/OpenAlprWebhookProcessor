@@ -162,7 +162,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             Guid cameraId,
             SunriseSunset sunriseSunset)
         {
-            CameraScheduling.ExecuteSingleDayNightTask(
+            CameraScheduling.ExecuteSingleDayNightTaskAsync(
                 sunriseSunset,
                 cameraId,
                 _backgroundJobService);
@@ -170,7 +170,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public void ScheduleOverlayRequest(CameraUpdateRequest cameraUpdateRequest)
         {
-            _backgroundJobService.EnqueueProcessJob(cameraUpdateRequest);
+            _backgroundJobService.EnqueueProcessJobAsync(cameraUpdateRequest);
         }
 
         public async Task ProcessJobAsync(CameraUpdateRequest cameraUpdateRequest)
