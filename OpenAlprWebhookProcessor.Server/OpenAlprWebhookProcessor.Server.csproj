@@ -48,6 +48,9 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="Microsoft.ML" Version="4.0.0" />
+		<PackageReference Include="Microsoft.ML.TimeSeries" Version="4.0.0" />
+		<PackageReference Include="Microsoft.ML.FastTree" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -8,10 +8,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
     {
         public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
+            ArgumentNullException.ThrowIfNull(password);
 
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -27,15 +24,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
 
         public bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
-            if (password == null)
-            {
-                throw new ArgumentNullException(nameof(password));
-            }
-
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                throw new ArgumentException("Value cannot be empty or whitespace only string.", nameof(password));
-            }
+            ArgumentException.ThrowIfNullOrWhiteSpace(password);
 
             if (storedHash.Length != 64)
             {

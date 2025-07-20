@@ -1,5 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,9 +19,13 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
 
         public async Task<GetMostSeenPlatesResponse> Handle(GetMostSeenPlatesQuery request, CancellationToken cancellationToken)
         {
+            // Default to last 30 days if no dates provided
+            var startDate = request.StartDate ?? DateTimeOffset.UtcNow.AddDays(-30);
+            var endDate = request.EndDate ?? DateTimeOffset.UtcNow;
+
             var plateGroups = await _unitOfWork.PlateGroups.GetMostSeenPlatesAsync(
-                request.StartDate,
-                request.EndDate,
+                startDate,
+                endDate,
                 request.Limit,
                 cancellationToken);
 

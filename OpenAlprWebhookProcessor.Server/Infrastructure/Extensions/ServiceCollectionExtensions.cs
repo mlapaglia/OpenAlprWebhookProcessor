@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -26,6 +27,7 @@ using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Register;
 using OpenAlprWebhookProcessor.Features.Alerts;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -104,6 +106,17 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             return services;
         }
 
+        public static IServiceCollection AddMachineLearningServices(this IServiceCollection services)
+        {
+            services.AddSingleton<LicensePlateMlTrainingService>();
+            services.AddSingleton<IHostedService>(p => p.GetService<LicensePlateMlTrainingService>());
+
+            services.AddScoped<ILicensePlateFeatureExtractor, LicensePlateFeatureExtractor>();
+            services.AddScoped<ILicensePlatePredictionService, LicensePlatePredictionService>();
+
+            return services;
+        }
+
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
             services.AddScoped<IGroupWebhookHandler, GroupWebhookHandler>();
@@ -115,8 +128,13 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<IAlertClient, PushoverClient>();
             services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
-            services.AddHttpClient<PushServiceClient>();
-            services.AddScoped<IPushServiceClientWrapper, PushServiceClientWrapper>();
+            services.AddSingleton<PushServiceClient>(provider => 
+            {
+                var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+                var httpClient = httpClientFactory.CreateClient();
+                return new PushServiceClient(httpClient);
+            });
+            services.AddSingleton<IPushServiceClientWrapper, PushServiceClientWrapper>();
             services.AddHttpClient();
             services.AddScoped<IImageCompressionService, ImageCompressionService>();
             services.AddSingleton<Features.Cameras.ICameraFactory, Features.Cameras.CameraFactory>();

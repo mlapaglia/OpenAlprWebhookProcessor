@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
@@ -50,6 +51,8 @@ namespace OpenAlprWebhookProcessor
 
             services.AddBackgroundServices();
 
+            services.AddMachineLearningServices();
+
             services.AddAutoMapper();
 
             services.AddMemoryCache();
@@ -93,24 +96,6 @@ namespace OpenAlprWebhookProcessor
                 endpoints.MapFallbackToFile("/index.html");
                 endpoints.MapHub<ProcessorHub.ProcessorHub>("/api/processorHub");
             });
-
-            ConfigureLogging(app);
-        }
-
-        private static void ConfigureLogging(IApplicationBuilder app)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
-                .Enrich.FromLogContext()
-                .WriteTo.File(
-                    "./config/log-.txt",
-                    rollingInterval: RollingInterval.Day,
-                    shared: true,
-                    flushToDiskInterval: TimeSpan.FromSeconds(5),
-                    retainedFileCountLimit: 3)
-                .WriteTo.Console()
-                .WriteTo.Signalr(app.ApplicationServices.GetService<IHubContext<ProcessorHub.ProcessorHub, IProcessorHub>>())
-                .CreateLogger();
         }
     }
 }

@@ -9,6 +9,8 @@ using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilters;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetHourlyStats;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
 using System;
 using System.Threading;
@@ -89,11 +91,15 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates
 
         [HttpGet("counts")]
         public async Task<ActionResult<GetLicensePlateCountsResponse>> GetLicensePlateCounts(
-            [FromQuery] DateTimeOffset startDate,
-            [FromQuery] DateTimeOffset endDate,
+            [FromQuery] DateTimeOffset? startDate,
+            [FromQuery] DateTimeOffset? endDate,
             CancellationToken cancellationToken)
         {
-            var query = new GetLicensePlateCountsQuery(startDate, endDate);
+            // Default to last 30 days if no dates provided
+            var start = startDate ?? DateTimeOffset.UtcNow.AddDays(-30);
+            var end = endDate ?? DateTimeOffset.UtcNow;
+            
+            var query = new GetLicensePlateCountsQuery(start, end);
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
@@ -146,6 +152,24 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates
             var command = new EnrichPlateCommand(id);
             await _mediator.Send(command, cancellationToken);
             return Ok();
+        }
+
+        [HttpGet("stats/hourly")]
+        public async Task<ActionResult<GetHourlyStatsResponse>> GetHourlyStats(
+            CancellationToken cancellationToken)
+        {
+            var query = new GetHourlyStatsQuery();
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("stats/quick")]
+        public async Task<ActionResult<GetQuickStatsResponse>> GetQuickStats(
+            CancellationToken cancellationToken)
+        {
+            var query = new GetQuickStatsQuery();
+            var result = await _mediator.Send(query, cancellationToken);
+            return Ok(result);
         }
     }
 } 

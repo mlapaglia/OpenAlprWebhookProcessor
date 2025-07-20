@@ -2,8 +2,10 @@ import { enableProdMode, isDevMode, importProvidersFrom, inject, provideAppIniti
 import { environment } from './environments/environment'
 import { AppComponent } from './app/app.component'
 import { ServiceWorkerModule } from '@angular/service-worker'
-import { NgxChartsModule } from '@swimlane/ngx-charts'
+import { Chart, registerables } from 'chart.js'
 import { MatExpansionModule } from '@angular/material/expansion'
+
+Chart.register(...registerables);
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
@@ -55,7 +57,6 @@ bootstrapApplication(AppComponent, {
       MatSnackBarModule,
       MatProgressSpinnerModule,
       MatExpansionModule,
-      NgxChartsModule,
       HighlightModule,
       ServiceWorkerModule.register('ngsw-worker.js', {
         enabled: !isDevMode(),

@@ -110,13 +110,33 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 query = query.Where(x => x.ReceivedOnEpoch <= endEpochMs);
             }
 
-            return await query
+            // First, get the counts and most recent epoch for each plate
+            var plateCounts = await query
                 .GroupBy(x => x.BestNumber)
-                .Select(g => new { PlateNumber = g.Key, Count = g.Count(), Latest = g.OrderByDescending(x => x.ReceivedOnEpoch).First() })
+                .Select(g => new { 
+                    PlateNumber = g.Key, 
+                    Count = g.Count(),
+                    LatestEpoch = g.Max(x => x.ReceivedOnEpoch)
+                })
                 .OrderByDescending(x => x.Count)
                 .Take(limit)
-                .Select(x => x.Latest)
                 .ToListAsync(cancellationToken);
+
+            // Then get the actual PlateGroup objects for those plates
+            var result = new List<PlateGroup>();
+            foreach (var plateCount in plateCounts)
+            {
+                var plateGroup = await _dbSet
+                    .Where(x => x.BestNumber == plateCount.PlateNumber && x.ReceivedOnEpoch == plateCount.LatestEpoch)
+                    .FirstOrDefaultAsync(cancellationToken);
+                
+                if (plateGroup != null)
+                {
+                    result.Add(plateGroup);
+                }
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<DayCount>> GetPlateCountsAsync(

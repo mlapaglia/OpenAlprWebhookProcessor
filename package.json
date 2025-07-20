@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "ngx-echarts": "^20.0.1"
+  }
+}

@@ -21,6 +21,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         {
             _logger = logger;
             _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
+            _logger.LogWarning("warning!");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

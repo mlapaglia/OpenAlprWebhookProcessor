@@ -28,7 +28,7 @@
     "@angular/router": "^20.0.5",
     "@angular/service-worker": "^20.0.5",
     "@microsoft/signalr": "^7.0.12",
-    "@swimlane/ngx-charts": "^20.0.4",
+    "chart.js": "^4.5.0",
     "jest-editor-support": "*",
     "ngx-highlightjs": "^12.0.0",
     "ngx-lightbox": "^3.0.0",
