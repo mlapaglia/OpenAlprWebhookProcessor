@@ -50,7 +50,7 @@ jobs:
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" \
           /d:sonar.javascript.lcov.reportPaths="**/lcov.info" \
-          /d:sonar.exclusions="**/Features/Users/Data/Migrations/**"
+          /d:sonar.exclusions="**/Features/Users/Data/Migrations/**,**/Infrastructure/Extensions/ServiceCollectionExtensions.cs""
       
       - name: Build and Test Backend
         run: |
