@@ -94,7 +94,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
 
             if (!string.IsNullOrWhiteSpace(user.Username) && user.Username != requestedUser.Username)
             {
-                if (_usersContext.Users.Any(x => x.Username == user.Username))
+                if (await _usersContext.Users.AnyAsync(x => x.Username == user.Username))
                     throw new AppException("Username " + user.Username + " is already taken");
 
                 user.Username = requestedUser.Username;
