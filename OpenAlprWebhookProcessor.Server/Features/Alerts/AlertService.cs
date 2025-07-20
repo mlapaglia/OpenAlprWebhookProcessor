@@ -51,6 +51,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
 
             return Task.CompletedTask;
         }

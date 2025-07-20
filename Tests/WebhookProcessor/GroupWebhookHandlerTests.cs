@@ -260,7 +260,7 @@ namespace Tests.WebhookProcessor
             await _handler.HandleWebhookAsync(webhook, true, CancellationToken.None);
 
             // Assert
-            _cameraUpdateService.DidNotReceive().ScheduleOverlayRequest(Arg.Any<CameraUpdateRequest>());
+            await _cameraUpdateService.DidNotReceive().ScheduleOverlayRequestAsync(Arg.Any<CameraUpdateRequest>());
             await _processorHubClient.DidNotReceive().LicensePlateRecorded(Arg.Any<string>());
         }
 
@@ -283,7 +283,7 @@ namespace Tests.WebhookProcessor
             await _handler.HandleWebhookAsync(webhook, false, CancellationToken.None);
 
             // Assert
-            _cameraUpdateService.Received().ScheduleOverlayRequest(Arg.Any<CameraUpdateRequest>());
+            await _cameraUpdateService.Received().ScheduleOverlayRequestAsync(Arg.Any<CameraUpdateRequest>());
         }
 
         [Test]

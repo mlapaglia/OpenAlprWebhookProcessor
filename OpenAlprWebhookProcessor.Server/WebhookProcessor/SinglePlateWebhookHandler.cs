@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                     IsSinglePlate = true,
                 };
 
-                _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
+                await _cameraUpdateService.ScheduleOverlayRequestAsync(updateRequest);
             }
 
             var forwards = await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken);

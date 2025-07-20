@@ -158,19 +158,19 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public void EnqueueDayNight(
+        public async Task EnqueueDayNightAsync(
             Guid cameraId,
             SunriseSunset sunriseSunset)
         {
-            CameraScheduling.ExecuteSingleDayNightTaskAsync(
+            await CameraScheduling.ExecuteSingleDayNightTaskAsync(
                 sunriseSunset,
                 cameraId,
                 _backgroundJobService);
         }
 
-        public void ScheduleOverlayRequest(CameraUpdateRequest cameraUpdateRequest)
+        public async Task ScheduleOverlayRequestAsync(CameraUpdateRequest cameraUpdateRequest)
         {
-            _backgroundJobService.EnqueueProcessJobAsync(cameraUpdateRequest);
+            await _backgroundJobService.EnqueueProcessJobAsync(cameraUpdateRequest);
         }
 
         public async Task ProcessJobAsync(CameraUpdateRequest cameraUpdateRequest)

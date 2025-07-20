@@ -6,7 +6,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public interface ICameraUpdateService
     {
-        void ScheduleOverlayRequest(CameraUpdateRequest cameraUpdateRequest);
+        Task ScheduleOverlayRequestAsync(CameraUpdateRequest cameraUpdateRequest);
 
         Task ScheduleDayNightTaskAsync();
 
@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         Task<ZoomFocus> GetZoomAndFocusAsync(Guid cameraId, CancellationToken cancellationToken);
 
-        void EnqueueDayNight(Guid cameraId, SunriseSunset sunriseSunset);
+        Task EnqueueDayNightAsync(Guid cameraId, SunriseSunset sunriseSunset);
 
         Task ProcessSunriseSunsetJobAsync(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob);
 

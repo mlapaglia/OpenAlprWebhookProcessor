@@ -160,7 +160,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
                         VehicleDescription = VehicleUtilities.FormatVehicleDescription(plateGroup.VehicleYear + " " + plateGroup.VehicleMakeModel),
                     };
 
-                    _cameraUpdateService.ScheduleOverlayRequest(updateRequest);
+                    await _cameraUpdateService.ScheduleOverlayRequestAsync(updateRequest);
                 }
 
                 if (!webhook.Group.IsPreview)

@@ -431,7 +431,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public void ScheduleOverlayRequest_WithValidRequest_SchedulesJob()
+        public async Task ScheduleOverlayRequest_WithValidRequest_SchedulesJobAsync()
         {
             // Arrange
             var request = new CameraUpdateRequest
@@ -441,10 +441,10 @@ namespace Tests.CameraUpdateService
             };
 
             // Act
-            _cameraUpdateService.ScheduleOverlayRequest(request);
+            await _cameraUpdateService.ScheduleOverlayRequestAsync(request);
 
             // Assert
-            _backgroundJobService.Received(1).EnqueueProcessJobAsync(request);
+            await _backgroundJobService.Received(1).EnqueueProcessJobAsync(request);
         }
 
         [Test]

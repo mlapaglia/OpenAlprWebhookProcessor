@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
 
         public Task Handle(TestCameraOverlayCommand request, CancellationToken cancellationToken)
         {
-            _cameraUpdateService.ScheduleOverlayRequest(new CameraUpdateService.CameraUpdateRequest()
+            _cameraUpdateService.ScheduleOverlayRequestAsync(new CameraUpdateService.CameraUpdateRequest()
             {
                 Id = request.CameraId,
                 IsTest = true,

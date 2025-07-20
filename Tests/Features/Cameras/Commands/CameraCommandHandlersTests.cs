@@ -317,7 +317,7 @@ namespace Tests.Features.Cameras.Commands
             await handler.Handle(command, CancellationToken.None);
 
             // Assert
-            _cameraUpdateService.Received(1).EnqueueDayNight(cameraId, SunriseSunset.Sunrise);
+            await _cameraUpdateService.Received(1).EnqueueDayNightAsync(cameraId, SunriseSunset.Sunrise);
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace Tests.Features.Cameras.Commands
             await handler.Handle(command, CancellationToken.None);
 
             // Assert
-            _cameraUpdateService.Received(1).EnqueueDayNight(cameraId, SunriseSunset.Sunset);
+            await _cameraUpdateService.Received(1).EnqueueDayNightAsync(cameraId, SunriseSunset.Sunset);
         }
 
         [Test]
@@ -347,7 +347,7 @@ namespace Tests.Features.Cameras.Commands
             await handler.Handle(command, CancellationToken.None);
 
             // Assert
-            _cameraUpdateService.Received(1).ScheduleOverlayRequest(
+            await _cameraUpdateService.Received(1).ScheduleOverlayRequestAsync(
                 Arg.Is<CameraUpdateRequest>(r =>
                     r.Id == cameraId &&
                     r.IsTest == true &&

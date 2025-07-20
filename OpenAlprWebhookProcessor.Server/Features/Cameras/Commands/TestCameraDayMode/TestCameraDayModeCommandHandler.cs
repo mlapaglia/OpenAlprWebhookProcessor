@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraDayMode
 
         public Task Handle(TestCameraDayModeCommand request, CancellationToken cancellationToken)
         {
-            _cameraUpdateService.EnqueueDayNight(
+            _cameraUpdateService.EnqueueDayNightAsync(
                 request.CameraId,
                 SunriseSunset.Sunrise);
 
