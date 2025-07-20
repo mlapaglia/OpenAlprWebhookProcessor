@@ -1,0 +1,435 @@
+using FluentAssertions;
+using NUnit.Framework;
+using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
+using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
+using System.Net;
+using System.Text;
+using System.Xml.Serialization;
+using Tests.TestHelpers;
+
+namespace Tests.CameraUpdateService.Hikvision
+{
+    [TestFixture]
+    public class HikvisionCameraTests : TestBase
+    {
+        private TestableHikvisionCamera _hikvisionCamera;
+
+        private TestHttpMessageHandler _testHttpHandler;
+
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+            
+            _testHttpHandler = new TestHttpMessageHandler();
+            var testCamera = CreateTestDataCameraForHikvision();
+            
+            // Replace the HttpClient with our test handler
+            _hikvisionCamera = new TestableHikvisionCamera(testCamera, _testHttpHandler);
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            _hikvisionCamera?.Dispose();
+            _testHttpHandler?.Dispose();
+            base.TearDown();
+        }
+
+        [Test]
+        public void Constructor_WithValidCamera_InitializesCorrectly()
+        {
+            // Arrange
+            var camera = CreateTestDataCameraForHikvision();
+
+            // Act
+            var hikvisionCamera = new HikvisionCamera(camera);
+
+            // Assert
+            hikvisionCamera.Should().NotBeNull();
+        }
+
+        [Test]
+        public void Constructor_WithNullCamera_ThrowsNullReferenceException()
+        {
+            // Arrange & Act & Assert
+            Assert.Throws<NullReferenceException>(() => new HikvisionCamera(null));
+        }
+
+        [Test]
+        public async Task ClearCameraTextAsync_WithValidRequest_SendsCorrectXmlRequest()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.OK, "Success");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _hikvisionCamera.ClearCameraTextAsync(cancellationToken);
+
+            // Assert
+            _testHttpHandler.RequestMethod.Should().Be(HttpMethod.Put);
+            _testHttpHandler.RequestUri.ToString().Should().Be("http://192.168.1.100/test-overlay-url");
+            
+            var content = _testHttpHandler.RequestContent;
+            content.Should().NotBeEmpty();
+            
+            // Verify XML structure
+            var videoOverlay = DeserializeVideoOverlay(content);
+            videoOverlay.Should().NotBeNull();
+            videoOverlay.Alignment.Should().Be("customize");
+            videoOverlay.TextOverlayList.TextOverlay.Should().HaveCount(4);
+            
+            // All overlays should be disabled and empty
+            foreach (var overlay in videoOverlay.TextOverlayList.TextOverlay)
+            {
+                overlay.Enabled.Should().Be("false");
+                overlay.DisplayText.Should().BeEmpty();
+            }
+        }
+
+        [Test]
+        public async Task SetCameraTextAsync_WithValidRequest_SendsCorrectXmlRequest()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.OK, "Success");
+            var updateRequest = CreateTestCameraUpdateRequest();
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _hikvisionCamera.SetCameraTextAsync(updateRequest, cancellationToken);
+
+            // Assert
+            _testHttpHandler.RequestMethod.Should().Be(HttpMethod.Put);
+            _testHttpHandler.RequestUri.ToString().Should().Be("http://192.168.1.100/test-overlay-url");
+            
+            var content = _testHttpHandler.RequestContent;
+            content.Should().NotBeEmpty();
+            
+            // Verify XML structure and content
+            var videoOverlay = DeserializeVideoOverlay(content);
+            videoOverlay.Should().NotBeNull();
+            videoOverlay.Alignment.Should().Be("customize");
+            videoOverlay.TextOverlayList.TextOverlay.Should().HaveCount(4);
+            
+            // Verify specific overlay content
+            videoOverlay.TextOverlayList.TextOverlay[0].Id.Should().Be("1");
+            videoOverlay.TextOverlayList.TextOverlay[0].Enabled.Should().Be("true");
+            videoOverlay.TextOverlayList.TextOverlay[0].DisplayText.Should().Be("ABC123");
+            
+            videoOverlay.TextOverlayList.TextOverlay[1].Id.Should().Be("2");
+            videoOverlay.TextOverlayList.TextOverlay[1].Enabled.Should().Be("true");
+            videoOverlay.TextOverlayList.TextOverlay[1].DisplayText.Should().Be("Toyota Camry");
+            
+            videoOverlay.TextOverlayList.TextOverlay[2].Id.Should().Be("3");
+            videoOverlay.TextOverlayList.TextOverlay[2].Enabled.Should().Be("true");
+            videoOverlay.TextOverlayList.TextOverlay[2].DisplayText.Should().Be("Processing Time: 150.5ms");
+            
+            videoOverlay.TextOverlayList.TextOverlay[3].Id.Should().Be("4");
+            videoOverlay.TextOverlayList.TextOverlay[3].Enabled.Should().Be("true");
+            videoOverlay.TextOverlayList.TextOverlay[3].DisplayText.Should().Be("Confidence: 95.8%");
+        }
+
+        [Test]
+        public async Task SetCameraTextAsync_WithHttpError_ThrowsArgumentException()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Error occurred");
+            var updateRequest = CreateTestCameraUpdateRequest();
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            try
+            {
+                await _hikvisionCamera.SetCameraTextAsync(updateRequest, cancellationToken);
+                Assert.Fail("Expected ArgumentException was not thrown");
+            }
+            catch (ArgumentException ex)
+            {
+                ex.Message.Should().StartWith("unable to update video overlay:");
+                ex.Message.Should().Contain("Error occurred");
+            }
+        }
+
+        [Test]
+        public async Task TriggerDayNightModeAsync_WithSunrise_SendsCorrectRequest()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.OK, "Success");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _hikvisionCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, cancellationToken);
+
+            // Assert
+            _testHttpHandler.RequestMethod.Should().Be(HttpMethod.Put);
+            _testHttpHandler.RequestUri.ToString().Should().Be("http://192.168.1.100/ISAPI/Image/channels/1");
+            
+            var content = _testHttpHandler.RequestContent;
+            content.Should().Contain("<IrcutFilterType>day</IrcutFilterType>");
+            content.Should().Contain("http://www.hikvision.com/ver20/XMLSchema");
+        }
+
+        [Test]
+        public async Task TriggerDayNightModeAsync_WithSunset_SendsCorrectRequest()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.OK, "Success");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            await _hikvisionCamera.TriggerDayNightModeAsync(SunriseSunset.Sunset, cancellationToken);
+
+            // Assert
+            _testHttpHandler.RequestMethod.Should().Be(HttpMethod.Put);
+            _testHttpHandler.RequestUri.ToString().Should().Be("http://192.168.1.100/ISAPI/Image/channels/1");
+            
+            var content = _testHttpHandler.RequestContent;
+            content.Should().Contain("<IrcutFilterType>night</IrcutFilterType>");
+            content.Should().Contain("http://www.hikvision.com/ver20/XMLSchema");
+        }
+
+        [Test]
+        public async Task TriggerDayNightModeAsync_WithHttpError_ThrowsArgumentException()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.InternalServerError, "Camera error");
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            try
+            {
+                await _hikvisionCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, cancellationToken);
+                Assert.Fail("Expected ArgumentException was not thrown");
+            }
+            catch (ArgumentException ex)
+            {
+                ex.Message.Should().StartWith("unable to set sunrise/sunset:");
+                ex.Message.Should().Contain("Camera error");
+            }
+        }
+
+        [Test]
+        public async Task GetSnapshotAsync_WithSuccessResponse_ReturnsStream()
+        {
+            // Arrange
+            var imageBytes = Encoding.UTF8.GetBytes("fake image data");
+            _testHttpHandler.SetupResponse(HttpStatusCode.OK, imageBytes);
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _hikvisionCamera.GetSnapshotAsync(cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            _testHttpHandler.RequestMethod.Should().Be(HttpMethod.Get);
+            _testHttpHandler.RequestUri.ToString().Should().Be("http://192.168.1.100/ISAPI/Streaming/channels/1/picture");
+            
+            // Verify stream content
+            using var reader = new StreamReader(result);
+            var content = await reader.ReadToEndAsync();
+            content.Should().Be("fake image data");
+        }
+
+        [Test]
+        public async Task GetSnapshotAsync_WithHttpError_StillReturnsStream()
+        {
+            // Arrange
+            _testHttpHandler.SetupResponse(HttpStatusCode.NotFound, "Not found");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _hikvisionCamera.GetSnapshotAsync(cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            
+            // Should still return the error response as a stream
+            using var reader = new StreamReader(result);
+            var content = await reader.ReadToEndAsync();
+            content.Should().Be("Not found");
+        }
+
+        [Test]
+        public void SetZoomAndFocusAsync_NotImplemented_ThrowsNotImplementedException()
+        {
+            // Arrange
+            var zoomFocus = new ZoomFocus { Zoom = 1.5m, Focus = 2.0m };
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            Assert.ThrowsAsync<NotImplementedException>(() =>
+                _hikvisionCamera.SetZoomAndFocusAsync(zoomFocus, cancellationToken));
+        }
+
+        [Test]
+        public void GetZoomAndFocusAsync_NotImplemented_ThrowsNotImplementedException()
+        {
+            // Arrange
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            Assert.ThrowsAsync<NotImplementedException>(() =>
+                _hikvisionCamera.GetZoomAndFocusAsync(cancellationToken));
+        }
+
+        [Test]
+        public void TriggerAutoFocusAsync_NotImplemented_ThrowsNotImplementedException()
+        {
+            // Arrange
+            var cancellationToken = GetCancellationToken();
+
+            // Act & Assert
+            Assert.ThrowsAsync<NotImplementedException>(() =>
+                _hikvisionCamera.TriggerAutoFocusAsync(cancellationToken));
+        }
+
+        [Test]
+        public async Task ClearCameraTextAsync_WithCancellation_ThrowsOperationCanceledException()
+        {
+            // Arrange
+            var cancellationTokenSource = new CancellationTokenSource();
+            _testHttpHandler.SetupDelayedResponse(HttpStatusCode.OK, "Success", TimeSpan.FromSeconds(1));
+            
+            // Cancel immediately
+            await cancellationTokenSource.CancelAsync();
+
+            // Act & Assert
+            try
+            {
+                await _hikvisionCamera.ClearCameraTextAsync(cancellationTokenSource.Token);
+                Assert.Fail("Expected OperationCanceledException was not thrown");
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected exception - test passes
+            }
+        }
+
+        private static OpenAlprWebhookProcessor.Data.Camera CreateTestDataCameraForHikvision()
+        {
+            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
+            camera.IpAddress = "192.168.1.100";
+            camera.UpdateOverlayTextUrl = "http://192.168.1.100/test-overlay-url";
+            camera.CameraUsername = "testuser";
+            camera.CameraPassword = "testpass";
+            return camera;
+        }
+
+        private static CameraUpdateRequest CreateTestCameraUpdateRequest()
+        {
+            return new CameraUpdateRequest
+            {
+                Id = Guid.NewGuid(),
+                LicensePlate = "ABC123",
+                VehicleDescription = "Toyota Camry",
+                OpenAlprProcessingTimeMs = 150.5,
+                ProcessedPlateConfidence = 95.8,
+                LicensePlateImageUuid = Guid.NewGuid().ToString(),
+                IsAlert = false,
+                IsTest = false,
+                IsSinglePlate = false,
+                IsPreviewGroup = false
+            };
+        }
+
+        private static VideoOverlay DeserializeVideoOverlay(string xmlContent)
+        {
+            var serializer = new XmlSerializer(typeof(VideoOverlay));
+            using var reader = new StringReader(xmlContent);
+            return (VideoOverlay)serializer.Deserialize(reader);
+        }
+    }
+
+    /// <summary>
+    /// Testable version of HikvisionCamera that allows injection of HttpClient for testing
+    /// </summary>
+    public class TestableHikvisionCamera : HikvisionCamera, IDisposable
+    {
+        private readonly HttpClient _testHttpClient;
+
+        public TestableHikvisionCamera(OpenAlprWebhookProcessor.Data.Camera camera, HttpMessageHandler handler)
+            : base(camera)
+        {
+            _testHttpClient = new HttpClient(handler);
+            
+            // Use reflection to replace the private HttpClient field
+            var field = typeof(HikvisionCamera).GetField("_httpClient", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            field?.SetValue(this, _testHttpClient);
+        }
+
+        public void Dispose()
+        {
+            _testHttpClient?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Test HTTP handler that captures requests and returns mock responses
+    /// </summary>
+    public class TestHttpMessageHandler : HttpMessageHandler
+    {
+        public HttpMethod RequestMethod { get; private set; }
+        public Uri RequestUri { get; private set; }
+        public string RequestContent { get; private set; }
+        
+        private HttpStatusCode _responseStatusCode = HttpStatusCode.OK;
+        private string _responseContent = "";
+        private byte[] _responseBytes;
+        private TimeSpan? _delay;
+
+        public void SetupResponse(HttpStatusCode statusCode, string content)
+        {
+            _responseStatusCode = statusCode;
+            _responseContent = content;
+            _responseBytes = null;
+            _delay = null;
+        }
+
+        public void SetupResponse(HttpStatusCode statusCode, byte[] content)
+        {
+            _responseStatusCode = statusCode;
+            _responseContent = null;
+            _responseBytes = content;
+            _delay = null;
+        }
+
+        public void SetupDelayedResponse(HttpStatusCode statusCode, string content, TimeSpan delay)
+        {
+            _responseStatusCode = statusCode;
+            _responseContent = content;
+            _responseBytes = null;
+            _delay = delay;
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            RequestMethod = request.Method;
+            RequestUri = request.RequestUri;
+            
+            if (request.Content != null)
+            {
+                RequestContent = await request.Content.ReadAsStringAsync();
+            }
+
+            if (_delay.HasValue)
+            {
+                await Task.Delay(_delay.Value, cancellationToken);
+            }
+
+            var response = new HttpResponseMessage(_responseStatusCode);
+            
+            if (_responseBytes != null)
+            {
+                response.Content = new ByteArrayContent(_responseBytes);
+            }
+            else
+            {
+                response.Content = new StringContent(_responseContent ?? "");
+            }
+
+            return response;
+        }
+    }
+} 
