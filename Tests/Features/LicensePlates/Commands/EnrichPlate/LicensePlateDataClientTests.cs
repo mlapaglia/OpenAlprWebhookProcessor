@@ -3,15 +3,10 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Commands.EnrichPlate
@@ -20,10 +15,15 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
     public class LicensePlateDataClientTests : TestBase
     {
         private LicensePlateDataClient _client;
+
         private TestHttpMessageHandler _httpMessageHandler;
+
         private ILogger<LicensePlateDataClient> _logger;
+
         private IUnitOfWork _unitOfWork;
+
         private IHttpClientFactory _httpClientFactory;
+
         private HttpClient _httpClient;
 
         [SetUp]

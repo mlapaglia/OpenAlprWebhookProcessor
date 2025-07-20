@@ -1,10 +1,12 @@
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Cameras;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
+using System.Net.Http;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Cameras
@@ -13,11 +15,14 @@ namespace Tests.Features.Cameras
     public class CameraFactoryTests
     {
         private CameraFactory _factory;
+        private IHttpClientFactory _httpClientFactory;
 
         [SetUp]
         public void SetUp()
         {
-            _factory = new CameraFactory();
+            _httpClientFactory = Substitute.For<IHttpClientFactory>();
+            _httpClientFactory.CreateClient().Returns(new HttpClient());
+            _factory = new CameraFactory(_httpClientFactory);
         }
 
         [Test]
@@ -63,15 +68,20 @@ namespace Tests.Features.Cameras
         }
 
         [Test]
-        public void Create_WithNullCamera_ShouldThrowNullReferenceException()
+        public void Create_WithNullCamera_DoesNotThrowImmediately()
         {
             // Arrange
             OpenAlprWebhookProcessor.Data.Camera nullCamera = null;
 
-            // Act & Assert
-            // Both camera implementations will throw NullReferenceException when accessing null camera properties
-            Assert.Throws<NullReferenceException>(() => _factory.Create(CameraManufacturer.Hikvision, nullCamera));
-            Assert.Throws<NullReferenceException>(() => _factory.Create(CameraManufacturer.Dahua, nullCamera));
+            // Act
+            var hikvisionCamera = _factory.Create(CameraManufacturer.Hikvision, nullCamera);
+            var dahuaCamera = _factory.Create(CameraManufacturer.Dahua, nullCamera);
+
+            // Assert
+            // Both cameras now use IHttpClientFactory and don't throw immediately with null cameras
+            // The exception will occur when methods try to access camera properties
+            hikvisionCamera.Should().NotBeNull();
+            dahuaCamera.Should().NotBeNull();
         }
 
         [Test]

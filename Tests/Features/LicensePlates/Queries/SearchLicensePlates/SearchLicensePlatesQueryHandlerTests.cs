@@ -3,9 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates

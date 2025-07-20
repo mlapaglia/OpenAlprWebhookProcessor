@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
-using System.Net;
+using System.Text;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 {
@@ -14,12 +15,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
     {
         private readonly Data.Camera _camera;
 
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HikvisionCamera(Data.Camera camera)
+        public HikvisionCamera(
+            Data.Camera camera,
+            IHttpClientFactory httpClientFactory)
         {
             _camera = camera;
-            _httpClient = GetHttpClient();
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task ClearCameraTextAsync(
@@ -112,8 +115,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             CancellationToken cancellationToken)
         {
             var body = new StringContent($"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>");
-            
-            var response = await _httpClient.PutAsync(
+
+            using var httpClient = GetConfiguredHttpClient();
+            var response = await httpClient.PutAsync(
                 $"http://{_camera.IpAddress}/ISAPI/Image/channels/1",
                 body,
                 cancellationToken);
@@ -137,7 +141,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
                         writer,
                         videoOverlay);
 
-                    var response = await _httpClient.PutAsync(
+                    using var httpClient = GetConfiguredHttpClient();
+                    var response = await httpClient.PutAsync(
                         _camera.UpdateOverlayTextUrl,
                         new StringContent(stringWriter.ToString()),
                         cancellationToken);
@@ -150,15 +155,19 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             }
         }
 
-        private HttpClient GetHttpClient()
+        private HttpClient GetConfiguredHttpClient()
         {
-            return new HttpClient(new HttpClientHandler()
+            var httpClient = _httpClientFactory.CreateClient();
+            
+            // Set basic authentication credentials via Authorization header
+            if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
             {
-                UseDefaultCredentials = true,
-                Credentials = new NetworkCredential(
-                    _camera.CameraUsername,
-                    _camera.CameraPassword),
-            });
+                var authValue = Convert.ToBase64String(
+                    Encoding.ASCII.GetBytes($"{_camera.CameraUsername}:{_camera.CameraPassword}"));
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
+            }
+
+            return httpClient;
         }
 
         private static VideoOverlay CreateBaseVideoOverlayRequest()
@@ -175,7 +184,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            var result = await _httpClient.GetAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var result = await httpClient.GetAsync(
                 $"http://{_camera.IpAddress}/ISAPI/Streaming/channels/1/picture",
                 cancellationToken);
 

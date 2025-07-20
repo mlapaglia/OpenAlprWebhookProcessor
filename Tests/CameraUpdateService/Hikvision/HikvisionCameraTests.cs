@@ -1,10 +1,16 @@
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
+using System;
+using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Tests.TestHelpers;
 
@@ -13,9 +19,10 @@ namespace Tests.CameraUpdateService.Hikvision
     [TestFixture]
     public class HikvisionCameraTests : TestBase
     {
-        private TestableHikvisionCamera _hikvisionCamera;
-
+        private HikvisionCamera _hikvisionCamera;
         private TestHttpMessageHandler _testHttpHandler;
+        private IHttpClientFactory _httpClientFactory;
+        private HttpClient _httpClient;
 
         [SetUp]
         public override void SetUp()
@@ -23,38 +30,66 @@ namespace Tests.CameraUpdateService.Hikvision
             base.SetUp();
             
             _testHttpHandler = new TestHttpMessageHandler();
-            var testCamera = CreateTestDataCameraForHikvision();
+            _httpClient = new HttpClient(_testHttpHandler);
+            _httpClientFactory = Substitute.For<IHttpClientFactory>();
             
-            // Replace the HttpClient with our test handler
-            _hikvisionCamera = new TestableHikvisionCamera(testCamera, _testHttpHandler);
+            // Setup the factory to return our test HTTP client
+            _httpClientFactory.CreateClient().Returns(_httpClient);
+            
+            var testCamera = CreateTestDataCameraForHikvision();
+            _hikvisionCamera = new HikvisionCamera(testCamera, _httpClientFactory);
         }
 
         [TearDown]
         public override void TearDown()
         {
-            _hikvisionCamera?.Dispose();
+            _httpClient?.Dispose();
             _testHttpHandler?.Dispose();
             base.TearDown();
         }
 
         [Test]
-        public void Constructor_WithValidCamera_InitializesCorrectly()
+        public void Constructor_WithValidParameters_InitializesCorrectly()
         {
             // Arrange
             var camera = CreateTestDataCameraForHikvision();
+            var httpClientFactory = Substitute.For<IHttpClientFactory>();
 
             // Act
-            var hikvisionCamera = new HikvisionCamera(camera);
+            var hikvisionCamera = new HikvisionCamera(camera, httpClientFactory);
 
             // Assert
             hikvisionCamera.Should().NotBeNull();
         }
 
         [Test]
-        public void Constructor_WithNullCamera_ThrowsNullReferenceException()
+        public void Constructor_WithNullCamera_DoesNotThrowImmediately()
         {
-            // Arrange & Act & Assert
-            Assert.Throws<NullReferenceException>(() => new HikvisionCamera(null));
+            // Arrange
+            var httpClientFactory = Substitute.For<IHttpClientFactory>();
+
+            // Act
+            var hikvisionCamera = new HikvisionCamera(null, httpClientFactory);
+
+            // Assert
+            hikvisionCamera.Should().NotBeNull();
+            // Note: The null camera will cause issues when methods are called,
+            // but the constructor itself doesn't validate parameters
+        }
+
+        [Test]
+        public void Constructor_WithNullHttpClientFactory_DoesNotThrowImmediately()
+        {
+            // Arrange
+            var camera = CreateTestDataCameraForHikvision();
+
+            // Act
+            var hikvisionCamera = new HikvisionCamera(camera, null);
+
+            // Assert
+            hikvisionCamera.Should().NotBeNull();
+            // Note: The null httpClientFactory will cause issues when methods are called,
+            // but the constructor itself doesn't validate parameters
         }
 
         [Test]
@@ -338,98 +373,6 @@ namespace Tests.CameraUpdateService.Hikvision
             var serializer = new XmlSerializer(typeof(VideoOverlay));
             using var reader = new StringReader(xmlContent);
             return (VideoOverlay)serializer.Deserialize(reader);
-        }
-    }
-
-    /// <summary>
-    /// Testable version of HikvisionCamera that allows injection of HttpClient for testing
-    /// </summary>
-    public class TestableHikvisionCamera : HikvisionCamera, IDisposable
-    {
-        private readonly HttpClient _testHttpClient;
-
-        public TestableHikvisionCamera(OpenAlprWebhookProcessor.Data.Camera camera, HttpMessageHandler handler)
-            : base(camera)
-        {
-            _testHttpClient = new HttpClient(handler);
-            
-            // Use reflection to replace the private HttpClient field
-            var field = typeof(HikvisionCamera).GetField("_httpClient", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field?.SetValue(this, _testHttpClient);
-        }
-
-        public void Dispose()
-        {
-            _testHttpClient?.Dispose();
-        }
-    }
-
-    /// <summary>
-    /// Test HTTP handler that captures requests and returns mock responses
-    /// </summary>
-    public class TestHttpMessageHandler : HttpMessageHandler
-    {
-        public HttpMethod RequestMethod { get; private set; }
-        public Uri RequestUri { get; private set; }
-        public string RequestContent { get; private set; }
-        
-        private HttpStatusCode _responseStatusCode = HttpStatusCode.OK;
-        private string _responseContent = "";
-        private byte[] _responseBytes;
-        private TimeSpan? _delay;
-
-        public void SetupResponse(HttpStatusCode statusCode, string content)
-        {
-            _responseStatusCode = statusCode;
-            _responseContent = content;
-            _responseBytes = null;
-            _delay = null;
-        }
-
-        public void SetupResponse(HttpStatusCode statusCode, byte[] content)
-        {
-            _responseStatusCode = statusCode;
-            _responseContent = null;
-            _responseBytes = content;
-            _delay = null;
-        }
-
-        public void SetupDelayedResponse(HttpStatusCode statusCode, string content, TimeSpan delay)
-        {
-            _responseStatusCode = statusCode;
-            _responseContent = content;
-            _responseBytes = null;
-            _delay = delay;
-        }
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            RequestMethod = request.Method;
-            RequestUri = request.RequestUri;
-            
-            if (request.Content != null)
-            {
-                RequestContent = await request.Content.ReadAsStringAsync();
-            }
-
-            if (_delay.HasValue)
-            {
-                await Task.Delay(_delay.Value, cancellationToken);
-            }
-
-            var response = new HttpResponseMessage(_responseStatusCode);
-            
-            if (_responseBytes != null)
-            {
-                response.Content = new ByteArrayContent(_responseBytes);
-            }
-            else
-            {
-                response.Content = new StringContent(_responseContent ?? "");
-            }
-
-            return response;
         }
     }
 } 

@@ -1,8 +1,9 @@
 ﻿using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,12 +14,12 @@ namespace OpenAlprWebhookProcessor.Cameras
     {
         private readonly Data.Camera _camera;
 
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public DahuaCamera(Data.Camera camera)
+        public DahuaCamera(Data.Camera camera, IHttpClientFactory httpClientFactory)
         {
             _camera = camera;
-            _httpClient = GetHttpClient();
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task ClearCameraTextAsync(
@@ -51,7 +52,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             string textToSet,
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.PostAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var response = await httpClient.PostAsync(
                 $"{_camera.UpdateOverlayTextUrl}" + textToSet,
                 null,
                 cancellationToken);
@@ -66,7 +68,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             SunriseSunset sunriseSunset,
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.PostAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var response = await httpClient.PostAsync(
                 $"{_camera.UpdateDayNightModeUrl}{(sunriseSunset == SunriseSunset.Sunrise ? 0 : 1)}",
                 null,
                 cancellationToken);
@@ -77,20 +80,25 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
         }
 
-        private HttpClient GetHttpClient()
+        private HttpClient GetConfiguredHttpClient()
         {
-            return new HttpClient(new HttpClientHandler()
+            var httpClient = _httpClientFactory.CreateClient();
+            
+            // Set basic authentication credentials via Authorization header
+            if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
             {
-                UseDefaultCredentials = true,
-                Credentials = new NetworkCredential(
-                    _camera.CameraUsername,
-                    _camera.CameraPassword),
-            });
+                var authValue = Convert.ToBase64String(
+                    Encoding.ASCII.GetBytes($"{_camera.CameraUsername}:{_camera.CameraPassword}"));
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
+            }
+
+            return httpClient;
         }
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            var result = await _httpClient.GetAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var result = await httpClient.GetAsync(
                 $"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi",
                 cancellationToken);
 
@@ -101,7 +109,8 @@ namespace OpenAlprWebhookProcessor.Cameras
             ZoomFocus zoomAndFocus,
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.PostAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var response = await httpClient.PostAsync(
                 $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=adjustFocus&focus={zoomAndFocus.Focus}&zoom={zoomAndFocus.Zoom}",
                 null,
                 cancellationToken);
@@ -114,7 +123,8 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
         {
-            var result = await _httpClient.PostAsync(
+            using var httpClient = GetConfiguredHttpClient();
+            var result = await httpClient.PostAsync(
                 $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=getFocusStatus",
                 null,
                 cancellationToken);
@@ -137,7 +147,8 @@ namespace OpenAlprWebhookProcessor.Cameras
         {
             try
             {
-                var result = await _httpClient.PostAsync(
+                using var httpClient = GetConfiguredHttpClient();
+                var result = await httpClient.PostAsync(
                     $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=autoFocus",
                     null,
                     cancellationToken);

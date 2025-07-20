@@ -10,7 +10,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.WebPushSubscriptions;
-using System.Collections.Generic;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts
