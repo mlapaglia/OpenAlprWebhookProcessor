@@ -39,23 +39,24 @@ export class PushSubscriberService {
       })
         .then(subscription => this.httpClient.post(this.baseUrl + 'api/WebPushSubscriptions', subscription, this.httpOptions).subscribe(
           () => {
-            console.log('sent subscription to server.')
           },
-          error => console.error(error),
+          () => {
+          }
         ))
         .catch(() => {
           this.resetSubscription()
         })
-    }, error => console.error(error))
+      }, _ => {
+    });
   }
 
   public unsubscribe() {
     this.swPush.unsubscribe()
       .then(() => this.httpClient.delete(this.baseUrl + 'api/WebPushSubscriptions/' + encodeURIComponent(this._subscription.endpoint)).subscribe(
-        () => { /* do nothing */ },
-        error => console.error(error),
+        () => { },
+        _ => { },
       ))
-      .catch(error => console.error(error))
+      .catch(_ => { })
   }
 
   public resetSubscription() {
@@ -65,7 +66,7 @@ export class PushSubscriberService {
           if (pushSubscription) {
             pushSubscription.unsubscribe().then(() => {
               this.subscribe()
-            }).catch(() => { /* do nothing */ })
+            }).catch(() => { })
           }
         })
     })

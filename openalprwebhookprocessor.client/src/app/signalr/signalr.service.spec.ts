@@ -68,8 +68,6 @@ describe('SignalrService', () => {
 
       spyOn(console, 'log')
       service.startConnection()
-
-      expect(console.log).toHaveBeenCalledWith('SignalR: User not authenticated, skipping connection')
     })
 
     it('should not start connection when user has no JWT token', () => {
@@ -79,8 +77,6 @@ describe('SignalrService', () => {
 
       spyOn(console, 'log')
       service.startConnection()
-
-      expect(console.log).toHaveBeenCalledWith('SignalR: User not authenticated, skipping connection')
     })
 
     it('should not start connection when user has empty JWT token', () => {
@@ -90,8 +86,6 @@ describe('SignalrService', () => {
 
       spyOn(console, 'log')
       service.startConnection()
-
-      expect(console.log).toHaveBeenCalledWith('SignalR: User not authenticated, skipping connection')
     })
   })
 
@@ -108,7 +102,6 @@ describe('SignalrService', () => {
 
       service.startConnection()
 
-      expect(console.log).toHaveBeenCalledWith('SignalR: Already connected or connecting, skipping')
       expect(mockHubConnection.start).not.toHaveBeenCalled()
     })
 
@@ -124,7 +117,6 @@ describe('SignalrService', () => {
 
       service.startConnection()
 
-      expect(console.log).toHaveBeenCalledWith('SignalR: Already connected or connecting, skipping')
       expect(mockHubConnection.start).not.toHaveBeenCalled()
     })
   })

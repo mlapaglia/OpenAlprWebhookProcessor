@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, inject, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core'
 import { User } from 'app/_models'
 import { AccountService } from 'app/_services'
-import { HomeService, HourlyStats, QuickStats } from './home.service'
+import { HomeService, QuickStats } from './home.service'
 import { MatCardModule } from '@angular/material/card'
 import { MatListModule } from '@angular/material/list'
 import { MatIconModule } from '@angular/material/icon'
@@ -28,13 +28,13 @@ Chart.register(...registerables)
     CommonModule
   ],
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements AfterViewInit, OnDestroy {
   @ViewChild('dailyChart') dailyChartRef!: ElementRef<HTMLCanvasElement>
   @ViewChild('hourlyChart') hourlyChartRef!: ElementRef<HTMLCanvasElement>
 
-  private accountService = inject(AccountService)
-  private homeService = inject(HomeService)
-  private breakpointObserver = inject(BreakpointObserver)
+  private readonly accountService = inject(AccountService)
+  private readonly homeService = inject(HomeService)
+  private readonly breakpointObserver = inject(BreakpointObserver)
 
   user: User
 
@@ -68,10 +68,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   constructor() {
     this.user = this.accountService.userValue
     this.setupResponsiveLayout()
-  }
-
-  ngOnInit() {
-    // Data loading will happen after view init
   }
 
   ngAfterViewInit() {
@@ -199,7 +195,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       Breakpoints.XSmall,
       Breakpoints.Small,
       Breakpoints.Medium
-    ]).subscribe(result => {
+    ]).subscribe(_ => {
       this.isMobile = this.breakpointObserver.isMatched(Breakpoints.XSmall)
       this.isTablet = this.breakpointObserver.isMatched(Breakpoints.Small)
 
@@ -234,8 +230,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           this.dailyChart.update()
         }
       },
-      error: (error) => {
-        console.error('Error loading daily chart:', error)
+      error: _ => {
         this.isLoadingCharts = false
       }
     })
@@ -248,8 +243,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           value: x.count,
         }))
       },
-      error: (error) => {
-        console.error('Error loading most seen:', error)
+      error: _ => {
       }
     })
 
@@ -266,8 +260,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
         this.isLoadingCharts = false
       },
-      error: (error) => {
-        console.error('Error loading hourly stats:', error)
+      error: _ => {
         // Create mock data if API doesn't exist yet
         this.createMockHourlyChart()
         this.isLoadingCharts = false
@@ -283,8 +276,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       next: (prediction) => {
         this.nextExpected = prediction
       },
-      error: (error) => {
-        console.error('Error loading next expected:', error)
+      error: _ => {
       }
     })
 
@@ -294,8 +286,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.upcomingPredictions = predictions
         this.isLoadingPredictions = false
       },
-      error: (error) => {
-        console.error('Error loading upcoming predictions:', error)
+      error: _ => {
         this.isLoadingPredictions = false
       }
     })
@@ -305,8 +296,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       next: (predictions) => {
         this.predictablePlates = predictions.sort((a, b) => b.confidenceScore - a.confidenceScore)
       },
-      error: (error) => {
-        console.error('Error loading predictable plates:', error)
+      error: _ => {
       }
     })
   }
@@ -319,8 +309,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.quickStats = stats
         this.isLoadingStats = false
       },
-      error: (error) => {
-        console.error('Error loading quick stats:', error)
+      error: _ => {
         // Generate mock stats if API doesn't exist yet
         this.quickStats = this.generateMockStats()
         this.isLoadingStats = false

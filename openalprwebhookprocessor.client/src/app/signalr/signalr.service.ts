@@ -26,7 +26,6 @@ export class SignalrService {
     // Only start connection if user is authenticated
     const user = this.accountService.userValue
     if (!user || !user.jwtToken) {
-      console.log('SignalR: User not authenticated, skipping connection')
       return
     }
 
@@ -34,7 +33,6 @@ export class SignalrService {
     if (this.hubConnection
       && (this.hubConnection.state === signalR.HubConnectionState.Connected
         || this.hubConnection.state === signalR.HubConnectionState.Connecting)) {
-      console.log('SignalR: Already connected or connecting, skipping')
       return
     }
 
@@ -57,8 +55,7 @@ export class SignalrService {
         this.connectionEstablished.next(true)
         this.triggerConnectionStatusChange(true)
       })
-      .catch((err) => {
-        console.log('Error while starting connection: ' + err)
+      .catch(_ => {
         this.snackbarService.create('Connection lost', SnackBarType.Disconnected)
       })
 
@@ -91,25 +88,21 @@ export class SignalrService {
     })
 
     this.hubConnection.onreconnected(() => {
-      console.log('Connection reconnected')
       this.snackbarService.create('Reconnected to server!', SnackBarType.Connected)
       this.triggerConnectionStatusChange(true)
     })
 
     this.hubConnection.onreconnecting(() => {
-      console.log('Connection reconnecting')
       this.snackbarService.create('Reconnecting to server...', SnackBarType.Disconnected)
       this.triggerConnectionStatusChange(false)
     })
 
     this.hubConnection.onclose(() => {
-      console.log('Connection ended')
       this.snackbarService.create('Connection lost', SnackBarType.Disconnected)
       this.triggerConnectionStatusChange(false)
     })
 
     this.hubConnection.on('ScrapeFinished', () => {
-      console.log('Scrape finished')
       this.snackbarService.create('Scrape finished!', SnackBarType.Info)
     })
   }
@@ -122,8 +115,7 @@ export class SignalrService {
           this.snackbarService.create('Connection closed', SnackBarType.Disconnected)
           this.triggerConnectionStatusChange(false)
         })
-        .catch((err) => {
-          console.log('Error stopping SignalR connection: ' + err)
+        .catch(_ => {
         })
     }
   }

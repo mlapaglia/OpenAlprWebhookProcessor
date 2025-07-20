@@ -227,14 +227,12 @@ export class CameraMaskComponent implements OnInit {
           }
 
           this.measureDiv.nativeElement.removeChild(this.image)
-          console.log('trying to draw image')
           this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight)
 
           this.loadMaskCoordinates()
         }
 
         this.image.onerror = () => {
-          console.log('failed to get image')
           this.imageInValidState = false
         }
 
