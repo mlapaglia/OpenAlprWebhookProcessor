@@ -171,7 +171,7 @@ namespace Tests.Features.Users.Services
                 _passwordService.VerifyPasswordHash("", passwordHash, passwordSalt));
             
             exception.ParamName.Should().Be("password");
-            exception.Message.Should().Contain("Value cannot be empty or whitespace only string.");
+            exception.Message.Should().Contain("The value cannot be an empty string or composed entirely of whitespace");
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace Tests.Features.Users.Services
                 _passwordService.VerifyPasswordHash("   ", passwordHash, passwordSalt));
             
             exception.ParamName.Should().Be("password");
-            exception.Message.Should().Contain("Value cannot be empty or whitespace only string.");
+            exception.Message.Should().Contain("The value cannot be an empty string or composed entirely of whitespace");
         }
 
         [Test]
