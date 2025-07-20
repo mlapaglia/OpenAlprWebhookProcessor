@@ -204,14 +204,16 @@ namespace OpenAlprWebhookProcessor.Features.Users
             var refreshCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(30),
+                Secure = true,
             };
             Response.Cookies.Append("refreshToken", refreshToken, refreshCookieOptions);
 
             var authenticateCookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = DateTime.UtcNow.AddMinutes(15)
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                Secure = true,
             };
             Response.Cookies.Append("jwtToken", authenticationToken, authenticateCookieOptions);
         }

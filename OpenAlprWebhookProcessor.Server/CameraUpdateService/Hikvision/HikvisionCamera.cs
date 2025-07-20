@@ -158,8 +158,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
         private HttpClient GetConfiguredHttpClient()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            
-            // Set basic authentication credentials via Authorization header
+
             if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
             {
                 var authValue = Convert.ToBase64String(

@@ -149,14 +149,12 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             string plateNumber, 
             CancellationToken cancellationToken = default)
         {
-            // Get all plates where BestNumber matches the plate number
             var seenPlates = await _dbSet
                 .AsNoTracking()
                 .Where(x => x.BestNumber == plateNumber)
                 .Select(x => x.ReceivedOnEpoch)
                 .ToListAsync(cancellationToken);
 
-            // Get all plates from PlateGroupPossibleNumbers where Number matches the plate number
             var seenPossiblePlates = await _context.PlateGroupPossibleNumbers
                 .AsNoTracking()
                 .Where(x => x.Number == plateNumber)

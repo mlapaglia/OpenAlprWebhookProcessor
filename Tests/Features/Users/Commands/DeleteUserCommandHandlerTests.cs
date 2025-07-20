@@ -41,10 +41,11 @@ namespace Tests.Features.Users.Commands
             // Arrange
             var command = new DeleteUserCommand(999);
 
-            // Act & Assert
+            // Act
             await _handler.Handle(command, GetCancellationToken());
 
-            // Should complete without throwing exception
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
@@ -71,10 +72,11 @@ namespace Tests.Features.Users.Commands
             // Arrange
             var command = new DeleteUserCommand(0);
 
-            // Act & Assert
+            // Act
             await _handler.Handle(command, GetCancellationToken());
 
-            // Should complete without throwing exception
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
@@ -83,10 +85,11 @@ namespace Tests.Features.Users.Commands
             // Arrange
             var command = new DeleteUserCommand(-1);
 
-            // Act & Assert
+            // Act
             await _handler.Handle(command, GetCancellationToken());
 
-            // Should complete without throwing exception
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
@@ -162,10 +165,11 @@ namespace Tests.Features.Users.Commands
             // Arrange
             var command = new DeleteUserCommand(int.MaxValue);
 
-            // Act & Assert
+            // Act
             await _handler.Handle(command, GetCancellationToken());
 
-            // Should complete without throwing exception
+            // Assert
+            Assert.Pass();
         }
 
         [Test]
