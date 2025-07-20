@@ -12,10 +12,15 @@ namespace Tests.CameraUpdateService
     public class TimerBasedBackgroundJobServiceTests
     {
         private TimerBasedBackgroundJobService _backgroundJobService;
+
         private IServiceProvider _serviceProvider;
+
         private IServiceScope _serviceScope;
+
         private IServiceScopeFactory _serviceScopeFactory;
+
         private ICameraUpdateService _cameraUpdateService;
+
         private ILogger<TimerBasedBackgroundJobService> _logger;
 
         [SetUp]
@@ -27,7 +32,6 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService = Substitute.For<ICameraUpdateService>();
             _logger = Substitute.For<ILogger<TimerBasedBackgroundJobService>>();
 
-            // Setup service provider chain
             _serviceProvider.GetService(typeof(IServiceScopeFactory)).Returns(_serviceScopeFactory);
             _serviceScopeFactory.CreateScope().Returns(_serviceScope);
             _serviceScope.ServiceProvider.GetService(typeof(ICameraUpdateService)).Returns(_cameraUpdateService);
@@ -128,7 +132,7 @@ namespace Tests.CameraUpdateService
             var scheduleNextJob = true;
 
             // Act
-            _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+            await _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -141,7 +145,7 @@ namespace Tests.CameraUpdateService
         public void EnqueueProcessSunriseSunsetJob_WithEmptyGuid_ShouldNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(Guid.Empty, SunriseSunset.Sunrise, true));
+            Assert.DoesNotThrowAsync(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(Guid.Empty, SunriseSunset.Sunrise, true));
         }
 
         [Test]
@@ -156,7 +160,7 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob).ThrowsAsync(exception);
 
             // Act & Assert (should not throw)
-            Assert.DoesNotThrow(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob));
+            Assert.DoesNotThrowAsync(() => _backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob));
 
             // Give some time for the task to complete
             await Task.Delay(100);
@@ -431,7 +435,7 @@ namespace Tests.CameraUpdateService
             var delay = TimeSpan.FromMilliseconds(100);
 
             // Act
-            var jobId = _backgroundJobService.ScheduleClearOverlayJob(cameraId, delay);
+            _backgroundJobService.ScheduleClearOverlayJob(cameraId, delay);
             _backgroundJobService.Dispose();
 
             // Wait longer than the delay

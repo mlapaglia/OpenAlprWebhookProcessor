@@ -16,10 +16,15 @@ namespace Tests.CameraUpdateService
     public class CameraUpdateServiceTests : TestBase
     {
         private OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService _cameraUpdateService;
+
         private ILogger<OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService> _logger;
+
         private IBackgroundJobService _backgroundJobService;
+
         private ICameraFactory _cameraFactory;
+
         private ICamera _mockCamera;
+
         private IServiceProvider _serviceProvider;
 
         [SetUp]
@@ -254,7 +259,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ClearExpiredOverlayAsync_WithNonExistentCamera_LogsError()
+        public void ClearExpiredOverlayAsync_WithNonExistentCamera_LogsError()
         {
             // Arrange
             var nonExistentCameraId = Guid.NewGuid();

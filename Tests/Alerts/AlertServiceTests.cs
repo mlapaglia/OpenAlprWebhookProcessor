@@ -13,12 +13,19 @@ namespace Tests.Alerts
     public class AlertServiceTests
     {
         private AlertService _alertService;
+
         private ILogger<AlertService> _logger;
+
         private IHubContext<ProcessorHub, IProcessorHub> _processorHub;
+
         private IProcessorHub _clientProxy;
+
         private IHubCallerClients<IProcessorHub> _clients;
+
         private IAlertClient _alertClient1;
+
         private IAlertClient _alertClient2;
+
         private List<IAlertClient> _alertClients;
 
         [SetUp]
@@ -35,20 +42,20 @@ namespace Tests.Alerts
             _clients.All.Returns(_clientProxy);
             _processorHub.Clients.Returns(_clients);
 
-            _alertService = new AlertService(_logger, _processorHub, _alertClients);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            // No cleanup needed
+            _alertService = new AlertService(
+                _logger,
+                _processorHub,
+                _alertClients);
         }
 
         [Test]
         public void Constructor_WithValidParameters_ShouldInitializeService()
         {
             // Arrange & Act
-            var service = new AlertService(_logger, _processorHub, _alertClients);
+            var service = new AlertService(
+                _logger,
+                _processorHub,
+                _alertClients);
 
             // Assert
             service.Should().NotBeNull();

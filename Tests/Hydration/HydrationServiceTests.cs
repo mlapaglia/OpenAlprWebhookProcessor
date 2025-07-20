@@ -17,16 +17,27 @@ namespace Tests.Hydration
     public class HydrationServiceTests
     {
         private HydrationService _hydrationService;
+
         private IServiceProvider _serviceProvider;
+
         private IServiceScope _serviceScope;
+
         private IServiceScopeFactory _serviceScopeFactory;
+
         private IHubContext<ProcessorHub, IProcessorHub> _processorHub;
+
         private IProcessorHub _clientProxy;
+
         private IHubCallerClients<IProcessorHub> _clients;
+
         private ILogger<HydrationService> _logger;
+
         private IUnitOfWork _unitOfWork;
+
         private IAgentRepository _agentRepository;
+
         private IOpenAlprAgentScraper _scraper;
+
         private Agent _agent;
 
         [SetUp]

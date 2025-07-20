@@ -16,7 +16,6 @@ namespace Tests.CameraUpdateService
         {
             base.SetUp();
 
-            // Create mocks
             _backgroundJobService = Substitute.For<IBackgroundJobService>();
         }
 
@@ -28,7 +27,7 @@ namespace Tests.CameraUpdateService
             var cameraId = Guid.NewGuid();
 
             // Act
-            CameraScheduling.ExecuteSingleDayNightTaskAsync(
+            await CameraScheduling.ExecuteSingleDayNightTaskAsync(
                 sunriseSunset,
                 cameraId,
                 _backgroundJobService);
