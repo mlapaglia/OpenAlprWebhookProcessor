@@ -31,10 +31,15 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             }
 
             var fullPlateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(plateGroup.Id, cancellationToken);
-            
+
+            if (fullPlateGroup == null)
+            {
+                throw new ArgumentException("No plate group found with that id.");
+            }
+
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
-            if (fullPlateGroup?.PlateImage == null)
+            if (fullPlateGroup.PlateImage == null)
             {
                 var imageBytes = await _imageCompressionService.GetCropImageFromAgentAsync(
                     agent,

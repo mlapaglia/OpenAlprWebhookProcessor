@@ -40,6 +40,11 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
                 plateGroup.Id,
                 cancellationToken);
             
+            if (fullPlateGroup == null)
+            {
+                throw new ArgumentException("No plate group found with that id.");
+            }
+
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
             if (fullPlateGroup?.VehicleImage == null)

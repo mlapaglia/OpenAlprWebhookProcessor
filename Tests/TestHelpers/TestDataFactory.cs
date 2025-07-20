@@ -78,6 +78,34 @@ namespace Tests.TestHelpers
             };
         }
 
+        // Overloaded method with additional parameters for testing
+        public static OpenAlprWebhookProcessor.Data.PlateGroup CreateTestPlateGroupDetailed(
+            string? plateNumber = null, 
+            long? receivedOnEpoch = null,
+            string? vehicleColor = null,
+            string? vehicleMakeModel = null,
+            string? vehicleType = null,
+            string? vehicleRegion = null,
+            long? epochTimeMs = null,
+            int? seenCount = null)
+        {
+            return new OpenAlprWebhookProcessor.Data.PlateGroup
+            {
+                Id = Guid.NewGuid(),
+                BestNumber = plateNumber ?? "TEST123",
+                ReceivedOnEpoch = epochTimeMs ?? receivedOnEpoch ?? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                OpenAlprUuid = Guid.NewGuid().ToString(),
+                OpenAlprCameraId = 1,
+                Confidence = 90.5,
+                IsAlert = false,
+                PossibleNumbers = new List<PlateGroupPossibleNumbers>(),
+                VehicleColor = vehicleColor,
+                VehicleMakeModel = vehicleMakeModel,
+                VehicleType = vehicleType,
+                VehicleRegion = vehicleRegion ?? "us-ca"
+            };
+        }
+
         public static OpenAlprWebhookProcessor.Data.Agent CreateTestAgent(string? endpointUrl = null, string? hostname = null)
         {
             return new OpenAlprWebhookProcessor.Data.Agent
@@ -135,12 +163,12 @@ namespace Tests.TestHelpers
             };
         }
 
-        public static OpenAlprWebhookProcessor.Data.Enricher CreateTestEnricher()
+        public static OpenAlprWebhookProcessor.Data.Enricher CreateTestEnricher(bool isEnabled = true)
         {
             return new OpenAlprWebhookProcessor.Data.Enricher
             {
                 Id = Guid.NewGuid(),
-                IsEnabled = true,
+                IsEnabled = isEnabled,
                 ApiKey = "test-api-key"
             };
         }
