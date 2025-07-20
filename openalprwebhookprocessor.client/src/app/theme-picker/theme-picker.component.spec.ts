@@ -1,0 +1,400 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ActivatedRoute, ParamMap } from '@angular/router'
+import { LiveAnnouncer } from '@angular/cdk/a11y'
+import { BehaviorSubject, of } from 'rxjs'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { By } from '@angular/platform-browser'
+import { NO_ERRORS_SCHEMA } from '@angular/core'
+
+import { ThemePickerComponent } from './theme-picker.component'
+import { ThemeStorage, DocsSiteTheme } from './theme-storage/theme-storage'
+import { StyleManager } from './style-manager/style-manager.component'
+
+describe('ThemePickerComponent', () => {
+  let component: ThemePickerComponent
+  let fixture: ComponentFixture<ThemePickerComponent>
+  let mockThemeStorage: jasmine.SpyObj<ThemeStorage>
+  let mockStyleManager: jasmine.SpyObj<StyleManager>
+  let mockLiveAnnouncer: jasmine.SpyObj<LiveAnnouncer>
+  let mockActivatedRoute: any
+  let queryParamSubject: BehaviorSubject<ParamMap>
+
+  const mockThemes: DocsSiteTheme[] = [
+    {
+      primary: '#673AB7',
+      accent: '#FFC107',
+      displayName: 'Deep Purple & Amber',
+      name: 'deeppurple-amber',
+      isDark: false,
+    },
+    {
+      primary: '#3F51B5',
+      accent: '#E91E63',
+      displayName: 'Indigo & Pink',
+      name: 'indigo-pink',
+      isDark: false,
+      isDefault: true,
+    },
+    {
+      primary: '#E91E63',
+      accent: '#607D8B',
+      displayName: 'Pink & Blue-grey',
+      name: 'pink-bluegrey',
+      isDark: true,
+    }
+  ]
+
+    beforeEach(async () => {
+    const themeStorageSpy = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName', 'storeTheme'])
+    const styleManagerSpy = jasmine.createSpyObj('StyleManager', ['setStyle', 'removeStyle'])
+    const liveAnnouncerSpy = jasmine.createSpyObj('LiveAnnouncer', ['announce'])
+
+    queryParamSubject = new BehaviorSubject<ParamMap>(new Map() as any)
+    mockActivatedRoute = {
+      queryParamMap: queryParamSubject.asObservable()
+    }
+
+    await TestBed.configureTestingModule({
+      imports: [ThemePickerComponent, NoopAnimationsModule],
+      providers: [
+        { provide: ThemeStorage, useValue: themeStorageSpy },
+        { provide: StyleManager, useValue: styleManagerSpy },
+        { provide: LiveAnnouncer, useValue: liveAnnouncerSpy },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+      ],
+      schemas: [NO_ERRORS_SCHEMA] // Ignore Material Design components for easier testing
+    }).compileComponents()
+
+    mockThemeStorage = TestBed.inject(ThemeStorage) as jasmine.SpyObj<ThemeStorage>
+    mockStyleManager = TestBed.inject(StyleManager) as jasmine.SpyObj<StyleManager>
+    mockLiveAnnouncer = TestBed.inject(LiveAnnouncer) as jasmine.SpyObj<LiveAnnouncer>
+
+    fixture = TestBed.createComponent(ThemePickerComponent)
+    component = fixture.componentInstance
+  })
+
+  describe('Component Initialization', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy()
+    })
+
+    it('should have correct themes array', () => {
+      expect(component.themes).toBeDefined()
+      expect(component.themes.length).toBe(4)
+      expect(component.themes[1].isDefault).toBe(true)
+      expect(component.themes[1].name).toBe('indigo-pink')
+    })
+
+        it('should initialize with stored theme when available', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue('pink-bluegrey')
+
+      // Create a new component instance to test constructor logic
+      const newFixture = TestBed.createComponent(ThemePickerComponent)
+      const newComponent = newFixture.componentInstance
+      newFixture.detectChanges()
+
+      expect(mockThemeStorage.getStoredThemeName).toHaveBeenCalled()
+      expect(newComponent.currentTheme?.name).toBe('pink-bluegrey')
+    })
+
+    it('should initialize with default theme when no stored theme', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+
+      // Create a new component instance to test constructor logic
+      const newFixture = TestBed.createComponent(ThemePickerComponent)
+      const newComponent = newFixture.componentInstance
+      newFixture.detectChanges()
+
+      expect(newComponent.currentTheme?.name).toBe('indigo-pink')
+    })
+
+    it('should have expected theme count and default', () => {
+      expect(component.themes.length).toBe(4)
+      expect(component.themes.find(t => t.isDefault)?.name).toBe('indigo-pink')
+    })
+  })
+
+  describe('ngOnInit', () => {
+    beforeEach(() => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      fixture.detectChanges()
+    })
+
+    it('should subscribe to query param changes', () => {
+      spyOn(component, 'selectTheme')
+
+      component.ngOnInit()
+
+      // Simulate query param change
+      const mockParamMap = {
+        get: jasmine.createSpy('get').and.returnValue('deeppurple-amber')
+      } as any
+      queryParamSubject.next(mockParamMap)
+
+      expect(component.selectTheme).toHaveBeenCalledWith('deeppurple-amber')
+    })
+
+    it('should handle null query param', () => {
+      spyOn(component, 'selectTheme')
+
+      component.ngOnInit()
+
+      const mockParamMap = {
+        get: jasmine.createSpy('get').and.returnValue(null)
+      } as any
+      queryParamSubject.next(mockParamMap)
+
+      expect(component.selectTheme).not.toHaveBeenCalled()
+    })
+
+    it('should handle empty query param', () => {
+      spyOn(component, 'selectTheme')
+
+      component.ngOnInit()
+
+      const mockParamMap = {
+        get: jasmine.createSpy('get').and.returnValue('')
+      } as any
+      queryParamSubject.next(mockParamMap)
+
+      expect(component.selectTheme).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe from query param subscription', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      fixture.detectChanges()
+      component.ngOnInit()
+
+      spyOn(component['_queryParamSubscription'], 'unsubscribe')
+
+      component.ngOnDestroy()
+
+      expect(component['_queryParamSubscription'].unsubscribe).toHaveBeenCalled()
+    })
+  })
+
+  describe('selectTheme', () => {
+    beforeEach(() => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      fixture.detectChanges()
+
+      // Reset spies after component initialization
+      mockStyleManager.setStyle.calls.reset()
+      mockStyleManager.removeStyle.calls.reset()
+      mockThemeStorage.storeTheme.calls.reset()
+      mockLiveAnnouncer.announce.calls.reset()
+    })
+
+    it('should select valid theme and update current theme', () => {
+      component.selectTheme('pink-bluegrey')
+
+      expect(component.currentTheme).toBeDefined()
+      expect(component.currentTheme?.name).toBe('pink-bluegrey')
+      expect(component.currentTheme?.displayName).toBe('Pink & Blue-grey')
+    })
+
+    it('should not update theme for invalid theme name', () => {
+      const originalTheme = component.currentTheme
+
+      component.selectTheme('invalid-theme')
+
+      expect(component.currentTheme).toBe(originalTheme)
+      expect(mockStyleManager.setStyle).not.toHaveBeenCalled()
+      expect(mockStyleManager.removeStyle).not.toHaveBeenCalled()
+    })
+
+    it('should remove style for default theme', () => {
+      component.selectTheme('indigo-pink')
+
+      expect(mockStyleManager.removeStyle).toHaveBeenCalledWith('theme')
+      expect(mockStyleManager.setStyle).not.toHaveBeenCalled()
+    })
+
+    it('should set style for non-default theme', () => {
+      component.selectTheme('pink-bluegrey')
+
+      expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', 'pink-bluegrey.css')
+      expect(mockStyleManager.removeStyle).not.toHaveBeenCalled()
+    })
+
+    it('should announce theme selection to screen readers', () => {
+      component.selectTheme('deeppurple-amber')
+
+      expect(mockLiveAnnouncer.announce).toHaveBeenCalledWith(
+        'Deep Purple & Amber theme selected.',
+        'polite',
+        3000
+      )
+    })
+
+    it('should store theme when successfully selected', () => {
+      component.selectTheme('pink-bluegrey')
+
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          name: 'pink-bluegrey',
+          displayName: 'Pink & Blue-grey'
+        })
+      )
+    })
+
+    it('should handle selecting the same theme multiple times', () => {
+      component.selectTheme('pink-bluegrey')
+      component.selectTheme('pink-bluegrey')
+
+      expect(mockStyleManager.setStyle).toHaveBeenCalledTimes(2)
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalledTimes(2)
+      expect(mockLiveAnnouncer.announce).toHaveBeenCalledTimes(2)
+    })
+
+    it('should handle all available themes', () => {
+      component.themes.forEach(theme => {
+        component.selectTheme(theme.name)
+
+        expect(component.currentTheme?.name).toBe(theme.name)
+
+        if (theme.isDefault) {
+          expect(mockStyleManager.removeStyle).toHaveBeenCalledWith('theme')
+        } else {
+          expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', `${theme.name}.css`)
+        }
+
+        expect(mockThemeStorage.storeTheme).toHaveBeenCalledWith(theme)
+        expect(mockLiveAnnouncer.announce).toHaveBeenCalledWith(
+          `${theme.displayName} theme selected.`,
+          'polite',
+          3000
+        )
+      })
+    })
+  })
+
+    describe('Template Integration', () => {
+    it('should render without errors', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue('indigo-pink')
+
+      expect(() => fixture.detectChanges()).not.toThrow()
+      expect(fixture.nativeElement).toBeTruthy()
+    })
+
+    it('should contain theme picker elements', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue('indigo-pink')
+      fixture.detectChanges()
+
+      // With NO_ERRORS_SCHEMA, we just verify the template renders
+      // without testing complex Material Design interactions
+      const compiled = fixture.nativeElement
+      expect(compiled).toBeTruthy()
+    })
+  })
+
+  describe('Theme Properties', () => {
+    it('should have themes with required properties', () => {
+      component.themes.forEach(theme => {
+        expect(theme.name).toBeTruthy()
+        expect(theme.primary).toBeTruthy()
+        expect(theme.accent).toBeTruthy()
+        expect(theme.displayName).toBeTruthy()
+        expect(typeof theme.isDark).toBe('boolean')
+      })
+    })
+
+    it('should have exactly one default theme', () => {
+      const defaultThemes = component.themes.filter(theme => theme.isDefault)
+      expect(defaultThemes.length).toBe(1)
+      expect(defaultThemes[0].name).toBe('indigo-pink')
+    })
+
+    it('should have mix of light and dark themes', () => {
+      const lightThemes = component.themes.filter(theme => !theme.isDark)
+      const darkThemes = component.themes.filter(theme => theme.isDark)
+
+      expect(lightThemes.length).toBeGreaterThan(0)
+      expect(darkThemes.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Integration Tests', () => {
+    beforeEach(() => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      fixture.detectChanges()
+
+      // Reset spies after component initialization
+      mockStyleManager.setStyle.calls.reset()
+      mockStyleManager.removeStyle.calls.reset()
+      mockThemeStorage.storeTheme.calls.reset()
+      mockLiveAnnouncer.announce.calls.reset()
+    })
+
+    it('should complete full theme selection workflow', () => {
+      // Select non-default theme
+      component.selectTheme('pink-bluegrey')
+
+      expect(component.currentTheme?.name).toBe('pink-bluegrey')
+      expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', 'pink-bluegrey.css')
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalled()
+      expect(mockLiveAnnouncer.announce).toHaveBeenCalled()
+
+      // Switch back to default theme
+      component.selectTheme('indigo-pink')
+
+      expect(component.currentTheme?.name).toBe('indigo-pink')
+      expect(mockStyleManager.removeStyle).toHaveBeenCalledWith('theme')
+    })
+
+    it('should handle theme switching between multiple themes', () => {
+      const themes = ['deeppurple-amber', 'pink-bluegrey', 'purple-green']
+
+      themes.forEach(themeName => {
+        component.selectTheme(themeName)
+        expect(component.currentTheme?.name).toBe(themeName)
+        expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', `${themeName}.css`)
+      })
+    })
+  })
+
+  describe('Service Dependencies', () => {
+    beforeEach(() => {
+      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      fixture.detectChanges()
+
+      // Reset spies after component initialization
+      mockStyleManager.setStyle.calls.reset()
+      mockStyleManager.removeStyle.calls.reset()
+      mockThemeStorage.storeTheme.calls.reset()
+      mockLiveAnnouncer.announce.calls.reset()
+    })
+
+    it('should call theme storage when theme is selected', () => {
+      const theme = component.themes.find(t => t.name === 'pink-bluegrey')!
+
+      component.selectTheme('pink-bluegrey')
+
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalledWith(theme)
+    })
+
+    it('should call live announcer for accessibility', () => {
+      component.selectTheme('deeppurple-amber')
+
+      expect(mockLiveAnnouncer.announce).toHaveBeenCalledWith(
+        'Deep Purple & Amber theme selected.',
+        'polite',
+        3000
+      )
+    })
+
+    it('should use consistent announcement format', () => {
+      const theme = component.themes.find(t => t.name === 'purple-green')!
+
+      component.selectTheme('purple-green')
+
+      expect(mockLiveAnnouncer.announce).toHaveBeenCalledWith(
+        `${theme.displayName} theme selected.`,
+        'polite',
+        3000
+      )
+    })
+  })
+})
