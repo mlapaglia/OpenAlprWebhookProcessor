@@ -18,15 +18,16 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
         private const string TestPlateState = "XX";
 
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         private readonly IUnitOfWork _unitOfWork;
 
         public LicensePlateDataClient(
             IUnitOfWork unitOfWork,
+            IHttpClientFactory httpClientFactory,
             ILogger<LicensePlateDataClient> logger)
         {
-            _httpClient = new HttpClient();
+            _httpClientFactory = httpClientFactory;
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
@@ -36,7 +37,9 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
             string state,
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.GetAsync(
+            using var httpClient = _httpClientFactory.CreateClient();
+
+            var response = await httpClient.GetAsync(
                 LicensePlateDataApiUrl
                     .Replace("$key", await GetApiKeyAsync(cancellationToken))
                     .Replace("$state", state)
@@ -76,7 +79,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
 
         public async Task<bool> TestAsync(CancellationToken cancellationToken)
         {
-            var response = await _httpClient.GetAsync(
+            using var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetAsync(
                 LicensePlateDataApiUrl
                     .Replace("$key", await GetApiKeyAsync(cancellationToken))
                     .Replace("$state", TestPlateState)

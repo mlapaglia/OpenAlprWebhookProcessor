@@ -7,6 +7,7 @@ using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.LicensePlateData;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -18,10 +19,12 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
     [TestFixture]
     public class LicensePlateDataClientTests : TestBase
     {
-        private TestableLicensePlateDataClient _client;
+        private LicensePlateDataClient _client;
         private TestHttpMessageHandler _httpMessageHandler;
         private ILogger<LicensePlateDataClient> _logger;
         private IUnitOfWork _unitOfWork;
+        private IHttpClientFactory _httpClientFactory;
+        private HttpClient _httpClient;
 
         [SetUp]
         public override void SetUp()
@@ -29,21 +32,26 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             base.SetUp();
             
             _httpMessageHandler = new TestHttpMessageHandler();
+            _httpClient = new HttpClient(_httpMessageHandler);
             _logger = Substitute.For<ILogger<LicensePlateDataClient>>();
             _unitOfWork = Substitute.For<IUnitOfWork>();
+            _httpClientFactory = Substitute.For<IHttpClientFactory>();
+            
+            // Setup the factory to return our test HTTP client
+            _httpClientFactory.CreateClient().Returns(_httpClient);
             
             // Setup enricher with API key
             var enricher = TestDataFactory.CreateTestEnricher();
             _unitOfWork.Enrichers.GetFirstAsync(Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(enricher));
             
-            _client = new TestableLicensePlateDataClient(_unitOfWork, _logger, _httpMessageHandler);
+            _client = new LicensePlateDataClient(_unitOfWork, _httpClientFactory, _logger);
         }
 
         [TearDown]
         public override void TearDown()
         {
-            _client?.Dispose();
+            _httpClient?.Dispose();
             _httpMessageHandler?.Dispose();
             (_unitOfWork as IDisposable)?.Dispose();
             base.TearDown();
@@ -53,7 +61,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         public void Constructor_WithValidParameters_InitializesCorrectly()
         {
             // Arrange & Act
-            var client = new LicensePlateDataClient(_unitOfWork, _logger);
+            var client = new LicensePlateDataClient(_unitOfWork, _httpClientFactory, _logger);
 
             // Assert
             client.Should().NotBeNull();
@@ -63,7 +71,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         public void Constructor_WithNullUnitOfWork_DoesNotThrowImmediately()
         {
             // Arrange & Act
-            var client = new LicensePlateDataClient(null, _logger);
+            var client = new LicensePlateDataClient(null, _httpClientFactory, _logger);
 
             // Assert
             client.Should().NotBeNull();
@@ -75,11 +83,23 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         public void Constructor_WithNullLogger_DoesNotThrowImmediately()
         {
             // Arrange & Act
-            var client = new LicensePlateDataClient(_unitOfWork, null);
+            var client = new LicensePlateDataClient(_unitOfWork, _httpClientFactory, null);
 
             // Assert
             client.Should().NotBeNull();
             // Note: The null logger will cause issues when logging is attempted,
+            // but the constructor itself doesn't validate parameters
+        }
+
+        [Test]
+        public void Constructor_WithNullHttpClientFactory_DoesNotThrowImmediately()
+        {
+            // Arrange & Act
+            var client = new LicensePlateDataClient(_unitOfWork, null, _logger);
+
+            // Assert
+            client.Should().NotBeNull();
+            // Note: The null httpClientFactory will cause issues when methods are called,
             // but the constructor itself doesn't validate parameters
         }
 
@@ -378,33 +398,6 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 Cache = false,
                 LicensePlateLookup = null
             };
-        }
-    }
-
-    /// <summary>
-    /// Testable version of LicensePlateDataClient that allows injection of HttpClient for testing
-    /// </summary>
-    public class TestableLicensePlateDataClient : LicensePlateDataClient, IDisposable
-    {
-        private readonly HttpClient _testHttpClient;
-
-        public TestableLicensePlateDataClient(
-            IUnitOfWork unitOfWork,
-            ILogger<LicensePlateDataClient> logger,
-            HttpMessageHandler handler)
-            : base(unitOfWork, logger)
-        {
-            _testHttpClient = new HttpClient(handler);
-            
-            // Use reflection to replace the private HttpClient field
-            var field = typeof(LicensePlateDataClient).GetField("_httpClient",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            field?.SetValue(this, _testHttpClient);
-        }
-
-        public void Dispose()
-        {
-            _testHttpClient?.Dispose();
         }
     }
 } 
