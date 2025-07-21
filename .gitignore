@@ -357,3 +357,4 @@ dist/
 *db-shm
 *db-wal
 openalprwebhookprocessor.client/.angular/*
+**/ml-models/*
