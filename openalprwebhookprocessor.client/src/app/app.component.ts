@@ -39,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { linkTitle: 'Alerts', icon: 'notifications_active', link: '/settings/alerts' },
     { linkTitle: 'Ignores', icon: 'alarm_off', link: '/settings/ignores' },
     { linkTitle: 'Webhook Forwards', icon: 'forward_to_inbox', link: '/settings/forwards' },
+    { linkTitle: 'Machine Learning', icon: 'psychology', link: '/settings/machine-learning' },
     { linkTitle: 'System Logs', icon: 'library_books', link: '/settings/logs' },
     { linkTitle: 'Enrichers', icon: 'merge_type', link: '/settings/enrichers' },
     { linkTitle: 'Users', icon: 'person', link: '/settings/users' },

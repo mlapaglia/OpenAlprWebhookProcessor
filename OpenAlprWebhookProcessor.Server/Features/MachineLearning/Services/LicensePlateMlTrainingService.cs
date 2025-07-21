@@ -14,6 +14,21 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 {
+    public class TrainingStatus
+    {
+        public bool IsTraining { get; set; }
+        public DateTime? LastTrainingStarted { get; set; }
+        public DateTime? LastTrainingCompleted { get; set; }
+        public bool LastTrainingSuccessful { get; set; }
+        public string LastError { get; set; }
+        public int TrainingDataCount { get; set; }
+        public double? RSquared { get; set; }
+        public double? MeanAbsoluteError { get; set; }
+        public double? RootMeanSquaredError { get; set; }
+        public DateTime? ModelLastSaved { get; set; }
+        public long? ModelFileSize { get; set; }
+    }
+
     /// <summary>
     /// Background service that continuously trains and updates ML models for license plate prediction.
     /// Handles model versioning, training scheduling, and model persistence.
@@ -22,8 +37,8 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
     {
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly ILogger<LicensePlateMlTrainingService> _logger
-            ;
+        private readonly ILogger<LicensePlateMlTrainingService> _logger;
+
         private readonly MLContext _mlContext;
 
         private Timer _trainingTimer;
@@ -31,6 +46,8 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
         private readonly ConcurrentDictionary<string, ITransformer> _modelCache;
 
         private readonly string _configPath;
+
+        private readonly TrainingStatus _trainingStatus;
 
         public LicensePlateMlTrainingService(
             IServiceProvider serviceProvider,
@@ -41,20 +58,40 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             _mlContext = new MLContext(seed: 42);
             _modelCache = new ConcurrentDictionary<string, ITransformer>();
             _configPath = MachineLearningConfiguration.GetConfigPath();
+            _trainingStatus = new TrainingStatus();
+        }
+
+        public TrainingStatus GetTrainingStatus()
+        {
+            var modelPath = MachineLearningConfiguration.GetModelPath();
+            if (File.Exists(modelPath))
+            {
+                var fileInfo = new FileInfo(modelPath);
+                _trainingStatus.ModelLastSaved = fileInfo.LastWriteTime;
+                _trainingStatus.ModelFileSize = fileInfo.Length;
+            }
+            return _trainingStatus;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            _trainingTimer = new Timer(TriggerTraining, null, TimeSpan.Zero, MachineLearningConfiguration.DefaultTrainingInterval);
+
+            _trainingTimer = new Timer(
+                TriggerTrainingAsync,
+                null,
+                TimeSpan.Zero,
+                MachineLearningConfiguration.DefaultTrainingInterval);
 
             _logger.LogInformation("License Plate ML Training Service started");
             
-            await LoadExistingModelAsync(stoppingToken);
+            LoadExistingModel();
             
             try
             {
-                await Task.Delay(Timeout.Infinite, stoppingToken);
+                await Task.Delay(
+                    Timeout.Infinite,
+                    stoppingToken);
             }
             catch (OperationCanceledException ex)
             {
@@ -62,7 +99,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             }
         }
 
-        private async void TriggerTraining(object state)
+        private async void TriggerTrainingAsync(object state)
         {
             try
             {
@@ -78,6 +115,10 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
         {
             _logger.LogInformation("Starting ML model training");
             
+            _trainingStatus.IsTraining = true;
+            _trainingStatus.LastTrainingStarted = DateTime.UtcNow;
+            _trainingStatus.LastError = null;
+            
             try
             {
                 using var scope = _serviceProvider.CreateScope();
@@ -86,9 +127,15 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 _logger.LogInformation("Extracting training data from database...");
                 var trainingData = await featureExtractor.ExtractTrainingDataAsync(MachineLearningConfiguration.DefaultTrainingBatchSize);
                 
+                _trainingStatus.TrainingDataCount = trainingData.Count;
+                
                 if (trainingData.Count < MachineLearningConfiguration.MinimumTrainingData)
                 {
                     _logger.LogWarning("Insufficient training data ({Count} samples). Skipping training.", trainingData.Count);
+                    _trainingStatus.IsTraining = false;
+                    _trainingStatus.LastTrainingCompleted = DateTime.UtcNow;
+                    _trainingStatus.LastTrainingSuccessful = false;
+                    _trainingStatus.LastError = $"Insufficient training data ({trainingData.Count} samples, minimum required: {MachineLearningConfiguration.MinimumTrainingData})";
                     return false;
                 }
 
@@ -101,7 +148,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 var testData = trainTestSplit.TestSet;
 
                 var pipeline = _mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "CameraIdEncoded", inputColumnName: "CameraId")
-                    // Add feature scaling to handle different ranges (TotalVisits: 1-2895, vs HourOfDay: 0-23)
                     .Append(_mlContext.Transforms.NormalizeMinMax("TotalVisits"))
                     .Append(_mlContext.Transforms.NormalizeMinMax("TimeSinceLastSeen"))  
                     .Append(_mlContext.Transforms.NormalizeMinMax("HistoricalFrequency"))
@@ -111,7 +157,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                         "CameraIdEncoded", "TimeSinceLastSeen", "HistoricalFrequency", 
                         "AverageTimeBetweenVisits", "TotalVisits", "IsWeekend", "IsBusinessHour",
                         "SeasonalFactor", "VehicleTypeCode", "VehicleColorCode"))
-                    .Append(_mlContext.Regression.Trainers.FastForest(labelColumnName: "Label", featureColumnName: "Features")); // FastTree regression for non-linear patterns
+                    .Append(_mlContext.Regression.Trainers.FastForest(labelColumnName: "Label", featureColumnName: "Features"));
 
                 _logger.LogInformation("Training model pipeline...");
                 var model = pipeline.Fit(trainData);
@@ -125,10 +171,18 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 _logger.LogInformation("Mean Absolute Error: {MAE:F2} hours", metrics.MeanAbsoluteError);
                 _logger.LogInformation("Root Mean Squared Error: {RMSE:F2} hours", metrics.RootMeanSquaredError);
 
+                _trainingStatus.RSquared = metrics.RSquared;
+                _trainingStatus.MeanAbsoluteError = metrics.MeanAbsoluteError;
+                _trainingStatus.RootMeanSquaredError = metrics.RootMeanSquaredError;
+
                 if (metrics.RSquared > MachineLearningConfiguration.MinimumModelQuality)
                 {
                     await SaveModelAsync(model);
                     _modelCache.AddOrUpdate("current", model, (key, oldValue) => model);
+                    
+                    _trainingStatus.IsTraining = false;
+                    _trainingStatus.LastTrainingCompleted = DateTime.UtcNow;
+                    _trainingStatus.LastTrainingSuccessful = true;
                     
                     _logger.LogInformation("Model training completed successfully and saved");
                     return true;
@@ -136,12 +190,20 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 else
                 {
                     _logger.LogWarning("Model quality too low (R²: {RSquared:F4}). Not saving model.", metrics.RSquared);
+                    _trainingStatus.IsTraining = false;
+                    _trainingStatus.LastTrainingCompleted = DateTime.UtcNow;
+                    _trainingStatus.LastTrainingSuccessful = false;
+                    _trainingStatus.LastError = $"Model quality too low (R²: {metrics.RSquared:F4}, minimum required: {MachineLearningConfiguration.MinimumModelQuality})";
                     return false;
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during model training");
+                _trainingStatus.IsTraining = false;
+                _trainingStatus.LastTrainingCompleted = DateTime.UtcNow;
+                _trainingStatus.LastTrainingSuccessful = false;
+                _trainingStatus.LastError = ex.Message;
                 return false;
             }
         }
@@ -149,25 +211,21 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
         private Task SaveModelAsync(ITransformer model)
         {
             var modelPath = MachineLearningConfiguration.GetModelPath();
-            var backupPath = MachineLearningConfiguration.GetBackupPath(DateTime.UtcNow);
             
             try
             {
-                // Backup existing model if it exists
-                if (File.Exists(modelPath))
-                {
-                    File.Copy(modelPath, backupPath);
-                    _logger.LogInformation("Backed up existing model to {BackupPath}", backupPath);
-                }
+                using var fileStream = new FileStream(
+                    modelPath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.Read);
 
-                // Save new model
-                using var fileStream = new FileStream(modelPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                _mlContext.Model.Save(model, null, fileStream);
+                _mlContext.Model.Save(
+                    model,
+                    null,
+                    fileStream);
                 
                 _logger.LogInformation("Model saved to {ModelPath}", modelPath);
-                
-                // Clean up old backups (keep last 5)
-                CleanupOldBackupsAsync();
             }
             catch (Exception ex)
             {
@@ -178,20 +236,24 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             return Task.CompletedTask;
         }
 
-        private Task LoadExistingModelAsync(CancellationToken cancellationToken)
+        private void LoadExistingModel()
         {
             var modelPath = MachineLearningConfiguration.GetModelPath();
             
             if (!File.Exists(modelPath))
             {
                 _logger.LogInformation("No existing model found at {ModelPath}. Will train new model.", modelPath);
-                return Task.CompletedTask;
             }
 
             try
             {
-                using var fileStream = new FileStream(modelPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var model = _mlContext.Model.Load(fileStream, out var modelInputSchema);
+                using var fileStream = new FileStream(
+                    modelPath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read);
+
+                var model = _mlContext.Model.Load(fileStream, out var _);
                 
                 _modelCache.AddOrUpdate("current", model, (key, oldValue) => model);
                 _logger.LogInformation("Loaded existing model from {ModelPath}", modelPath);
@@ -200,40 +262,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             {
                 _logger.LogError(ex, "Error loading existing model from {ModelPath}. Will train new model.", modelPath);
             }
-
-            return Task.CompletedTask;
-        }
-
-        private Task CleanupOldBackupsAsync()
-        {
-            try
-            {
-                var mlModelsPath = Path.Combine(_configPath, MachineLearningConfiguration.MlModelsFolderName);
-                var backupFiles = Directory.GetFiles(mlModelsPath, "backup-*" + MachineLearningConfiguration.ModelFileName)
-                    .Select(f => new FileInfo(f))
-                    .OrderByDescending(f => f.CreationTime)
-                    .Skip(5) // Keep 5 most recent backups
-                    .ToList();
-
-                foreach (var file in backupFiles)
-                {
-                    try
-                    {
-                        file.Delete();
-                        _logger.LogDebug("Deleted old backup: {FileName}", file.Name);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Could not delete backup file {FileName}", file.Name);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error during backup cleanup");
-            }
-
-            return Task.CompletedTask;
         }
 
         public ITransformer GetCurrentModel()

@@ -1,0 +1,143 @@
+<div style="margin: 16px; display: flex; flex-wrap: wrap; justify-content: flex-start; flex-direction: column; row-gap: 16px;">
+
+  <!-- Model Information Card -->
+  @if (modelInfo) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Model Information</mat-card-title>
+        <mat-card-subtitle>{{ modelInfo.description }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div style="display: flex; flex-direction: row; gap: 16px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 300px;">
+            <p><strong>Model Type:</strong> {{ modelInfo.modelType }}</p>
+            <p><strong>Status:</strong>
+              <span [style.color]="modelInfo.modelAvailable ? '#32de84' : '#D2122E'">
+                {{ modelInfo.modelAvailable ? 'Available' : 'Not Available' }}
+              </span>
+            </p>
+            <p><strong>Training Schedule:</strong> {{ modelInfo.trainingSchedule }}</p>
+            <p><strong>Last Updated:</strong> {{ modelInfo.lastUpdated }}</p>
+          </div>
+          <div style="flex: 1; min-width: 300px;">
+            <p><strong>Features Used ({{ featuresData.data.length }}):</strong></p>
+            <div style="max-height: 200px; overflow-y: auto;">
+              <table mat-table [dataSource]="featuresData" class="mat-elevation-z1">
+                <ng-container matColumnDef="feature">
+                  <th mat-header-cell *matHeaderCellDef>Feature</th>
+                  <td mat-cell *matCellDef="let element">{{ element.feature }}</td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="featuresColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: featuresColumns;"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Training Status Card -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        Training Status
+        @if (isLoadingTrainingStatus) {
+          <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" diameter="20"></mat-progress-spinner>
+        }
+      </mat-card-title>
+      <mat-card-subtitle>Current training service status and history</mat-card-subtitle>
+    </mat-card-header>
+    @if (trainingStatus) {
+      <mat-card-content>
+        <table mat-table [dataSource]="statusData" class="mat-elevation-z2" style="width: 100%;">
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Property</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef>Value</th>
+            <td mat-cell *matCellDef="let element">
+              @if (element.key === 'Training Status') {
+                <span [style.color]="trainingStatus.isTraining ? '#ff9800' : '#32de84'">
+                  {{ element.value }}
+                </span>
+              }
+              @else if (element.key === 'Last Training Result') {
+                <span [style.color]="getResultColor(element.value)">
+                  {{ element.value }}
+                </span>
+              }
+              @else {
+                {{ element.value }}
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    }
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="triggerTraining()" [disabled]="isTriggering || trainingStatus?.isTraining">
+        @if (isTriggering) {
+          <mat-progress-spinner color="primary" mode="indeterminate" diameter="20" style="margin-right: 8px;"></mat-progress-spinner>
+        }
+        {{ isTriggering ? 'Training...' : 'Trigger Training' }}
+      </button>
+      <button mat-button (click)="refreshData()" [disabled]="isLoadingTrainingStatus">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Model Metrics Card -->
+  @if (trainingStatus?.modelMetrics) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Model Performance Metrics</mat-card-title>
+        <mat-card-subtitle>Quality metrics from the last successful training</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="metricsData" class="mat-elevation-z2" style="width: 100%;">
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Metric</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef>Value</th>
+            <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Configuration Card -->
+  @if (trainingStatus?.configuration) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Training Configuration</mat-card-title>
+        <mat-card-subtitle>Current ML training parameters</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="configData" class="mat-elevation-z2" style="width: 100%;">
+          <ng-container matColumnDef="key">
+            <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Setting</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef>Value</th>
+            <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  }
+
+</div>

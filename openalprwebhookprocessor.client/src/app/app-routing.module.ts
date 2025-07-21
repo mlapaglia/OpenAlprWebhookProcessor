@@ -8,6 +8,7 @@ import { AlertsComponent } from './settings/alerts/alerts.component'
 import { EnrichersComponent } from './settings/enrichers/enrichers.component'
 import { ForwardsComponent } from './settings/forwards/forwards.component'
 import { IgnoresComponent } from './settings/ignores/ignores.component'
+import { MachineLearningComponent } from './settings/machine-learning/machine-learning.component'
 import { SystemLogsComponent } from './settings/system-logs/system-logs.component'
 import { PlatesComponent } from './plates/plates.component'
 import { AddEditComponent } from './settings/users/add-edit.component'
@@ -37,6 +38,7 @@ const routes: Routes = [
       { path: 'forwards', component: ForwardsComponent },
       { path: 'ignores', component: IgnoresComponent },
       { path: 'logs', component: SystemLogsComponent },
+      { path: 'machine-learning', component: MachineLearningComponent },
       {
         path: 'users',
         children: [

@@ -19,13 +19,16 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
     public class MachineLearningController : ControllerBase
     {
         private readonly ILicensePlatePredictionService _predictionService;
+        private readonly LicensePlateMlTrainingService _trainingService;
         private readonly ILogger<MachineLearningController> _logger;
 
         public MachineLearningController(
             ILicensePlatePredictionService predictionService,
+            LicensePlateMlTrainingService trainingService,
             ILogger<MachineLearningController> logger)
         {
             _predictionService = predictionService;
+            _trainingService = trainingService;
             _logger = logger;
         }
 
@@ -175,6 +178,48 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
             {
                 _logger.LogError(ex, "Error getting model info");
                 return StatusCode(500, "Error retrieving model information");
+            }
+        }
+
+        [HttpGet("training/status")]
+        public IActionResult GetTrainingStatus()
+        {
+            try
+            {
+                var status = _trainingService.GetTrainingStatus();
+                
+                return Ok(new
+                {
+                    status.IsTraining,
+                    status.LastTrainingStarted,
+                    status.LastTrainingCompleted,
+                    status.LastTrainingSuccessful,
+                    status.LastError,
+                    status.TrainingDataCount,
+                    ModelMetrics = status.RSquared.HasValue ? new
+                    {
+                        RSquared = status.RSquared.Value,
+                        MeanAbsoluteError = status.MeanAbsoluteError.Value,
+                        RootMeanSquaredError = status.RootMeanSquaredError.Value
+                    } : null,
+                    ModelFile = status.ModelLastSaved.HasValue ? new
+                    {
+                        LastSaved = status.ModelLastSaved.Value,
+                        FileSizeBytes = status.ModelFileSize.Value
+                    } : null,
+                    Configuration = new
+                    {
+                        TrainingInterval = "Every 6 hours",
+                        MinimumTrainingData = 100,
+                        MinimumModelQuality = 0.05,
+                        BatchSize = 50000
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting training status");
+                return StatusCode(500, "Error retrieving training status");
             }
         }
     }
