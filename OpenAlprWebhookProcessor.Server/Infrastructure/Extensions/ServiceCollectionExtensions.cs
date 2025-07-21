@@ -47,7 +47,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
         public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
         {
             var processorConnectionString = configuration.GetConnectionString("ProcessorConnection") 
-                ?? "Data Source=F:/processor.db;foreign keys=true;";
+                ?? "Data Source=config/processor.db;foreign keys=true;";
             
             var usersConnectionString = configuration.GetConnectionString("UsersConnection")
                 ?? "Data Source=config/users.db";

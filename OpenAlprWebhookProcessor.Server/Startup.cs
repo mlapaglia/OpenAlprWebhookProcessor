@@ -68,7 +68,6 @@ namespace OpenAlprWebhookProcessor
             app.UseStaticFiles();
 
             app.UseCors(x => x
-                .WithOrigins("https://localhost:4200", "http://localhost:4200")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
