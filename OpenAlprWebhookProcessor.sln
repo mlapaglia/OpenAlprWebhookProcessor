@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{350E0804-C372-49AB-B670-75E037878FAF}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAlprWebhookProcessor.Server", "OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.Server.csproj", "{F296E683-25F3-49B9-B82B-E17985808B3C}"
 EndProject
