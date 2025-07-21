@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
     && apt-get update && apt-get install nodejs -y
 
+RUN dotnet tool install --global dotnet-ef
+
 COPY ["openalprwebhookprocessor.client/nuget.config", "openalprwebhookprocessor.client/"]
 COPY ["OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj", "OpenAlprWebhookProcessor.Server/"]
 COPY ["openalprwebhookprocessor.client/openalprwebhookprocessor.client.esproj", "openalprwebhookprocessor.client/"]
@@ -24,6 +26,9 @@ COPY . .
 WORKDIR "/src/OpenAlprWebhookProcessor.Server"
 RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+RUN /root/.dotnet/tools/dotnet-ef migrations bundle --context ProcessorContext --output /app/build/processorMigrator --no-build --configuration $BUILD_CONFIGURATION
+RUN /root/.dotnet/tools/dotnet-ef migrations bundle --context UsersContext --output /app/build/usersMigrator --no-build --configuration $BUILD_CONFIGURATION
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
@@ -31,4 +36,12 @@ RUN dotnet publish "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGUR
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "OpenAlprWebhookProcessor.Server.dll"]
+COPY --from=build /app/build/processorMigrator ./processorMigrator
+COPY --from=build /app/build/usersMigrator ./usersMigrator
+COPY --from=build /src/scripts/entrypoint.sh ./
+
+USER root
+RUN chmod +x ./entrypoint.sh
+USER app
+
+ENTRYPOINT ["./entrypoint.sh"]

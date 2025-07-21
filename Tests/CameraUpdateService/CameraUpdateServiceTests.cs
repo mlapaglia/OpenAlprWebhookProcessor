@@ -9,7 +9,7 @@ using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using Tests.TestHelpers;
 
-namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
+namespace Tests.CameraUpdateService
 {
     [TestFixture]
     public class CameraUpdateServiceTests : TestBase
@@ -102,7 +102,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
             // Arrange
             var cameraId = Guid.NewGuid();
             var scheduleId = "schedule123";
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 NextDayNightScheduleId = scheduleId,
@@ -126,7 +126,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 NextDayNightScheduleId = string.Empty,
@@ -160,7 +160,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -185,7 +185,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -210,7 +210,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -249,7 +249,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua,
@@ -327,7 +327,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
             // Arrange
             var cameraId = Guid.NewGuid();
             var oldJobId = "oldJob123";
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua,
@@ -359,7 +359,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
             // Arrange
             var cameraId = Guid.NewGuid();
             var plateUuid = Guid.NewGuid().ToString();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua,
@@ -409,7 +409,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
             // Arrange
             var cameraId = Guid.NewGuid();
             var expectedZoomFocus = new ZoomFocus { Zoom = 1.5M, Focus = 0.8M };
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -447,7 +447,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
             // Arrange
             var cameraId = Guid.NewGuid();
             var zoomFocus = new ZoomFocus { Zoom = 1.5M, Focus = 0.8M };
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -482,7 +482,7 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         {
             // Arrange
             var cameraId = Guid.NewGuid();
-            var camera = new Data.Camera
+            var camera = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = cameraId,
                 Manufacturer = CameraManufacturer.Dahua
@@ -505,13 +505,13 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         public async Task ForceClearOverlaysAsync_MultipleCameras_ClearsAllAndSavesOnce()
         {
             // Arrange
-            var camera1 = new Data.Camera
+            var camera1 = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = Guid.NewGuid(),
                 Manufacturer = CameraManufacturer.Dahua,
                 NextClearOverlayScheduleId = "schedule1"
             };
-            var camera2 = new Data.Camera
+            var camera2 = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = Guid.NewGuid(),
                 Manufacturer = CameraManufacturer.Hikvision,
@@ -544,13 +544,13 @@ namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
         public async Task ForceClearOverlaysAsync_OneCameraFails_ContinuesWithOthers()
         {
             // Arrange
-            var camera1 = new Data.Camera
+            var camera1 = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = Guid.NewGuid(),
                 Manufacturer = CameraManufacturer.Dahua,
                 NextClearOverlayScheduleId = "schedule1"
             };
-            var camera2 = new Data.Camera
+            var camera2 = new OpenAlprWebhookProcessor.Data.Camera
             {
                 Id = Guid.NewGuid(),
                 Manufacturer = CameraManufacturer.Hikvision,

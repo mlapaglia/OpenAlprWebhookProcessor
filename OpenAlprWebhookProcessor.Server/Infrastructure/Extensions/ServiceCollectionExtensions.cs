@@ -46,11 +46,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var processorConnectionString = configuration.GetConnectionString("ProcessorConnection") 
-                ?? "Data Source=config/processor.db;foreign keys=true;";
-            
-            var usersConnectionString = configuration.GetConnectionString("UsersConnection")
-                ?? "Data Source=config/users.db";
+            var processorConnectionString = configuration.GetConnectionString("ProcessorConnection");
+
+            var usersConnectionString = configuration.GetConnectionString("UsersConnection");
 
             services.AddDbContext<ProcessorContext>(options =>
                 options.UseSqlite(processorConnectionString));

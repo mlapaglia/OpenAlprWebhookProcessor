@@ -41,6 +41,8 @@ namespace OpenAlprWebhookProcessor.Data
         public DbSet<WebPushSubscriptionKey> WebPushSubscriptionKeys { get; set; }
 
         public DbSet<WebPushSettings> WebPushSettings { get; set; }
+        
+        public DbSet<WebPushSettings> WebPushSettings2 { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

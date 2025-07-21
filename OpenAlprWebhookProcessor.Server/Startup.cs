@@ -56,8 +56,6 @@ namespace OpenAlprWebhookProcessor
 
         public void Configure(IApplicationBuilder app)
         {
-            app.EnsureDatabasesCreatedAsync().Wait();
-
             app.UseSerilogRequestLogging();
 
             app.UseDefaultFiles();
