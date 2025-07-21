@@ -1,14 +1,10 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
-using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.SystemLogs;
 using Serilog;
 using System;
 

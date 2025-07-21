@@ -82,26 +82,22 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton<WebPushNotificationProducer>();
             services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
 
-            services.AddSingleton<WebsocketClientOrganizer>();
-            services.AddSingleton<IWebsocketClientOrganizer>(p => p.GetService<WebsocketClientOrganizer>());
-            services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
+            services.AddSingleton<IWebsocketClientOrganizer, WebsocketClientOrganizer>();
+            services.AddHostedService<WebsocketClientOrganizerHostedService>();
 
-            services.AddSingleton<CameraUpdateService.CameraUpdateService>();
-            services.AddSingleton<ICameraUpdateService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
-            services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
+            services.AddSingleton<ICameraUpdateService, CameraUpdateService.CameraUpdateService>();
+            services.AddHostedService<CameraUpdateHostedService>();
 
-            services.AddSingleton<IBackgroundJobService, CameraUpdateService.TimerBasedBackgroundJobService>();
+            services.AddSingleton<IBackgroundJobService, TimerBasedBackgroundJobService>();
 
-            services.AddSingleton<HydrationService>();
-            services.AddSingleton<IHydrationService>(p => p.GetService<HydrationService>());
-            services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
+            services.AddSingleton<IHydrationService, HydrationService>();
+            services.AddHostedService<HydrationHostedService>();
 
-            services.AddSingleton<AlertService>();
-            services.AddSingleton<IAlertService>(p => p.GetService<AlertService>());
-            services.AddSingleton<IHostedService>(p => p.GetService<AlertService>());
+            services.AddSingleton<IAlertService, AlertService>();
+            services.AddHostedService<AlertHostedService>();
 
-            services.AddSingleton<ImageRetrieverService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<ImageRetrieverService>());
+            services.AddSingleton<IImageRetrieverService, ImageRetrieverService>();
+            services.AddHostedService<ImageRetrieverHostedService>();
 
             return services;
         }
@@ -119,24 +115,24 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
+            services.AddHttpClient();
             services.AddScoped<IGroupWebhookHandler, GroupWebhookHandler>();
             services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<IOpenAlprAgentScraper, OpenAlprAgentScraper>();
-            services.AddScoped<IImageRetrieverService, ImageRetrieverService>();
+            services.AddScoped<IImageCompressionService, ImageCompressionService>();
             services.AddScoped<ITimeService, TimeService>();
             services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
             services.AddSingleton<IAlertClient, PushoverClient>();
             services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
             services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
-            services.AddSingleton<PushServiceClient>(provider => 
+            services.AddSingleton(provider => 
             {
                 var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
                 var httpClient = httpClientFactory.CreateClient();
                 return new PushServiceClient(httpClient);
             });
+
             services.AddSingleton<IPushServiceClientWrapper, PushServiceClientWrapper>();
-            services.AddHttpClient();
-            services.AddScoped<IImageCompressionService, ImageCompressionService>();
             services.AddSingleton<Features.Cameras.ICameraFactory, Features.Cameras.CameraFactory>();
 
             return services;

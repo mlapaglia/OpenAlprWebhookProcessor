@@ -1,80 +1,26 @@
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts
 {
-    public class AlertService : IHostedService, IAlertService
+    public class AlertService : IAlertService
     {
-        private readonly BlockingCollection<AlertUpdateRequest> _alertsToProcess;
-
-        private readonly CancellationTokenSource _cancellationTokenSource;
-
-        private readonly ILogger _logger;
-
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
-
-        private readonly IEnumerable<IAlertClient> _alertClients;
-
-        public AlertService(
-            ILogger<AlertService> logger,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            IEnumerable<IAlertClient> alertClients)
-        {
-            _logger = logger;
-            _cancellationTokenSource = new CancellationTokenSource();
-            _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
-            _processorHub = processorHub;
-            _alertClients = alertClients;
-        }
+        private readonly BlockingCollection<AlertUpdateRequest> _alertsToProcess = new BlockingCollection<AlertUpdateRequest>();
 
         public void AddJob(AlertUpdateRequest request)
         {
-            _logger.LogInformation("adding job for alert: ");
             _alertsToProcess.Add(request);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public int GetPendingAlertsCount()
         {
-            Task.Run(async () =>
-                await ProcessAlertsAsync(),
-                cancellationToken);
-
-            return Task.CompletedTask;
+            return _alertsToProcess.Count;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public IEnumerable<AlertUpdateRequest> GetConsumingAlerts(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-
-            return Task.CompletedTask;
-        }
-
-        private async Task ProcessAlertsAsync()
-        {
-            foreach (var job in _alertsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
-            {
-                _logger.LogInformation("alerting for: {PlateNumber}", job.PlateNumber);
-                await _processorHub.Clients.All.LicensePlateAlerted(job.PlateNumber);
-
-                foreach (var alertClient in _alertClients)
-                {
-                    try
-                    {
-                        await alertClient.SendAlertAsync(job, _cancellationTokenSource.Token);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"failed to send alert to {nameof(alertClient)}");
-                    }
-                }
-            }
+            return _alertsToProcess.GetConsumingEnumerable(cancellationToken);
         }
     }
 }

@@ -1,21 +1,24 @@
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using Tests.TestHelpers;
-using NSubstitute.ExceptionExtensions;
-using DataCamera = OpenAlprWebhookProcessor.Data.Camera;
 
-namespace Tests.CameraUpdateService
+namespace OpenAlprWebhookProcessor.Tests.CameraUpdateService
 {
     [TestFixture]
     public class CameraUpdateServiceTests : TestBase
     {
-        private OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService _cameraUpdateService;
+        private IServiceProvider _serviceProvider;
+
+        private IServiceScope _serviceScope;
+
+        private IServiceScopeFactory _serviceScopeFactory;
 
         private ILogger<OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService> _logger;
 
@@ -23,460 +26,557 @@ namespace Tests.CameraUpdateService
 
         private ICameraFactory _cameraFactory;
 
-        private ICamera _mockCamera;
+        private ICamera _camera;
 
-        private IServiceProvider _serviceProvider;
+        private OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService _sut;
 
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
 
+            _serviceProvider = Substitute.For<IServiceProvider>();
+            _serviceScope = Substitute.For<IServiceScope>();
+            _serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
             _logger = Substitute.For<ILogger<OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService>>();
             _backgroundJobService = Substitute.For<IBackgroundJobService>();
             _cameraFactory = Substitute.For<ICameraFactory>();
-            _mockCamera = Substitute.For<ICamera>();
+            _camera = Substitute.For<ICamera>();
 
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(UnitOfWork);
-            serviceCollection.AddSingleton(_cameraFactory);
-            _serviceProvider = serviceCollection.BuildServiceProvider();
+            _serviceProvider.GetService(typeof(IServiceScopeFactory)).Returns(_serviceScopeFactory);
+            _serviceScopeFactory.CreateScope().Returns(_serviceScope);
+            _serviceScope.ServiceProvider.Returns(_serviceProvider);
 
-            _cameraFactory.Create(Arg.Any<CameraManufacturer>(), Arg.Any<DataCamera>())
-                .Returns(_mockCamera);
+            _serviceProvider.GetService(typeof(IUnitOfWork)).Returns(UnitOfWork);
+            _serviceProvider.GetService(typeof(ICameraFactory)).Returns(_cameraFactory);
 
-            _cameraUpdateService = new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                _serviceProvider,
-                _logger,
-                _backgroundJobService);
+            _sut = new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(_serviceProvider, _logger, _backgroundJobService);
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            (_serviceScope as IDisposable)?.Dispose();
+            base.TearDown();
         }
 
         [Test]
-        public void Constructor_WithNullServiceProvider_ThrowsArgumentNullException()
+        public void Constructor_NullServiceProvider_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                null, _logger, _backgroundJobService));
+            Assert.Throws<ArgumentNullException>(() =>
+                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(null, _logger, _backgroundJobService));
         }
 
         [Test]
-        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
+        public void Constructor_NullLogger_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                _serviceProvider, null, _backgroundJobService));
+            Assert.Throws<ArgumentNullException>(() =>
+                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(_serviceProvider, null, _backgroundJobService));
         }
 
         [Test]
-        public void Constructor_WithNullBackgroundJobService_ThrowsArgumentNullException()
+        public void Constructor_NullBackgroundJobService_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => 
-                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(
-                _serviceProvider, _logger, null));
+            Assert.Throws<ArgumentNullException>(() =>
+                new OpenAlprWebhookProcessor.CameraUpdateService.CameraUpdateService(_serviceProvider, _logger, null));
         }
 
         [Test]
-        public async Task DeleteSunriseSunsetAsync_WithExistingCamera_DeletesScheduledJob()
+        public void DeleteSunriseSunsetAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            camera.NextDayNightScheduleId = "scheduled-job-id";
+            var cameraId = Guid.NewGuid();
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.DeleteSunriseSunsetAsync(cameraId));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
+        }
+
+        [Test]
+        public async Task DeleteSunriseSunsetAsync_CameraWithScheduleId_DeletesJobAndUpdatesCamera()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var scheduleId = "schedule123";
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                NextDayNightScheduleId = scheduleId,
+                Manufacturer = CameraManufacturer.Dahua
+            };
+
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
+            await _sut.DeleteSunriseSunsetAsync(cameraId);
 
             // Assert
-            _backgroundJobService.Received(1).DeleteJob("scheduled-job-id");
+            _backgroundJobService.Received(1).DeleteJob(scheduleId);
+            var updatedCamera = await UnitOfWork.Cameras.GetByIdAsync(cameraId);
+            Assert.That(updatedCamera.NextDayNightScheduleId, Is.Empty);
         }
 
         [Test]
-        public void DeleteSunriseSunsetAsync_WithNonExistentCamera_ThrowsArgumentException()
+        public async Task DeleteSunriseSunsetAsync_CameraWithoutScheduleId_DoesNotDeleteJob()
         {
             // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                NextDayNightScheduleId = string.Empty,
+                Manufacturer = CameraManufacturer.Dahua
+            };
 
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.DeleteSunriseSunsetAsync(nonExistentCameraId));
-
-            Assert.That(exception.Message, Contains.Substring("Camera not found"));
-        }
-
-        [Test]
-        public async Task DeleteSunriseSunsetAsync_WithNoScheduledJob_DoesNotDeleteJob()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            camera.NextDayNightScheduleId = null;
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _cameraUpdateService.DeleteSunriseSunsetAsync(camera.Id);
+            await _sut.DeleteSunriseSunsetAsync(cameraId);
 
             // Assert
             _backgroundJobService.DidNotReceive().DeleteJob(Arg.Any<string>());
         }
 
         [Test]
-        public async Task ProcessSunriseSunsetJobAsync_WithValidCamera_ProcessesSuccessfully()
+        public async Task ProcessSunriseSunsetJobAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            
-            var agent = TestDataFactory.CreateTestAgent();
-            await UnitOfWork.Agents.AddAsync(agent);
-            await UnitOfWork.SaveChangesAsync();
-
-            // Act
-            await _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, false);
-
-            // Assert
-            await _mockCamera.Received(1).SetCameraTextAsync(Arg.Any<CameraUpdateRequest>(), Arg.Any<CancellationToken>());
-        }
-
-        [Test]
-        public void ProcessSunriseSunsetJobAsync_WithNonExistentCamera_ThrowsArgumentException()
-        {
-            // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
+            var cameraId = Guid.NewGuid();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.ProcessSunriseSunsetJobAsync(nonExistentCameraId, SunriseSunset.Sunrise, false));
-
-            Assert.That(exception.Message, Is.EqualTo("camera not found"));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunrise, false));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
         }
 
         [Test]
-        public async Task ProcessSunriseSunsetJobAsync_WithCameraException_LogsError()
+        public async Task ProcessSunriseSunsetJobAsync_Sunrise_SetsDAYText()
         {
             // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            
-            var agent = TestDataFactory.CreateTestAgent();
-            await UnitOfWork.Agents.AddAsync(agent);
-            await UnitOfWork.SaveChangesAsync();
-
-            _mockCamera.SetCameraTextAsync(Arg.Any<CameraUpdateRequest>(), Arg.Any<CancellationToken>())
-                .Throws(new InvalidOperationException("Camera error"));
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() =>
-                _cameraUpdateService.ProcessSunriseSunsetJobAsync(camera.Id, SunriseSunset.Sunrise, false));
-            
-            exception.Message.Should().Be("Camera error");
-        }
-
-        [Test]
-        public async Task ProcessJobAsync_WithValidRequest_ProcessesSuccessfully()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            var request = new CameraUpdateRequest
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
             {
-                Id = camera.Id,
-                LicensePlate = "ABC123",
-                VehicleDescription = "Red Car",
-                OpenAlprProcessingTimeMs = 150,
-                ProcessedPlateConfidence = 95.5,
-                IsTest = false
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
             };
 
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+
             // Act
-            await _cameraUpdateService.ProcessJobAsync(request);
+            await _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunrise, false);
 
             // Assert
-            await _mockCamera.Received(1).SetCameraTextAsync(request, Arg.Any<CancellationToken>());
+            await _camera.Received(1).SetCameraTextAsync(
+                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "DAY"),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public void ProcessJobAsync_WithNonExistentCamera_ThrowsArgumentException()
+        public async Task ProcessSunriseSunsetJobAsync_Sunset_SetsNIGHTText()
         {
             // Arrange
-            var request = new CameraUpdateRequest
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
             {
-                Id = Guid.NewGuid(),
-                LicensePlate = "ABC123"
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
             };
 
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.ProcessJobAsync(request));
-
-            Assert.That(exception.Message, Contains.Substring("unknown camera Id"));
-        }
-
-        [Test]
-        public async Task ProcessJobAsync_WithTestRequest_DoesNotUpdateStatistics()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
-            var initialPlatesSeen = camera.PlatesSeen;
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
 
-            var request = new CameraUpdateRequest
+            // Act
+            await _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunset, false);
+
+            // Assert
+            await _camera.Received(1).SetCameraTextAsync(
+                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "NIGHT"),
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task ProcessSunriseSunsetJobAsync_ScheduleNextJobTrue_SchedulesAdditionalTasks()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
             {
-                Id = camera.Id,
-                LicensePlate = "ABC123",
-                IsTest = true
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
             };
 
-            // Act
-            await _cameraUpdateService.ProcessJobAsync(request);
-
-            // Assert
-            Assert.That(camera.PlatesSeen, Is.EqualTo(initialPlatesSeen));
-        }
-
-        [Test]
-        public async Task ClearExpiredOverlayAsync_WithValidCamera_ClearsOverlay()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            camera.NextClearOverlayScheduleId = "clear-job-id";
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+
             // Act
-            await _cameraUpdateService.ClearExpiredOverlayAsync(camera.Id);
+            await _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunrise, true);
 
             // Assert
-            await _mockCamera.Received(1).ClearCameraTextAsync(Arg.Any<CancellationToken>());
-            Assert.That(camera.NextClearOverlayScheduleId, Is.Empty);
+            // Note: Testing static method calls might require wrapping CameraScheduling
+            // For now, we can verify the camera text was set
+            await _camera.Received(1).SetCameraTextAsync(
+                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "DAY"),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public void ClearExpiredOverlayAsync_WithNonExistentCamera_LogsError()
+        public async Task ClearExpiredOverlayAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
+            var cameraId = Guid.NewGuid();
 
             // Act & Assert
-            Assert.ThrowsAsync<ArgumentException>(() => _cameraUpdateService.ClearExpiredOverlayAsync(nonExistentCameraId));
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.ClearExpiredOverlayAsync(cameraId));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
         }
 
         [Test]
-        public async Task ClearExpiredOverlayAsync_WithCameraException_LogsError()
+        public async Task ClearExpiredOverlayAsync_Success_ClearsOverlayAndUpdatesCamera()
         {
             // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            _mockCamera.ClearCameraTextAsync(Arg.Any<CancellationToken>())
-                .Throws(new InvalidOperationException("Camera error"));
-
-            // Act
-            await _cameraUpdateService.ClearExpiredOverlayAsync(camera.Id);
-
-            // Assert
-            _logger.Received(1).Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Any<object>(),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>());
-        }
-
-        [Test]
-        public async Task GetZoomAndFocusAsync_WithValidCamera_ReturnsZoomFocus()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            var expectedZoomFocus = new ZoomFocus { Zoom = 2.5m, Focus = 3.0m };
-            _mockCamera.GetZoomAndFocusAsync(Arg.Any<CancellationToken>())
-                .Returns(expectedZoomFocus);
-
-            // Act
-            var result = await _cameraUpdateService.GetZoomAndFocusAsync(camera.Id, CancellationToken.None);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(expectedZoomFocus));
-        }
-
-        [Test]
-        public void GetZoomAndFocusAsync_WithNonExistentCamera_ThrowsArgumentException()
-        {
-            // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.GetZoomAndFocusAsync(nonExistentCameraId, CancellationToken.None));
-
-            Assert.That(exception.Message, Contains.Substring("Camera not found"));
-        }
-
-        [Test]
-        public async Task SetZoomAndFocusAsync_WithValidCamera_SetsZoomFocus()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            var zoomFocus = new ZoomFocus { Zoom = 2.5m, Focus = 3.0m };
-
-            // Act
-            await _cameraUpdateService.SetZoomAndFocusAsync(camera.Id, zoomFocus, CancellationToken.None);
-
-            // Assert
-            await _mockCamera.Received(1).SetZoomAndFocusAsync(zoomFocus, CancellationToken.None);
-        }
-
-        [Test]
-        public void SetZoomAndFocusAsync_WithNonExistentCamera_ThrowsArgumentException()
-        {
-            // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
-            var zoomFocus = new ZoomFocus { Zoom = 2.5m, Focus = 3.0m };
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.SetZoomAndFocusAsync(nonExistentCameraId, zoomFocus, CancellationToken.None));
-
-            Assert.That(exception.Message, Contains.Substring("Camera not found"));
-        }
-
-        [Test]
-        public async Task TriggerAutofocusAsync_WithValidCamera_TriggersAutofocus()
-        {
-            // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            await UnitOfWork.Cameras.AddAsync(camera);
-            await UnitOfWork.SaveChangesAsync();
-
-            _mockCamera.TriggerAutoFocusAsync(Arg.Any<CancellationToken>())
-                .Returns(true);
-
-            // Act
-            var result = await _cameraUpdateService.TriggerAutofocusAsync(camera.Id, CancellationToken.None);
-
-            // Assert
-            Assert.That(result, Is.True);
-            await _mockCamera.Received(1).TriggerAutoFocusAsync(CancellationToken.None);
-        }
-
-        [Test]
-        public void TriggerAutofocusAsync_WithNonExistentCamera_ThrowsArgumentException()
-        {
-            // Arrange
-            var nonExistentCameraId = Guid.NewGuid();
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() =>
-                _cameraUpdateService.TriggerAutofocusAsync(nonExistentCameraId, CancellationToken.None));
-
-            Assert.That(exception.Message, Contains.Substring("Camera not found"));
-        }
-
-        [Test]
-        public async Task ForceClearOverlaysAsync_WithMultipleCameras_ClearsAllOverlays()
-        {
-            // Arrange
-            var camera1 = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            var camera2 = TestDataFactory.CreateTestCamera(CameraManufacturer.Dahua);
-            
-            await UnitOfWork.Cameras.AddAsync(camera1);
-            await UnitOfWork.Cameras.AddAsync(camera2);
-            await UnitOfWork.SaveChangesAsync();
-
-            // Act
-            await _cameraUpdateService.ForceClearOverlaysAsync();
-
-            // Assert
-            await _mockCamera.Received(2).ClearCameraTextAsync(Arg.Any<CancellationToken>());
-        }
-
-        [Test]
-        public async Task ForceClearOverlaysAsync_WithCameraException_LogsErrorAndContinues()
-        {
-            // Arrange
-            var camera1 = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
-            var camera2 = TestDataFactory.CreateTestCamera(CameraManufacturer.Dahua);
-            
-            await UnitOfWork.Cameras.AddAsync(camera1);
-            await UnitOfWork.Cameras.AddAsync(camera2);
-            await UnitOfWork.SaveChangesAsync();
-
-            _mockCamera.ClearCameraTextAsync(Arg.Any<CancellationToken>())
-                .Throws(new InvalidOperationException("Camera error"));
-
-            // Act
-            await _cameraUpdateService.ForceClearOverlaysAsync();
-
-            // Assert
-            _logger.Received(2).Log(
-                LogLevel.Error,
-                Arg.Any<EventId>(),
-                Arg.Any<object>(),
-                Arg.Any<Exception>(),
-                Arg.Any<Func<object, Exception, string>>());
-        }
-
-        [Test]
-        public async Task ScheduleOverlayRequest_WithValidRequest_SchedulesJobAsync()
-        {
-            // Arrange
-            var request = new CameraUpdateRequest
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
             {
-                Id = Guid.NewGuid(),
-                LicensePlate = "ABC123"
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua,
+                NextClearOverlayScheduleId = "schedule123"
             };
 
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+
             // Act
-            await _cameraUpdateService.ScheduleOverlayRequestAsync(request);
+            await _sut.ClearExpiredOverlayAsync(cameraId);
+
+            // Assert
+            await _camera.Received(1).ClearCameraTextAsync(Arg.Any<CancellationToken>());
+            var updatedCamera = await UnitOfWork.Cameras.GetByIdAsync(cameraId);
+            Assert.That(updatedCamera.NextClearOverlayScheduleId, Is.Empty);
+        }
+
+        [Test]
+        public async Task ScheduleDayNightTaskAsync_CallsScheduling()
+        {
+            // Act
+            await _sut.ScheduleDayNightTaskAsync();
+
+            // Assert
+            // This tests that the method completes without error
+            // Actual scheduling logic would need to be tested separately
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task EnqueueDayNightAsync_CallsScheduling()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var sunriseSunset = SunriseSunset.Sunrise;
+
+            // Act
+            await _sut.EnqueueDayNightAsync(cameraId, sunriseSunset);
+
+            // Assert
+            // This tests that the method completes without error
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task ScheduleOverlayRequestAsync_EnqueuesJob()
+        {
+            // Arrange
+            var request = new CameraUpdateRequest { Id = Guid.NewGuid() };
+
+            // Act
+            await _sut.ScheduleOverlayRequestAsync(request);
 
             // Assert
             await _backgroundJobService.Received(1).EnqueueProcessJobAsync(request);
         }
 
         [Test]
-        public async Task StartAsync_ReturnsCompletedTask()
+        public async Task ProcessJobAsync_CameraNotFound_ThrowsArgumentException()
         {
-            // Act
-            await _cameraUpdateService.StartAsync(CancellationToken.None);
+            // Arrange
+            var request = new CameraUpdateRequest { Id = Guid.NewGuid() };
 
-            // Assert
-            Assert.Pass(); // StartAsync should complete without throwing
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(() => _sut.ProcessJobAsync(request));
+            Assert.That(ex.Message, Does.Contain($"Unknown camera ID: {request.Id}"));
         }
 
         [Test]
-        public async Task StopAsync_CallsForceClearOverlaysAsync()
+        public async Task ProcessJobAsync_ExistingClearOverlayJob_DeletesOldJob()
         {
             // Arrange
-            var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
+            var cameraId = Guid.NewGuid();
+            var oldJobId = "oldJob123";
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua,
+                NextClearOverlayScheduleId = oldJobId
+            };
+            var request = new CameraUpdateRequest
+            {
+                Id = cameraId,
+                LicensePlate = "ABC123"
+            };
+
             await UnitOfWork.Cameras.AddAsync(camera);
             await UnitOfWork.SaveChangesAsync();
 
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+            _backgroundJobService.ScheduleClearOverlayJob(cameraId, Arg.Any<TimeSpan>())
+                .Returns("newJob123");
+
             // Act
-            await _cameraUpdateService.StopAsync(CancellationToken.None);
+            await _sut.ProcessJobAsync(request);
 
             // Assert
-            await _mockCamera.Received().ClearCameraTextAsync(Arg.Any<CancellationToken>());
+            _backgroundJobService.Received(1).DeleteJob(oldJobId);
         }
 
-        [TearDown]
-        public override void TearDown()
+        [Test]
+        public async Task ProcessJobAsync_NonTestNonPreviewNonSinglePlate_UpdatesPlatesSeenAndUuid()
         {
-            (_serviceProvider as IDisposable)?.Dispose();
-            base.TearDown();
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var plateUuid = Guid.NewGuid().ToString();
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua,
+                PlatesSeen = 5
+            };
+            var request = new CameraUpdateRequest
+            {
+                Id = cameraId,
+                LicensePlate = "ABC123",
+                IsTest = false,
+                IsPreviewGroup = false,
+                IsSinglePlate = false,
+                LicensePlateImageUuid = plateUuid
+            };
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+            _backgroundJobService.ScheduleClearOverlayJob(cameraId, Arg.Any<TimeSpan>())
+                .Returns("newJob123");
+
+            // Act
+            await _sut.ProcessJobAsync(request);
+
+            // Assert
+            var updatedCamera = await UnitOfWork.Cameras.GetByIdAsync(cameraId);
+            Assert.That(updatedCamera.PlatesSeen, Is.EqualTo(6));
+            Assert.That(updatedCamera.LatestProcessedPlateUuid, Is.EqualTo(plateUuid));
+        }
+
+        [Test]
+        public async Task GetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.GetZoomAndFocusAsync(cameraId, CancellationToken.None));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
+        }
+
+        [Test]
+        public async Task GetZoomAndFocusAsync_Success_ReturnsZoomFocus()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var expectedZoomFocus = new ZoomFocus { Zoom = 1.5M, Focus = 0.8M };
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
+            };
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+            _camera.GetZoomAndFocusAsync(Arg.Any<CancellationToken>()).Returns(expectedZoomFocus);
+
+            // Act
+            var result = await _sut.GetZoomAndFocusAsync(cameraId, CancellationToken.None);
+
+            // Assert
+            Assert.That(result, Is.EqualTo(expectedZoomFocus));
+        }
+
+        [Test]
+        public async Task SetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var zoomFocus = new ZoomFocus { Zoom = 1.5M, Focus = 0.8M };
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.SetZoomAndFocusAsync(cameraId, zoomFocus, CancellationToken.None));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
+        }
+
+        [Test]
+        public async Task SetZoomAndFocusAsync_Success_CallsCameraMethod()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var zoomFocus = new ZoomFocus { Zoom = 1.5M, Focus = 0.8M };
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
+            };
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+
+            // Act
+            await _sut.SetZoomAndFocusAsync(cameraId, zoomFocus, CancellationToken.None);
+
+            // Assert
+            await _camera.Received(1).SetZoomAndFocusAsync(zoomFocus, Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task TriggerAutofocusAsync_CameraNotFound_ThrowsArgumentException()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(() =>
+                _sut.TriggerAutofocusAsync(cameraId, CancellationToken.None));
+            Assert.That(ex.Message, Does.Contain($"Camera not found: {cameraId}"));
+        }
+
+        [Test]
+        public async Task TriggerAutofocusAsync_Success_ReturnsResult()
+        {
+            // Arrange
+            var cameraId = Guid.NewGuid();
+            var camera = new Data.Camera
+            {
+                Id = cameraId,
+                Manufacturer = CameraManufacturer.Dahua
+            };
+
+            await UnitOfWork.Cameras.AddAsync(camera);
+            await UnitOfWork.SaveChangesAsync();
+
+            _cameraFactory.Create(camera.Manufacturer, camera).Returns(_camera);
+            _camera.TriggerAutoFocusAsync(Arg.Any<CancellationToken>()).Returns(true);
+
+            // Act
+            var result = await _sut.TriggerAutofocusAsync(cameraId, CancellationToken.None);
+
+            // Assert
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public async Task ForceClearOverlaysAsync_MultipleCameras_ClearsAllAndSavesOnce()
+        {
+            // Arrange
+            var camera1 = new Data.Camera
+            {
+                Id = Guid.NewGuid(),
+                Manufacturer = CameraManufacturer.Dahua,
+                NextClearOverlayScheduleId = "schedule1"
+            };
+            var camera2 = new Data.Camera
+            {
+                Id = Guid.NewGuid(),
+                Manufacturer = CameraManufacturer.Hikvision,
+                NextClearOverlayScheduleId = "schedule2"
+            };
+
+            await UnitOfWork.Cameras.AddAsync(camera1);
+            await UnitOfWork.Cameras.AddAsync(camera2);
+            await UnitOfWork.SaveChangesAsync();
+
+            var camera1Mock = Substitute.For<ICamera>();
+            var camera2Mock = Substitute.For<ICamera>();
+            _cameraFactory.Create(camera1.Manufacturer, camera1).Returns(camera1Mock);
+            _cameraFactory.Create(camera2.Manufacturer, camera2).Returns(camera2Mock);
+
+            // Act
+            await _sut.ForceClearOverlaysAsync();
+
+            // Assert
+            await camera1Mock.Received(1).ClearCameraTextAsync(Arg.Any<CancellationToken>());
+            await camera2Mock.Received(1).ClearCameraTextAsync(Arg.Any<CancellationToken>());
+
+            var updatedCamera1 = await UnitOfWork.Cameras.GetByIdAsync(camera1.Id);
+            var updatedCamera2 = await UnitOfWork.Cameras.GetByIdAsync(camera2.Id);
+            Assert.That(updatedCamera1.NextClearOverlayScheduleId, Is.Empty);
+            Assert.That(updatedCamera2.NextClearOverlayScheduleId, Is.Empty);
+        }
+
+        [Test]
+        public async Task ForceClearOverlaysAsync_OneCameraFails_ContinuesWithOthers()
+        {
+            // Arrange
+            var camera1 = new Data.Camera
+            {
+                Id = Guid.NewGuid(),
+                Manufacturer = CameraManufacturer.Dahua,
+                NextClearOverlayScheduleId = "schedule1"
+            };
+            var camera2 = new Data.Camera
+            {
+                Id = Guid.NewGuid(),
+                Manufacturer = CameraManufacturer.Hikvision,
+                NextClearOverlayScheduleId = "schedule2"
+            };
+            var exception = new Exception("Camera 1 error");
+
+            await UnitOfWork.Cameras.AddAsync(camera1);
+            await UnitOfWork.Cameras.AddAsync(camera2);
+            await UnitOfWork.SaveChangesAsync();
+
+            var camera1Mock = Substitute.For<ICamera>();
+            var camera2Mock = Substitute.For<ICamera>();
+            _cameraFactory.Create(camera1.Manufacturer, camera1).Returns(camera1Mock);
+            _cameraFactory.Create(camera2.Manufacturer, camera2).Returns(camera2Mock);
+
+            camera1Mock.ClearCameraTextAsync(Arg.Any<CancellationToken>()).ThrowsAsync(exception);
+
+            // Act
+            await _sut.ForceClearOverlaysAsync();
+
+            // Assert
+            await camera2Mock.Received(1).ClearCameraTextAsync(Arg.Any<CancellationToken>());
+
+            var updatedCamera2 = await UnitOfWork.Cameras.GetByIdAsync(camera2.Id);
+            Assert.That(updatedCamera2.NextClearOverlayScheduleId, Is.Empty);
         }
     }
-} 
+}

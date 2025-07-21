@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.IO;
-using Microsoft.AspNetCore.SignalR;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
@@ -23,19 +22,15 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         private readonly ILogger _logger;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> _processorHub;
-
         public OpenAlprWebsocketClient(
             ILogger logger,
             string agentId,
-            WebSocket webSocket,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
+            WebSocket webSocket)
         {
             _logger = logger;
             _agentId = agentId;
             _webSocket = webSocket;
             _availableResponses = new ConcurrentDictionary<Guid, string>();
-            _processorHub = processorHub;
         }
 
         public async Task ConsumeMessagesAsync(CancellationToken cancellationToken)

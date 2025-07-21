@@ -28,5 +28,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string maskImage,
             string openAlprName,
             CancellationToken cancellationToken);
+
+        Task DisconnectAllClientsAsync(CancellationToken cancellationToken = default);
     }
-} 
+}

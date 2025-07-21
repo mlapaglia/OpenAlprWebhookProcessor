@@ -1,49 +1,24 @@
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
-    public class WebsocketClientOrganizer : BackgroundService, IWebsocketClientOrganizer
+    public class WebsocketClientOrganizer : IWebsocketClientOrganizer
     {
-        private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients;
+        private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients = new();
 
         private readonly ILogger<WebsocketClientOrganizer> _logger;
 
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly TimeSpan _responseTimeout = TimeSpan.FromSeconds(10);
 
-        public WebsocketClientOrganizer(
-            ILogger<WebsocketClientOrganizer> logger)
+        public WebsocketClientOrganizer(ILogger<WebsocketClientOrganizer> logger)
         {
-            _logger = logger;
-            _connectedClients = new ConcurrentDictionary<string, OpenAlprWebsocketClient>();
-            _logger.LogWarning("warning!");
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            try
-            {
-                _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
-                await Task.Delay(Timeout.Infinite, _cancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException ex)
-            {
-                _logger.LogInformation(ex, "Service cancellation requested, stopping websockets: {Message}", ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unknown error occurred, stopping websockets: {Message}", ex.Message);
-            }
-            finally
-            {
-                await DisconnectClientsAsync();
-                _cancellationTokenSource.Dispose();
-            }
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<AddAgentResult> AddAgentAsync(
@@ -51,32 +26,36 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             OpenAlprWebsocketClient webSocketClient,
             CancellationToken cancellationToken)
         {
-            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+            ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
+            ArgumentNullException.ThrowIfNull(webSocketClient);
 
             var result = new AddAgentResult();
 
             result.WasUpdated = _connectedClients.TryRemove(agentId, out var oldWebSocketClient);
 
-            if (result.WasUpdated)
+            if (result.WasUpdated && oldWebSocketClient != null)
             {
                 try
                 {
-                    await oldWebSocketClient.CloseConnectionAsync(linkedCancellationToken);
+                    await oldWebSocketClient.CloseConnectionAsync(cancellationToken);
                     result.UpdateWasCleanDisconnect = true;
+                    _logger.LogInformation("Cleanly disconnected old websocket client for agent: {AgentId}", agentId);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "unable to disconnect client cleanly");
+                    _logger.LogError(ex, "Unable to disconnect old client cleanly for agent: {AgentId}", agentId);
                 }
             }
 
+            // Add new client
             if (_connectedClients.TryAdd(agentId, webSocketClient))
             {
                 result.WasAdded = true;
+                _logger.LogInformation("Added websocket client for agent: {AgentId}", agentId);
             }
             else
             {
-                _logger.LogError("Unable to add agent: {AgentID}", agentId);
+                _logger.LogError("Unable to add websocket client for agent: {AgentId}", agentId);
             }
 
             return result;
@@ -86,11 +65,25 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string agentId,
             CancellationToken cancellationToken)
         {
-            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentException("Agent ID cannot be null or empty", nameof(agentId));
 
             if (_connectedClients.TryRemove(agentId, out var webSocketClient))
             {
-                await webSocketClient.CloseConnectionAsync(linkedCancellationToken);
+                try
+                {
+                    await webSocketClient.CloseConnectionAsync(cancellationToken);
+                    _logger.LogInformation("Removed and disconnected websocket client for agent: {AgentId}", agentId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error closing connection for agent: {AgentId}", agentId);
+                    throw;
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Agent not found for removal: {AgentId}", agentId);
             }
         }
 
@@ -98,35 +91,38 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string agentId,
             CancellationToken cancellationToken)
         {
-            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentException("Agent ID cannot be null or empty", nameof(agentId));
 
-            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
-
-            if (!agentExists)
+            if (!_connectedClients.TryGetValue(agentId, out var webSocketClient))
             {
-                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
+                _logger.LogError("Agent is not connected: {AgentId}", agentId);
                 return null;
             }
 
             var transactionId = Guid.NewGuid();
 
-            await webSocketClient.SendGetAgentStatusRequestAsync(transactionId, linkedCancellationToken);
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(10))
+            try
             {
-                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var agentStatusResponse))
+                await webSocketClient.SendGetAgentStatusRequestAsync(transactionId, cancellationToken);
+
+                var response = await WaitForResponseAsync<AgentStatusResponse>(
+                    webSocketClient,
+                    transactionId,
+                    cancellationToken);
+
+                if (response == null)
                 {
-                    return agentStatusResponse;
+                    _logger.LogError("Agent did not respond to status request: {AgentId}", agentId);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1), linkedCancellationToken);
+                return response;
             }
-
-            _logger.LogError("Agent did not respond to request.");
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting status for agent: {AgentId}", agentId);
+                throw;
+            }
         }
 
         public async Task<bool> DisableEnableAgentAsync(
@@ -134,39 +130,43 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             AgentStartStopType startStopType,
             CancellationToken cancellationToken)
         {
-            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentException("Agent ID cannot be null or empty", nameof(agentId));
 
-            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
-
-            if (!agentExists)
+            if (!_connectedClients.TryGetValue(agentId, out var webSocketClient))
             {
-                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
+                _logger.LogError("Agent is not connected: {AgentId}", agentId);
                 return false;
             }
 
             var transactionId = Guid.NewGuid();
 
-            await webSocketClient.SendAgentStartStopRequestAsync(
-                transactionId,
-                startStopType,
-                agentId,
-                linkedCancellationToken);
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(10))
+            try
             {
-                if (webSocketClient.TryGetAgentResponse<AgentStartStopResponse>(transactionId, out var agentResponse))
+                await webSocketClient.SendAgentStartStopRequestAsync(
+                    transactionId,
+                    startStopType,
+                    agentId,
+                    cancellationToken);
+
+                var response = await WaitForResponseAsync<AgentStartStopResponse>(
+                    webSocketClient,
+                    transactionId,
+                    cancellationToken);
+
+                if (response == null)
                 {
-                    return agentResponse.Success;
+                    _logger.LogError("Agent did not respond to {StartStopType} request: {AgentId}", startStopType, agentId);
+                    return false;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1), linkedCancellationToken);
+                return response.Success;
             }
-
-            _logger.LogError("Agent did not respond to request.");
-            return false;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending {StartStopType} request to agent: {AgentId}", startStopType, agentId);
+                throw;
+            }
         }
 
         public async Task<bool> UpsertCameraMaskAsync(
@@ -175,52 +175,114 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             string openAlprName,
             CancellationToken cancellationToken)
         {
-            var linkedCancellationToken = GetLinkedCancellationToken(cancellationToken);
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentException("Agent ID cannot be null or empty", nameof(agentId));
 
-            var agentExists = _connectedClients.TryGetValue(agentId, out var webSocketClient);
+            if (string.IsNullOrWhiteSpace(maskImage))
+                throw new ArgumentException("Mask image cannot be null or empty", nameof(maskImage));
 
-            if (!agentExists)
+            if (string.IsNullOrWhiteSpace(openAlprName))
+                throw new ArgumentException("OpenALPR name cannot be null or empty", nameof(openAlprName));
+
+            if (!_connectedClients.TryGetValue(agentId, out var webSocketClient))
             {
-                _logger.LogError("AgentId is not connected: {AgentId}", agentId);
+                _logger.LogError("Agent is not connected: {AgentId}", agentId);
                 return false;
             }
 
             var transactionId = Guid.NewGuid();
 
-            await webSocketClient.SendSaveMaskRequestAsync(
-                transactionId,
-                maskImage,
-                openAlprName,
-                linkedCancellationToken);
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            while (stopwatch.Elapsed < TimeSpan.FromSeconds(10))
+            try
             {
-                if (webSocketClient.TryGetAgentResponse<AgentStatusResponse>(transactionId, out var _))
+                await webSocketClient.SendSaveMaskRequestAsync(
+                    transactionId,
+                    maskImage,
+                    openAlprName,
+                    cancellationToken);
+
+                var response = await WaitForResponseAsync<AgentStatusResponse>(
+                    webSocketClient,
+                    transactionId,
+                    cancellationToken);
+
+                if (response == null)
                 {
-                    return true;
+                    _logger.LogError("Agent did not respond to save mask request: {AgentId}", agentId);
+                    return false;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(1), linkedCancellationToken);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving mask for agent: {AgentId}, camera: {OpenAlprName}", agentId, openAlprName);
+                throw;
+            }
+        }
+
+        public IReadOnlyDictionary<string, OpenAlprWebsocketClient> GetConnectedClients()
+        {
+            return _connectedClients;
+        }
+
+        public async Task DisconnectAllClientsAsync(CancellationToken cancellationToken = default)
+        {
+            _logger.LogInformation("Disconnecting all {Count} websocket clients", _connectedClients.Count);
+
+            var disconnectTasks = new List<Task>();
+
+            foreach (var kvp in _connectedClients)
+            {
+                var task = DisconnectClientSafelyAsync(kvp.Key, kvp.Value, cancellationToken);
+                disconnectTasks.Add(task);
             }
 
-            _logger.LogError("Agent did not respond to request.");
-            return false;
+            await Task.WhenAll(disconnectTasks);
+            _connectedClients.Clear();
         }
 
-        private CancellationToken GetLinkedCancellationToken(CancellationToken cancellationToken)
+        private async Task DisconnectClientSafelyAsync(
+            string agentId,
+            OpenAlprWebsocketClient client,
+            CancellationToken cancellationToken)
         {
-            return CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken).Token;
-        }
-
-        private async Task DisconnectClientsAsync()
-        {
-            await Parallel.ForEachAsync(_connectedClients.Values, async (connectedClient, cancellationToken) =>
+            try
             {
-                await connectedClient.CloseConnectionAsync(default);
-            });
+                await client.CloseConnectionAsync(cancellationToken);
+                _logger.LogInformation("Disconnected websocket client for agent: {AgentId}", agentId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error disconnecting websocket client for agent: {AgentId}", agentId);
+            }
+        }
+
+        private async Task<T> WaitForResponseAsync<T>(
+            OpenAlprWebsocketClient webSocketClient,
+            Guid transactionId,
+            CancellationToken cancellationToken) where T : class
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            while (stopwatch.Elapsed < _responseTimeout)
+            {
+                if (webSocketClient.TryGetAgentResponse<T>(transactionId, out var response))
+                {
+                    return response;
+                }
+
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    _logger.LogInformation(ex, "Response wait cancelled for transaction: {TransactionId}", transactionId);
+                    throw;
+                }
+            }
+
+            return null;
         }
     }
 }

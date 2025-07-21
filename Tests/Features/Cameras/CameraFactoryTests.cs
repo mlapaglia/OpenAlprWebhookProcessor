@@ -6,7 +6,6 @@ using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
-using System.Net.Http;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Cameras

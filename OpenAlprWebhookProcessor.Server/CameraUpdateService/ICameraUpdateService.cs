@@ -25,5 +25,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         Task ProcessJobAsync(CameraUpdateRequest cameraUpdateRequest);
 
         Task ClearExpiredOverlayAsync(Guid cameraId);
+
+        Task ForceClearOverlaysAsync(CancellationToken cancellationToken = default);
     }
-} 
+}

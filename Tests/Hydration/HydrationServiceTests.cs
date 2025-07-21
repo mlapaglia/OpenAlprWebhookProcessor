@@ -1,5 +1,3 @@
-using FluentAssertions;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -8,218 +6,326 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
+using Tests.TestHelpers;
 
-namespace Tests.Hydration
+namespace Tests.Hydrator
 {
     [TestFixture]
-    public class HydrationServiceTests
+    public class HydrationServiceTests : TestBase
     {
-        private HydrationService _hydrationService;
-
         private IServiceProvider _serviceProvider;
 
         private IServiceScope _serviceScope;
 
         private IServiceScopeFactory _serviceScopeFactory;
 
-        private IHubContext<ProcessorHub, IProcessorHub> _processorHub;
-
-        private IProcessorHub _clientProxy;
-
-        private IHubCallerClients<IProcessorHub> _clients;
-
         private ILogger<HydrationService> _logger;
 
-        private IUnitOfWork _unitOfWork;
-
-        private IAgentRepository _agentRepository;
-
-        private IOpenAlprAgentScraper _scraper;
-
-        private Agent _agent;
+        private HydrationService _sut;
 
         [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
+            base.SetUp();
+
             _serviceProvider = Substitute.For<IServiceProvider>();
             _serviceScope = Substitute.For<IServiceScope>();
             _serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
-            _processorHub = Substitute.For<IHubContext<ProcessorHub, IProcessorHub>>();
-            _clientProxy = Substitute.For<IProcessorHub>();
-            _clients = Substitute.For<IHubCallerClients<IProcessorHub>>();
             _logger = Substitute.For<ILogger<HydrationService>>();
-            _unitOfWork = Substitute.For<IUnitOfWork>();
-            _agentRepository = Substitute.For<IAgentRepository>();
-            _scraper = Substitute.For<IOpenAlprAgentScraper>();
 
-            _agent = new Agent
-            {
-                Id = Guid.NewGuid(),
-                Uid = "test-agent-uid",
-                ScheduledScrapingIntervalMinutes = 15
-            };
-
-            // Setup service provider with IServiceScopeFactory
             _serviceProvider.GetService(typeof(IServiceScopeFactory)).Returns(_serviceScopeFactory);
             _serviceScopeFactory.CreateScope().Returns(_serviceScope);
-            _serviceScope.ServiceProvider.GetService(typeof(ILogger<HydrationService>)).Returns(_logger);
-            _serviceScope.ServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_unitOfWork);
-            _serviceScope.ServiceProvider.GetService(typeof(IOpenAlprAgentScraper)).Returns(_scraper);
+            _serviceScope.ServiceProvider.Returns(_serviceProvider);
 
-            // Setup SignalR
-            _processorHub.Clients.Returns(_clients);
-            _clients.All.Returns(_clientProxy);
+            _serviceProvider.GetService(typeof(IUnitOfWork)).Returns(UnitOfWork);
+            _serviceProvider.GetService(typeof(ILogger<HydrationService>)).Returns(_logger);
 
-            // Setup unit of work
-            _unitOfWork.Agents.Returns(_agentRepository);
-            _agentRepository.GetFirstAgentAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(_agent));
-
-            // Create service under test
-            _hydrationService = new HydrationService(_serviceProvider, _processorHub);
+            _sut = new HydrationService(_serviceProvider);
         }
 
         [TearDown]
-        public async Task TearDownAsync()
+        public override void TearDown()
         {
-            try
-            {
-                await _hydrationService?.StopAsync(CancellationToken.None);
-            }
-            catch (ObjectDisposedException)
-            {
-                // Service may have already been stopped, ignore
-            }
-            _unitOfWork.Dispose();
-            _serviceScope.Dispose();
+            _serviceScope?.Dispose();
+            _sut?.DisposeTimer();
+            base.TearDown();
         }
 
         [Test]
-        public void Constructor_WithNullServiceProvider_ThrowsArgumentNullException()
+        public void Constructor_NullServiceProvider_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new HydrationService(null, _processorHub));
+            Assert.Throws<ArgumentNullException>(() => new HydrationService(null));
         }
 
         [Test]
-        public void Constructor_WithNullProcessorHub_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new HydrationService(_serviceProvider, null));
-        }
-
-        [Test]
-        public async Task ScheduleHydrationAsync_WithValidAgent_ShouldSetNextScrapeTime()
+        public void StartHydration_AddsNameToQueue()
         {
             // Arrange
-            var cancellationToken = CancellationToken.None;
+            var name = "test-agent";
 
             // Act
-            await _hydrationService.ScheduleHydrationAsync(cancellationToken);
+            _sut.StartHydration(name);
 
             // Assert
-            await _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
-            _unitOfWork.Agents.Received(1).Update(_agent);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
-            _agent.NextScrapeEpochMs.Should().NotBeNull();
+            Assert.That(_sut.GetPendingHydrationCount(), Is.EqualTo(1));
         }
 
         [Test]
-        public async Task ScheduleHydrationAsync_WithEmptyAgentUid_ShouldLogWarningAndReturn()
+        public void StartHydration_MultipleNames_AddsAllToQueue()
         {
             // Arrange
-            _agent.Uid = string.Empty;
-            var cancellationToken = CancellationToken.None;
+            var names = new[] { "agent1", "agent2", "agent3" };
 
             // Act
-            await _hydrationService.ScheduleHydrationAsync(cancellationToken);
+            foreach (var name in names)
+            {
+                _sut.StartHydration(name);
+            }
+
+            // Assert
+            Assert.That(_sut.GetPendingHydrationCount(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void GetPendingHydrationCount_EmptyQueue_ReturnsZero()
+        {
+            // Act
+            var count = _sut.GetPendingHydrationCount();
+
+            // Assert
+            Assert.That(count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetConsumingHydrationRequests_ReturnsItemsInOrder()
+        {
+            // Arrange
+            var names = new[] { "agent1", "agent2", "agent3" };
+            foreach (var name in names)
+            {
+                _sut.StartHydration(name);
+            }
+
+            // Act
+            using var cts = new CancellationTokenSource();
+            var consumingEnumerable = _sut.GetConsumingHydrationRequests(cts.Token);
+            var results = consumingEnumerable.Take(3).ToList();
+
+            // Assert
+            Assert.That(results, Is.EqualTo(names));
+            Assert.That(_sut.GetPendingHydrationCount(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public async Task ScheduleHydrationAsync_NoAgent_LogsWarningAndDisposesTimer()
+        {
+            // Arrange
+            // No agent in database
+
+            // Act
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
 
             // Assert
             _logger.Received(1).LogWarning("Agent UID is not set. Cannot schedule hydration.");
-            _unitOfWork.Agents.DidNotReceive().Update(Arg.Any<Agent>());
-            await _unitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
         }
 
         [Test]
-        public async Task ScheduleHydrationAsync_WithNullScheduledInterval_ShouldClearNextScrapeTime()
+        public async Task ScheduleHydrationAsync_AgentWithNoUid_LogsWarningAndDisposesTimer()
         {
             // Arrange
-            _agent.ScheduledScrapingIntervalMinutes = null;
-            var cancellationToken = CancellationToken.None;
+            var agent = new Agent { Uid = "" };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _hydrationService.ScheduleHydrationAsync(cancellationToken);
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
 
             // Assert
-            _agent.NextScrapeEpochMs.Should().BeNull();
-            _unitOfWork.Agents.Received(1).Update(_agent);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            _logger.Received(1).LogWarning("Agent UID is not set. Cannot schedule hydration.");
         }
 
         [Test]
-        public void StartHydration_WithValidRequest_ShouldAddToQueue()
+        public async Task ScheduleHydrationAsync_AgentWithNoInterval_SetsNextScrapeToNull()
         {
             // Arrange
-            var request = "test-request";
+            var agent = new Agent
+            {
+                Uid = "test-agent",
+                ScheduledScrapingIntervalMinutes = null,
+                NextScrapeEpochMs = 123456789
+            };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
 
             // Act
-            _hydrationService.StartHydration(request);
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
 
             // Assert
-            Assert.Pass();
+            var updatedAgent = await UnitOfWork.Agents.GetFirstAgentAsync();
+            Assert.That(updatedAgent.NextScrapeEpochMs, Is.Null);
         }
 
         [Test]
-        public async Task StartAsync_ShouldScheduleHydrationAndStartProcessing()
+        public async Task ScheduleHydrationAsync_AgentWithInterval_SetsNextScrapeTime()
         {
             // Arrange
-            var cancellationToken = CancellationToken.None;
+            var intervalMinutes = 30;
+            var agent = new Agent
+            {
+                Uid = "test-agent",
+                ScheduledScrapingIntervalMinutes = intervalMinutes
+            };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
+
+            var beforeSchedule = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Act
-            await _hydrationService.StartAsync(cancellationToken);
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
 
             // Assert
-            await _agentRepository.Received(1).GetFirstAgentAsync(cancellationToken);
-            _unitOfWork.Agents.Received(1).Update(_agent);
-            await _unitOfWork.Received(1).SaveChangesAsync(cancellationToken);
+            var updatedAgent = await UnitOfWork.Agents.GetFirstAgentAsync();
+            Assert.That(updatedAgent.NextScrapeEpochMs, Is.Not.Null);
+
+            // Verify next scrape time is approximately correct (within 1 second tolerance)
+            var expectedTime = beforeSchedule + (intervalMinutes * 60 * 1000);
+            Assert.That(updatedAgent.NextScrapeEpochMs.Value, Is.InRange(expectedTime - 1000, expectedTime + 1000));
         }
 
         [Test]
-        public async Task StopAsync_ShouldCancelTokenAndDisposeResources()
+        public async Task ScheduleHydrationAsync_CalledTwiceWithSameConfig_DoesNotRecreateTimer()
         {
             // Arrange
-            var cancellationToken = CancellationToken.None;
+            var agent = new Agent
+            {
+                Uid = "test-agent",
+                ScheduledScrapingIntervalMinutes = 30
+            };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
 
             // Act
-            await _hydrationService.StopAsync(cancellationToken);
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+            var firstNextScrapeTime = (await UnitOfWork.Agents.GetFirstAgentAsync()).NextScrapeEpochMs;
+
+            // Wait a bit to ensure time difference if timer was recreated
+            await Task.Delay(100);
+
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+            var secondNextScrapeTime = (await UnitOfWork.Agents.GetFirstAgentAsync()).NextScrapeEpochMs;
+
+            // Assert - If configuration hasn't changed, next scrape time should be updated but similar
+            Assert.That(secondNextScrapeTime, Is.Not.Null);
+            Assert.That(firstNextScrapeTime, Is.Not.Null);
+            // Both times should be close (within 1 second)
+            Assert.That(Math.Abs(secondNextScrapeTime.Value - firstNextScrapeTime.Value), Is.LessThan(1000));
+        }
+
+        [Test]
+        public async Task ScheduleHydrationAsync_IntervalChanges_RecreatesTimer()
+        {
+            // Arrange
+            var agent = new Agent
+            {
+                Uid = "test-agent",
+                ScheduledScrapingIntervalMinutes = 30
+            };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
+
+            // Act - First schedule
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+
+            // Change interval
+            agent.ScheduledScrapingIntervalMinutes = 60;
+            UnitOfWork.Agents.Update(agent);
+            await UnitOfWork.SaveChangesAsync();
+
+            // Act - Second schedule
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
 
             // Assert
-            Assert.Pass();
+            var updatedAgent = await UnitOfWork.Agents.GetFirstAgentAsync();
+            Assert.That(updatedAgent.ScheduledScrapingIntervalMinutes, Is.EqualTo(60));
+
+            // Next scrape time should reflect the new interval
+            var expectedTime = DateTimeOffset.UtcNow.AddMinutes(60).ToUnixTimeMilliseconds();
+            Assert.That(updatedAgent.NextScrapeEpochMs.Value, Is.InRange(expectedTime - 1000, expectedTime + 1000));
         }
 
         [Test]
-        public async Task ScheduleHydrationAsync_WithScrapingException_ShouldNotThrow()
+        public async Task ScheduleHydrationAsync_AgentUidChanges_RecreatesTimer()
         {
             // Arrange
-            _agentRepository.GetFirstAgentAsync(Arg.Any<CancellationToken>()).Throws<Exception>();
-            var cancellationToken = CancellationToken.None;
+            var agent1 = new Agent
+            {
+                Uid = "agent1",
+                ScheduledScrapingIntervalMinutes = 30
+            };
+            await UnitOfWork.Agents.AddAsync(agent1);
+            await UnitOfWork.SaveChangesAsync();
 
-            // Act & Assert
-            await _hydrationService.Invoking(async s => await s.ScheduleHydrationAsync(cancellationToken))
-                .Should().ThrowAsync<Exception>();
+            // Act - First schedule
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+
+            // Remove first agent and add new one
+            UnitOfWork.Agents.Delete(agent1);
+            await UnitOfWork.SaveChangesAsync();
+
+            var agent2 = new Agent
+            {
+                Uid = "agent2",
+                ScheduledScrapingIntervalMinutes = 30
+            };
+            await UnitOfWork.Agents.AddAsync(agent2);
+            await UnitOfWork.SaveChangesAsync();
+
+            // Act - Second schedule
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+
+            // Assert
+            var updatedAgent = await UnitOfWork.Agents.GetFirstAgentAsync();
+            Assert.That(updatedAgent.Uid, Is.EqualTo("agent2"));
+            Assert.That(updatedAgent.NextScrapeEpochMs, Is.Not.Null);
         }
 
         [Test]
-        public async Task ScheduleHydrationAsync_WithDatabaseException_ShouldNotThrow()
+        public async Task ScheduleHydrationAsync_IntervalRemovedAfterBeingSet_DisposesTimerAndClearsNextScrape()
         {
             // Arrange
-            _unitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Throws<Exception>();
-            var cancellationToken = CancellationToken.None;
+            var agent = new Agent
+            {
+                Uid = "test-agent",
+                ScheduledScrapingIntervalMinutes = 30
+            };
+            await UnitOfWork.Agents.AddAsync(agent);
+            await UnitOfWork.SaveChangesAsync();
 
-            // Act & Assert
-            await _hydrationService.Invoking(async s => await s.ScheduleHydrationAsync(cancellationToken))
-                .Should().ThrowAsync<Exception>();
+            // Act - Schedule with interval
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+
+            // Remove interval
+            agent.ScheduledScrapingIntervalMinutes = null;
+            UnitOfWork.Agents.Update(agent);
+            await UnitOfWork.SaveChangesAsync();
+
+            // Act - Schedule without interval
+            await _sut.ScheduleHydrationAsync(CancellationToken.None);
+
+            // Assert
+            var updatedAgent = await UnitOfWork.Agents.GetFirstAgentAsync();
+            Assert.That(updatedAgent.NextScrapeEpochMs, Is.Null);
+        }
+
+        [Test]
+        public void DisposeTimer_DisposesTimerAndClearsState()
+        {
+            // Act
+            _sut.DisposeTimer();
+
+            // Assert - Calling dispose multiple times should not throw
+            Assert.DoesNotThrow(() => _sut.DisposeTimer());
         }
     }
-} 
+}

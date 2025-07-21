@@ -367,7 +367,7 @@ namespace Tests.WebhookProcessor
             var camera = TestDataFactory.CreateTestCamera(openAlprName: null, openAlprCameraId: 1);
             await UnitOfWork.Cameras.AddAsync(camera);
             
-            var webhookForward = TestDataFactory.CreateTestWebhookForward("https://example.com/webhook");
+            var webhookForward = TestDataFactory.CreateTestWebhookForward("https://localhost/webhook");
             webhookForward.ForwardGroups = true;
             await UnitOfWork.WebhookForwards.AddAsync(webhookForward);
             

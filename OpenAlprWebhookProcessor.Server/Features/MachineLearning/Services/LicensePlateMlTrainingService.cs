@@ -2,8 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML;
-using Microsoft.ML.Data;
-using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
 using System;
 using System.Collections.Concurrent;
@@ -45,8 +43,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
         private readonly ConcurrentDictionary<string, ITransformer> _modelCache;
 
-        private readonly string _configPath;
-
         private readonly TrainingStatus _trainingStatus;
 
         public LicensePlateMlTrainingService(
@@ -57,7 +53,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             _logger = logger;
             _mlContext = new MLContext(seed: 42);
             _modelCache = new ConcurrentDictionary<string, ITransformer>();
-            _configPath = MachineLearningConfiguration.GetConfigPath();
             _trainingStatus = new TrainingStatus();
         }
 

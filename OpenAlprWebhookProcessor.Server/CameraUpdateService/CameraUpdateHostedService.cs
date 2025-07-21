@@ -1,0 +1,59 @@
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace OpenAlprWebhookProcessor.CameraUpdateService
+{
+    public class CameraUpdateHostedService : IHostedService
+    {
+        private readonly ICameraUpdateService _cameraUpdateService;
+
+        private readonly ILogger<CameraUpdateHostedService> _logger;
+
+        public CameraUpdateHostedService(
+            ICameraUpdateService cameraUpdateService,
+            ILogger<CameraUpdateHostedService> logger)
+        {
+            _cameraUpdateService = cameraUpdateService ?? throw new ArgumentNullException(nameof(cameraUpdateService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogDebug("CameraUpdateHostedService starting...");
+
+            try
+            {
+                // Schedule initial day/night tasks
+                await _cameraUpdateService.ScheduleDayNightTaskAsync();
+                _logger.LogDebug("Initial day/night tasks scheduled");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error scheduling initial day/night tasks");
+                // Don't throw - allow the service to start even if initial scheduling fails
+            }
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogDebug("CameraUpdateHostedService stopping...");
+
+            try
+            {
+                // Clear all overlays when stopping
+                await _cameraUpdateService.ForceClearOverlaysAsync(cancellationToken);
+                _logger.LogDebug("All camera overlays cleared");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing camera overlays during shutdown");
+                // Don't throw during shutdown
+            }
+
+            _logger.LogDebug("CameraUpdateHostedService stopped.");
+        }
+    }
+}
