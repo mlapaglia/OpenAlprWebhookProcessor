@@ -145,7 +145,7 @@ namespace Tests.Features.MachineLearning.Services
             _modelPersistence.GetModelFileInfo(Arg.Any<string>()).Returns((ModelFileInfo)null);
 
             // Act
-            var result = await _trainingService.GetTrainingStatusAsync();
+            var result = _trainingService.GetTrainingStatus();
 
             // Assert
             result.Should().NotBeNull();
@@ -167,7 +167,7 @@ namespace Tests.Features.MachineLearning.Services
             _modelPersistence.GetModelFileInfo(Arg.Any<string>()).Returns(testFileInfo);
 
             // Act
-            var result = await _trainingService.GetTrainingStatusAsync();
+            var result = _trainingService.GetTrainingStatus();
 
             // Assert
             result.Should().NotBeNull();
@@ -216,7 +216,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeTrue();
             
             // Verify training status updated correctly
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.LastTrainingSuccessful.Should().BeTrue();
             status.IsTraining.Should().BeFalse();
             status.LastError.Should().BeNull();
@@ -241,7 +241,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeFalse();
             
             // Verify training status updated correctly
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.LastTrainingSuccessful.Should().BeFalse();
             status.IsTraining.Should().BeFalse();
             status.LastError.Should().Contain("Insufficient training data");
@@ -267,7 +267,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeFalse();
             
             // Verify training status
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.LastTrainingSuccessful.Should().BeFalse();
             status.IsTraining.Should().BeFalse();
             status.LastError.Should().Contain("Model quality too low");
@@ -290,7 +290,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeFalse();
             
             // Verify training status
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.LastTrainingSuccessful.Should().BeFalse();
             status.IsTraining.Should().BeFalse();
             status.LastError.Should().Be(expectedException.Message);
@@ -316,7 +316,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeFalse();
             
             // Verify training status
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.LastTrainingSuccessful.Should().BeFalse();
             status.LastError.Should().Be(expectedException.Message);
         }
@@ -334,7 +334,7 @@ namespace Tests.Features.MachineLearning.Services
             
             // Check status during training (briefly)
             await Task.Delay(10);
-            var statusDuringTraining = await _trainingService.GetTrainingStatusAsync();
+            var statusDuringTraining = _trainingService.GetTrainingStatus();
 
             // Complete training
             var result = await trainingTask;
@@ -343,7 +343,7 @@ namespace Tests.Features.MachineLearning.Services
             result.Should().BeTrue();
             
             // Verify final status
-            var finalStatus = await _trainingService.GetTrainingStatusAsync();
+            var finalStatus = _trainingService.GetTrainingStatus();
             finalStatus.LastTrainingStarted.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
             finalStatus.LastTrainingCompleted.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
         }
@@ -449,7 +449,7 @@ namespace Tests.Features.MachineLearning.Services
             await _trainingService.LoadExistingModelAsync();
 
             // Service should continue running even if model loading fails
-            var status = await _trainingService.GetTrainingStatusAsync();
+            var status = _trainingService.GetTrainingStatus();
             status.Should().NotBeNull();
         }
 

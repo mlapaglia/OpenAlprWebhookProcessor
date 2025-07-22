@@ -5,8 +5,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 {
     public interface ILicensePlateMlTrainingService
     {
-        Task<TrainingStatus> GetTrainingStatusAsync();
-        
         TrainingStatus GetTrainingStatus();
         
         Task<bool> TrainModelAsync();

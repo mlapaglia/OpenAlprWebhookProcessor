@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
@@ -41,7 +42,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             _trainingStatus = new TrainingStatus();
         }
 
-        public async Task<TrainingStatus> GetTrainingStatusAsync()
+        public TrainingStatus GetTrainingStatus()
         {
             var modelPath = _configuration.GetModelPath();
             var fileInfo = _modelPersistence.GetModelFileInfo(modelPath);
@@ -54,13 +55,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
             return _trainingStatus;
         }
-
-        public TrainingStatus GetTrainingStatus()
-        {
-            return GetTrainingStatusAsync().GetAwaiter().GetResult();
-        }
-
-
 
         public async Task<bool> TrainModelAsync()
         {

@@ -8,6 +8,7 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning
@@ -188,7 +189,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         }
 
         [HttpGet("training/status")]
-        public IActionResult GetTrainingStatus()
+        public async Task<IActionResult> GetTrainingStatusAsync(CancellationToken cancellationToken)
         {
             try
             {
