@@ -12,7 +12,7 @@ using System.IO;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
-    public partial class OpenAlprWebsocketClient
+    public partial class OpenAlprWebsocketClient : IOpenAlprWebsocketClient
     {
         private readonly ConcurrentDictionary<Guid, string> _availableResponses;
 

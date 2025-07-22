@@ -10,7 +10,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 {
     public class WebsocketClientOrganizer : IWebsocketClientOrganizer
     {
-        private readonly ConcurrentDictionary<string, OpenAlprWebsocketClient> _connectedClients = new();
+        private readonly ConcurrentDictionary<string, IOpenAlprWebsocketClient> _connectedClients = new();
 
         private readonly ILogger<WebsocketClientOrganizer> _logger;
 
@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         public async Task<AddAgentResult> AddAgentAsync(
             string agentId,
-            OpenAlprWebsocketClient webSocketClient,
+            IOpenAlprWebsocketClient webSocketClient,
             CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(agentId);
@@ -220,7 +220,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
             }
         }
 
-        public IReadOnlyDictionary<string, OpenAlprWebsocketClient> GetConnectedClients()
+        public IReadOnlyDictionary<string, IOpenAlprWebsocketClient> GetConnectedClients()
         {
             return _connectedClients;
         }
@@ -243,7 +243,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         private async Task DisconnectClientSafelyAsync(
             string agentId,
-            OpenAlprWebsocketClient client,
+            IOpenAlprWebsocketClient client,
             CancellationToken cancellationToken)
         {
             try
@@ -258,7 +258,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         }
 
         private async Task<T> WaitForResponseAsync<T>(
-            OpenAlprWebsocketClient webSocketClient,
+            IOpenAlprWebsocketClient webSocketClient,
             Guid transactionId,
             CancellationToken cancellationToken) where T : class
         {

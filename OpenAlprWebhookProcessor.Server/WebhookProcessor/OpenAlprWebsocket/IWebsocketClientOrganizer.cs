@@ -7,7 +7,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
     {
         Task<AddAgentResult> AddAgentAsync(
             string agentId,
-            OpenAlprWebsocketClient webSocketClient,
+            IOpenAlprWebsocketClient webSocketClient,
             CancellationToken cancellationToken);
 
         Task RemoveAgentAsync(
