@@ -1,24 +1,32 @@
 ﻿using Microsoft.ML;
 using System.IO;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem
 {
     public class ModelPersistenceService : IModelPersistenceService
     {
+        private readonly IFileSystem _fileSystem;
+
+        public ModelPersistenceService(IFileSystem fileSystem)
+        {
+            _fileSystem = fileSystem;
+        }
+
         public bool ModelExists(string modelPath)
         {
-            return File.Exists(modelPath);
+            return _fileSystem.File.Exists(modelPath);
         }
 
         public ModelFileInfo GetModelFileInfo(string modelPath)
         {
-            if (!File.Exists(modelPath))
+            if (!_fileSystem.File.Exists(modelPath))
             {
                 return new ModelFileInfo { Exists = false };
             }
 
-            var fileInfo = new FileInfo(modelPath);
+            var fileInfo = _fileSystem.FileInfo.New(modelPath);
             return new ModelFileInfo
             {
                 Exists = true,
@@ -29,12 +37,12 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem
 
         public async Task<ITransformer> LoadModelAsync(string modelPath, MLContext mlContext)
         {
-            if (!File.Exists(modelPath))
+            if (!_fileSystem.File.Exists(modelPath))
             {
                 return null;
             }
 
-            using var fileStream = new FileStream(
+            using var fileStream = _fileSystem.FileStream.New(
                 modelPath,
                 FileMode.Open,
                 FileAccess.Read,
@@ -43,25 +51,25 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem
             return mlContext.Model.Load(fileStream, out var _);
         }
 
-        public async Task SaveModelAsync(ITransformer model, string modelPath, MLContext mlContext)
+        public async Task SaveModelAsync(
+            ITransformer model,
+            string modelPath,
+            MLContext mlContext)
         {
-            // Ensure directory exists
-            var directory = Path.GetDirectoryName(modelPath);
-            if (!Directory.Exists(directory))
+            var directory = _fileSystem.Path.GetDirectoryName(modelPath);
+            if (!_fileSystem.Directory.Exists(directory))
             {
-                Directory.CreateDirectory(directory);
+                _fileSystem.Directory.CreateDirectory(directory);
             }
 
-            using var fileStream = new FileStream(
+            using var fileStream = _fileSystem.FileStream.New(
                 modelPath,
                 FileMode.Create,
                 FileAccess.Write,
                 FileShare.Read);
 
-            // Use MLContext.Model.Save with the correct parameters
             mlContext.Model.Save(model, null, fileStream);
 
-            // Make it async for consistency (even though the operation is synchronous)
             await Task.CompletedTask;
         }
     }
