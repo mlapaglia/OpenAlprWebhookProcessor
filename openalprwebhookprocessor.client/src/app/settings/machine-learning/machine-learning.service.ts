@@ -47,6 +47,18 @@ export interface TrainingStatus {
   configuration: TrainingConfiguration
 }
 
+export interface MachineLearningConfigDto {
+  minimumModelQuality: number
+  minimumTrainingData: number
+  trainingBatchSize: number
+  trainingInterval: string
+  modelFileName: string
+  configFolderName: string
+  mlModelsFolderName: string
+  lastUpdated?: string
+  updatedBy?: string
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -67,5 +79,13 @@ export class MachineLearningService {
 
   triggerTraining(): Observable<{ message: string; timestamp: string }> {
     return this.http.post<{ message: string; timestamp: string }>('/api/machinelearning/model/retrain', {})
+  }
+
+  getConfiguration(): Observable<MachineLearningConfigDto> {
+    return this.http.get<MachineLearningConfigDto>('/api/machinelearning/configuration')
+  }
+
+  saveConfiguration(config: MachineLearningConfigDto): Observable<any> {
+    return this.http.put('/api/machinelearning/configuration', config)
   }
 }

@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         private IRepository<WebPushSettings>? _webPushSettings;
 
-        private IRepository<WebPushSettings>? _webPushSettings2;
+        private IMachineLearningConfigurationRepository? _machineLearningConfigurationRepository;
 
         public UnitOfWork(ProcessorContext context)
         {
@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         public IRepository<WebPushSettings> WebPushSettings => _webPushSettings ??= new Repository<WebPushSettings>(_context);
 
-        public IRepository<WebPushSettings> WebPushSettings2 => _webPushSettings2 ??= new Repository<WebPushSettings>(_context);
+        public IMachineLearningConfigurationRepository MachineLearningConfigurations => _machineLearningConfigurationRepository ??= new MachineLearningConfigurationRepository(_context);
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

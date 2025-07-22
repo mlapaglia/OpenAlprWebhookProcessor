@@ -28,6 +28,8 @@ using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Register;
 using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -69,7 +71,8 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddScoped<IRepository<Pushover>, Repository<Pushover>>();
             services.AddScoped<IRepository<WebPushSubscription>, Repository<WebPushSubscription>>();
             services.AddScoped<IRepository<WebPushSettings>, Repository<WebPushSettings>>();
-            
+            services.AddScoped<IRepository<MachineLearningConfigurationRepository>, Repository<MachineLearningConfigurationRepository>>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
@@ -107,6 +110,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
             services.AddScoped<ILicensePlateFeatureExtractor, LicensePlateFeatureExtractor>();
             services.AddScoped<ILicensePlatePredictionService, LicensePlatePredictionService>();
+
+            services.AddSingleton<IMachineLearningConfiguration, Features.MachineLearning.Configuration.MachineLearningConfiguration>();
+            services.AddSingleton<IModelPersistenceService, ModelPersistenceService>();
 
             return services;
         }

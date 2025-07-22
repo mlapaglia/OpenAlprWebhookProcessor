@@ -51,10 +51,12 @@
 		<PackageReference Include="Microsoft.ML" Version="4.0.0" />
 		<PackageReference Include="Microsoft.ML.TimeSeries" Version="4.0.0" />
 		<PackageReference Include="Microsoft.ML.FastTree" Version="4.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="config\" />
+		<Folder Include="Features\MachineLearning\Configuration\UpsertConfiguration\" />
 	</ItemGroup>
 
 	<ItemGroup>

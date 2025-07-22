@@ -42,7 +42,7 @@ namespace OpenAlprWebhookProcessor.Data
 
         public DbSet<WebPushSettings> WebPushSettings { get; set; }
         
-        public DbSet<WebPushSettings> WebPushSettings2 { get; set; }
+        public DbSet<MachineLearningConfiguration> MachineLearningConfigurations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,7 +1,10 @@
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfiguration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
 using System.Collections.Generic;
@@ -21,8 +24,10 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         private readonly ILicensePlatePredictionService _predictionService;
         private readonly LicensePlateMlTrainingService _trainingService;
         private readonly ILogger<MachineLearningController> _logger;
+        private readonly IMediator _mediator;
 
         public MachineLearningController(
+            IMediator mediator,
             ILicensePlatePredictionService predictionService,
             LicensePlateMlTrainingService trainingService,
             ILogger<MachineLearningController> logger)
@@ -30,6 +35,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
             _predictionService = predictionService;
             _trainingService = trainingService;
             _logger = logger;
+            _mediator = mediator;
         }
 
         [HttpPost("predict")]
@@ -221,6 +227,27 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
                 _logger.LogError(ex, "Error getting training status");
                 return StatusCode(500, "Error retrieving training status");
             }
+        }
+
+        [HttpGet("configuration")]
+        public async Task<ActionResult<MachineLearningConfigDto>> GetConfiguration()
+        {
+            var result = await _mediator.Send(new GetConfigurationQuery());
+            return Ok(result);
+        }
+
+        [HttpPut("configuration")]
+        public async Task<ActionResult<Unit>> UpsertConfiguration(
+            [FromBody] MachineLearningConfigDto request)
+        {
+            var command = new UpsertConfigurationCommand
+            {
+                Configuration = request,
+                UpdatedBy = User.Identity?.Name ?? "System"
+            };
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
     }
 } 

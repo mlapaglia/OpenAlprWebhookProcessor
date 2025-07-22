@@ -30,6 +30,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         IRepository<WebPushSettings> WebPushSettings { get; }
 
+        IMachineLearningConfigurationRepository MachineLearningConfigurations { get; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

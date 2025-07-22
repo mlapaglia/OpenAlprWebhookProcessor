@@ -1,44 +1,47 @@
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Configuration
 {
-    /// <summary>
-    /// Configuration settings and utilities for machine learning functionality.
-    /// Manages model storage paths and training parameters.
-    /// </summary>
-    public static class MachineLearningConfiguration
+    public class MachineLearningConfiguration : IMachineLearningConfiguration
     {
-        public const string ModelFileName = "license-plate-prediction-model.zip";
-        public const string ConfigFolderName = "config";
-        public const string MlModelsFolderName = "ml-models";
-        
-        public static TimeSpan DefaultTrainingInterval => TimeSpan.FromHours(6);
-        public static int DefaultTrainingBatchSize => 50000;
-        public static int MinimumTrainingData => 100;
-        public static double MinimumModelQuality => 0.05; // R-squared threshold (lowered to 5% for license plate prediction)
-        
-        public static string GetConfigPath()
+        private readonly MachineLearningOptions _options;
+
+        public MachineLearningConfiguration(IOptions<MachineLearningOptions> options)
+        {
+            _options = options.Value;
+        }
+
+        public string ModelFileName => _options.ModelFileName;
+        public string ConfigFolderName => _options.ConfigFolderName;
+        public string MlModelsFolderName => _options.MlModelsFolderName;
+        public TimeSpan TrainingInterval => _options.TrainingInterval;
+        public int TrainingBatchSize => _options.TrainingBatchSize;
+        public int MinimumTrainingData => _options.MinimumTrainingData;
+        public double MinimumModelQuality => _options.MinimumModelQuality;
+
+        public string GetConfigPath()
         {
             var configPath = Path.Combine(Directory.GetCurrentDirectory(), ConfigFolderName);
             var mlModelsPath = Path.Combine(configPath, MlModelsFolderName);
-            
+
             Directory.CreateDirectory(configPath);
             Directory.CreateDirectory(mlModelsPath);
-            
+
             return configPath;
         }
-        
-        public static string GetModelPath()
+
+        public string GetModelPath()
         {
             return Path.Combine(GetConfigPath(), MlModelsFolderName, ModelFileName);
         }
-        
-        public static string GetBackupPath(DateTime timestamp)
+
+        public string GetBackupPath(DateTime timestamp)
         {
             var configPath = GetConfigPath();
             var backupFileName = $"backup-{timestamp:yyyyMMdd-HHmmss}-{ModelFileName}";
             return Path.Combine(configPath, MlModelsFolderName, backupFileName);
         }
     }
-} 
+}
