@@ -1,11 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTraining;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfiguration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration;
-using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStatus;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredictions;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingStatus;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextSeen;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,25 +27,17 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
     [Authorize]
     public class MachineLearningController : ControllerBase
     {
-        private readonly ILicensePlatePredictionService _predictionService;
-        private readonly ILicensePlateMlTrainingService _trainingService;
-        private readonly ILogger<MachineLearningController> _logger;
         private readonly IMediator _mediator;
 
-        public MachineLearningController(
-            IMediator mediator,
-            ILicensePlatePredictionService predictionService,
-            ILicensePlateMlTrainingService trainingService,
-            ILogger<MachineLearningController> logger)
+        public MachineLearningController(IMediator mediator)
         {
-            _predictionService = predictionService;
-            _trainingService = trainingService;
-            _logger = logger;
             _mediator = mediator;
         }
 
         [HttpPost("predict")]
-        public async Task<ActionResult<LicensePlatePredictionResult>> PredictNextSeen([FromBody] LicensePlateInput input)
+        public async Task<ActionResult<LicensePlatePredictionResult>> PredictNextSeen(
+            [FromBody] LicensePlateInput input, 
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(input?.LicensePlate))
             {
@@ -49,18 +46,24 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
 
             try
             {
-                var prediction = await _predictionService.PredictNextSeenAsync(input);
+                var query = new PredictNextSeenQuery(input);
+                var prediction = await _mediator.Send(query, cancellationToken);
                 return Ok(prediction);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                _logger.LogError(ex, "Error predicting for license plate {LicensePlate}", input.LicensePlate);
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
                 return StatusCode(500, "Error generating prediction");
             }
         }
 
         [HttpPost("predict/batch")]
-        public async Task<ActionResult<List<LicensePlatePredictionResult>>> PredictBatch([FromBody] List<LicensePlateInput> inputs)
+        public async Task<ActionResult<List<LicensePlatePredictionResult>>> PredictBatch(
+            [FromBody] List<LicensePlateInput> inputs, 
+            CancellationToken cancellationToken)
         {
             if (inputs == null || inputs.Count == 0)
             {
@@ -74,12 +77,16 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
 
             try
             {
-                var predictions = await _predictionService.PredictBatchAsync(inputs);
+                var query = new PredictBatchQuery(inputs);
+                var predictions = await _mediator.Send(query, cancellationToken);
                 return Ok(predictions);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                _logger.LogError(ex, "Error in batch prediction for {Count} license plates", inputs.Count);
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
                 return StatusCode(500, "Error generating batch predictions");
             }
         }
@@ -87,7 +94,8 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         [HttpGet("predict/top")]
         public async Task<ActionResult<List<LicensePlatePredictionResult>>> GetTopPredictions(
             [FromQuery] int count = 10, 
-            [FromQuery] int withinHours = 168)
+            [FromQuery] int withinHours = 168,
+            CancellationToken cancellationToken = default)
         {
             if (count <= 0 || count > 50)
             {
@@ -101,131 +109,90 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
 
             try
             {
-                var predictions = await _predictionService.GetTopPredictionsAsync(
-                    count, 
-                    TimeSpan.FromHours(withinHours));
+                var query = new GetTopPredictionsQuery(count, TimeSpan.FromHours(withinHours));
+                var predictions = await _mediator.Send(query, cancellationToken);
                 
                 return Ok(predictions);
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                _logger.LogError(ex, "Error getting top predictions");
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
                 return StatusCode(500, "Error retrieving top predictions");
             }
         }
 
         [HttpGet("model/status")]
-        public IActionResult GetModelStatus()
+        public async Task<ActionResult<ModelStatusDto>> GetModelStatus(CancellationToken cancellationToken = default)
         {
             try
             {
-                var isAvailable = _predictionService.IsModelAvailable();
-                return Ok(new
-                {
-                    ModelAvailable = isAvailable,
-                    Status = isAvailable ? "Ready" : "Training or Not Available",
-                    LastChecked = DateTime.UtcNow
-                });
+                var query = new GetModelStatusQuery();
+                var result = await _mediator.Send(query, cancellationToken);
+                return Ok(result);
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error checking model status");
                 return StatusCode(500, "Error checking model status");
             }
         }
 
         [HttpPost("model/retrain")]
-        public async Task<IActionResult> TriggerTraining()
+        public async Task<ActionResult<TrainingResultDto>> TriggerTraining(CancellationToken cancellationToken = default)
         {
             try
             {
-                _logger.LogInformation("Manual model training requested by user");
-                var success = await _trainingService.TrainModelAsync();
+                var command = new TriggerTrainingCommand(User.Identity?.Name ?? "Unknown");
+                var result = await _mediator.Send(command, cancellationToken);
                 
-                if (success)
+                if (result.Success)
                 {
-                    return Ok(new { Message = "Model training completed successfully", Timestamp = DateTime.UtcNow });
+                    return Ok(result);
                 }
                 else
                 {
-                    return BadRequest(new { Message = "Model training failed or insufficient data", Timestamp = DateTime.UtcNow });
+                    return BadRequest(result);
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error triggering model training");
-                return StatusCode(500, "Error triggering model training");
+                return StatusCode(500, new TrainingResultDto 
+                { 
+                    Message = "Error triggering model training", 
+                    Timestamp = DateTime.UtcNow, 
+                    Success = false 
+                });
             }
         }
 
         [HttpGet("model/info")]
-        public IActionResult GetModelInfo()
+        public async Task<ActionResult<ModelInfoDto>> GetModelInfo(CancellationToken cancellationToken = default)
         {
             try
             {
-                var isAvailable = _predictionService.IsModelAvailable();
-                
-                return Ok(new
-                {
-                    ModelAvailable = isAvailable,
-                    ModelType = "FastTree Regression",
-                    Features = new[]
-                    {
-                        "HourOfDay", "DayOfWeek", "DayOfMonth", "MonthOfYear",
-                        "CameraId", "TimeSinceLastSeen", "HistoricalFrequency",
-                        "AverageTimeBetweenVisits", "TotalVisits", "IsWeekend",
-                        "IsBusinessHour", "SeasonalFactor", "VehicleType", "VehicleColor"
-                    },
-                    Description = "Predicts when a license plate will next be seen based on historical patterns",
-                    TrainingSchedule = "Every 6 hours",
-                    LastUpdated = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC")
-                });
+                var query = new GetModelInfoQuery();
+                var result = await _mediator.Send(query, cancellationToken);
+                return Ok(result);
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error getting model info");
                 return StatusCode(500, "Error retrieving model information");
             }
         }
 
         [HttpGet("training/status")]
-        public async Task<IActionResult> GetTrainingStatusAsync(CancellationToken cancellationToken)
+        public async Task<ActionResult<TrainingStatusDto>> GetTrainingStatusAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var status = _trainingService.GetTrainingStatus();
-                
-                return Ok(new
-                {
-                    status.IsTraining,
-                    status.LastTrainingStarted,
-                    status.LastTrainingCompleted,
-                    status.LastTrainingSuccessful,
-                    status.LastError,
-                    status.TrainingDataCount,
-                    ModelMetrics = status.RSquared.HasValue ? new
-                    {
-                        RSquared = status.RSquared.Value,
-                        MeanAbsoluteError = status.MeanAbsoluteError.Value,
-                        RootMeanSquaredError = status.RootMeanSquaredError.Value
-                    } : null,
-                    ModelFile = status.ModelLastSaved.HasValue ? new
-                    {
-                        LastSaved = status.ModelLastSaved.Value,
-                        FileSizeBytes = status.ModelFileSize.Value
-                    } : null,
-                    Configuration = new
-                    {
-                        TrainingInterval = "Every 6 hours",
-                        MinimumTrainingData = 100,
-                        MinimumModelQuality = 0.05,
-                        BatchSize = 50000
-                    }
-                });
+                var query = new GetTrainingStatusQuery();
+                var result = await _mediator.Send(query, cancellationToken);
+                return Ok(result);
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Error getting training status");
                 return StatusCode(500, "Error retrieving training status");
             }
         }
