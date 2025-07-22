@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
@@ -7,12 +6,11 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 {
-    public class LicensePlateMlTrainingService : BackgroundService
+    public class LicensePlateMlTrainingService : ILicensePlateMlTrainingService
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -24,8 +22,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
         private readonly MLContext _mlContext;
 
-        private Timer _trainingTimer;
-
         private readonly ConcurrentDictionary<string, ITransformer> _modelCache;
 
         private readonly TrainingStatus _trainingStatus;
@@ -36,10 +32,10 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             IModelPersistenceService modelPersistence,
             IMachineLearningConfiguration configuration)
         {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-            _modelPersistence = modelPersistence;
-            _configuration = configuration;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _modelPersistence = modelPersistence ?? throw new ArgumentNullException(nameof(modelPersistence));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _mlContext = new MLContext(seed: 42);
             _modelCache = new ConcurrentDictionary<string, ITransformer>();
             _trainingStatus = new TrainingStatus();
@@ -64,41 +60,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             return GetTrainingStatusAsync().GetAwaiter().GetResult();
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            var trainingInterval = _configuration.TrainingInterval;
 
-            _trainingTimer = new Timer(
-                TriggerTrainingAsync,
-                null,
-                TimeSpan.Zero,
-                trainingInterval);
-
-            _logger.LogInformation("License Plate ML Training Service started");
-
-            await LoadExistingModelAsync();
-
-            try
-            {
-                await Task.Delay(Timeout.Infinite, stoppingToken);
-            }
-            catch (OperationCanceledException ex)
-            {
-                _logger.LogInformation(ex, "Training service cancellation requested");
-            }
-        }
-
-        private async void TriggerTrainingAsync(object state)
-        {
-            try
-            {
-                await TrainModelAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during scheduled model training");
-            }
-        }
 
         public async Task<bool> TrainModelAsync()
         {
@@ -216,7 +178,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             }
         }
 
-        private async Task LoadExistingModelAsync()
+        public async Task LoadExistingModelAsync()
         {
             var modelPath = _configuration.GetModelPath();
 
@@ -247,10 +209,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             return _modelCache.TryGetValue("current", out var model) ? model : null;
         }
 
-        public override void Dispose()
-        {
-            _trainingTimer?.Dispose();
-            base.Dispose();
-        }
+
     }
 }

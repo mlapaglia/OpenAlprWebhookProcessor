@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using NSubstitute;
@@ -57,7 +56,6 @@ namespace Tests.Features.MachineLearning.Services
         [TearDown]
         public override void TearDown()
         {
-            _trainingService?.Dispose();
             _serviceScope?.Dispose();
             base.TearDown();
         }
@@ -101,39 +99,39 @@ namespace Tests.Features.MachineLearning.Services
             
             // Assert
             _trainingService.Should().NotBeNull();
-            _trainingService.Should().BeAssignableTo<BackgroundService>();
+            _trainingService.Should().BeAssignableTo<ILicensePlateMlTrainingService>();
         }
 
         [Test]
-        public void Constructor_WithNullServiceProvider_DoesNotThrow()
+        public void Constructor_WithNullServiceProvider_ThrowsArgumentNullException()
         {
-            // Act & Assert - Constructor doesn't validate null parameters
-            Assert.DoesNotThrow(() => 
-                new LicensePlateMlTrainingService(null, _logger, _modelPersistence, _configuration));
+            // Act & Assert
+            var act = () => new LicensePlateMlTrainingService(null, _logger, _modelPersistence, _configuration);
+            act.Should().Throw<ArgumentNullException>().WithParameterName("serviceProvider");
         }
 
         [Test]
-        public void Constructor_WithNullLogger_DoesNotThrow()
+        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
         {
-            // Act & Assert - Constructor doesn't validate null parameters
-            Assert.DoesNotThrow(() => 
-                new LicensePlateMlTrainingService(_serviceProvider, null, _modelPersistence, _configuration));
+            // Act & Assert
+            var act = () => new LicensePlateMlTrainingService(_serviceProvider, null, _modelPersistence, _configuration);
+            act.Should().Throw<ArgumentNullException>().WithParameterName("logger");
         }
 
         [Test]
-        public void Constructor_WithNullModelPersistence_DoesNotThrow()
+        public void Constructor_WithNullModelPersistence_ThrowsArgumentNullException()
         {
-            // Act & Assert - Constructor doesn't validate null parameters
-            Assert.DoesNotThrow(() => 
-                new LicensePlateMlTrainingService(_serviceProvider, _logger, null, _configuration));
+            // Act & Assert
+            var act = () => new LicensePlateMlTrainingService(_serviceProvider, _logger, null, _configuration);
+            act.Should().Throw<ArgumentNullException>().WithParameterName("modelPersistence");
         }
 
         [Test]
-        public void Constructor_WithNullConfiguration_DoesNotThrow()
+        public void Constructor_WithNullConfiguration_ThrowsArgumentNullException()
         {
-            // Act & Assert - Constructor doesn't validate null parameters
-            Assert.DoesNotThrow(() => 
-                new LicensePlateMlTrainingService(_serviceProvider, _logger, _modelPersistence, null));
+            // Act & Assert
+            var act = () => new LicensePlateMlTrainingService(_serviceProvider, _logger, _modelPersistence, null);
+            act.Should().Throw<ArgumentNullException>().WithParameterName("configuration");
         }
 
         #endregion
@@ -405,59 +403,18 @@ namespace Tests.Features.MachineLearning.Services
 
         #endregion
 
-        #region Background Service Tests
+        #region Load Existing Model Tests
 
         [Test]
-        public async Task ExecuteAsync_StartsTrainingTimer()
-        {
-            // Arrange
-            var cancellationTokenSource = new CancellationTokenSource();
-            var cancellationToken = cancellationTokenSource.Token;
-
-            // Mock existing model loading
-            _modelPersistence.ModelExists(Arg.Any<string>()).Returns(false);
-
-            // Act
-            var executeTask = _trainingService.StartAsync(cancellationToken);
-            await Task.Delay(100); // Allow service to start
-            cancellationTokenSource.Cancel(); // Stop the service
-            
-            try
-            {
-                await executeTask;
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected when cancellation is requested
-            }
-
-            // Assert - Verify the service attempted to load existing model
-            _modelPersistence.Received(1).ModelExists(Arg.Any<string>());
-        }
-
-        [Test]
-        public async Task ExecuteAsync_LoadsExistingModelOnStartup()
+        public async Task LoadExistingModelAsync_WithExistingModel_LoadsModel()
         {
             // Arrange
             var mockModel = Substitute.For<ITransformer>();
             _modelPersistence.ModelExists(Arg.Any<string>()).Returns(true);
             _modelPersistence.LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>()).Returns(mockModel);
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             // Act
-            var executeTask = _trainingService.StartAsync(cancellationTokenSource.Token);
-            await Task.Delay(100); // Allow service to start
-            cancellationTokenSource.Cancel();
-
-            try
-            {
-                await executeTask;
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected
-            }
+            await _trainingService.LoadExistingModelAsync();
 
             // Assert
             await _modelPersistence.Received(1).LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>());
@@ -468,48 +425,32 @@ namespace Tests.Features.MachineLearning.Services
         }
 
         [Test]
-        public async Task ExecuteAsync_HandlesModelLoadingException()
+        public async Task LoadExistingModelAsync_WithNoExistingModel_DoesNotLoadModel()
+        {
+            // Arrange
+            _modelPersistence.ModelExists(Arg.Any<string>()).Returns(false);
+
+            // Act
+            await _trainingService.LoadExistingModelAsync();
+
+            // Assert
+            await _modelPersistence.DidNotReceive().LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>());
+        }
+
+        [Test]
+        public async Task LoadExistingModelAsync_WithLoadException_DoesNotThrow()
         {
             // Arrange
             _modelPersistence.ModelExists(Arg.Any<string>()).Returns(true);
             _modelPersistence.LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>())
                 .Throws(new InvalidOperationException("Model file corrupted"));
 
-            var cancellationTokenSource = new CancellationTokenSource();
-
             // Act & Assert - Should not throw, should log error and continue
-            var executeTask = _trainingService.StartAsync(cancellationTokenSource.Token);
-            await Task.Delay(100);
-            cancellationTokenSource.Cancel();
-
-            try
-            {
-                await executeTask;
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected
-            }
+            await _trainingService.LoadExistingModelAsync();
 
             // Service should continue running even if model loading fails
             var status = await _trainingService.GetTrainingStatusAsync();
             status.Should().NotBeNull();
-        }
-
-        #endregion
-
-        #region Dispose Tests
-
-        [Test]
-        public void Dispose_DisposesTimerProperly()
-        {
-            // Arrange - service created in SetUp
-
-            // Act
-            _trainingService.Dispose();
-
-            // Assert - Should not throw exceptions
-            Assert.DoesNotThrow(() => _trainingService.Dispose());
         }
 
         #endregion

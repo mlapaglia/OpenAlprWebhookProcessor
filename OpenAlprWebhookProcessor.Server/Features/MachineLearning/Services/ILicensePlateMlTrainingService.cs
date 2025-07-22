@@ -1,0 +1,18 @@
+using Microsoft.ML;
+using System.Threading.Tasks;
+
+namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
+{
+    public interface ILicensePlateMlTrainingService
+    {
+        Task<TrainingStatus> GetTrainingStatusAsync();
+        
+        TrainingStatus GetTrainingStatus();
+        
+        Task<bool> TrainModelAsync();
+        
+        ITransformer GetCurrentModel();
+        
+        Task LoadExistingModelAsync();
+    }
+} 

@@ -105,8 +105,8 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddMachineLearningServices(this IServiceCollection services)
         {
-            services.AddSingleton<LicensePlateMlTrainingService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<LicensePlateMlTrainingService>());
+            services.AddSingleton<ILicensePlateMlTrainingService, LicensePlateMlTrainingService>();
+            services.AddHostedService<LicensePlateMlTrainingHostedService>();
 
             services.AddScoped<ILicensePlateFeatureExtractor, LicensePlateFeatureExtractor>();
             services.AddScoped<ILicensePlatePredictionService, LicensePlatePredictionService>();

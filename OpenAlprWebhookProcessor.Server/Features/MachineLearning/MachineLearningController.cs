@@ -22,14 +22,14 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
     public class MachineLearningController : ControllerBase
     {
         private readonly ILicensePlatePredictionService _predictionService;
-        private readonly LicensePlateMlTrainingService _trainingService;
+        private readonly ILicensePlateMlTrainingService _trainingService;
         private readonly ILogger<MachineLearningController> _logger;
         private readonly IMediator _mediator;
 
         public MachineLearningController(
             IMediator mediator,
             ILicensePlatePredictionService predictionService,
-            LicensePlateMlTrainingService trainingService,
+            ILicensePlateMlTrainingService trainingService,
             ILogger<MachineLearningController> logger)
         {
             _predictionService = predictionService;
@@ -139,7 +139,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
             try
             {
                 _logger.LogInformation("Manual model training requested by user");
-                var success = await _predictionService.TriggerTrainingAsync();
+                var success = await _trainingService.TrainModelAsync();
                 
                 if (success)
                 {

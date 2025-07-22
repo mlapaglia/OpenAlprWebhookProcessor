@@ -18,14 +18,14 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
     /// </summary>
     public class LicensePlatePredictionService : ILicensePlatePredictionService
     {
-        private readonly LicensePlateMlTrainingService _trainingService;
+        private readonly ILicensePlateMlTrainingService _trainingService;
         private readonly ILicensePlateFeatureExtractor _featureExtractor;
         private readonly ILogger<LicensePlatePredictionService> _logger;
         private readonly MLContext _mlContext;
         private readonly IServiceProvider _serviceProvider;
 
         public LicensePlatePredictionService(
-            LicensePlateMlTrainingService trainingService,
+            ILicensePlateMlTrainingService trainingService,
             ILicensePlateFeatureExtractor featureExtractor,
             ILogger<LicensePlatePredictionService> logger,
             IServiceProvider serviceProvider)
