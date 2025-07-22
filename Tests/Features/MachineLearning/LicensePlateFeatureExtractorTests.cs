@@ -175,7 +175,7 @@ namespace Tests.Features.MachineLearning.Services
         {
             // Arrange
             var plateNumber = "TIME123";
-            var testDateTime = new DateTime(2024, 6, 15, 14, 30, 0); // Saturday, June 15, 2:30 PM
+            var testDateTime = new DateTime(2024, 6, 15, 18, 30, 0, DateTimeKind.Utc); // Saturday, June 15, 6:30 PM UTC
             var testEpoch = ((DateTimeOffset)testDateTime).ToUnixTimeMilliseconds();
 
             await UnitOfWork.PlateGroups.AddAsync(CreatePlateGroup(plateNumber, testEpoch));
@@ -185,7 +185,7 @@ namespace Tests.Features.MachineLearning.Services
             {
                 LicensePlate = plateNumber,
                 CameraId = 1,
-                LastSeen = testDateTime.AddHours(-1),
+                LastSeen = testDateTime.AddHours(-1), // 5:30 PM UTC
                 VehicleType = "car",
                 VehicleColor = "white"
             };
