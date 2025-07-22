@@ -283,13 +283,4 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             return await _trainingService.TrainModelAsync();
         }
     }
-
-    public interface ILicensePlatePredictionService
-    {
-        Task<LicensePlatePredictionResult> PredictNextSeenAsync(LicensePlateInput input, CancellationToken cancellationToken = default);
-        Task<List<LicensePlatePredictionResult>> PredictBatchAsync(List<LicensePlateInput> inputs, CancellationToken cancellationToken = default);
-        Task<List<LicensePlatePredictionResult>> GetTopPredictionsAsync(int topCount = 10, TimeSpan? withinHours = null, CancellationToken cancellationToken = default);
-        bool IsModelAvailable();
-        Task<bool> TriggerTrainingAsync();
-    }
 } 
