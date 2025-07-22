@@ -17,6 +17,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _jobCancellationTokens = new();
 
+        private readonly ConcurrentDictionary<string, DateTimeOffset> _scheduledExecutionTimes = new();
+
         private bool _disposed = false;
 
         public TimerBasedBackgroundJobService(
@@ -66,6 +68,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var jobId = Guid.NewGuid().ToString();
             var cancellationTokenSource = new CancellationTokenSource();
             _jobCancellationTokens[jobId] = cancellationTokenSource;
+            var executionTime = DateTimeOffset.Now.Add(delay);
+            _scheduledExecutionTimes[jobId] = executionTime;
 
             var timer = new Timer(async _ =>
             {
@@ -91,6 +95,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     {
                         tokenSource?.Dispose();
                     }
+                    _scheduledExecutionTimes.TryRemove(jobId, out DateTimeOffset _);
                 }
             }, null, delay, Timeout.InfiniteTimeSpan);
 
@@ -116,6 +121,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var jobId = Guid.NewGuid().ToString();
             var cancellationTokenSource = new CancellationTokenSource();
             _jobCancellationTokens[jobId] = cancellationTokenSource;
+            _scheduledExecutionTimes[jobId] = scheduleAt;
 
             var timer = new Timer(async _ =>
             {
@@ -141,6 +147,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     {
                         tokenSource?.Dispose();
                     }
+                    _scheduledExecutionTimes.TryRemove(jobId, out DateTimeOffset _);
                 }
             }, null, delay, Timeout.InfiniteTimeSpan);
 
@@ -162,6 +169,15 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 timer?.Dispose();
             }
+
+            _scheduledExecutionTimes.TryRemove(jobId, out _);
+        }
+
+        public DateTimeOffset? GetNextScheduledExecutionTime(string jobId)
+        {
+            if (string.IsNullOrEmpty(jobId)) return null;
+            
+            return _scheduledExecutionTimes.TryGetValue(jobId, out var executionTime) ? executionTime : null;
         }
 
         public void Dispose()
@@ -180,6 +196,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 kvp.Value?.Dispose();
             }
             _scheduledJobs.Clear();
+
+            _scheduledExecutionTimes.Clear();
 
             _disposed = true;
         }

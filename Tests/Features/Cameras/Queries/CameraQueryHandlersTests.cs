@@ -15,17 +15,20 @@ namespace Tests.Features.Cameras.Queries
     [TestFixture]
     public class GetCamerasQueryHandlerTests : TestBase
     {
+        private IBackgroundJobService _backgroundJobService;
+
         [SetUp]
         public override void SetUp()
         {
             base.SetUp();
+            _backgroundJobService = Substitute.For<IBackgroundJobService>();
         }
 
         [Test]
         public async Task GetCamerasQueryHandler_WithCameras_ReturnsAllCameras()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             var camera1 = TestDataFactory.CreateTestCamera("Camera 1", 1);
             var camera2 = TestDataFactory.CreateTestCamera("Camera 2", 2);
@@ -50,7 +53,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_NoCameras_ReturnsEmptyList()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             await UnitOfWork.Agents.AddAsync(agent);
             await UnitOfWork.SaveChangesAsync();
@@ -68,7 +71,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithScheduledJob_ReturnsNullScheduledInfo()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.NextDayNightScheduleId = "job-123";
@@ -92,7 +95,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithoutScheduledJob_ReturnsNullScheduledInfo()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.NextDayNightScheduleId = null;
@@ -115,7 +118,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithLatestPlateUuid_ReturnsSampleImageUrl()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.UpdateOverlayEnabled = true;
@@ -139,7 +142,7 @@ namespace Tests.Features.Cameras.Queries
         public async Task GetCamerasQueryHandler_WithoutLatestPlateUuid_ReturnsSnapshotUrl()
         {
             // Arrange
-            var handler = new GetCamerasQueryHandler(UnitOfWork);
+            var handler = new GetCamerasQueryHandler(UnitOfWork, _backgroundJobService);
             var agent = TestDataFactory.CreateTestAgent();
             var camera = TestDataFactory.CreateTestCamera("Camera 1", 1);
             camera.UpdateOverlayEnabled = true;

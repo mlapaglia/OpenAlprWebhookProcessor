@@ -1,4 +1,5 @@
 using MediatR;
+using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -11,10 +12,12 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
     public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<CameraUpdateService.Camera>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IBackgroundJobService _backgroundJobService;
 
-        public GetCamerasQueryHandler(IUnitOfWork unitOfWork)
+        public GetCamerasQueryHandler(IUnitOfWork unitOfWork, IBackgroundJobService backgroundJobService)
         {
             _unitOfWork = unitOfWork;
+            _backgroundJobService = backgroundJobService;
         }
 
         public async Task<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken)
@@ -32,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
                     CameraUsername = camera.CameraUsername,
                     DayNightModeUrl = camera.UpdateDayNightModeUrl,
                     DayNightModeEnabled = camera.UpdateDayNightModeEnabled,
-                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(agent, camera),
+                    DayNightNextScheduledCommand = GetNextScheduledExecutionDate(camera),
                     IpAddress = camera.IpAddress,
                     Latitude = camera.Latitude ?? agent?.Latitude ?? null,
                     Longitude = camera.Longitude ?? agent?.Longitude ?? null,
@@ -78,14 +81,14 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
             }
         }
 
-        private static DateTimeOffset? GetNextScheduledExecutionDate(
-            Agent agent,
-            Data.Camera camera)
+        private DateTimeOffset? GetNextScheduledExecutionDate(Data.Camera camera)
         {
-            // Since we're using a timer-based system now, we don't track individual job schedules
-            // This could be enhanced to track next execution times if needed
-            // For now, return null to indicate no specific scheduled time is available
-            return null;
+            if (string.IsNullOrWhiteSpace(camera.NextDayNightScheduleId))
+            {
+                return null;
+            }
+
+            return _backgroundJobService.GetNextScheduledExecutionTime(camera.NextDayNightScheduleId);
         }
     }
 } 
