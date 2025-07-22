@@ -15,12 +15,19 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
     public class LicensePlateMlTrainingService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+
         private readonly ILogger<LicensePlateMlTrainingService> _logger;
+
         private readonly IModelPersistenceService _modelPersistence;
+
         private readonly IMachineLearningConfiguration _configuration;
+
         private readonly MLContext _mlContext;
+
         private Timer _trainingTimer;
+
         private readonly ConcurrentDictionary<string, ITransformer> _modelCache;
+
         private readonly TrainingStatus _trainingStatus;
 
         public LicensePlateMlTrainingService(
