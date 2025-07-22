@@ -30,6 +30,7 @@ using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
+using System.IO.Abstractions;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -112,6 +113,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddScoped<ILicensePlatePredictionService, LicensePlatePredictionService>();
 
             services.AddSingleton<IMachineLearningConfiguration, Features.MachineLearning.Configuration.MachineLearningConfiguration>();
+            
+            // Register IFileSystem for testable file operations
+            services.AddSingleton<IFileSystem, FileSystem>();
             services.AddSingleton<IModelPersistenceService, ModelPersistenceService>();
 
             return services;
