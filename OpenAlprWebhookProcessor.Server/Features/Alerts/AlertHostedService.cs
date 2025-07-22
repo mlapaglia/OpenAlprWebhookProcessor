@@ -53,7 +53,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
 
         private async Task ProcessAlertsAsync(CancellationToken cancellationToken)
         {
-            foreach (var job in _alertService.GetConsumingAlerts(cancellationToken))
+            await foreach (var job in _alertService.GetConsumingAlertsAsync(cancellationToken))
             {
                 try
                 {

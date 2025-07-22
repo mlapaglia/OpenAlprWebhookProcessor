@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private async Task ProcessHydrationRequestsAsync(CancellationToken cancellationToken)
         {
-            foreach (var hydrationRequest in _hydrationService.GetConsumingHydrationRequests(cancellationToken))
+            await foreach (var hydrationRequest in _hydrationService.GetConsumingHydrationRequestsAsync(cancellationToken))
             {
                 try
                 {
@@ -70,7 +70,6 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 }
                 finally
                 {
-                    // Always reschedule after processing, regardless of success or failure
                     try
                     {
                         await _hydrationService.ScheduleHydrationAsync(cancellationToken);

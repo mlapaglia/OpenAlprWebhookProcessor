@@ -12,6 +12,6 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         int GetPendingHydrationCount();
 
-        IEnumerable<string> GetConsumingHydrationRequests(CancellationToken cancellationToken);
+        IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync(CancellationToken cancellationToken);
     }
 }

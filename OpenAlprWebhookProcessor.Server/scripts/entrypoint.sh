@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 echo "OpenAlprWebhookProcessor starting..."
@@ -46,7 +46,7 @@ ensure_db_directory "$USERS_CONNECTION"
 
 # Run migrations for ProcessorConnection
 echo "Running migrations for ProcessorConnection..."
-./processorMigrator --connection "$PROCESSOR_CONNECTION" 2>&1
+./processor-migrator --connection "$PROCESSOR_CONNECTION" 2>&1
 
 MIGRATION_EXIT_CODE=$?
 if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
@@ -58,7 +58,7 @@ fi
 
 # Run migrations for UsersConnection  
 echo "Running migrations for UsersConnection..."
-./usersMigrator --connection "$USERS_CONNECTION" 2>&1
+./users-migrator --connection "$USERS_CONNECTION" 2>&1
 
 MIGRATION_EXIT_CODE=$?
 if [ $MIGRATION_EXIT_CODE -eq 0 ]; then

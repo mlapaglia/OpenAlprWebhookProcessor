@@ -9,6 +9,6 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
 
         int GetPendingAlertsCount();
 
-        IEnumerable<AlertUpdateRequest> GetConsumingAlerts(CancellationToken cancellationToken);
+        IAsyncEnumerable<AlertUpdateRequest> GetConsumingAlertsAsync(CancellationToken cancellationToken);
     }
 }

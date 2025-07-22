@@ -35,6 +35,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         private IRepository<WebPushSettings>? _webPushSettings;
 
+        private IRepository<WebPushSettings>? _webPushSettings2;
+
         public UnitOfWork(ProcessorContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -63,6 +65,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
         public IRepository<WebPushSubscription> WebPushSubscriptions => _webPushSubscriptions ??= new Repository<WebPushSubscription>(_context);
 
         public IRepository<WebPushSettings> WebPushSettings => _webPushSettings ??= new Repository<WebPushSettings>(_context);
+
+        public IRepository<WebPushSettings> WebPushSettings2 => _webPushSettings2 ??= new Repository<WebPushSettings>(_context);
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

@@ -2,46 +2,68 @@
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
-    public class HydrationService : IHydrationService
+    public class HydrationService : IHydrationService, IDisposable
     {
-        private readonly BlockingCollection<string> _hydrationRequestsToProcess = new BlockingCollection<string>();
+        private readonly Channel<string> _hydrationRequestsChannel;
+        private readonly ChannelWriter<string> _writer;
+        private readonly ChannelReader<string> _reader;
 
         private readonly IServiceProvider _serviceProvider;
 
         private Timer _scheduledScrapeTimer;
 
-        private readonly object _timerLock = new object();
+        private readonly Lock _timerLock = new Lock();
 
         // Track current configuration to avoid unnecessary timer recreation
         private int? _currentIntervalMinutes;
 
         private string _currentAgentUid;
 
+        private bool _disposed = false;
+
         public HydrationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+            // Create an unbounded channel for hydration requests
+            _hydrationRequestsChannel = Channel.CreateUnbounded<string>();
+            _writer = _hydrationRequestsChannel.Writer;
+            _reader = _hydrationRequestsChannel.Reader;
         }
 
         public void StartHydration(string name)
         {
-            _hydrationRequestsToProcess.Add(name);
+            if (_disposed)
+                return;
+
+            // TryWrite returns false if the channel is closed
+            if (!_writer.TryWrite(name))
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                logger.LogWarning("Failed to queue hydration request for {Name} - channel may be closed", name);
+            }
         }
 
         public int GetPendingHydrationCount()
         {
-            return _hydrationRequestsToProcess.Count;
+            return _reader.Count;
         }
 
-        public IEnumerable<string> GetConsumingHydrationRequests(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            return _hydrationRequestsToProcess.GetConsumingEnumerable(cancellationToken);
+            await foreach (var request in _reader.ReadAllAsync(cancellationToken))
+            {
+                yield return request;
+            }
         }
 
         public async Task ScheduleHydrationAsync(CancellationToken cancellationToken)
@@ -115,6 +137,15 @@ namespace OpenAlprWebhookProcessor.Hydrator
             }
         }
 
+        /// <summary>
+        /// Complete the channel to signal that no more items will be written.
+        /// Call this when shutting down the service.
+        /// </summary>
+        public void CompleteChannel()
+        {
+            _writer.TryComplete();
+        }
+
         private async Task UpdateNextScrapeTimeAsync(string agentUid, int intervalMinutes)
         {
             try
@@ -137,6 +168,46 @@ namespace OpenAlprWebhookProcessor.Hydrator
                 using var scope = _serviceProvider.CreateScope();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
                 logger.LogError(ex, "Error updating next scrape time for agent {AgentUid}", agentUid);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            DisposeTimer();
+            CompleteChannel();
+            _disposed = true;
+        }
+    }
+
+    // Extension method to convert IAsyncEnumerable to blocking IEnumerable (for backwards compatibility)
+    public static class AsyncEnumerableExtensions
+    {
+        public static IEnumerable<T> ToBlockingEnumerable<T>(this IAsyncEnumerable<T> asyncEnumerable, CancellationToken cancellationToken = default)
+        {
+            var enumerator = asyncEnumerable.GetAsyncEnumerator(cancellationToken);
+            try
+            {
+                while (true)
+                {
+                    var moveNextTask = enumerator.MoveNextAsync();
+                    var hasNext = moveNextTask.IsCompletedSuccessfully
+                        ? moveNextTask.Result
+                        : moveNextTask.AsTask().GetAwaiter().GetResult();
+
+                    if (!hasNext)
+                        yield break;
+
+                    yield return enumerator.Current;
+                }
+            }
+            finally
+            {
+                var disposeTask = enumerator.DisposeAsync();
+                if (!disposeTask.IsCompletedSuccessfully)
+                    disposeTask.AsTask().GetAwaiter().GetResult();
             }
         }
     }

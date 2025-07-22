@@ -63,6 +63,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="scripts\entrypoint.sh" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="scripts\entrypoint.sh">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\openalprwebhookprocessor.client\openalprwebhookprocessor.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

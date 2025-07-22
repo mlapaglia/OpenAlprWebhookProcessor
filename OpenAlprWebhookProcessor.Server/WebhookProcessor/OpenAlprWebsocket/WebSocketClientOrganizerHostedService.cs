@@ -22,6 +22,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await Task.Yield();
+
             _logger.LogDebug("WebsocketClientOrganizerHostedService starting...");
 
             try

@@ -48,6 +48,7 @@ namespace Tests.Hydrator
         {
             _serviceScope?.Dispose();
             _sut?.DisposeTimer();
+            _sut?.Dispose();
             base.TearDown();
         }
 
@@ -98,7 +99,7 @@ namespace Tests.Hydrator
         }
 
         [Test]
-        public void GetConsumingHydrationRequests_ReturnsItemsInOrder()
+        public async Task GetConsumingHydrationRequestsAsync_ReturnsItemsInOrder()
         {
             // Arrange
             var names = new[] { "agent1", "agent2", "agent3" };
@@ -107,10 +108,17 @@ namespace Tests.Hydrator
                 _sut.StartHydration(name);
             }
 
+            // Complete the channel to signal no more items will be added
+            _sut.CompleteChannel();
+
             // Act
             using var cts = new CancellationTokenSource();
-            var consumingEnumerable = _sut.GetConsumingHydrationRequests(cts.Token);
-            var results = consumingEnumerable.Take(3).ToList();
+            var results = new List<string>();
+
+            await foreach (var item in _sut.GetConsumingHydrationRequestsAsync(cts.Token))
+            {
+                results.Add(item);
+            }
 
             // Assert
             Assert.That(results, Is.EqualTo(names));

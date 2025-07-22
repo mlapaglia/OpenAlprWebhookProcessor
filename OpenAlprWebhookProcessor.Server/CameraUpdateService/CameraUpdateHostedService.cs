@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug("CameraUpdateHostedService starting...");
+            _logger.LogInformation("CameraUpdateHostedService starting...");
 
             try
             {

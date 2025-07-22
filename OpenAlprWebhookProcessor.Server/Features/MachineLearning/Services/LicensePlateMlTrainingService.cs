@@ -70,8 +70,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-
             _trainingTimer = new Timer(
                 TriggerTrainingAsync,
                 null,
