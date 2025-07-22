@@ -1,56 +1,81 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 
 namespace OpenAlprWebhookProcessor.WebhookProcessor
 {
-    public class ImageRetrieverService : IImageRetrieverService
+    public class ImageRetrieverService : IImageRetrieverService, IDisposable
     {
-        private readonly BlockingCollection<string> _imageRequestsToProcess = new BlockingCollection<string>();
+        private readonly Channel<string> _imageRequestsChannel;
+        private readonly ChannelWriter<string> _imageRequestsWriter;
+        private readonly ChannelReader<string> _imageRequestsReader;
+
+        private readonly Channel<string> _imageCompressionRequestsChannel;
+        private readonly ChannelWriter<string> _imageCompressionRequestsWriter;
+        private readonly ChannelReader<string> _imageCompressionRequestsReader;
 
         private readonly HashSet<string> _imageRequestsToProcessList = new();
-
-        private readonly object _imageRequestsToProcessGate = new();
-
-        private readonly BlockingCollection<string> _imageCompressionRequestsToProcess = new();
-
+        private readonly Lock _imageRequestsToProcessGate = new();
         private readonly HashSet<string> _imageCompressionRequestsToProcessList = new();
+        private readonly Lock _imageCompressionRequestsGate = new();
 
-        private readonly object _imageCompressionRequestsGate = new();
+        private bool _disposed = false;
+
+        public ImageRetrieverService()
+        {
+            _imageRequestsChannel = Channel.CreateUnbounded<string>();
+            _imageRequestsWriter = _imageRequestsChannel.Writer;
+            _imageRequestsReader = _imageRequestsChannel.Reader;
+
+            _imageCompressionRequestsChannel = Channel.CreateUnbounded<string>();
+            _imageCompressionRequestsWriter = _imageCompressionRequestsChannel.Writer;
+            _imageCompressionRequestsReader = _imageCompressionRequestsChannel.Reader;
+        }
 
         public void AddImageRetrievalJob(string uuid)
         {
-            if (string.IsNullOrWhiteSpace(uuid))
+            if (_disposed || string.IsNullOrWhiteSpace(uuid))
                 return;
 
             lock (_imageRequestsToProcessGate)
             {
                 if (_imageRequestsToProcessList.Add(uuid))
                 {
-                    _imageRequestsToProcess.Add(uuid);
+                    if (!_imageRequestsWriter.TryWrite(uuid))
+                    {
+                        _imageRequestsToProcessList.Remove(uuid);
+                    }
                 }
             }
         }
 
         public void AddImageCompressionJob(string ignoreThisParameter)
         {
-            if (string.IsNullOrWhiteSpace(ignoreThisParameter))
+            if (_disposed || string.IsNullOrWhiteSpace(ignoreThisParameter))
                 return;
 
             lock (_imageCompressionRequestsGate)
             {
                 if (_imageCompressionRequestsToProcessList.Add(ignoreThisParameter))
                 {
-                    _imageCompressionRequestsToProcess.Add(ignoreThisParameter);
+                    if (!_imageCompressionRequestsWriter.TryWrite(ignoreThisParameter))
+                    {
+                        _imageCompressionRequestsToProcessList.Remove(ignoreThisParameter);
+                    }
                 }
             }
         }
 
         public void AddImageCompressionJob()
         {
+            if (_disposed)
+                return;
+
             lock (_imageCompressionRequestsGate)
             {
-                _imageCompressionRequestsToProcess.Add("allImages");
+                _imageCompressionRequestsWriter.TryWrite("allImages");
             }
         }
 
@@ -64,22 +89,48 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         public int GetImageRequestsCount()
         {
-            return _imageRequestsToProcess.Count;
+            return _imageRequestsChannel.Reader.Count;
         }
 
         public int GetCompressionRequestsCount()
         {
-            return _imageCompressionRequestsToProcess.Count;
+            return _imageCompressionRequestsChannel.Reader.Count;
         }
 
-        public IEnumerable<string> GetConsumingImageRequests(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> GetConsumingImageRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            return _imageRequestsToProcess.GetConsumingEnumerable(cancellationToken);
+            await foreach (var request in _imageRequestsReader.ReadAllAsync(cancellationToken))
+            {
+                yield return request;
+            }
         }
 
-        public IEnumerable<string> GetConsumingCompressionRequests(CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> GetConsumingCompressionRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            return _imageCompressionRequestsToProcess.GetConsumingEnumerable(cancellationToken);
+            await foreach (var request in _imageCompressionRequestsReader.ReadAllAsync(cancellationToken))
+            {
+                yield return request;
+            }
+        }
+
+        public void CompleteImageRequests()
+        {
+            _imageRequestsWriter.TryComplete();
+        }
+
+        public void CompleteCompressionRequests()
+        {
+            _imageCompressionRequestsWriter.TryComplete();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            CompleteImageRequests();
+            CompleteCompressionRequests();
+            _disposed = true;
         }
     }
 }

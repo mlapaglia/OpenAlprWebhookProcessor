@@ -17,8 +17,8 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor
 
         int GetCompressionRequestsCount();
 
-        IEnumerable<string> GetConsumingImageRequests(CancellationToken cancellationToken);
+        IAsyncEnumerable<string> GetConsumingImageRequestsAsync(CancellationToken cancellationToken);
 
-        IEnumerable<string> GetConsumingCompressionRequests(CancellationToken cancellationToken);
+        IAsyncEnumerable<string> GetConsumingCompressionRequestsAsync(CancellationToken cancellationToken);
     }
 }
