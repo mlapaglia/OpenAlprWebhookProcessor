@@ -185,7 +185,10 @@ export class MachineLearningComponent implements OnInit, OnDestroy {
   }
 
   private updateMetricsTable(): void {
-    if (!this.trainingStatus?.modelMetrics) return
+    if (!this.trainingStatus?.modelMetrics) {
+      this.metricsData = new MatTableDataSource<{ key: string; value: string }>([])
+      return
+    }
 
     const data = [
       { key: 'R-Squared (R²)', value: this.trainingStatus.modelMetrics.rSquared.toFixed(4) },

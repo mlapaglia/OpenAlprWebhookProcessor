@@ -66,8 +66,9 @@ describe('SignalrService', () => {
         get: () => null
       })
 
-      spyOn(console, 'log')
       service.startConnection()
+      
+      expect(service['hubConnection']).toBeUndefined()
     })
 
     it('should not start connection when user has no JWT token', () => {
@@ -75,8 +76,9 @@ describe('SignalrService', () => {
         get: () => ({ ...mockUser, jwtToken: null })
       })
 
-      spyOn(console, 'log')
       service.startConnection()
+      
+      expect(service['hubConnection']).toBeUndefined()
     })
 
     it('should not start connection when user has empty JWT token', () => {
@@ -84,8 +86,9 @@ describe('SignalrService', () => {
         get: () => ({ ...mockUser, jwtToken: '' })
       })
 
-      spyOn(console, 'log')
       service.startConnection()
+      
+      expect(service['hubConnection']).toBeUndefined()
     })
   })
 

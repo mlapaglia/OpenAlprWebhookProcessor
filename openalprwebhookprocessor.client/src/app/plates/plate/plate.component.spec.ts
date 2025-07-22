@@ -33,9 +33,20 @@ describe('PlateComponent', () => {
     fixture = TestBed.createComponent(PlateComponent)
     component = fixture.componentInstance
     component.plate = new Plate({
-      cropImageUrl: new URL('http://google.com'),
-      imageUrl: new URL('http://google.com'),
+      id: 'test-id',
+      plateNumber: 'TEST123',
+      vehicleDescription: 'Test Vehicle',
+      cropImageUrl: new URL('http://test.com/crop.jpg'),
+      imageUrl: new URL('http://test.com/image.jpg'),
+      processedPlateConfidence: 95,
+      receivedOn: new Date(),
+      canBeEnriched: false
     })
+    
+    // Initialize image URLs to prevent 404s in tests
+    component.vehicleImageUrl = 'http://test.com/image.jpg'
+    component.plateImageUrl = 'http://test.com/crop.jpg'
+    component.isVisible = false // Prevent automatic image loading
 
     fixture.detectChanges()
   })

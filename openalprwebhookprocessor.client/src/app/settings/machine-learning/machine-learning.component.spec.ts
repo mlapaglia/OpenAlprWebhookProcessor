@@ -173,6 +173,8 @@ describe('MachineLearningComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Failed to load training status', SnackBarType.Error)
       expect(component.isLoadingTrainingStatus).toBe(false)
+      
+      component.ngOnDestroy()
     }))
 
     it('should handle configuration loading error', fakeAsync(() => {
@@ -203,6 +205,8 @@ describe('MachineLearningComponent', () => {
     }))
 
     it('should trigger training successfully', fakeAsync(() => {
+      const initialCalls = mockMlService.getTrainingStatus.calls.count()
+      
       component.triggerTraining()
       tick()
 
@@ -212,7 +216,7 @@ describe('MachineLearningComponent', () => {
       
       // Should reload training status after 2 seconds
       tick(2000)
-      expect(mockMlService.getTrainingStatus).toHaveBeenCalledTimes(2) // Initial + reload
+      expect(mockMlService.getTrainingStatus).toHaveBeenCalledTimes(initialCalls + 1) // Initial + reload
     }))
 
     it('should handle training trigger error', fakeAsync(() => {
@@ -235,12 +239,15 @@ describe('MachineLearningComponent', () => {
 
     it('should refresh data when refresh button clicked', () => {
       spyOn(component, 'refreshData').and.callThrough()
+      const initialTrainingStatusCalls = mockMlService.getTrainingStatus.calls.count()
+      const initialModelInfoCalls = mockMlService.getModelInfo.calls.count()
+      const initialConfigCalls = mockMlService.getConfiguration.calls.count()
       
       component.refreshData()
       
-      expect(mockMlService.getModelInfo).toHaveBeenCalledTimes(2) // Initial + refresh
-      expect(mockMlService.getTrainingStatus).toHaveBeenCalledTimes(2) // Initial + refresh  
-      expect(mockMlService.getConfiguration).toHaveBeenCalledTimes(2) // Initial + refresh
+      expect(mockMlService.getModelInfo).toHaveBeenCalledTimes(initialModelInfoCalls + 1) // Initial + refresh
+      expect(mockMlService.getTrainingStatus).toHaveBeenCalledTimes(initialTrainingStatusCalls + 1) // Initial + refresh  
+      expect(mockMlService.getConfiguration).toHaveBeenCalledTimes(initialConfigCalls + 1) // Initial + refresh
     })
   })
 
