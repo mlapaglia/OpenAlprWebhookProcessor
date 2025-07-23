@@ -52,6 +52,8 @@ namespace OpenAlprWebhookProcessor
             services.AddAutoMapper();
 
             services.AddMemoryCache();
+
+            services.AddDevelopmentDataSeeding();
         }
 
         public void Configure(IApplicationBuilder app)

@@ -2,10 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetStatistics

@@ -1,3 +1,4 @@
+<div class="dashboard-container">
 <mat-grid-list [cols]="quickStatCols" rowHeight="120px" gutterSize="16px" class="quick-stats-grid">
   <mat-grid-tile>
     <mat-card class="stat-card">
@@ -86,7 +87,7 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="predictions-section">
+  <div class="predictions-section" *ngIf="nextExpected || isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0) || (predictablePlates && predictablePlates.length > 0)">
     <mat-card class="featured-prediction-card" *ngIf="nextExpected">
       <mat-card-header>
         <mat-card-title>Next Expected Arrival</mat-card-title>
@@ -107,7 +108,7 @@
         </div>
       </mat-card-content>
     </mat-card>
-    <mat-card class="predictions-card">
+    <mat-card class="predictions-card" *ngIf="isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0)">
       <mat-card-header>
         <mat-card-title>Upcoming Predictions</mat-card-title>
         <mat-card-subtitle>Next 24 hours</mat-card-subtitle>
@@ -129,7 +130,7 @@
         </mat-list>
       </mat-card-content>
     </mat-card>
-    <mat-card class="predictions-card">
+    <mat-card class="predictions-card" *ngIf="predictablePlates && predictablePlates.length > 0">
       <mat-card-header>
         <mat-card-title>Most Predictable</mat-card-title>
         <mat-card-subtitle>Highest confidence patterns</mat-card-subtitle>
@@ -156,18 +157,25 @@
       <mat-card-subtitle>Top plates by occurrence</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
-          <span matListItemTitle class="rank">#{{ i + 1 }}</span>
-          <div matListItemTitle>{{ plate.name }}</div>
-          <span matListItemMeta class="count-badge">{{ plate.value }} times</span>
-        </mat-list-item>
-      </mat-list>
+              <mat-list>
+          <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
+            <span matListItemTitle class="rank">#{{ i + 1 }}</span>
+            <div matListItemTitle>{{ plate.name }}</div>
+            <mat-chip matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
+          </mat-list-item>
+        </mat-list>
     </mat-card-content>
   </mat-card>
 </div>
+</div>
 
 <style>
+  .dashboard-container {
+    padding: 1.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
   .dashboard-header {
     text-align: center;
     margin-bottom: 2rem;
@@ -189,7 +197,6 @@
   }
 
   .stat-card {
-    height: 100%;
     display: flex;
     align-items: center;
   }
@@ -324,19 +331,35 @@
 
   .most-seen-card mat-list-item {
     border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .most-seen-card mat-list-item:hover {
+    background-color: rgba(33, 150, 243, 0.08);
+  }
+
+  .most-seen-card mat-list-item [matListItemMeta] {
+    display: flex;
+    align-items: center;
   }
 
   .rank {
     font-weight: 600;
     color: #2196f3;
     margin-right: 1rem;
+    transition: color 0.2s ease;
   }
 
-  .count-badge {
-    background-color: #f5f5f5;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 0.875rem;
+  .most-seen-card mat-list-item:hover .rank {
+    color: #2196f3;
+  }
+
+  .count-chip {
+    background-color: #e3f2fd !important;
+    color: #1976d2 !important;
+    font-size: 0.75rem;
+    align-self: center !important;
   }
 
   /* Responsive adjustments */

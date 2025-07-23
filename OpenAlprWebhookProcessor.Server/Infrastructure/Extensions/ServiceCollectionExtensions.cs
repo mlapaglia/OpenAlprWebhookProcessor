@@ -198,6 +198,19 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             services.AddSingleton(mapper.CreateMapper());
             return services;
         }
+
+        public static IServiceCollection AddDevelopmentDataSeeding(this IServiceCollection services)
+        {
+            services.AddScoped<DevelopmentDataSeeder>();
+            return services;
+        }
+
+        public static async Task SeedDevelopmentDataAsync(this IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var seeder = scope.ServiceProvider.GetRequiredService<DevelopmentDataSeeder>();
+            await seeder.SeedAsync();
+        }
     }
 
     public class JwtBearerPostConfigureOptions : Microsoft.Extensions.Options.IPostConfigureOptions<JwtBearerOptions>

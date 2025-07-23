@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
+using OpenAlprWebhookProcessor.Infrastructure.Extensions;
 using Serilog;
 using System;
 using System.Threading.Tasks;
@@ -51,6 +52,10 @@ namespace OpenAlprWebhookProcessor
                             var usersContext = services.GetRequiredService<UsersContext>();
                             await usersContext.Database.MigrateAsync();
                             Log.Information("UsersConnection migrations completed.");
+
+                            Log.Information("Seeding development data...");
+                            await services.SeedDevelopmentDataAsync();
+                            Log.Information("Development data seeding completed.");
                         }
                         catch (Exception ex)
                         {

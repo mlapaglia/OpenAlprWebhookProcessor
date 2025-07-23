@@ -1,12 +1,7 @@
 using FluentAssertions;
-using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetMostSeenPlates
