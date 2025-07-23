@@ -1,7 +1,6 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users;
-using System;
 
 namespace Tests.Features.Users
 {

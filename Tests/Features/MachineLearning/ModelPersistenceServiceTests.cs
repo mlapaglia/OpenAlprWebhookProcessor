@@ -3,10 +3,7 @@ using Microsoft.ML;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
-using System;
-using System.IO;
 using System.IO.Abstractions.TestingHelpers;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services.Filesystem

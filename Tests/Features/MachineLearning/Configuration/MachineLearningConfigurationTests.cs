@@ -3,8 +3,6 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
-using System;
-using System.IO;
 
 namespace Tests.Features.MachineLearning.Configuration
 {

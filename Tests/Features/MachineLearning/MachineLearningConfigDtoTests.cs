@@ -1,9 +1,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.MachineLearning;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Tests.Features.MachineLearning
 {
