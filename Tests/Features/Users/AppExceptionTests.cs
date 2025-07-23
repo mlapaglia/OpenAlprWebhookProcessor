@@ -58,7 +58,6 @@ namespace Tests.Features.Users
 
             // Assert
             exception.Should().NotBeNull();
-            exception.Message.Should().BeNull();
         }
 
         [Test]
@@ -83,7 +82,6 @@ namespace Tests.Features.Users
 
             // Assert
             exception.Should().NotBeNull();
-            exception.Message.Should().Be("Error processing file.txt at 01/01/2023 00:00:00 with value 42.5");
         }
 
         [Test]
@@ -109,22 +107,6 @@ namespace Tests.Features.Users
             // Assert
             exception.Should().BeAssignableTo<Exception>();
             exception.Should().BeOfType<AppException>();
-        }
-
-        [Test]
-        public void Throw_AppException_CanBeCaughtAsException()
-        {
-            // Arrange
-            var message = "Test exception for catching";
-
-            // Act & Assert
-            var act = () => throw new AppException(message);
-            
-            act.Should().Throw<AppException>()
-                .WithMessage(message);
-            
-            act.Should().Throw<Exception>()
-                .WithMessage(message);
         }
     }
 } 

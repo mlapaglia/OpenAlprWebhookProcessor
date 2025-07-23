@@ -67,7 +67,7 @@ namespace Tests.Features.MachineLearning
 
             // Act
             var requiredAttribute = property.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault() as RequiredAttribute;
-            var rangeAttribute = property.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() as RangeAttribute;
+            var rangeAttribute = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RangeAttribute), false).FirstOrDefault() as System.ComponentModel.DataAnnotations.RangeAttribute;
 
             // Assert
             requiredAttribute.Should().NotBeNull();
@@ -84,7 +84,7 @@ namespace Tests.Features.MachineLearning
 
             // Act
             var requiredAttribute = property.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault() as RequiredAttribute;
-            var rangeAttribute = property.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() as RangeAttribute;
+            var rangeAttribute = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RangeAttribute), false).FirstOrDefault() as System.ComponentModel.DataAnnotations.RangeAttribute;
 
             // Assert
             requiredAttribute.Should().NotBeNull();
@@ -101,7 +101,7 @@ namespace Tests.Features.MachineLearning
 
             // Act
             var requiredAttribute = property.GetCustomAttributes(typeof(RequiredAttribute), false).FirstOrDefault() as RequiredAttribute;
-            var rangeAttribute = property.GetCustomAttributes(typeof(RangeAttribute), false).FirstOrDefault() as RangeAttribute;
+            var rangeAttribute = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RangeAttribute), false).FirstOrDefault() as System.ComponentModel.DataAnnotations.RangeAttribute;
 
             // Assert
             requiredAttribute.Should().NotBeNull();
