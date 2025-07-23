@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure
                     OpenAlprName = "Front Gate Camera",
                     OpenAlprCameraId = 1,
                     OpenAlprEnabled = true,
-                    IpAddress = "192.168.1.100",
+                    IpAddress = "localhost",
                     PlatesSeen = 0
                 },
                 new Camera
@@ -101,7 +101,7 @@ namespace OpenAlprWebhookProcessor.Infrastructure
                     OpenAlprName = "Back Entrance Camera",
                     OpenAlprCameraId = 2,
                     OpenAlprEnabled = true,
-                    IpAddress = "192.168.1.101",
+                    IpAddress = "localhost",
                     PlatesSeen = 0
                 }
             };
