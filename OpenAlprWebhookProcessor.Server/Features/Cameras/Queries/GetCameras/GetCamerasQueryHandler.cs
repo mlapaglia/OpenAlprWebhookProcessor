@@ -1,6 +1,5 @@
 using MediatR;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Collections.Generic;

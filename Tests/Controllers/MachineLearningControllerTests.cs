@@ -16,12 +16,7 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPrediction
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingStatus;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextSeen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

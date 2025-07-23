@@ -2,8 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.GetConfiguration

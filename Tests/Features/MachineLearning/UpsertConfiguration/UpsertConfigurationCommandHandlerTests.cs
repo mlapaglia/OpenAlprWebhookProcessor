@@ -4,8 +4,6 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.MachineLearning;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfiguration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.UpsertConfiguration

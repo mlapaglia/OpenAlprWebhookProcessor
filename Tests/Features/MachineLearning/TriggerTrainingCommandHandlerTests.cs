@@ -2,14 +2,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTraining;
-using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Commands.TriggerTraining

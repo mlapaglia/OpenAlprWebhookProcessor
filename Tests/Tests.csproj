@@ -28,6 +28,7 @@
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.0.15" />
   </ItemGroup>
 
   <ItemGroup>

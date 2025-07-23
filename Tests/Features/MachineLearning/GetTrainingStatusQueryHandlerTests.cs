@@ -3,12 +3,8 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingStatus;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.GetTrainingStatus

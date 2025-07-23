@@ -1,5 +1,3 @@
-using System;
-
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Models
 {
     public class ModelInfoDto

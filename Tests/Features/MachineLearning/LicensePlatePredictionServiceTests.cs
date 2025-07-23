@@ -8,11 +8,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services

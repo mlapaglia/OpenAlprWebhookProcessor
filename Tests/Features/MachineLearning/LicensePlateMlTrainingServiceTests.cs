@@ -9,10 +9,6 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services

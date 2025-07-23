@@ -6,7 +6,6 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services

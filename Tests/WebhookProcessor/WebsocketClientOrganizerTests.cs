@@ -2,12 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.WebhookProcessor;
 using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor

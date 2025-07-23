@@ -9,11 +9,6 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using OpenAlprWebhookProcessor.WebhookProcessor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor
