@@ -3,7 +3,10 @@ using Microsoft.ML;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
+using System;
+using System.IO;
 using System.IO.Abstractions.TestingHelpers;
+using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services.Filesystem
@@ -43,7 +46,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void ModelExists_WhenFileExists_ReturnsTrue()
         {
             // Arrange
-            var modelPath = @"c:\models\test-model.zip";
+            var modelPath = "/models/test-model.zip";
             _mockFileSystem.AddFile(modelPath, new MockFileData("fake model data"));
 
             // Act
@@ -57,7 +60,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void ModelExists_WhenFileDoesNotExist_ReturnsFalse()
         {
             // Arrange
-            var modelPath = @"c:\models\non-existent-model.zip";
+            var modelPath = "/models/non-existent-model.zip";
 
             // Act
             var result = _service.ModelExists(modelPath);
@@ -90,7 +93,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void ModelExists_WithDirectory_ReturnsFalse()
         {
             // Arrange
-            var directoryPath = @"c:\models\";
+            var directoryPath = "/models/";
             _mockFileSystem.AddDirectory(directoryPath);
 
             // Act
@@ -108,7 +111,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void GetModelFileInfo_WhenFileExists_ReturnsCorrectInfo()
         {
             // Arrange
-            var modelPath = @"c:\models\test-model.zip";
+            var modelPath = "/models/test-model.zip";
             var fileContent = "fake model data with some content to test file size";
             var lastWriteTime = new DateTime(2023, 10, 15, 14, 30, 0);
             
@@ -132,7 +135,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void GetModelFileInfo_WhenFileDoesNotExist_ReturnsNonExistentInfo()
         {
             // Arrange
-            var modelPath = @"c:\models\non-existent-model.zip";
+            var modelPath = "/models/non-existent-model.zip";
 
             // Act
             var result = _service.GetModelFileInfo(modelPath);
@@ -148,7 +151,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void GetModelFileInfo_WithEmptyFile_ReturnsZeroFileSize()
         {
             // Arrange
-            var modelPath = @"c:\models\empty-model.zip";
+            var modelPath = "/models/empty-model.zip";
             _mockFileSystem.AddFile(modelPath, new MockFileData(""));
 
             // Act
@@ -164,7 +167,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public void GetModelFileInfo_WithLargeFile_ReturnsCorrectFileSize()
         {
             // Arrange
-            var modelPath = @"c:\models\large-model.zip";
+            var modelPath = "/models/large-model.zip";
             var largeContent = new string('x', 1024 * 1024); // 1MB of data
             _mockFileSystem.AddFile(modelPath, new MockFileData(largeContent));
 
@@ -185,7 +188,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task LoadModelAsync_WhenFileExists_ReturnsModel()
         {
             // Arrange
-            var modelPath = @"c:\models\test-model.zip";
+            var modelPath = "/models/test-model.zip";
             
             // Create a simple model to serialize
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
@@ -216,7 +219,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task LoadModelAsync_WhenFileDoesNotExist_ReturnsNull()
         {
             // Arrange
-            var modelPath = @"c:\models\non-existent-model.zip";
+            var modelPath = "/models/non-existent-model.zip";
 
             // Act
             var result = await _service.LoadModelAsync(modelPath, _mlContext);
@@ -239,7 +242,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task LoadModelAsync_WithEmptyFile_ThrowsException()
         {
             // Arrange
-            var modelPath = @"c:\models\empty-model.zip";
+            var modelPath = "/models/empty-model.zip";
             _mockFileSystem.AddFile(modelPath, new MockFileData(""));
 
             // Act & Assert
@@ -251,7 +254,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task LoadModelAsync_WithInvalidModelData_ThrowsException()
         {
             // Arrange
-            var modelPath = @"c:\models\invalid-model.zip";
+            var modelPath = "/models/invalid-model.zip";
             _mockFileSystem.AddFile(modelPath, new MockFileData("invalid model data"));
 
             // Act & Assert
@@ -267,7 +270,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task SaveModelAsync_WithValidModel_CreatesFile()
         {
             // Arrange
-            var modelPath = @"c:\models\new-model.zip";
+            var modelPath = "/models/new-model.zip";
             
             // Create a simple model
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
@@ -292,7 +295,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task SaveModelAsync_WhenDirectoryDoesNotExist_CreatesDirectory()
         {
             // Arrange
-            var modelPath = @"c:\new-folder\subdir\model.zip";
+            var modelPath = "/new-folder/subdir/model.zip";
             
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
             {
@@ -306,7 +309,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
             await _service.SaveModelAsync(model, modelPath, _mlContext);
 
             // Assert
-            _mockFileSystem.Directory.Exists(@"c:\new-folder\subdir").Should().BeTrue();
+            _mockFileSystem.Directory.Exists("/new-folder/subdir").Should().BeTrue();
             _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
         }
 
@@ -314,7 +317,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task SaveModelAsync_WhenFileAlreadyExists_OverwritesFile()
         {
             // Arrange
-            var modelPath = @"c:\models\existing-model.zip";
+            var modelPath = "/models/existing-model.zip";
             _mockFileSystem.AddFile(modelPath, new MockFileData("old model data"));
             
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
@@ -341,7 +344,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task SaveModelAsync_WithComplexPath_HandlesProperly()
         {
             // Arrange
-            var modelPath = @"c:\models\deep\nested\folder\structure\model.zip";
+            var modelPath = "/models/deep/nested/folder/structure/model.zip";
             
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
             {
@@ -355,7 +358,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
             await _service.SaveModelAsync(model, modelPath, _mlContext);
 
             // Assert
-            _mockFileSystem.Directory.Exists(@"c:\models\deep\nested\folder\structure").Should().BeTrue();
+            _mockFileSystem.Directory.Exists("/models/deep/nested/folder/structure").Should().BeTrue();
             _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
         }
 
@@ -363,7 +366,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task SaveModelAsync_SaveAndLoad_RoundTripSucceeds()
         {
             // Arrange
-            var modelPath = @"c:\models\roundtrip-model.zip";
+            var modelPath = "/models/roundtrip-model.zip";
             
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
             {
@@ -398,7 +401,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         public async Task FullWorkflow_SaveLoadAndGetInfo_WorksCorrectly()
         {
             // Arrange
-            var modelPath = @"c:\models\workflow-test-model.zip";
+            var modelPath = "/models/workflow-test-model.zip";
             
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
             {
