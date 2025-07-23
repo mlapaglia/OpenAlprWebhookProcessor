@@ -1,7 +1,7 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,34 +17,30 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetMostSeenPlatesResponse> Handle(GetMostSeenPlatesQuery request, CancellationToken cancellationToken)
+        public async Task<GetMostSeenPlatesResponse> Handle(
+            GetMostSeenPlatesQuery request,
+            CancellationToken cancellationToken)
         {
-            // Default to last 30 days if no dates provided
             var startDate = request.StartDate ?? DateTimeOffset.UtcNow.AddDays(-30);
-            var endDate = request.EndDate ?? DateTimeOffset.UtcNow;
+            var endDate = (request.EndDate ?? DateTimeOffset.UtcNow).AddDays(1).AddTicks(-1);
 
-            var plateGroups = await _unitOfWork.PlateGroups.GetMostSeenPlatesAsync(
-                startDate,
-                endDate,
-                request.Limit,
-                cancellationToken);
-
-            var licensePlates = plateGroups.GroupBy(x => x.BestNumber)
-                .Select(x => new MostSeenCount
-                {
-                    PlateNumber = x.Key,
-                    Count = x.Count(),
-                }).ToList();
+            var plateCounts = await _unitOfWork.PlateGroups.GetQueryable()
+                .Where(x =>
+                    x.ReceivedOnEpoch >= startDate.ToUnixTimeMilliseconds()
+                    && x.ReceivedOnEpoch <= endDate.ToUnixTimeMilliseconds())
+                .GroupBy(x => x.BestNumber)
+                .Select(g => new MostSeenCount {
+                    PlateNumber = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(x => x.Count)
+                .Take(request.Limit)
+                .ToListAsync(cancellationToken);
 
             return new GetMostSeenPlatesResponse
             {
-                Counts = licensePlates
+                Counts = plateCounts
             };
-        }
-
-        private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Ignores.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
     }
 } 

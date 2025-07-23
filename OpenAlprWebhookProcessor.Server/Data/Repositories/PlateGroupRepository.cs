@@ -90,62 +90,17 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             return await query.CountAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<PlateGroup>> GetMostSeenPlatesAsync(
-            DateTimeOffset? startDate, 
-            DateTimeOffset? endDate, 
-            int limit,
-            CancellationToken cancellationToken = default)
-        {
-            var query = _dbSet.AsQueryable();
-
-            if (startDate.HasValue)
-            {
-                var startEpochMs = startDate.Value.ToUnixTimeMilliseconds();
-                query = query.Where(x => x.ReceivedOnEpoch >= startEpochMs);
-            }
-
-            if (endDate.HasValue)
-            {
-                var endEpochMs = endDate.Value.ToUnixTimeMilliseconds();
-                query = query.Where(x => x.ReceivedOnEpoch <= endEpochMs);
-            }
-
-            // First, get the counts and most recent epoch for each plate
-            var plateCounts = await query
-                .GroupBy(x => x.BestNumber)
-                .Select(g => new { 
-                    PlateNumber = g.Key, 
-                    Count = g.Count(),
-                    LatestEpoch = g.Max(x => x.ReceivedOnEpoch)
-                })
-                .OrderByDescending(x => x.Count)
-                .Take(limit)
-                .ToListAsync(cancellationToken);
-
-            // Then get the actual PlateGroup objects for those plates
-            var result = new List<PlateGroup>();
-            foreach (var plateCount in plateCounts)
-            {
-                var plateGroup = await _dbSet
-                    .Where(x => x.BestNumber == plateCount.PlateNumber && x.ReceivedOnEpoch == plateCount.LatestEpoch)
-                    .FirstOrDefaultAsync(cancellationToken);
-                
-                if (plateGroup != null)
-                {
-                    result.Add(plateGroup);
-                }
-            }
-
-            return result;
-        }
-
         public async Task<IEnumerable<DayCount>> GetPlateCountsAsync(
             DateTimeOffset startDate, 
             DateTimeOffset endDate,
             CancellationToken cancellationToken = default)
         {
-            var startEpochMs = startDate.ToUnixTimeMilliseconds();
-            var endEpochMs = endDate.ToUnixTimeMilliseconds();
+            // Preserve the original timezone when creating day boundaries
+            var startFloor = new DateTimeOffset(startDate.Date, startDate.Offset);
+            var endCeiling = new DateTimeOffset(endDate.Date, endDate.Offset).AddDays(1).AddTicks(-1);
+
+            var startEpochMs = startFloor.ToUnixTimeMilliseconds();
+            var endEpochMs = endCeiling.ToUnixTimeMilliseconds();
 
             var results = await _context.PlateGroups
                 .AsNoTracking()
@@ -153,7 +108,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 .Select(y => y.ReceivedOnEpoch)
                 .ToListAsync(cancellationToken);
 
-            return GroupByDay(results);
+            return GroupByDay(results, startDate.Offset);
         }
 
         public async Task<PlateGroup?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
@@ -184,9 +139,16 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             return (seenPlates, seenPossiblePlates);
         }
 
-        private static List<DayCount> GroupByDay(List<long> plateCounts)
+        private static List<DayCount> GroupByDay(List<long> plateCounts, TimeSpan timeZoneOffset)
         {
-            var groupedResults = plateCounts.GroupBy(x => DateTimeOffset.FromUnixTimeMilliseconds(x).Date);
+            var groupedResults = plateCounts.GroupBy(x => 
+            {
+                var dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(x);
+                // Convert to the original timezone to ensure consistent day grouping
+                var adjustedDateTime = dateTimeOffset.ToOffset(timeZoneOffset);
+                return adjustedDateTime.Date;
+            });
+            
             var parsedResults = new List<DayCount>();
 
             foreach (var date in groupedResults)
@@ -194,7 +156,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 parsedResults.Add(new DayCount()
                 {
                     Count = date.Count(),
-                    Date = date.Key,
+                    Date = new DateTimeOffset(date.Key, timeZoneOffset),
                 });
             }
 
