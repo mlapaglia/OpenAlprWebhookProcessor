@@ -57,7 +57,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem
             MLContext mlContext)
         {
             var directory = _fileSystem.Path.GetDirectoryName(modelPath);
-            if (!_fileSystem.Directory.Exists(directory))
+            if (!string.IsNullOrEmpty(directory) && !_fileSystem.Directory.Exists(directory))
             {
                 _fileSystem.Directory.CreateDirectory(directory);
             }
