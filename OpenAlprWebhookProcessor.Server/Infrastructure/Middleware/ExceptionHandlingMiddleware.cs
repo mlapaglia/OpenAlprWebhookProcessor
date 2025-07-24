@@ -53,6 +53,17 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Middleware
                     break;
 
                 case ArgumentException:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    response = new
+                    {
+                        error = new
+                        {
+                            message = exception.Message,
+                            details = exception.InnerException?.Message
+                        }
+                    };
+                    break;
+
                 case UnauthorizedAccessException:
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                     response = new
