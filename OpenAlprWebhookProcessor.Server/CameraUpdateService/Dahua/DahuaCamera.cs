@@ -3,6 +3,7 @@ using Flurl.Http.Configuration;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -90,12 +91,17 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private IFlurlClient GetConfiguredFlurlClient()
         {
-            return _flurlClientCache.GetOrAdd($"camera_{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
+            return _flurlClientCache.GetOrAdd($"camera*{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
             {
                 if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
                 {
-                    fluentClientBuilder.WithBasicAuth(_camera.CameraUsername, _camera.CameraPassword);
-                    fluentClientBuilder.ConfigureInnerHandler(handler => handler.UseDefaultCredentials = true);
+                    fluentClientBuilder.ConfigureInnerHandler(handler =>
+                    {
+                        handler.UseDefaultCredentials = true;
+                        handler.Credentials = new NetworkCredential(
+                            _camera.CameraUsername,
+                            _camera.CameraPassword);
+                    });
                 }
             });
         }
@@ -107,7 +113,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             try
             {
                 var response = await client
-                    .Request($"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi")
+                    .Request($"cgi-bin/snapshot.cgi")
                     .GetAsync(cancellationToken: cancellationToken);
 
                 return await response.GetStreamAsync();
@@ -127,7 +133,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             try
             {
                 var response = await client
-                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .Request($"cgi-bin/devVideoInput.cgi")
                     .SetQueryParam("action", "adjustFocus")
                     .SetQueryParam("focus", zoomAndFocus.Focus)
                     .SetQueryParam("zoom", zoomAndFocus.Zoom)
@@ -148,7 +154,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             try
             {
                 var response = await client
-                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .Request($"cgi-bin/devVideoInput.cgi")
                     .SetQueryParam("action", "getFocusStatus")
                     .PostAsync(null, cancellationToken: cancellationToken);
 
@@ -173,7 +179,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             try
             {
                 var response = await client
-                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .Request($"cgi-bin/devVideoInput.cgi")
                     .SetQueryParam("action", "autoFocus")
                     .PostAsync(null, cancellationToken: cancellationToken);
 

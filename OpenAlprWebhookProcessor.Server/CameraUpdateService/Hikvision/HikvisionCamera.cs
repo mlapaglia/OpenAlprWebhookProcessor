@@ -3,6 +3,7 @@ using Flurl.Http.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -165,12 +166,17 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         private IFlurlClient GetConfiguredFlurlClient()
         {
-            return _flurlClientCache.GetOrAdd($"camera_{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
+            return _flurlClientCache.GetOrAdd($"camera*{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
             {
                 if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
                 {
-                    fluentClientBuilder.WithBasicAuth(_camera.CameraUsername, _camera.CameraPassword);
-                    fluentClientBuilder.ConfigureInnerHandler(handler => handler.UseDefaultCredentials = true);
+                    fluentClientBuilder.ConfigureInnerHandler(handler =>
+                    {
+                        handler.UseDefaultCredentials = true;
+                        handler.Credentials = new NetworkCredential(
+                            _camera.CameraUsername,
+                            _camera.CameraPassword);
+                    });
                 }
             });
         }
