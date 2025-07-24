@@ -161,7 +161,7 @@ namespace Tests.CameraUpdateService.Hikvision
         }
 
         [Test]
-        public async Task SetCameraTextAsync_WithHttpError_ThrowsArgumentException()
+        public async Task SetCameraTextAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Error occurred");
@@ -172,11 +172,11 @@ namespace Tests.CameraUpdateService.Hikvision
             try
             {
                 await _hikvisionCamera.SetCameraTextAsync(updateRequest, cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().StartWith("unable to update video overlay:");
+                ex.Message.Should().StartWith("Error setting video overlay for camera");
                 ex.Message.Should().Contain("Error occurred");
             }
         }
@@ -220,7 +220,7 @@ namespace Tests.CameraUpdateService.Hikvision
         }
 
         [Test]
-        public async Task TriggerDayNightModeAsync_WithHttpError_ThrowsArgumentException()
+        public async Task TriggerDayNightModeAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.InternalServerError, "Camera error");
@@ -230,11 +230,11 @@ namespace Tests.CameraUpdateService.Hikvision
             try
             {
                 await _hikvisionCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().StartWith("unable to set sunrise/sunset:");
+                ex.Message.Should().StartWith("Error setting sunrise/sunset for camera");
                 ex.Message.Should().Contain("Camera error");
             }
         }
@@ -262,22 +262,23 @@ namespace Tests.CameraUpdateService.Hikvision
         }
 
         [Test]
-        public async Task GetSnapshotAsync_WithHttpError_StillReturnsStream()
+        public async Task GetSnapshotAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.NotFound, "Not found");
             var cancellationToken = GetCancellationToken();
 
-            // Act
-            var result = await _hikvisionCamera.GetSnapshotAsync(cancellationToken);
-
-            // Assert
-            result.Should().NotBeNull();
-            
-            // Should still return the error response as a stream
-            using var reader = new StreamReader(result);
-            var content = await reader.ReadToEndAsync();
-            content.Should().Be("Not found");
+            // Act & Assert
+            try
+            {
+                await _hikvisionCamera.GetSnapshotAsync(cancellationToken);
+                Assert.Fail("Expected HttpRequestException was not thrown");
+            }
+            catch (HttpRequestException ex)
+            {
+                ex.Message.Should().StartWith("Error getting snapshot from camera");
+                ex.Message.Should().Contain("Not found");
+            }
         }
 
         [Test]

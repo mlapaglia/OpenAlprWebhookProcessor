@@ -127,7 +127,7 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task SetCameraTextAsync_WithHttpError_ThrowsArgumentException()
+        public async Task SetCameraTextAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Error occurred");
@@ -138,11 +138,11 @@ namespace Tests.CameraUpdateService.Dahua
             try
             {
                 await _dahuaCamera.SetCameraTextAsync(updateRequest, cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().StartWith("unable to update video overlay:");
+                ex.Message.Should().StartWith("Error setting video overlay for camera");
                 ex.Message.Should().Contain("Error occurred");
             }
         }
@@ -186,7 +186,7 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task TriggerDayNightModeAsync_WithHttpError_ThrowsArgumentException()
+        public async Task TriggerDayNightModeAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.InternalServerError, "Camera error");
@@ -196,11 +196,11 @@ namespace Tests.CameraUpdateService.Dahua
             try
             {
                 await _dahuaCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().StartWith("unable to set sunrise/sunset:");
+                ex.Message.Should().StartWith("Error setting sunrise/sunset for camera");
                 ex.Message.Should().Contain("Camera error");
             }
         }
@@ -232,22 +232,23 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task GetSnapshotAsync_WithHttpError_StillReturnsStream()
+        public async Task GetSnapshotAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.NotFound, "Not found");
             var cancellationToken = GetCancellationToken();
 
-            // Act
-            var result = await _dahuaCamera.GetSnapshotAsync(cancellationToken);
-
-            // Assert
-            result.Should().NotBeNull();
-            
-            // Should still return the error response as a stream
-            using var reader = new StreamReader(result);
-            var content = await reader.ReadToEndAsync();
-            content.Should().Be("Not found");
+            // Act & Assert
+            try
+            {
+                await _dahuaCamera.GetSnapshotAsync(cancellationToken);
+                Assert.Fail("Expected HttpRequestException was not thrown");
+            }
+            catch (HttpRequestException ex)
+            {
+                ex.Message.Should().StartWith("Error getting snapshot from camera");
+                ex.Message.Should().Contain("Not found");
+            }
         }
 
         [Test]
@@ -272,7 +273,7 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task SetZoomAndFocusAsync_WithHttpError_ThrowsArgumentException()
+        public async Task SetZoomAndFocusAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Focus error");
@@ -283,11 +284,11 @@ namespace Tests.CameraUpdateService.Dahua
             try
             {
                 await _dahuaCamera.SetZoomAndFocusAsync(zoomFocus, cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().StartWith("unable to set zoom/focus:");
+                ex.Message.Should().StartWith("Error setting zoom and focus for camera");
                 ex.Message.Should().Contain("Focus error");
             }
         }
@@ -313,7 +314,7 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task GetZoomAndFocusAsync_WithHttpError_ThrowsArgumentException()
+        public async Task GetZoomAndFocusAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
             _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Get focus error");
@@ -323,11 +324,11 @@ namespace Tests.CameraUpdateService.Dahua
             try
             {
                 await _dahuaCamera.GetZoomAndFocusAsync(cancellationToken);
-                Assert.Fail("Expected ArgumentException was not thrown");
+                Assert.Fail("Expected HttpRequestException was not thrown");
             }
-            catch (ArgumentException ex)
+            catch (HttpRequestException ex)
             {
-                ex.Message.Should().Be("error getting zoom and focus");
+                ex.Message.Should().StartWith("Error getting zoom and focus from camera");
             }
         }
 
@@ -365,17 +366,23 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public async Task TriggerAutoFocusAsync_WithException_ReturnsFalse()
+        public async Task TriggerAutoFocusAsync_WithHttpError_ThrowsHttpRequestException()
         {
             // Arrange
-            _testHttpHandler.SetupException(new HttpRequestException("Network error"));
+            _testHttpHandler.SetupResponse(HttpStatusCode.BadRequest, "Auto focus error");
             var cancellationToken = GetCancellationToken();
 
-            // Act
-            var result = await _dahuaCamera.TriggerAutoFocusAsync(cancellationToken);
-
-            // Assert
-            result.Should().BeFalse();
+            // Act & Assert
+            try
+            {
+                await _dahuaCamera.TriggerAutoFocusAsync(cancellationToken);
+                Assert.Fail("Expected HttpRequestException was not thrown");
+            }
+            catch (HttpRequestException ex)
+            {
+                ex.Message.Should().StartWith("Error triggering auto focus for camera");
+                ex.Message.Should().Contain("Auto focus error");
+            }
         }
 
         [Test]
