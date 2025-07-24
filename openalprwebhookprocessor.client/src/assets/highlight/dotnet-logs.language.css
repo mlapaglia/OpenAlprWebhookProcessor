@@ -1,0 +1,78 @@
+/*
+  .NET Logs Theme for Highlight.js
+  Based on VS Code Dark+ theme colors
+*/
+
+/* Base styles */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #1e1e1e;
+  color: #d4d4d4;
+}
+
+/* Timestamps - Light green */
+.hljs-log-timestamp {
+  color: #b5cea8;
+  font-weight: normal;
+}
+
+/* HTTP requests - Blue */
+.hljs-log-http {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+/* Time intervals/durations - Orange */
+.hljs-log-duration {
+  color: #ce9178;
+  font-weight: bold;
+}
+
+/* .NET class names - Purple/Magenta */
+.hljs-log-class {
+  color: #c586c0;
+  font-weight: normal;
+}
+
+/* Assembly names - Darker purple */
+.hljs-log-assembly {
+  color: #9cdcfe;
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* Log levels */
+.hljs-log-trace {
+  color: #808080;
+  font-weight: bold;
+}
+
+.hljs-log-debug {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+.hljs-log-info {
+  color: #4ec9b0;
+  font-weight: bold;
+}
+
+.hljs-log-warn {
+  color: #dcdcaa;
+  font-weight: bold;
+}
+
+.hljs-log-error {
+  color: #f44747;
+  font-weight: bold;
+}
+
+.hljs-log-critical {
+  color: #ff6b6b;
+  font-weight: bold;
+  background-color: rgba(244, 71, 71, 0.15);
+  padding: 0 2px;
+  border-radius: 2px;
+}

@@ -76,6 +76,9 @@ bootstrapApplication(AppComponent, {
         coreLibraryLoader: () => import('highlight.js/lib/core'),
         languages: {
           plaintext: () => import('highlight.js/lib/languages/plaintext'),
+          shell: () => import('highlight.js/lib/languages/shell'),
+          accesslog: () => import('highlight.js/lib/languages/accesslog'),
+          dotnetlogs: () => import('./assets/highlight/dotnet-logs.language'),
         },
       },
     },

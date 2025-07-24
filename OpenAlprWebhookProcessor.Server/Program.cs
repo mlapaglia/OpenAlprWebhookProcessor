@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
+using OpenAlprWebhookProcessor.ProcessorHub;
+using OpenAlprWebhookProcessor.SystemLogs;
 using Serilog;
 using System;
 using System.Threading.Tasks;
@@ -15,24 +18,25 @@ namespace OpenAlprWebhookProcessor
     {
         public static async Task Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Migrations", Serilog.Events.LogEventLevel.Error)
-                .Enrich.FromLogContext()
-                .WriteTo.File(
-                    "./config/log-.txt",
-                    rollingInterval: RollingInterval.Day,
-                    shared: true,
-                    flushToDiskInterval: TimeSpan.FromSeconds(5),
-                    retainedFileCountLimit: 3)
-                .WriteTo.Console()
-                .CreateLogger();
-
             try
             {
                 Log.Information("Starting web host");
 
                 var host = CreateHostBuilder(args).Build();
+
+                Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
+                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Migrations", Serilog.Events.LogEventLevel.Error)
+                    .Enrich.FromLogContext()
+                    .WriteTo.File(
+                        "./config/log-.txt",
+                        rollingInterval: RollingInterval.Day,
+                        shared: true,
+                        flushToDiskInterval: TimeSpan.FromSeconds(5),
+                        retainedFileCountLimit: 3)
+                    .WriteTo.Console()
+                    .WriteTo.Signalr(host.Services.GetService<IHubContext<ProcessorHub.ProcessorHub, IProcessorHub>>())
+                    .CreateLogger();
 
                 using (var scope = host.Services.CreateScope())
                 {
