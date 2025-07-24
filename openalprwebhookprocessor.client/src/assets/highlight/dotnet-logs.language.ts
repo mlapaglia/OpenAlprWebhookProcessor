@@ -1,6 +1,4 @@
-import { HLJSApi } from 'highlight.js';
-
-export default function(hljs: HLJSApi) {
+export default function() {
   return {
     name: 'dotnet-logs',
     contains: [
