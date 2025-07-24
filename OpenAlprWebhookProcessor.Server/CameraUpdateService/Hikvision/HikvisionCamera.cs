@@ -1,11 +1,9 @@
-﻿using OpenAlprWebhookProcessor.Utilities;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+﻿using Flurl.Http;
+using Flurl.Http.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -17,14 +15,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
     {
         private readonly Data.Camera _camera;
 
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IFlurlClientCache _flurlClientCache;
 
         public HikvisionCamera(
             Data.Camera camera,
-            IHttpClientFactory httpClientFactory)
+            IFlurlClientCache flurlClientCache)
         {
             _camera = camera;
-            _httpClientFactory = httpClientFactory;
+            _flurlClientCache = flurlClientCache;
         }
 
         public async Task ClearCameraTextAsync(
@@ -116,53 +114,65 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             SunriseSunset sunriseSunset,
             CancellationToken cancellationToken)
         {
-            var body = new StringContent($"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>");
+            var xmlContent = $"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>";
 
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PutAsync(
-                $"http://{_camera.IpAddress}/ISAPI/Image/channels/1",
-                body,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error setting sunrise/sunset for camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request("/ISAPI/Image/channels/1")
+                    .PutStringAsync(xmlContent, cancellationToken: cancellationToken);
+
+                response.ResponseMessage.EnsureSuccessStatusCode();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error setting sunrise/sunset for camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         private async Task PushCameraTextAsync(
             VideoOverlay videoOverlay,
             CancellationToken cancellationToken)
         {
+            string xmlContent;
             using (var stringWriter = new StringWriter())
             {
                 using (XmlWriter writer = XmlWriter.Create(stringWriter))
                 {
                     var serializer = new XmlSerializer(typeof(VideoOverlay));
-                    serializer.Serialize(
-                        writer,
-                        videoOverlay);
-
-                    using var httpClient = GetConfiguredHttpClient();
-                    var result = await httpClient.PutAsync(
-                        _camera.UpdateOverlayTextUrl,
-                        new StringContent(stringWriter.ToString()),
-                        cancellationToken);
-
-                    await result.EnsureSuccessWithDetailsAsync($"Error setting video overlay for camera {_camera.Id}", cancellationToken);
+                    serializer.Serialize(writer, videoOverlay);
+                    xmlContent = stringWriter.ToString();
                 }
+            }
+
+            var client = GetConfiguredFlurlClient();
+
+            try
+            {
+                var response = await client
+                    .Request(_camera.UpdateOverlayTextUrl)
+                    .PutStringAsync(xmlContent, cancellationToken: cancellationToken);
+
+                response.ResponseMessage.EnsureSuccessStatusCode();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error setting video overlay for camera {_camera.Id}: {ex.Message}", ex);
             }
         }
 
-        private HttpClient GetConfiguredHttpClient()
+        private IFlurlClient GetConfiguredFlurlClient()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
+            return _flurlClientCache.GetOrAdd($"camera_{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
             {
-                var authValue = Convert.ToBase64String(
-                    Encoding.ASCII.GetBytes($"{_camera.CameraUsername}:{_camera.CameraPassword}"));
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
-            }
-
-            return httpClient;
+                if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
+                {
+                    fluentClientBuilder.WithBasicAuth(_camera.CameraUsername, _camera.CameraPassword);
+                    fluentClientBuilder.ConfigureInnerHandler(handler => handler.UseDefaultCredentials = true);
+                }
+            });
         }
 
         private static VideoOverlay CreateBaseVideoOverlayRequest()
@@ -179,14 +189,20 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.GetAsync(
-                $"http://{_camera.IpAddress}/ISAPI/Streaming/channels/1/picture",
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error getting snapshot from camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request("/ISAPI/Streaming/channels/1/picture")
+                    .GetAsync(cancellationToken: cancellationToken);
 
-            return await result.Content.ReadAsStreamAsync(cancellationToken);
+                return await response.GetStreamAsync();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error getting snapshot from camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         public Task SetZoomAndFocusAsync(

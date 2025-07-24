@@ -31,6 +31,7 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
 using System.IO.Abstractions;
+using Flurl.Http.Configuration;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {
@@ -122,7 +123,6 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
-            services.AddHttpClient();
             services.AddScoped<IGroupWebhookHandler, GroupWebhookHandler>();
             services.AddScoped<SinglePlateWebhookHandler>();
             services.AddScoped<IOpenAlprAgentScraper, OpenAlprAgentScraper>();

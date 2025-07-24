@@ -1,11 +1,9 @@
-﻿using OpenAlprWebhookProcessor.CameraUpdateService;
-using OpenAlprWebhookProcessor.Utilities;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
-using System;
+﻿using Flurl.Http;
+using Flurl.Http.Configuration;
+using OpenAlprWebhookProcessor.CameraUpdateService;
+
 using System.IO;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +14,12 @@ namespace OpenAlprWebhookProcessor.Cameras
     {
         private readonly Data.Camera _camera;
 
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IFlurlClientCache _flurlClientCache;
 
-        public DahuaCamera(Data.Camera camera, IHttpClientFactory httpClientFactory)
+        public DahuaCamera(Data.Camera camera, IFlurlClientCache flurlClientCache)
         {
             _camera = camera;
-            _httpClientFactory = httpClientFactory;
+            _flurlClientCache = flurlClientCache;
         }
 
         public async Task ClearCameraTextAsync(
@@ -54,99 +52,139 @@ namespace OpenAlprWebhookProcessor.Cameras
             string textToSet,
             CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PostAsync(
-                $"{_camera.UpdateOverlayTextUrl}" + textToSet,
-                null,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error setting video overlay for camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request(_camera.UpdateOverlayTextUrl + textToSet)
+                    .PostAsync(null, cancellationToken: cancellationToken);
+
+                response.ResponseMessage.EnsureSuccessStatusCode();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error setting video overlay for camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         private async Task SendDayNightCommandAsync(
             SunriseSunset sunriseSunset,
             CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PostAsync(
-                $"{_camera.UpdateDayNightModeUrl}{(sunriseSunset == SunriseSunset.Sunrise ? 0 : 1)}",
-                null,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error setting sunrise/sunset for camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request($"{_camera.UpdateDayNightModeUrl}{(sunriseSunset == SunriseSunset.Sunrise ? 0 : 1)}")
+                    .PostAsync(null, cancellationToken: cancellationToken);
+
+                response.ResponseMessage.EnsureSuccessStatusCode();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error setting sunrise/sunset for camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
-        private HttpClient GetConfiguredHttpClient()
+        private IFlurlClient GetConfiguredFlurlClient()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            
-            if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
+            return _flurlClientCache.GetOrAdd($"camera_{_camera.Id}", $"http://{_camera.IpAddress}", (fluentClientBuilder) =>
             {
-                var authValue = Convert.ToBase64String(
-                    Encoding.ASCII.GetBytes($"{_camera.CameraUsername}:{_camera.CameraPassword}"));
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
-            }
-
-            return httpClient;
+                if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
+                {
+                    fluentClientBuilder.WithBasicAuth(_camera.CameraUsername, _camera.CameraPassword);
+                    fluentClientBuilder.ConfigureInnerHandler(handler => handler.UseDefaultCredentials = true);
+                }
+            });
         }
 
         public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.GetAsync(
-                $"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi",
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error getting snapshot from camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request($"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi")
+                    .GetAsync(cancellationToken: cancellationToken);
 
-            return await result.Content.ReadAsStreamAsync(cancellationToken);
+                return await response.GetStreamAsync();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error getting snapshot from camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         public async Task SetZoomAndFocusAsync(
             ZoomFocus zoomAndFocus,
             CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PostAsync(
-                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=adjustFocus&focus={zoomAndFocus.Focus}&zoom={zoomAndFocus.Zoom}",
-                null,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error setting zoom and focus for camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .SetQueryParam("action", "adjustFocus")
+                    .SetQueryParam("focus", zoomAndFocus.Focus)
+                    .SetQueryParam("zoom", zoomAndFocus.Zoom)
+                    .PostAsync(null, cancellationToken: cancellationToken);
+
+                response.ResponseMessage.EnsureSuccessStatusCode();
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error setting zoom and focus for camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PostAsync(
-                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=getFocusStatus",
-                null,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error getting zoom and focus from camera {_camera.Id}", cancellationToken);
-
-            var response = await result.Content.ReadAsStringAsync(cancellationToken);
-
-            return new ZoomFocus()
+            try
             {
-                Focus = decimal.Parse(FocusRegex().Match(response).Groups[1].Value),
-                Zoom = decimal.Parse(ZoomRegex().Match(response).Groups[1].Value),
-            };
+                var response = await client
+                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .SetQueryParam("action", "getFocusStatus")
+                    .PostAsync(null, cancellationToken: cancellationToken);
+
+                var responseText = await response.GetStringAsync();
+
+                return new ZoomFocus()
+                {
+                    Focus = decimal.Parse(FocusRegex().Match(responseText).Groups[1].Value),
+                    Zoom = decimal.Parse(ZoomRegex().Match(responseText).Groups[1].Value),
+                };
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error getting zoom and focus from camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         public async Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
         {
-            using var httpClient = GetConfiguredHttpClient();
-            var result = await httpClient.PostAsync(
-                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=autoFocus",
-                null,
-                cancellationToken);
+            var client = GetConfiguredFlurlClient();
 
-            await result.EnsureSuccessWithDetailsAsync($"Error triggering auto focus for camera {_camera.Id}", cancellationToken);
+            try
+            {
+                var response = await client
+                    .Request($"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi")
+                    .SetQueryParam("action", "autoFocus")
+                    .PostAsync(null, cancellationToken: cancellationToken);
 
-            var response = await result.Content.ReadAsStringAsync(cancellationToken);
+                var responseText = await response.GetStringAsync();
 
-            return bool.Parse(SuccessRegex().Match(response).Groups[1].Value);
+                return bool.Parse(SuccessRegex().Match(responseText).Groups[1].Value);
+            }
+            catch (FlurlHttpException ex)
+            {
+                throw new HttpRequestException($"Error triggering auto focus for camera {_camera.Id}: {ex.Message}", ex);
+            }
         }
 
         [GeneratedRegex("result\":(.*?)\"")]

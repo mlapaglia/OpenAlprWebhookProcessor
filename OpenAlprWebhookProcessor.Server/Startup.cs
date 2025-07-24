@@ -1,3 +1,4 @@
+using Flurl.Http.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,8 @@ namespace OpenAlprWebhookProcessor
                 options.EnableDetailedErrors = true;
             });
 
+            services.AddHttpClient();
+            services.AddSingleton<IFlurlClientCache>(sp => new FlurlClientCache());
             services.AddApplicationServices(Configuration);
 
             services.AddDataServices(Configuration);
