@@ -1,20 +1,50 @@
-<div>
-    <button
-        mat-button 
-        color="primary"
-        (click)="downloadPlates()">Download past 24 hours plates</button>
-    <mat-checkbox 
-        color="primary"
-        [(ngModel)]="onlyFailedPlateGroups">Include ONLY failed plate groups</mat-checkbox>
-        <button
-            mat-button
-            color="warn"
-            (click)="deletePlates()"
-            [class.spinner]="isPurging">Delete debug plates</button>
-    <pre>
-        <code
-            [highlight]="logMessagesDisplay"
-            language="dotnetlogs">
-        </code>
-    </pre>
+<div class="system-logs-container">
+    <div class="controls-section">
+        <div class="log-level-section">
+            <mat-form-field appearance="outline">
+                <mat-label>Log Level</mat-label>
+                <mat-select [(value)]="selectedLogLevel" (selectionChange)="onLogLevelChange()">
+                    <mat-option
+                        *ngFor="let option of logLevelOptions"
+                        [value]="option.value">
+                        {{option.label}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        
+        <div class="plate-controls-section">
+            <div class="plate-download-group">
+                <button
+                    mat-raised-button 
+                    color="primary"
+                    (click)="downloadPlates()">
+                    Download Past 24 Hours Plates
+                </button>
+                <mat-checkbox 
+                    color="primary"
+                    [(ngModel)]="onlyFailedPlateGroups">
+                    Include ONLY failed plate groups
+                </mat-checkbox>
+            </div>
+            
+            <button
+                mat-raised-button
+                color="warn"
+                (click)="deletePlates()"
+                [disabled]="isPurging"
+                [class.spinner]="isPurging">
+                {{isPurging ? 'Deleting...' : 'Delete Debug Plates'}}
+            </button>
+        </div>
+    </div>
+    
+    <div class="logs-display-section">
+        <pre>
+            <code
+                [highlight]="logMessagesDisplay"
+                language="dotnetlogs">
+            </code>
+        </pre>
+    </div>
 </div>

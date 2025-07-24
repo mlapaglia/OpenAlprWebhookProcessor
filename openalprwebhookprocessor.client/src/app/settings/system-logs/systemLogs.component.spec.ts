@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { SystemLogsComponent } from './system-logs.component'
-import { SystemLogsService } from './system-logs.service'
+import { SystemLogsService, ApiLogLevel } from './system-logs.service'
 import { of } from 'rxjs'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs'
@@ -65,6 +65,6 @@ describe(SystemLogsComponent.name, () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(systemLogsServiceSpy.getLogs).toHaveBeenCalled()
+    expect(systemLogsServiceSpy.getLogs).toHaveBeenCalledWith(ApiLogLevel.Information)
   })
 })

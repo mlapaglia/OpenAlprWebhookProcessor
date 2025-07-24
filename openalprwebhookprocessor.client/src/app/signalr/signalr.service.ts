@@ -4,6 +4,7 @@ import { SnackBarType } from 'app/snackbar/snackbartype'
 import * as signalR from '@microsoft/signalr'
 import { Subject } from 'rxjs'
 import { AccountService } from 'app/_services'
+import { ApiLogLevel } from 'app/settings/system-logs/system-logs.service'
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class SignalrService {
   public connectionEstablished = new Subject<boolean>()
   public licensePlateReceived = new Subject<string>()
   public licensePlateAlerted = new Subject<string>()
-  public processInformationLogged = new Subject<string>()
+  public processInformationLogged = new Subject<{ logLevel: ApiLogLevel, logMessage: string }>()
   public openAlprAgentConnectionStatusChanged = new Subject<boolean>()
   public isConnected: boolean
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>()
@@ -59,8 +60,8 @@ export class SignalrService {
         this.snackbarService.create('Connection lost', SnackBarType.Disconnected)
       })
 
-    this.hubConnection.on('ProcessInformationLogged', (logMessage) => {
-      this.processInformationLogged.next(logMessage)
+    this.hubConnection.on('ProcessInformationLogged', (logLevel: ApiLogLevel, logMessage: string) => {
+      this.processInformationLogged.next({ logLevel, logMessage })
     })
 
     this.hubConnection.on('OpenAlprAgentConnected', (agentId, ipAddress) => {

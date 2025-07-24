@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs;
 using OpenAlprWebhookProcessor.ProcessorHub;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Display;
-using System;
 using System.IO;
 
 namespace OpenAlprWebhookProcessor.SystemLogs
@@ -25,9 +25,10 @@ namespace OpenAlprWebhookProcessor.SystemLogs
         {
             using var writer = new StringWriter();
             _formatter.Format(logEvent, writer);
-            var formattedLog = writer.ToString().TrimEnd(); // Remove trailing newline
 
-            _processorHub.Clients.All.ProcessInformationLogged(formattedLog);
+            _processorHub.Clients.All.ProcessInformationLogged(
+                logEvent.Level.ToApiLogLevel(),
+                writer.ToString().TrimEnd());
         }
     }
 }
