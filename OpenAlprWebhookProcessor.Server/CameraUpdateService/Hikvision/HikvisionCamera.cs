@@ -1,13 +1,15 @@
-﻿using System;
+﻿using OpenAlprWebhookProcessor.Utilities;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using System.Xml;
-using System.IO;
-using System.Threading;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 {
@@ -117,15 +119,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             var body = new StringContent($"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>");
 
             using var httpClient = GetConfiguredHttpClient();
-            var response = await httpClient.PutAsync(
+            var result = await httpClient.PutAsync(
                 $"http://{_camera.IpAddress}/ISAPI/Image/channels/1",
                 body,
                 cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ArgumentException("unable to set sunrise/sunset: " + await response.Content.ReadAsStringAsync(cancellationToken));
-            }
+            await result.EnsureSuccessWithDetailsAsync($"Error setting sunrise/sunset for camera {_camera.Id}", cancellationToken);
         }
 
         private async Task PushCameraTextAsync(
@@ -142,15 +141,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
                         videoOverlay);
 
                     using var httpClient = GetConfiguredHttpClient();
-                    var response = await httpClient.PutAsync(
+                    var result = await httpClient.PutAsync(
                         _camera.UpdateOverlayTextUrl,
                         new StringContent(stringWriter.ToString()),
                         cancellationToken);
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new ArgumentException("unable to update video overlay: " + await response.Content.ReadAsStringAsync(cancellationToken));
-                    }
+                    await result.EnsureSuccessWithDetailsAsync($"Error setting video overlay for camera {_camera.Id}", cancellationToken);
                 }
             }
         }
@@ -187,6 +183,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             var result = await httpClient.GetAsync(
                 $"http://{_camera.IpAddress}/ISAPI/Streaming/channels/1/picture",
                 cancellationToken);
+
+            await result.EnsureSuccessWithDetailsAsync($"Error getting snapshot from camera {_camera.Id}", cancellationToken);
 
             return await result.Content.ReadAsStreamAsync(cancellationToken);
         }

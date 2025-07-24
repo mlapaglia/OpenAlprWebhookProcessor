@@ -83,7 +83,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
                 }
                 else
                 {
-                    _logger.LogInformation("Unknown payload received, ignoring: {RawWebhook}", rawWebhook);
+                    _logger.LogDebug("Unknown payload received, ignoring: {RawWebhook}", rawWebhook);
                 }
             }
 

@@ -1,4 +1,6 @@
 ﻿using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Utilities;
+using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -53,15 +55,12 @@ namespace OpenAlprWebhookProcessor.Cameras
             CancellationToken cancellationToken)
         {
             using var httpClient = GetConfiguredHttpClient();
-            var response = await httpClient.PostAsync(
+            var result = await httpClient.PostAsync(
                 $"{_camera.UpdateOverlayTextUrl}" + textToSet,
                 null,
                 cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ArgumentException("unable to update video overlay: " + await response.Content.ReadAsStringAsync(cancellationToken));
-            }
+            await result.EnsureSuccessWithDetailsAsync($"Error setting video overlay for camera {_camera.Id}", cancellationToken);
         }
 
         private async Task SendDayNightCommandAsync(
@@ -69,22 +68,18 @@ namespace OpenAlprWebhookProcessor.Cameras
             CancellationToken cancellationToken)
         {
             using var httpClient = GetConfiguredHttpClient();
-            var response = await httpClient.PostAsync(
+            var result = await httpClient.PostAsync(
                 $"{_camera.UpdateDayNightModeUrl}{(sunriseSunset == SunriseSunset.Sunrise ? 0 : 1)}",
                 null,
                 cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ArgumentException("unable to set sunrise/sunset: " + await response.Content.ReadAsStringAsync(cancellationToken));
-            }
+            await result.EnsureSuccessWithDetailsAsync($"Error setting sunrise/sunset for camera {_camera.Id}", cancellationToken);
         }
 
         private HttpClient GetConfiguredHttpClient()
         {
             var httpClient = _httpClientFactory.CreateClient();
             
-            // Set basic authentication credentials via Authorization header
             if (!string.IsNullOrEmpty(_camera.CameraUsername) && !string.IsNullOrEmpty(_camera.CameraPassword))
             {
                 var authValue = Convert.ToBase64String(
@@ -102,6 +97,8 @@ namespace OpenAlprWebhookProcessor.Cameras
                 $"http://{_camera.IpAddress}/cgi-bin/snapshot.cgi",
                 cancellationToken);
 
+            await result.EnsureSuccessWithDetailsAsync($"Error getting snapshot from camera {_camera.Id}", cancellationToken);
+
             return await result.Content.ReadAsStreamAsync(cancellationToken);
         }
 
@@ -110,15 +107,12 @@ namespace OpenAlprWebhookProcessor.Cameras
             CancellationToken cancellationToken)
         {
             using var httpClient = GetConfiguredHttpClient();
-            var response = await httpClient.PostAsync(
+            var result = await httpClient.PostAsync(
                 $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=adjustFocus&focus={zoomAndFocus.Focus}&zoom={zoomAndFocus.Zoom}",
                 null,
                 cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ArgumentException("unable to set zoom/focus: " + await response.Content.ReadAsStringAsync(cancellationToken));
-            }
+            await result.EnsureSuccessWithDetailsAsync($"Error setting zoom and focus for camera {_camera.Id}", cancellationToken);
         }
 
         public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
@@ -129,10 +123,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                 null,
                 cancellationToken);
 
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new ArgumentException("error getting zoom and focus");
-            }
+            await result.EnsureSuccessWithDetailsAsync($"Error getting zoom and focus from camera {_camera.Id}", cancellationToken);
 
             var response = await result.Content.ReadAsStringAsync(cancellationToken);
 
@@ -145,22 +136,17 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                using var httpClient = GetConfiguredHttpClient();
-                var result = await httpClient.PostAsync(
-                    $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=autoFocus",
-                    null,
-                    cancellationToken);
+            using var httpClient = GetConfiguredHttpClient();
+            var result = await httpClient.PostAsync(
+                $"http://{_camera.IpAddress}/cgi-bin/devVideoInput.cgi?action=autoFocus",
+                null,
+                cancellationToken);
 
-                var response = await result.Content.ReadAsStringAsync(cancellationToken);
+            await result.EnsureSuccessWithDetailsAsync($"Error triggering auto focus for camera {_camera.Id}", cancellationToken);
 
-                return bool.Parse(SuccessRegex().Match(response).Groups[1].Value);
-            }
-            catch
-            {
-                return false;
-            }
+            var response = await result.Content.ReadAsStringAsync(cancellationToken);
+
+            return bool.Parse(SuccessRegex().Match(response).Groups[1].Value);
         }
 
         [GeneratedRegex("result\":(.*?)\"")]
