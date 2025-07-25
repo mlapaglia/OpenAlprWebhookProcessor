@@ -4,7 +4,6 @@ using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 using System;
-using System.Net.Http;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras
 {

@@ -135,7 +135,7 @@ namespace Tests.Features.MachineLearning.Services
         #region Training Status Tests
 
         [Test]
-        public async Task GetTrainingStatusAsync_WithNoModelFile_ReturnsEmptyFileInfo()
+        public void GetTrainingStatusAsync_WithNoModelFile_ReturnsEmptyFileInfo()
         {
             // Arrange
             _modelPersistence.GetModelFileInfo(Arg.Any<string>()).Returns((ModelFileInfo)null);
@@ -151,7 +151,7 @@ namespace Tests.Features.MachineLearning.Services
         }
 
         [Test]
-        public async Task GetTrainingStatusAsync_WithExistingModelFile_ReturnsFileInfo()
+        public void GetTrainingStatusAsync_WithExistingModelFile_ReturnsFileInfo()
         {
             // Arrange
             var testFileInfo = new ModelFileInfo
@@ -402,47 +402,47 @@ namespace Tests.Features.MachineLearning.Services
         #region Load Existing Model Tests
 
         [Test]
-        public async Task LoadExistingModelAsync_WithExistingModel_LoadsModel()
+        public void LoadExistingModelAsync_WithExistingModel_LoadsModel()
         {
             // Arrange
             var mockModel = Substitute.For<ITransformer>();
             _modelPersistence.ModelExists(Arg.Any<string>()).Returns(true);
-            _modelPersistence.LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>()).Returns(mockModel);
+            _modelPersistence.LoadModel(Arg.Any<string>(), Arg.Any<MLContext>()).Returns(mockModel);
 
             // Act
-            await _trainingService.LoadExistingModelAsync();
+            _trainingService.LoadExistingModel();
 
             // Assert
-            await _modelPersistence.Received(1).LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>());
-            
+            _modelPersistence.Received(1).LoadModel(Arg.Any<string>(), Arg.Any<MLContext>());
+
             // Model should now be cached
             var cachedModel = _trainingService.GetCurrentModel();
             cachedModel.Should().NotBeNull();
         }
 
         [Test]
-        public async Task LoadExistingModelAsync_WithNoExistingModel_DoesNotLoadModel()
+        public void LoadExistingModelAsync_WithNoExistingModel_DoesNotLoadModel()
         {
             // Arrange
             _modelPersistence.ModelExists(Arg.Any<string>()).Returns(false);
 
             // Act
-            await _trainingService.LoadExistingModelAsync();
+            _trainingService.LoadExistingModel();
 
             // Assert
-            await _modelPersistence.DidNotReceive().LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>());
+            _modelPersistence.DidNotReceive().LoadModel(Arg.Any<string>(), Arg.Any<MLContext>());
         }
 
         [Test]
-        public async Task LoadExistingModelAsync_WithLoadException_DoesNotThrow()
+        public void LoadExistingModelAsync_WithLoadException_DoesNotThrow()
         {
             // Arrange
             _modelPersistence.ModelExists(Arg.Any<string>()).Returns(true);
-            _modelPersistence.LoadModelAsync(Arg.Any<string>(), Arg.Any<MLContext>())
+            _modelPersistence.LoadModel(Arg.Any<string>(), Arg.Any<MLContext>())
                 .Throws(new InvalidOperationException("Model file corrupted"));
 
             // Act & Assert - Should not throw, should log error and continue
-            await _trainingService.LoadExistingModelAsync();
+            _trainingService.LoadExistingModel();
 
             // Service should continue running even if model loading fails
             var status = _trainingService.GetTrainingStatus();

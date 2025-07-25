@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
             _logger = logger;
         }
 
-        public async Task<ModelStatusDto> Handle(
+        public Task<ModelStatusDto> Handle(
             GetModelStatusQuery request, 
             CancellationToken cancellationToken)
         {
@@ -33,12 +33,12 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
             {
                 var isAvailable = _predictionService.IsModelAvailable();
                 
-                return new ModelStatusDto
+                return Task.FromResult(new ModelStatusDto
                 {
                     ModelAvailable = isAvailable,
                     Status = isAvailable ? "Ready" : "Training or Not Available",
                     LastChecked = DateTime.UtcNow
-                };
+                });
             }
             catch (Exception ex)
             {

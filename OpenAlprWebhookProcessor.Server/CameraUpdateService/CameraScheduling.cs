@@ -12,7 +12,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         public static async Task ExecuteSingleDayNightTaskAsync(
             SunriseSunset sunriseSunset,
             Guid cameraId,
-            IBackgroundJobService backgroundJobService)
+            IBackgroundJobService backgroundJobService,
+            CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(backgroundJobService);
 

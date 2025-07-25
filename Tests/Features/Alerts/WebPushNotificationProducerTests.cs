@@ -293,7 +293,7 @@ namespace Tests.Features.Alerts
         }
 
         [Test]
-        public async Task VerifyCredentialsAsync_WithNoSettings_DoesNotThrow()
+        public void VerifyCredentialsAsync_WithNoSettings_DoesNotThrow()
         {
             // Arrange
             var cancellationToken = GetCancellationToken();

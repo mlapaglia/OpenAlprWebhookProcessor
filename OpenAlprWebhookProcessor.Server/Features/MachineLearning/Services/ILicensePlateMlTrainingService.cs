@@ -11,6 +11,6 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
         
         ITransformer GetCurrentModel();
         
-        Task LoadExistingModelAsync();
+        void LoadExistingModel();
     }
 } 

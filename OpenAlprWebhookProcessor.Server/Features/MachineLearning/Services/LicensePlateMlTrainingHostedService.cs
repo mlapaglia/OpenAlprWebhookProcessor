@@ -31,7 +31,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
             try
             {
-                await _trainingService.LoadExistingModelAsync();
+                _trainingService.LoadExistingModel();
                 
                 var trainingInterval = _configuration.TrainingInterval;
                 _trainingTimer = new Timer(

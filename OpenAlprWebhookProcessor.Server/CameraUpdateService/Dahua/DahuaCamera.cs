@@ -1,7 +1,7 @@
 ﻿using Flurl.Http;
 using Flurl.Http.Configuration;
 using OpenAlprWebhookProcessor.CameraUpdateService;
-
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -63,7 +63,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
                 response.ResponseMessage.EnsureSuccessStatusCode();
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error setting video overlay for camera {_camera.Id}: {ex.Message}", ex);
             }
@@ -83,7 +83,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
                 response.ResponseMessage.EnsureSuccessStatusCode();
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error setting sunrise/sunset for camera {_camera.Id}: {ex.Message}", ex);
             }
@@ -118,7 +118,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
                 return await response.GetStreamAsync();
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error getting snapshot from camera {_camera.Id}: {ex.Message}", ex);
             }
@@ -141,7 +141,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
                 response.ResponseMessage.EnsureSuccessStatusCode();
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error setting zoom and focus for camera {_camera.Id}: {ex.Message}", ex);
             }
@@ -166,7 +166,7 @@ namespace OpenAlprWebhookProcessor.Cameras
                     Zoom = decimal.Parse(ZoomRegex().Match(responseText).Groups[1].Value),
                 };
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error getting zoom and focus from camera {_camera.Id}: {ex.Message}", ex);
             }
@@ -187,7 +187,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
                 return bool.Parse(SuccessRegex().Match(responseText).Groups[1].Value);
             }
-            catch (FlurlHttpException ex)
+            catch (Exception ex)
             {
                 throw new HttpRequestException($"Error triggering auto focus for camera {_camera.Id}: {ex.Message}", ex);
             }

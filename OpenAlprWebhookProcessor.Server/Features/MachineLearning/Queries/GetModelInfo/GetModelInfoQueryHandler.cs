@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
             _logger = logger;
         }
 
-        public async Task<ModelInfoDto> Handle(
+        public Task<ModelInfoDto> Handle(
             GetModelInfoQuery request, 
             CancellationToken cancellationToken)
         {
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
             {
                 var isAvailable = _predictionService.IsModelAvailable();
                 
-                return new ModelInfoDto
+                return Task.FromResult(new ModelInfoDto
                 {
                     ModelAvailable = isAvailable,
                     ModelType = "FastTree Regression",
@@ -47,7 +47,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
                     Description = "Predicts when a license plate will next be seen based on historical patterns",
                     TrainingSchedule = "Every 6 hours",
                     LastUpdated = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC")
-                };
+                });
             }
             catch (Exception ex)
             {

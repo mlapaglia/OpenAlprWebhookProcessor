@@ -171,7 +171,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             }
         }
 
-        public async Task LoadExistingModelAsync()
+        public void LoadExistingModel()
         {
             var modelPath = _configuration.GetModelPath();
 
@@ -183,7 +183,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
             try
             {
-                var model = await _modelPersistence.LoadModelAsync(modelPath, _mlContext);
+                var model = _modelPersistence.LoadModel(modelPath, _mlContext);
 
                 if (model != null)
                 {

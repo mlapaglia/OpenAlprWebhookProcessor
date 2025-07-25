@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
             _logger = logger;
         }
 
-        public async Task<TrainingStatusDto> Handle(
+        public Task<TrainingStatusDto> Handle(
             GetTrainingStatusQuery request, 
             CancellationToken cancellationToken)
         {
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
             {
                 var status = _trainingService.GetTrainingStatus();
                 
-                return new TrainingStatusDto
+                return Task.FromResult(new TrainingStatusDto
                 {
                     IsTraining = status.IsTraining,
                     LastTrainingStarted = status.LastTrainingStarted,
@@ -59,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
                         MinimumModelQuality = 0.05,
                         BatchSize = 50000
                     }
-                };
+                });
             }
             catch (Exception ex)
             {

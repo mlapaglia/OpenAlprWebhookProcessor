@@ -182,30 +182,30 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         #region LoadModelAsync Tests
 
         [Test]
-        public async Task LoadModelAsync_WhenFileExists_ReturnsModel()
+        public void LoadModelAsync_WhenFileExists_ReturnsModel()
         {
             // Arrange
             var modelPath = Path.Combine("models", "test-model.zip");
-            
+
             // Create a simple model to serialize
             var dataView = _mlContext.Data.LoadFromEnumerable(new[]
             {
                 new { Value = 1.0f },
                 new { Value = 2.0f }
             });
-            
+
             var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
             var model = pipeline.Fit(dataView);
-            
+
             // Save the model to get real model data
             using var memoryStream = new MemoryStream();
             _mlContext.Model.Save(model, dataView.Schema, memoryStream);
             var modelData = memoryStream.ToArray();
-            
+
             _mockFileSystem.AddFile(modelPath, new MockFileData(modelData));
 
             // Act
-            var result = await _service.LoadModelAsync(modelPath, _mlContext);
+            var result = _service.LoadModel(modelPath, _mlContext);
 
             // Assert
             result.Should().NotBeNull();
@@ -213,50 +213,50 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
         }
 
         [Test]
-        public async Task LoadModelAsync_WhenFileDoesNotExist_ReturnsNull()
+        public void LoadModelAsync_WhenFileDoesNotExist_ReturnsNull()
         {
             // Arrange
             var modelPath = Path.Combine("models", "non-existent-model.zip");
 
             // Act
-            var result = await _service.LoadModelAsync(modelPath, _mlContext);
+            var result = _service.LoadModel(modelPath, _mlContext);
 
             // Assert
             result.Should().BeNull();
         }
 
         [Test]
-        public async Task LoadModelAsync_WithNullPath_ReturnsNull()
+        public void LoadModelAsync_WithNullPath_ReturnsNull()
         {
             // Act
-            var result = await _service.LoadModelAsync(null, _mlContext);
+            var result = _service.LoadModel(null, _mlContext);
 
             // Assert
             result.Should().BeNull();
         }
 
         [Test]
-        public async Task LoadModelAsync_WithEmptyFile_ThrowsException()
+        public void LoadModelAsync_WithEmptyFile_ThrowsException()
         {
             // Arrange
             var modelPath = Path.Combine("models", "empty-model.zip");
             _mockFileSystem.AddFile(modelPath, new MockFileData(""));
 
             // Act & Assert
-            var act = async () => await _service.LoadModelAsync(modelPath, _mlContext);
-            await act.Should().ThrowAsync<Exception>();
+            var act = () => _service.LoadModel(modelPath, _mlContext);
+            act.Should().Throw<Exception>();
         }
 
         [Test]
-        public async Task LoadModelAsync_WithInvalidModelData_ThrowsException()
+        public void LoadModelAsync_WithInvalidModelData_ThrowsException()
         {
             // Arrange
             var modelPath = Path.Combine("models", "invalid-model.zip");
             _mockFileSystem.AddFile(modelPath, new MockFileData("invalid model data"));
 
             // Act & Assert
-            var act = async () => await _service.LoadModelAsync(modelPath, _mlContext);
-            await act.Should().ThrowAsync<Exception>();
+            var act = () => _service.LoadModel(modelPath, _mlContext);
+            act.Should().Throw<Exception>();
         }
 
         #endregion
@@ -377,7 +377,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
 
             // Act
             await _service.SaveModelAsync(originalModel, modelPath, _mlContext);
-            var loadedModel = await _service.LoadModelAsync(modelPath, _mlContext);
+            var loadedModel = _service.LoadModel(modelPath, _mlContext);
 
             // Assert
             loadedModel.Should().NotBeNull();
@@ -429,7 +429,7 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
             savedInfo.LastModified.Should().NotBeNull();
 
             // 4. Load the model
-            var loadedModel = await _service.LoadModelAsync(modelPath, _mlContext);
+            var loadedModel = _service.LoadModel(modelPath, _mlContext);
             loadedModel.Should().NotBeNull();
             loadedModel.Should().BeAssignableTo<ITransformer>();
         }

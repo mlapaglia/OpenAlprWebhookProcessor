@@ -6,25 +6,47 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 {
     public interface ICameraUpdateService
     {
-        Task ScheduleOverlayRequestAsync(CameraUpdateRequest cameraUpdateRequest);
+        Task ScheduleOverlayRequestAsync(
+            CameraUpdateRequest cameraUpdateRequest,
+            CancellationToken cancellationToken = default);
 
-        Task ScheduleDayNightTaskAsync();
+        Task ScheduleDayNightTaskAsync(CancellationToken cancellationToken = default);
 
-        Task DeleteSunriseSunsetAsync(Guid cameraId);
+        Task DeleteSunriseSunsetAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken = default);
 
-        Task SetZoomAndFocusAsync(Guid cameraId, ZoomFocus zoomAndFocus, CancellationToken cancellationToken);
+        Task SetZoomAndFocusAsync(
+            Guid cameraId,
+            ZoomFocus zoomAndFocus,
+            CancellationToken cancellationToken);
 
-        Task<bool> TriggerAutofocusAsync(Guid cameraId, CancellationToken cancellationToken);
+        Task<bool> TriggerAutofocusAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken);
 
-        Task<ZoomFocus> GetZoomAndFocusAsync(Guid cameraId, CancellationToken cancellationToken);
+        Task<ZoomFocus> GetZoomAndFocusAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken);
 
-        Task EnqueueDayNightAsync(Guid cameraId, SunriseSunset sunriseSunset);
+        Task EnqueueDayNightAsync(
+            Guid cameraId,
+            SunriseSunset sunriseSunset,
+            CancellationToken cancellationToken = default);
 
-        Task ProcessSunriseSunsetJobAsync(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob);
+        Task ProcessSunriseSunsetJobAsync(
+            Guid cameraId,
+            SunriseSunset sunriseSunset,
+            bool scheduleNextJob,
+            CancellationToken cancellationToken = default);
 
-        Task ProcessJobAsync(CameraUpdateRequest cameraUpdateRequest);
+        Task ProcessJobAsync(
+            CameraUpdateRequest cameraUpdateRequest,
+            CancellationToken cancellationToken = default);
 
-        Task ClearExpiredOverlayAsync(Guid cameraId);
+        Task ClearExpiredOverlayAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken = default);
 
         Task ForceClearOverlaysAsync(CancellationToken cancellationToken = default);
     }

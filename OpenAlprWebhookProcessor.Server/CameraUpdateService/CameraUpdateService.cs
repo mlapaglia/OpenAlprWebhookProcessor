@@ -26,13 +26,16 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _backgroundJobService = backgroundJobService ?? throw new ArgumentNullException(nameof(backgroundJobService));
         }
 
-        public async Task DeleteSunriseSunsetAsync(Guid cameraId)
+        public async Task DeleteSunriseSunsetAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
             var cameraToUpdate = await unitOfWork.Cameras.FirstOrDefaultAsync(
-                x => x.Id == cameraId);
+                x => x.Id == cameraId,
+                cancellationToken);
 
             if (cameraToUpdate == null)
             {
@@ -44,14 +47,15 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 _backgroundJobService.DeleteJob(cameraToUpdate.NextDayNightScheduleId);
 
                 cameraToUpdate.NextDayNightScheduleId = string.Empty;
-                await unitOfWork.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             }
         }
 
         public async Task ProcessSunriseSunsetJobAsync(
             Guid cameraId,
             SunriseSunset sunriseSunset,
-            bool scheduleNextJob)
+            bool scheduleNextJob,
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -60,37 +64,37 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _logger.LogInformation("Setting {SunriseSunset} for camera {CameraId}", sunriseSunset, cameraId);
 
             var cameraToUpdate = await unitOfWork.Cameras.FirstOrDefaultAsync(
-                x => x.Id == cameraId);
+                x => x.Id == cameraId,
+                cancellationToken);
 
             if (cameraToUpdate == null)
             {
                 throw new ArgumentException($"Camera not found: {cameraId}", nameof(cameraId));
             }
 
-            var updateRequest = new CameraUpdateRequest
-            {
-                Id = cameraId,
-                LicensePlate = sunriseSunset == SunriseSunset.Sunrise ? "DAY" : "NIGHT",
-                IsTest = true,
-                IsSinglePlate = false,
-                IsPreviewGroup = false,
-                LicensePlateImageUuid = Guid.NewGuid().ToString()
-            };
+            var camera = cameraFactory.Create(
+                cameraToUpdate.Manufacturer,
+                cameraToUpdate);
 
-            var camera = cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
+            await camera.TriggerDayNightModeAsync(
+                sunriseSunset,
+                cancellationToken);
 
-            await camera.SetCameraTextAsync(updateRequest, default);
-
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             if (scheduleNextJob)
             {
                 _logger.LogInformation("Scheduling additional sunrise/sunset tasks after completing task for {CameraId}", cameraId);
-                await CameraScheduling.ScheduleDayNightTasksAsync(unitOfWork, _backgroundJobService);
+                await CameraScheduling.ScheduleDayNightTasksAsync(
+                    unitOfWork,
+                    _backgroundJobService,
+                    cancellationToken);
             }
         }
 
-        public async Task ClearExpiredOverlayAsync(Guid cameraId)
+        public async Task ClearExpiredOverlayAsync(
+            Guid cameraId,
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -99,7 +103,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _logger.LogInformation("Clearing expired overlay for camera {CameraId}", cameraId);
 
             var cameraToUpdate = await unitOfWork.Cameras.FirstOrDefaultAsync(
-                x => x.Id == cameraId);
+                x => x.Id == cameraId,
+                cancellationToken);
 
             if (cameraToUpdate == null)
             {
@@ -110,10 +115,10 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 var camera = cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
-                await camera.ClearCameraTextAsync(default);
+                await camera.ClearCameraTextAsync(cancellationToken);
 
                 cameraToUpdate.NextClearOverlayScheduleId = string.Empty;
-                await unitOfWork.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {
@@ -122,29 +127,37 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public async Task ScheduleDayNightTaskAsync()
+        public async Task ScheduleDayNightTaskAsync(CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            await CameraScheduling.ScheduleDayNightTasksAsync(unitOfWork, _backgroundJobService);
+            await CameraScheduling.ScheduleDayNightTasksAsync(unitOfWork, _backgroundJobService, cancellationToken);
         }
 
         public async Task EnqueueDayNightAsync(
             Guid cameraId,
-            SunriseSunset sunriseSunset)
+            SunriseSunset sunriseSunset,
+            CancellationToken cancellationToken = default)
         {
             await CameraScheduling.ExecuteSingleDayNightTaskAsync(
                 sunriseSunset,
                 cameraId,
-                _backgroundJobService);
+                _backgroundJobService,
+                cancellationToken);
         }
 
-        public async Task ScheduleOverlayRequestAsync(CameraUpdateRequest cameraUpdateRequest)
+        public async Task ScheduleOverlayRequestAsync(
+            CameraUpdateRequest cameraUpdateRequest,
+            CancellationToken cancellationToken = default)
         {
-            await _backgroundJobService.EnqueueProcessJobAsync(cameraUpdateRequest);
+            await _backgroundJobService.EnqueueProcessJobAsync(
+                cameraUpdateRequest,
+                cancellationToken);
         }
 
-        public async Task ProcessJobAsync(CameraUpdateRequest cameraUpdateRequest)
+        public async Task ProcessJobAsync(
+            CameraUpdateRequest cameraUpdateRequest,
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -155,7 +168,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             try
             {
                 var cameraToUpdate = await unitOfWork.Cameras.FirstOrDefaultAsync(
-                    x => x.Id == cameraUpdateRequest.Id);
+                    x => x.Id == cameraUpdateRequest.Id,
+                    cancellationToken);
 
                 if (cameraToUpdate == null)
                 {
@@ -171,7 +185,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 var camera = cameraFactory.Create(cameraToUpdate.Manufacturer, cameraToUpdate);
 
-                await camera.SetCameraTextAsync(cameraUpdateRequest, default);
+                await camera.SetCameraTextAsync(cameraUpdateRequest, cancellationToken);
 
                 cameraToUpdate.NextClearOverlayScheduleId = _backgroundJobService.ScheduleClearOverlayJob(
                    cameraUpdateRequest.Id,
@@ -185,7 +199,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                     cameraToUpdate.LatestProcessedPlateUuid = cameraUpdateRequest.LicensePlateImageUuid;
                 }
 
-                await unitOfWork.SaveChangesAsync();
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation("Completed processing job for plate: {PlateNumber}", cameraUpdateRequest.LicensePlate);
             }
@@ -198,7 +212,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         public async Task<ZoomFocus> GetZoomAndFocusAsync(
             Guid cameraId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -223,7 +237,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         public async Task SetZoomAndFocusAsync(
             Guid cameraId,
             ZoomFocus zoomAndFocus,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -242,12 +256,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 dbCamera.Manufacturer,
                 dbCamera);
 
-            await camera.SetZoomAndFocusAsync(zoomAndFocus, cancellationToken);
+            await camera.SetZoomAndFocusAsync(
+                zoomAndFocus,
+                cancellationToken);
         }
 
         public async Task<bool> TriggerAutofocusAsync(
             Guid cameraId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -290,7 +306,6 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error clearing overlay for camera {CameraId}", cameraToUpdate.Id);
-                    // Continue processing other cameras
                 }
             }
 

@@ -29,7 +29,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task EnqueueProcessJobAsync(CameraUpdateRequest request)
+        public async Task EnqueueProcessJobAsync(CameraUpdateRequest request,
+            CancellationToken cancellationToken = default)
         {
             if (request == null) return;
 
@@ -45,7 +46,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public async Task EnqueueProcessSunriseSunsetJobAsync(Guid cameraId, SunriseSunset sunriseSunset, bool scheduleNextJob)
+        public async Task EnqueueProcessSunriseSunsetJobAsync(
+            Guid cameraId,
+            SunriseSunset sunriseSunset,
+            bool scheduleNextJob,
+            CancellationToken cancellationToken = default)
         {
             if (cameraId == Guid.Empty) return;
 
@@ -53,7 +58,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 using var scope = _serviceProvider.CreateScope();
                 var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
-                await cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+                await cameraUpdateService.ProcessSunriseSunsetJobAsync(
+                    cameraId,
+                    sunriseSunset,
+                    scheduleNextJob,
+                    cancellationToken);
             }
             catch (Exception ex)
             {
@@ -61,7 +70,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public string ScheduleClearOverlayJob(Guid cameraId, TimeSpan delay)
+        public string ScheduleClearOverlayJob(
+            Guid cameraId,
+            TimeSpan delay)
         {
             if (cameraId == Guid.Empty || delay < TimeSpan.Zero) return null;
 
@@ -107,14 +118,20 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             Guid cameraId,
             SunriseSunset sunriseSunset,
             bool scheduleNextJob,
-            DateTimeOffset scheduleAt)
+            DateTimeOffset scheduleAt,
+            CancellationToken cancellationToken = default)
         {
             if (cameraId == Guid.Empty) return null;
 
             var delay = scheduleAt - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
-                await EnqueueProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+                await EnqueueProcessSunriseSunsetJobAsync(
+                    cameraId,
+                    sunriseSunset,
+                    scheduleNextJob,
+                    cancellationToken);
+
                 return null;
             }
 

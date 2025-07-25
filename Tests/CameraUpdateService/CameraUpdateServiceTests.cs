@@ -144,7 +144,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ProcessSunriseSunsetJobAsync_CameraNotFound_ThrowsArgumentException()
+        public void ProcessSunriseSunsetJobAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();
@@ -233,7 +233,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ClearExpiredOverlayAsync_CameraNotFound_ThrowsArgumentException()
+        public void ClearExpiredOverlayAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();
@@ -311,7 +311,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ProcessJobAsync_CameraNotFound_ThrowsArgumentException()
+        public void ProcessJobAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var request = new CameraUpdateRequest { Id = Guid.NewGuid() };
@@ -392,7 +392,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task GetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
+        public void GetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();
@@ -429,7 +429,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task SetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
+        public void SetZoomAndFocusAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();
@@ -466,7 +466,7 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task TriggerAutofocusAsync_CameraNotFound_ThrowsArgumentException()
+        public void TriggerAutofocusAsync_CameraNotFound_ThrowsArgumentException()
         {
             // Arrange
             var cameraId = Guid.NewGuid();

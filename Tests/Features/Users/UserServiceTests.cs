@@ -56,7 +56,7 @@ namespace Tests.Features.Users
         }
 
         [Test]
-        public async Task CreateAsync_WithEmptyPassword_ThrowsAppException()
+        public void CreateAsync_WithEmptyPassword_ThrowsAppException()
         {
             // Arrange
             var user = new User { Username = "testuser" };
@@ -68,7 +68,7 @@ namespace Tests.Features.Users
         }
 
         [Test]
-        public async Task CreateAsync_WithNullPassword_ThrowsAppException()
+        public void CreateAsync_WithNullPassword_ThrowsAppException()
         {
             // Arrange
             var user = new User { Username = "testuser" };
@@ -143,7 +143,7 @@ namespace Tests.Features.Users
         }
 
         [Test]
-        public async Task UpdateAsync_WithNonExistentUser_ThrowsAppException()
+        public void UpdateAsync_WithNonExistentUser_ThrowsAppException()
         {
             // Arrange
             var user = new User { Id = 999, Username = "nonexistent" };
@@ -189,7 +189,7 @@ namespace Tests.Features.Users
         }
 
         [Test]
-        public async Task DeleteAsync_WithNonExistentUser_DoesNotThrow()
+        public void DeleteAsync_WithNonExistentUser_DoesNotThrow()
         {
             // Arrange & Act & Assert
             Assert.DoesNotThrowAsync(() => _userService.DeleteAsync(999));
@@ -324,7 +324,7 @@ namespace Tests.Features.Users
         }
 
         [Test]
-        public async Task RefreshTokenAsync_WithInvalidToken_ThrowsArgumentException()
+        public void RefreshTokenAsync_WithInvalidToken_ThrowsArgumentException()
         {
             // Arrange
             var invalidToken = "invalid-token";

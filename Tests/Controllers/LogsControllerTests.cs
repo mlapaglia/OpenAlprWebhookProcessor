@@ -1,10 +1,8 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.SystemLogs;
 using OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs;
-using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using Tests.TestHelpers;

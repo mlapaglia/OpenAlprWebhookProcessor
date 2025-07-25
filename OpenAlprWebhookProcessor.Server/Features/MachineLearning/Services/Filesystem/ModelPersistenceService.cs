@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem
             };
         }
 
-        public async Task<ITransformer> LoadModelAsync(string modelPath, MLContext mlContext)
+        public ITransformer LoadModel(string modelPath, MLContext mlContext)
         {
             if (!_fileSystem.File.Exists(modelPath))
             {

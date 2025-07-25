@@ -67,7 +67,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         }
 
         [Test]
-        public async Task HandleAsync_WithNonExistentPlateId_ThrowsArgumentException()
+        public void HandleAsync_WithNonExistentPlateId_ThrowsArgumentException()
         {
             // Arrange
             var nonExistentPlateId = Guid.NewGuid();
