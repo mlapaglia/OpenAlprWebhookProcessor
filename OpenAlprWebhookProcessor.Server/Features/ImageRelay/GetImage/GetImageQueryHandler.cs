@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 
         public async Task<Stream> Handle(
             GetImageQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .Where(x => x.OpenAlprUuid == request.ImageId)

@@ -20,13 +20,8 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser
             _passwordService = passwordService;
         }
 
-        public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(request.Password))
-            {
-                throw new AppException("Password is required");
-            }
-
             var usernameExists = await _usersUnitOfWork.Users.UsernameExistsAsync(request.Username, cancellationToken);
             if (usernameExists)
             {

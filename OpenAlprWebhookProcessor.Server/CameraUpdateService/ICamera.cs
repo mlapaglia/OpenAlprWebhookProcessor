@@ -7,24 +7,24 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
     public interface ICamera
     {
         Task ClearCameraTextAsync(
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task SetCameraTextAsync(
             CameraUpdateRequest updateRequest,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task TriggerDayNightModeAsync(
             SunriseSunset sunriseSunset,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task SetZoomAndFocusAsync(
             ZoomFocus zoomAndFocus,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
-        Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken);
+        Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken = default);
 
-        Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken);
+        Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken = default);
 
-        Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken);
+        Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken = default);
     }
 }

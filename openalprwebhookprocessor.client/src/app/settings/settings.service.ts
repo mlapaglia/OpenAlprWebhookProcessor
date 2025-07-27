@@ -68,4 +68,8 @@ export class SettingsService {
   addAlert(alert: Alert) {
     return this.http.post('/api/settings/alerts/add', alert)
   }
+
+  cleanupDatabase(): Observable<null> {
+    return this.http.post<null>('/api/settings/cleanup/database', null)
+  }
 }

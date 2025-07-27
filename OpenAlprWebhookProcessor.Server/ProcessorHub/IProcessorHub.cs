@@ -22,5 +22,7 @@ namespace OpenAlprWebhookProcessor.ProcessorHub
             string ipAddress);
 
         Task ScrapeFinished();
+
+        Task DatabaseCleanupCompleted();
     }
 }

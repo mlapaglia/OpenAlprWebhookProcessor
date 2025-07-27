@@ -15,6 +15,7 @@ import { AddEditComponent } from './settings/users/add-edit.component'
 import { UsersComponent } from './settings/users/users.component'
 import { LoginComponent } from './account/login.component'
 import { RegisterComponent } from './account/register.component'
+import { DebugComponent } from './settings/debug/debug.component'
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
@@ -34,6 +35,7 @@ const routes: Routes = [
       { path: 'agent', component: OpenalprAgentComponent },
       { path: 'alerts', component: AlertsComponent },
       { path: 'cameras', component: CamerasComponent },
+      { path: 'debug', component: DebugComponent },
       { path: 'enrichers', component: EnrichersComponent },
       { path: 'forwards', component: ForwardsComponent },
       { path: 'ignores', component: IgnoresComponent },

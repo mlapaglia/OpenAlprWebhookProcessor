@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertIgnoresCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertIgnoresCommand request, CancellationToken cancellationToken = default)
         {
             var ignores = request.Ignores.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
 

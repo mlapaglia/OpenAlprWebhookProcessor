@@ -29,7 +29,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
 
         public async Task SendAlertAsync(
             AlertUpdateRequest alert,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             }
         }
 
-        public async Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken)
+        public async Task<bool> ShouldSendAllPlatesAsync(CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -108,7 +108,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             }
         }
 
-        public async Task VerifyCredentialsAsync(CancellationToken cancellationToken)
+        public async Task VerifyCredentialsAsync(CancellationToken cancellationToken = default)
         {
             using (var scope = _serviceProvider.CreateScope())
             {

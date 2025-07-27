@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredic
 
         public async Task<List<LicensePlatePredictionResult>> Handle(
             GetTopPredictionsQuery request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (request.Count <= 0 || request.Count > 50)
             {

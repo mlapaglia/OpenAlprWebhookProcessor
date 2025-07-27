@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<bool> Handle(CanRegisterQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(CanRegisterQuery request, CancellationToken cancellationToken = default)
         {
             return !await _usersUnitOfWork.Users.AnyAsync(x => true, cancellationToken);
         }

@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
             _hydrationService = hydrationService;
         }
 
-        public Task Handle(AgentScrapeCommand request, CancellationToken cancellationToken)
+        public Task Handle(AgentScrapeCommand request, CancellationToken cancellationToken = default)
         {
             _hydrationService.StartHydration("hydration");
             return Task.CompletedTask;

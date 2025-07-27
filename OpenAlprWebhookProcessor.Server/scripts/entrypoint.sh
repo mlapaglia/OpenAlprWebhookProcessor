@@ -3,7 +3,6 @@ set -e
 
 echo "OpenAlprWebhookProcessor starting..."
 
-# Read connection strings from appsettings.json
 APPSETTINGS_FILE="appsettings.json"
 if [ -f "appsettings.Production.json" ]; then
     APPSETTINGS_FILE="appsettings.Production.json"
@@ -11,7 +10,6 @@ fi
 
 echo "Reading connection strings from $APPSETTINGS_FILE..."
 
-# Extract connection strings using jq
 PROCESSOR_CONNECTION=$(jq -r '.ConnectionStrings.ProcessorConnection // empty' "$APPSETTINGS_FILE")
 USERS_CONNECTION=$(jq -r '.ConnectionStrings.UsersConnection // empty' "$APPSETTINGS_FILE")
 
@@ -28,7 +26,6 @@ fi
 echo "Processor connection: $PROCESSOR_CONNECTION"
 echo "Users connection: $USERS_CONNECTION"
 
-# Function to ensure database directory exists
 ensure_db_directory() {
     local connection_string="$1"
     local db_path=$(echo "$connection_string" | sed -n 's/.*Data Source=\([^;]*\).*/\1/p')
@@ -40,11 +37,9 @@ ensure_db_directory() {
     fi
 }
 
-# Ensure directories exist for both databases
 ensure_db_directory "$PROCESSOR_CONNECTION"
 ensure_db_directory "$USERS_CONNECTION"
 
-# Run migrations for ProcessorConnection
 echo "Running migrations for ProcessorConnection..."
 ./processor-migrator --connection "$PROCESSOR_CONNECTION" 2>&1
 
@@ -56,7 +51,6 @@ else
     exit $MIGRATION_EXIT_CODE
 fi
 
-# Run migrations for UsersConnection  
 echo "Running migrations for UsersConnection..."
 ./users-migrator --connection "$USERS_CONNECTION" 2>&1
 

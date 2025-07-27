@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             return _reader.Count;
         }
 
-        public async IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await foreach (var request in _reader.ReadAllAsync(cancellationToken))
             {
@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             }
         }
 
-        public async Task ScheduleHydrationAsync(CancellationToken cancellationToken)
+        public async Task ScheduleHydrationAsync(CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();

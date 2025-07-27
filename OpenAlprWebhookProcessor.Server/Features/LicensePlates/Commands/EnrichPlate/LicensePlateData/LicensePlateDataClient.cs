@@ -35,7 +35,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
         public async Task<EnrichedLicensePlate> GetLicenseInformationAsync(
             string plateNumber,
             string state,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using var httpClient = _httpClientFactory.CreateClient();
 
@@ -77,7 +77,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
             };
         }
 
-        public async Task<bool> TestAsync(CancellationToken cancellationToken)
+        public async Task<bool> TestAsync(CancellationToken cancellationToken = default)
         {
             using var httpClient = _httpClientFactory.CreateClient();
             var response = await httpClient.GetAsync(
@@ -106,7 +106,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate.L
             return true;
         }
 
-        private async Task<string> GetApiKeyAsync(CancellationToken cancellationToken)
+        private async Task<string> GetApiKeyAsync(CancellationToken cancellationToken = default)
         {
             var enricher = await _unitOfWork.Enrichers.GetFirstAsync(cancellationToken);
             return enricher.ApiKey;

@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
         public async Task<byte[]> GetImageFromAgentAsync(
             Agent agent,
             string imageId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {
@@ -45,7 +45,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
         public async Task<byte[]> GetCropImageFromAgentAsync(
             Agent agent,
             string imageId,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await GetCropImageFromAgentAsync(
                 agent,
@@ -58,7 +58,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
             Agent agent,
             string imageId,
             string plateCoordinates,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (agent == null || string.IsNullOrWhiteSpace(agent.EndpointUrl))
             {

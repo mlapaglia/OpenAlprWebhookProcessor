@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<EnricherDto> Handle(GetEnrichersQuery request, CancellationToken cancellationToken)
+        public async Task<EnricherDto> Handle(GetEnrichersQuery request, CancellationToken cancellationToken = default)
         {
             var enricher = await _unitOfWork.Enrichers.GetFirstAsync(cancellationToken);
 

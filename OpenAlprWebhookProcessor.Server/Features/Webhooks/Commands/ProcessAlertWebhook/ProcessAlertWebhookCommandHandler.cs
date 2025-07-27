@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.WebhookProcessor;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessAlertWebhoo
             _groupWebhookHandler = groupWebhookHandler;
         }
 
-        public async Task Handle(ProcessAlertWebhookCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ProcessAlertWebhookCommand request, CancellationToken cancellationToken = default)
         {
             await _groupWebhookHandler.HandleWebhookAsync(
                 request.Webhook,

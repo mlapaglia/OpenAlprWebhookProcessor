@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape;
+using OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent;
@@ -150,6 +151,20 @@ namespace OpenAlprWebhookProcessor.Features.Settings
         {
             var command = new DeleteDebugPlatesCommand();
             await _mediator.Send(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Used to sanitize the database by removing images, obfuscating plate numbers, and removing
+        /// webhook settings and other personally identifiable contents.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost("cleanup/database")]
+        public async Task<IActionResult> CleanupDatabase(CancellationToken cancellationToken)
+        {
+            var command = new CleanupDatabaseCommand();
+            await _mediator.Send(command, cancellationToken);
+            return StatusCode(202);
         }
     }
 } 

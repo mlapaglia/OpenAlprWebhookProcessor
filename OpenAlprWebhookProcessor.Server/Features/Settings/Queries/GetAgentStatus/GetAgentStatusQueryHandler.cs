@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async Task<AgentStatusDto> Handle(GetAgentStatusQuery request, CancellationToken cancellationToken)
+        public async Task<AgentStatusDto> Handle(GetAgentStatusQuery request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover
 
         public async Task<PushoverRequest> Handle(
             GetPushoverQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var client = await _unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 

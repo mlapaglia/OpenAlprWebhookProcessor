@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
         }
 
         public async Task ClearCameraTextAsync(
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
 
@@ -70,7 +70,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         public async Task SetCameraTextAsync(
             CameraUpdateRequest updateRequest,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var videoOverlayRequest = CreateBaseVideoOverlayRequest();
 
@@ -113,7 +113,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         public async Task TriggerDayNightModeAsync(
             SunriseSunset sunriseSunset,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var xmlContent = $"<ImageChannel version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilter version=\"2.0\" xmlns=\"http://www.hikvision.com/ver20/XMLSchema\"><IrcutFilterType>{(sunriseSunset == SunriseSunset.Sunrise ? "day" : "night")}</IrcutFilterType></IrcutFilter></ImageChannel>";
 
@@ -135,7 +135,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         private async Task PushCameraTextAsync(
             VideoOverlay videoOverlay,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             string xmlContent;
             using (var stringWriter = new StringWriter())
@@ -193,7 +193,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
             };
         }
 
-        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
+        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -213,17 +213,17 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService.Hikvision
 
         public Task SetZoomAndFocusAsync(
             ZoomFocus zoomAndFocus,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
+        public Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
+        public Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

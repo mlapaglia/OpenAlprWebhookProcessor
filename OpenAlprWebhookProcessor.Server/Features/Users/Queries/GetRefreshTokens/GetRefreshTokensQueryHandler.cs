@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetRefreshTokens
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<List<RefreshToken>> Handle(GetRefreshTokensQuery request, CancellationToken cancellationToken)
+        public async Task<List<RefreshToken>> Handle(GetRefreshTokensQuery request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByIdWithRefreshTokensAsync(request.UserId, cancellationToken);
             return user?.RefreshTokens;

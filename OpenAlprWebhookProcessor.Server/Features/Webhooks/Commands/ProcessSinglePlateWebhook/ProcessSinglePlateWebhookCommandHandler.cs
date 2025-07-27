@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.WebhookProcessor;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessSinglePlate
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
         }
 
-        public async Task Handle(ProcessSinglePlateWebhookCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ProcessSinglePlateWebhookCommand request, CancellationToken cancellationToken = default)
         {
             await _singlePlateWebhookHandler.HandleWebhookAsync(
                 request.SinglePlate,

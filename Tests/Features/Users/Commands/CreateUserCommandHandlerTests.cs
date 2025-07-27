@@ -81,44 +81,7 @@ namespace Tests.Features.Users.Commands
             exception.Message.Should().Be("Username \"existinguser\" is already taken");
         }
 
-        [Test]
-        public void Handle_EmptyPassword_ThrowsAppException()
-        {
-            // Arrange
-            var command = new CreateUserCommand("John", "Doe", "johndoe", "");
 
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(() => 
-                _handler.Handle(command, GetCancellationToken()));
-
-            exception.Message.Should().Be("Password is required");
-        }
-
-        [Test]
-        public void Handle_NullPassword_ThrowsAppException()
-        {
-            // Arrange
-            var command = new CreateUserCommand("John", "Doe", "johndoe", null);
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(() => 
-                _handler.Handle(command, GetCancellationToken()));
-
-            exception.Message.Should().Be("Password is required");
-        }
-
-        [Test]
-        public void Handle_WhitespacePassword_ThrowsAppException()
-        {
-            // Arrange
-            var command = new CreateUserCommand("John", "Doe", "johndoe", "   ");
-
-            // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(() => 
-                _handler.Handle(command, GetCancellationToken()));
-
-            exception.Message.Should().Be("Password is required");
-        }
 
         [Test]
         public async Task Handle_EmptyFirstName_CreatesUserWithEmptyFirstName()

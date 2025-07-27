@@ -125,7 +125,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         }
 
         [HttpGet("model/status")]
-        public async Task<ActionResult<ModelStatusDto>> GetModelStatus(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<ModelStatusDto>> GetModelStatus(CancellationToken cancellationToken)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         }
 
         [HttpPost("model/retrain")]
-        public async Task<ActionResult<TrainingResultDto>> TriggerTraining(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<TrainingResultDto>> TriggerTraining(CancellationToken cancellationToken)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         }
 
         [HttpGet("model/info")]
-        public async Task<ActionResult<ModelInfoDto>> GetModelInfo(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<ModelInfoDto>> GetModelInfo(CancellationToken cancellationToken)
         {
             try
             {
@@ -183,7 +183,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning
         }
 
         [HttpGet("training/status")]
-        public async Task<ActionResult<TrainingStatusDto>> GetTrainingStatusAsync(CancellationToken cancellationToken = default)
+        public async Task<ActionResult<TrainingStatusDto>> GetTrainingStatusAsync(CancellationToken cancellationToken)
         {
             try
             {

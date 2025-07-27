@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch
 
         public async Task<List<LicensePlatePredictionResult>> Handle(
             PredictBatchQuery request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (request.Inputs == null || request.Inputs.Count == 0)
             {

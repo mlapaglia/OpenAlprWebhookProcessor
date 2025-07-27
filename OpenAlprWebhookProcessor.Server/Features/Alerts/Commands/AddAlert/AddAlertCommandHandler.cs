@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(AddAlertCommand request, CancellationToken cancellationToken)
+        public async Task Handle(AddAlertCommand request, CancellationToken cancellationToken = default)
         {
             var existingAlerts = await _unitOfWork.Alerts.FindAsync(
                 x => x.PlateNumber == request.Alert.PlateNumber.ToUpper(),

@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
             _backgroundJobService = backgroundJobService;
         }
 
-        public async Task<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken)
+        public async Task<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken = default)
         {
             var cameras = new List<CameraUpdateService.Camera>();
 

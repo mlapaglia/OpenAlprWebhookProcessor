@@ -1,7 +1,7 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.WebhookProcessor;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
             _hydrationService = hydrationService;
         }
 
-        public async Task Handle(UpsertAgentCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertAgentCommand request, CancellationToken cancellationToken = default)
         {
             var agent = request.Agent;
             var dbAgent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);

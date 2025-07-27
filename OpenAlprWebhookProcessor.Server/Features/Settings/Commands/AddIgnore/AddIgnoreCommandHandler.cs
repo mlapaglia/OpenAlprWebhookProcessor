@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(AddIgnoreCommand request, CancellationToken cancellationToken)
+        public async Task Handle(AddIgnoreCommand request, CancellationToken cancellationToken = default)
         {
             var ignore = request.Ignore;
 

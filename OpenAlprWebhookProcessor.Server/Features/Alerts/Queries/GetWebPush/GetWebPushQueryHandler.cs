@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetWebPush
 
         public async Task<WebPushRequest> Handle(
             GetWebPushQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var client = await _unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 

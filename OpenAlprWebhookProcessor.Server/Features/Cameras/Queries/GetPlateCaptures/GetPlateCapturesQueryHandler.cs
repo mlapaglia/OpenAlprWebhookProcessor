@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<string>> Handle(GetPlateCapturesQuery request, CancellationToken cancellationToken)
+        public async Task<List<string>> Handle(GetPlateCapturesQuery request, CancellationToken cancellationToken = default)
         {
             var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
             

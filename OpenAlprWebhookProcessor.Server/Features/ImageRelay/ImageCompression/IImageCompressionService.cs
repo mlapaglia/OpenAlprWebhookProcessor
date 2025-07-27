@@ -9,18 +9,18 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression
         Task<byte[]> GetImageFromAgentAsync(
             Agent agent,
             string imageId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task<byte[]> GetCropImageFromAgentAsync(
             Agent agent,
             string imageId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
 
         Task<byte[]> GetCropImageFromAgentAsync(
             Agent agent,
             string imageId,
             string plateCoordinates,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
     }
 }

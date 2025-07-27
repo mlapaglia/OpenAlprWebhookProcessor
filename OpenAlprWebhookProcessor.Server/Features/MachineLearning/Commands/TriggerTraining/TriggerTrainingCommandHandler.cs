@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTrai
 
         public async Task<TrainingResultDto> Handle(
             TriggerTrainingCommand request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             try
             {

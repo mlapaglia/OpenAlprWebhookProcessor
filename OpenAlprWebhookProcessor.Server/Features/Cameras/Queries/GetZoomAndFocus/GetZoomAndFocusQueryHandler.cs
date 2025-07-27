@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken)
+        public async Task<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken = default)
         {
             return await _cameraUpdateService.GetZoomAndFocusAsync(
                 request.CameraId,

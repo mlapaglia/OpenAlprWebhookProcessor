@@ -8,6 +8,9 @@ using System.IO;
 
 namespace OpenAlprWebhookProcessor.SystemLogs
 {
+    /// <summary>
+    /// Used in the `system-logs` frontend component
+    /// </summary>
     public class SignalrSink : ILogEventSink
     {
         private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;

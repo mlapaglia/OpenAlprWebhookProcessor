@@ -19,15 +19,15 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         Task SetZoomAndFocusAsync(
             Guid cameraId,
             ZoomFocus zoomAndFocus,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task<bool> TriggerAutofocusAsync(
             Guid cameraId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task<ZoomFocus> GetZoomAndFocusAsync(
             Guid cameraId,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task EnqueueDayNightAsync(
             Guid cameraId,

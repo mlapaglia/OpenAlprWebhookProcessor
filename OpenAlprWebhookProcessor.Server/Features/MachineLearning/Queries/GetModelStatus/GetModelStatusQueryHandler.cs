@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
 
         public Task<ModelStatusDto> Handle(
             GetModelStatusQuery request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             try
             {

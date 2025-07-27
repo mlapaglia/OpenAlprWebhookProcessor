@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
             _cameraFactory = cameraFactory ?? throw new ArgumentNullException(nameof(cameraFactory));
         }
 
-        public async Task<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken)
+        public async Task<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken = default)
         {
             var dbCamera = await _unitOfWork.Cameras.GetByIdAsync(
                 request.CameraId,

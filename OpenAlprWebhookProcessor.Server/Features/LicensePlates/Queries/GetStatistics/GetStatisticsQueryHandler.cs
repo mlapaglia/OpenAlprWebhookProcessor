@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
 
         public async Task<PlateStatistics> Handle(
             GetStatisticsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
             var plateNumber = request.PlateNumber;

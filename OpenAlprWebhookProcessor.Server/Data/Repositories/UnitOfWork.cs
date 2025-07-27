@@ -68,6 +68,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         public IMachineLearningConfigurationRepository MachineLearningConfigurations => _machineLearningConfigurationRepository ??= new MachineLearningConfigurationRepository(_context);
 
+        public ProcessorContext Context => _context;
+
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return await _context.SaveChangesAsync(cancellationToken);

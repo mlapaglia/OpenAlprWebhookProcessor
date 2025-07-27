@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TriggerAutofocus
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task<bool> Handle(TriggerAutofocusCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(TriggerAutofocusCommand request, CancellationToken cancellationToken = default)
         {
             return await _cameraUpdateService.TriggerAutofocusAsync(
                 request.CameraId,

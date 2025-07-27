@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<WebhookForwardDto>> Handle(GetWebhookForwardsQuery request, CancellationToken cancellationToken)
+        public async Task<List<WebhookForwardDto>> Handle(GetWebhookForwardsQuery request, CancellationToken cancellationToken = default)
         {
             var webhookForwards = await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken);
             var forwards = new List<WebhookForwardDto>();

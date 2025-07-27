@@ -8,10 +8,10 @@ namespace OpenAlprWebhookProcessor.Hydrator
     {
         void StartHydration(string name);
 
-        Task ScheduleHydrationAsync(CancellationToken cancellationToken);
+        Task ScheduleHydrationAsync(CancellationToken cancellationToken = default);
 
         int GetPendingHydrationCount();
 
-        IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync(CancellationToken cancellationToken);
+        IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync(CancellationToken cancellationToken = default);
     }
 }

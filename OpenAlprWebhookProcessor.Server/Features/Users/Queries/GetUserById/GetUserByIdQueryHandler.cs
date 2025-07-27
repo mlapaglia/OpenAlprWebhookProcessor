@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetUserById
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<User> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<User> Handle(GetUserByIdQuery request, CancellationToken cancellationToken = default)
         {
             return await _usersUnitOfWork.Users.GetByIdAsync(request.Id, cancellationToken);
         }

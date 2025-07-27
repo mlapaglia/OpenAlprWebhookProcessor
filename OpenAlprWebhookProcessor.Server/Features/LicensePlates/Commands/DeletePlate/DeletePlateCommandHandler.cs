@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(DeletePlateCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeletePlateCommand request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdAsync(
                 request.Id,

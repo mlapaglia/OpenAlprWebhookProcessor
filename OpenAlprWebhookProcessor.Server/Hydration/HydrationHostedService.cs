@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +56,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
             _logger.LogInformation("HydrationHostedService stopped.");
         }
 
-        private async Task ProcessHydrationRequestsAsync(CancellationToken cancellationToken)
+        private async Task ProcessHydrationRequestsAsync(CancellationToken cancellationToken = default)
         {
             await foreach (var hydrationRequest in _hydrationService.GetConsumingHydrationRequestsAsync(cancellationToken))
             {
@@ -84,7 +84,7 @@ namespace OpenAlprWebhookProcessor.Hydrator
 
         private async Task ProcessSingleHydrationRequest(
             string requestName,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             using var scope = _serviceProvider.CreateScope();
             var scopedLogger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationHostedService>>();

@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken)
+        public async Task<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken = default)
         {
             var ignoredPlates = await GetIgnoredPlatesAsync(cancellationToken);
             var platesToIgnoreForFiltering = request.FilterIgnoredPlates ? new List<string>() : ignoredPlates;
@@ -76,12 +76,12 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
             };
         }
 
-        private async Task<List<string>> GetIgnoredPlatesAsync(CancellationToken cancellationToken)
+        private async Task<List<string>> GetIgnoredPlatesAsync(CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.Ignores.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
 
-        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
+        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.Alerts.SelectAsync(x => x.PlateNumber, cancellationToken);
         }

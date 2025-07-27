@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByIdAsync(request.Id, cancellationToken);
 

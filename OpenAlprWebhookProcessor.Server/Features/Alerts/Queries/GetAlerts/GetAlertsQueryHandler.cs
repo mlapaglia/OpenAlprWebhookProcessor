@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetAlerts
 
         public async Task<List<Alert>> Handle(
             GetAlertsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var dbAlerts = await _unitOfWork.Alerts.GetAllAsync(cancellationToken);
 

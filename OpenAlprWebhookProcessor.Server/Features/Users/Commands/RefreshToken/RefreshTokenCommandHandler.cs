@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken
             _jwtService = jwtService;
         }
 
-        public async Task<AuthenticateResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<AuthenticateResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByRefreshTokenAsync(request.Token, cancellationToken);
 

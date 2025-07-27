@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("CameraUpdateHostedService starting...");
 
@@ -37,7 +37,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogDebug("CameraUpdateHostedService stopping...");
 

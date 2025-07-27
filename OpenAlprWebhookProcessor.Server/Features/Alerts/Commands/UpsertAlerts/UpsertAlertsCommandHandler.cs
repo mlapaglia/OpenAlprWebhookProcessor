@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertAlerts
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertAlertsCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertAlertsCommand request, CancellationToken cancellationToken = default)
         {
             var alerts = request.Alerts.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
 

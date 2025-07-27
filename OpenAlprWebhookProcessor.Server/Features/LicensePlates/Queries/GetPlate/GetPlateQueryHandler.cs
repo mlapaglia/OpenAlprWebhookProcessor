@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken)
+        public async Task<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(request.Id, cancellationToken);
             
@@ -30,12 +30,12 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
             return PlateMapper.MapPlate(plateGroup, platesToIgnore, platesToAlert);
         }
 
-        private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken)
+        private async Task<List<string>> GetPlatesToIgnoreAsync(CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.Ignores.SelectAsync(x => x.PlateNumber, cancellationToken);
         }
 
-        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken)
+        private async Task<List<string>> GetPlatesToAlertAsync(CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.Alerts.SelectAsync(x => x.PlateNumber, cancellationToken);
         }

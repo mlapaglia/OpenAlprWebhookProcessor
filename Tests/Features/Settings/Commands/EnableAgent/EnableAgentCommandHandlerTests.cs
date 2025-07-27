@@ -2,7 +2,7 @@ using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.EnableAgent

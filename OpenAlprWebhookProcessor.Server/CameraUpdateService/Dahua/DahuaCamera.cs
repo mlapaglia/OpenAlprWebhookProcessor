@@ -24,7 +24,7 @@ namespace OpenAlprWebhookProcessor.Cameras
         }
 
         public async Task ClearCameraTextAsync(
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             await SendUpdateCommandAsync(
                 "||||",
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task SetCameraTextAsync(
             CameraUpdateRequest updateRequest,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             await SendUpdateCommandAsync(
                 $"{updateRequest.LicensePlate}|{updateRequest.VehicleDescription}|Processing Time: {updateRequest.OpenAlprProcessingTimeMs}ms|Confidence: {updateRequest.ProcessedPlateConfidence}%",
@@ -42,7 +42,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task TriggerDayNightModeAsync(
             SunriseSunset sunriseSunset,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             await SendDayNightCommandAsync(
                 sunriseSunset,
@@ -51,7 +51,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private async Task SendUpdateCommandAsync(
             string textToSet,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -71,7 +71,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         private async Task SendDayNightCommandAsync(
             SunriseSunset sunriseSunset,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -106,7 +106,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             });
         }
 
-        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken)
+        public async Task<Stream> GetSnapshotAsync(CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -126,7 +126,7 @@ namespace OpenAlprWebhookProcessor.Cameras
 
         public async Task SetZoomAndFocusAsync(
             ZoomFocus zoomAndFocus,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -147,7 +147,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
         }
 
-        public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken)
+        public async Task<ZoomFocus> GetZoomAndFocusAsync(CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 
@@ -172,7 +172,7 @@ namespace OpenAlprWebhookProcessor.Cameras
             }
         }
 
-        public async Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken)
+        public async Task<bool> TriggerAutoFocusAsync(CancellationToken cancellationToken = default)
         {
             var client = GetConfiguredFlurlClient();
 

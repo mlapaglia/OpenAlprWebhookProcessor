@@ -55,7 +55,7 @@ namespace Tests.TestHelpers
             _responseMessages.Clear();
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
             LastRequestUri = request.RequestUri;
             LastRequestMethod = request.Method;

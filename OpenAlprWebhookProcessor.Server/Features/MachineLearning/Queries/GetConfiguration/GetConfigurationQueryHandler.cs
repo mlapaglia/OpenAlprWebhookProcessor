@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfigura
 
         public async Task<MachineLearningConfigDto> Handle(
             GetConfigurationQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var repo = _unitOfWork.MachineLearningConfigurations;
 

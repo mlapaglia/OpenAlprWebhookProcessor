@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertPushover
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertPushoverCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertPushoverCommand request, CancellationToken cancellationToken = default)
         {
             var pushoverClient = await _unitOfWork.PushoverAlertClients.GetFirstAsync(cancellationToken);
 

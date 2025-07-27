@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
 
         public Task<ModelInfoDto> Handle(
             GetModelInfoQuery request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             try
             {

@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken)
+        public async Task<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken = default)
         {
             var now = DateTimeOffset.UtcNow;
             var todayUtc = DateTime.UtcNow.Date;

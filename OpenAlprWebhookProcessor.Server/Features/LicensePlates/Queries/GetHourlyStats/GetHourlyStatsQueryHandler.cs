@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetHourlyStats
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetHourlyStatsResponse> Handle(GetHourlyStatsQuery request, CancellationToken cancellationToken)
+        public async Task<GetHourlyStatsResponse> Handle(GetHourlyStatsQuery request, CancellationToken cancellationToken = default)
         {
             var thirtyDaysAgoEpoch = DateTimeOffset.UtcNow.AddDays(-30).ToUnixTimeMilliseconds();
 

@@ -5,9 +5,9 @@ using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Features.Alerts;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebhook;
 using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.WebhookProcessor;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
 using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor

@@ -402,7 +402,7 @@ namespace Tests.Features.Alerts
             };
         }
 
-        private async Task CallExecuteAsync(CancellationToken cancellationToken)
+        private async Task CallExecuteAsync(CancellationToken cancellationToken = default)
         {
             // Use reflection to access the protected ExecuteAsync method
             var method = typeof(WebPushNotificationProducer).GetMethod("ExecuteAsync", 

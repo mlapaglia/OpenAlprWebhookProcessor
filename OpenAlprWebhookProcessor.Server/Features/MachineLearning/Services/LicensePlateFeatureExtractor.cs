@@ -86,7 +86,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
         private Task<LicensePlateTrainingData> ExtractFeaturesAsync(
             PlateGroup plateGroup,
             List<PlateGroup> historicalSightings,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var currentTime = DateTimeOffset.FromUnixTimeMilliseconds(plateGroup.ReceivedOnEpoch).DateTime;
             

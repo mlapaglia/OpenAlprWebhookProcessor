@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(DeleteDebugPlatesCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteDebugPlatesCommand request, CancellationToken cancellationToken = default)
         {
             var allRawPlateGroups = await _unitOfWork.RawPlateGroups.GetAllAsync(cancellationToken);
             _unitOfWork.RawPlateGroups.DeleteRange(allRawPlateGroups);

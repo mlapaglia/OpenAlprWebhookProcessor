@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWe
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(ProcessHeartbeatWebhookCommand request, CancellationToken cancellationToken)
+        public async Task Handle(ProcessHeartbeatWebhookCommand request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

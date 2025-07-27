@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<bool> Handle(RevokeTokenCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(RevokeTokenCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByRefreshTokenAsync(request.Token, cancellationToken);
 

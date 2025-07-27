@@ -12,7 +12,7 @@ using OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay;
 using OpenAlprWebhookProcessor.Features.Cameras.Commands.TriggerAutofocus;
 using OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera;
 using OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using System.Text.Json;
 using Tests.TestHelpers;
 

@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfi
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Unit> Handle(UpsertConfigurationCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpsertConfigurationCommand request, CancellationToken cancellationToken = default)
         {
             var updateTime = DateTime.UtcNow;
 

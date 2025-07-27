@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilter
 
         public async Task<GetLicensePlateFiltersResponse> Handle(
             GetPlateFiltersQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var plateGroups = _unitOfWork.PlateGroups.GetQueryable();
 

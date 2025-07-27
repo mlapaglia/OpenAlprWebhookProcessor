@@ -18,13 +18,13 @@ namespace OpenAlprWebhookProcessor.Features.Users
         Task<AuthenticateResponse> AuthenticateAsync(
             AuthenticateRequest request,
             string ipAddress,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
-        Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
+        Task<List<User>> GetAllAsync(CancellationToken cancellationToken = default);
 
         Task<User> GetByIdAsync(
             int id,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task<User> CreateAsync(
             User user,
@@ -41,12 +41,12 @@ namespace OpenAlprWebhookProcessor.Features.Users
         Task<AuthenticateResponse> RefreshTokenAsync(
             string token,
             string ipAddress,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
         Task<bool> RevokeTokenAsync(
             string token,
             string ipAddress,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
     }
 
     public class UserService : IUserService
@@ -136,7 +136,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
         public async Task<AuthenticateResponse> AuthenticateAsync(
             AuthenticateRequest request,
             string ipAddress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var user = await _usersContext.Users
                 .SingleOrDefaultAsync(x =>
@@ -173,7 +173,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
         public async Task<AuthenticateResponse> RefreshTokenAsync(
             string token,
             string ipAddress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var user = await _usersContext.Users.SingleOrDefaultAsync(u =>
                 u.RefreshTokens.Any(t => t.Token == token),
@@ -213,7 +213,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
         public async Task<bool> RevokeTokenAsync(
             string token,
             string ipAddress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var user = await _usersContext.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token), cancellationToken);
 
@@ -232,14 +232,14 @@ namespace OpenAlprWebhookProcessor.Features.Users
             return true;
         }
 
-        public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _usersContext.Users.ToListAsync(cancellationToken);
         }
 
         public async Task<User> GetByIdAsync(
             int id,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await _usersContext.Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }

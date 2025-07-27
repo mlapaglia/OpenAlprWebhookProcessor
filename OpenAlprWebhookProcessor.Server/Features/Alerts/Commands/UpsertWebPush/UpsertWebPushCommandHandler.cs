@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertWebPushCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertWebPushCommand request, CancellationToken cancellationToken = default)
         {
             var webPushClient = await _unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 

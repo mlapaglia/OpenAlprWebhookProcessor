@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async Task<bool> Handle(DisableAgentCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DisableAgentCommand request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

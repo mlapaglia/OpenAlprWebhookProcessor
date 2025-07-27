@@ -8,7 +8,7 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
-using OpenAlprWebhookProcessor.WebhookProcessor;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor

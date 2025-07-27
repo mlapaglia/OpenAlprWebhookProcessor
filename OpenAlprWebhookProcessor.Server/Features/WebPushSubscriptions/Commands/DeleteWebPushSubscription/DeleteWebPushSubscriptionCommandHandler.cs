@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.Delete
 
         public async Task Handle(
             DeleteWebPushSubscriptionCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             await _pushSubscriptionsService.DeleteAsync(request.Endpoint, cancellationToken);
         }

@@ -8,8 +8,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
         Task<EnrichedLicensePlate> GetLicenseInformationAsync(
             string plateNumber,
             string state,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
-        Task<bool> TestAsync(CancellationToken cancellationToken);
+        Task<bool> TestAsync(CancellationToken cancellationToken = default);
     }
 }

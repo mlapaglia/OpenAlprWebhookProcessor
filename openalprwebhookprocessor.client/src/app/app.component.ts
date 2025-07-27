@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
     { linkTitle: 'System Logs', icon: 'library_books', link: '/settings/logs' },
     { linkTitle: 'Enrichers', icon: 'merge_type', link: '/settings/enrichers' },
     { linkTitle: 'Users', icon: 'person', link: '/settings/users' },
+    { linkTitle: 'Debug', icon: 'bug_report', link: '/settings/debug' },
   ]
 
   private eventSubscriptions = new Subscription()

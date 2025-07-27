@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task Handle(UpsertCameraCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpsertCameraCommand request, CancellationToken cancellationToken = default)
         {
             var camera = request.Camera;
 

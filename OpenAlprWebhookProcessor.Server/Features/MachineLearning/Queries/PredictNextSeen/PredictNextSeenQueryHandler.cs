@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextS
 
         public async Task<LicensePlatePredictionResult> Handle(
             PredictNextSeenQuery request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(request.Input?.LicensePlate))
             {

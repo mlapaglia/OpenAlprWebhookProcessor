@@ -51,7 +51,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             _logger.LogDebug("AlertHostedService stopped.");
         }
 
-        private async Task ProcessAlertsAsync(CancellationToken cancellationToken)
+        private async Task ProcessAlertsAsync(CancellationToken cancellationToken = default)
         {
             await foreach (var job in _alertService.GetConsumingAlertsAsync(cancellationToken))
             {
@@ -66,7 +66,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             }
         }
 
-        private async Task ProcessSingleAlert(AlertUpdateRequest job, CancellationToken cancellationToken)
+        private async Task ProcessSingleAlert(AlertUpdateRequest job, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Processing alert for: {PlateNumber}. Pending alerts: {Count}",
                 job.PlateNumber,
@@ -92,7 +92,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             await Task.WhenAll(sendTasks);
         }
 
-        private async Task SendAlertToClientAsync(IAlertClient alertClient, AlertUpdateRequest job, CancellationToken cancellationToken)
+        private async Task SendAlertToClientAsync(IAlertClient alertClient, AlertUpdateRequest job, CancellationToken cancellationToken = default)
         {
             try
             {

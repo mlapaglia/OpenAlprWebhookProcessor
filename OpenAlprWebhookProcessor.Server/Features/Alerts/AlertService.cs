@@ -39,7 +39,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
             return _reader.Count;
         }
 
-        public async IAsyncEnumerable<AlertUpdateRequest> GetConsumingAlertsAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<AlertUpdateRequest> GetConsumingAlertsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await foreach (var alert in _reader.ReadAllAsync(cancellationToken))
             {

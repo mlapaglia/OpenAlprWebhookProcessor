@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<IgnoreDto>> Handle(GetIgnoresQuery request, CancellationToken cancellationToken)
+        public async Task<List<IgnoreDto>> Handle(GetIgnoresQuery request, CancellationToken cancellationToken = default)
         {
             var dbIgnores = await _unitOfWork.Ignores.GetAllAsync(cancellationToken);
             var ignores = new List<IgnoreDto>();

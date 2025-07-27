@@ -9,7 +9,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
     {
         public static async Task<VapidDetails> GetVapidKeysAsync(
             IUnitOfWork unitOfWork,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var pushSettings = await unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 
@@ -28,7 +28,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
 
         public static async Task<WebPushSettings> AddVapidKeysAsync(
             IUnitOfWork unitOfWork,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var vapidKeys = VapidKeyGenerator.GenerateVapidKeys();
 

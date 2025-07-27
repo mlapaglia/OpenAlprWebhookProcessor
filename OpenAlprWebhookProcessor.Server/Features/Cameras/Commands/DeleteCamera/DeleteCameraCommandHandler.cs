@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task Handle(DeleteCameraCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteCameraCommand request, CancellationToken cancellationToken = default)
         {
             var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
 

@@ -6,8 +6,7 @@ using OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWebhoo
 using OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessPlateGroupWebhook;
 using OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessSinglePlateWebhook;
 using OpenAlprWebhookProcessor.Features.Webhooks.Queries.GetWebhookStatus;
-using OpenAlprWebhookProcessor.WebhookProcessor;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebhook;
 using System.IO;
 using System.Text;
 using System.Text.Json;

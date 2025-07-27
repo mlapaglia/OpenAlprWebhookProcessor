@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
 
         public async Task<List<string>> Handle(
             GetLogsQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var currentLogFile = _fileSystem.Directory.GetFiles("./config/")
                 .LastOrDefault(x => x.Contains("log-"));
@@ -49,7 +49,7 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
 
         private static async Task<List<string>> ParseLogEntriesAsync(
             StreamReader sr,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var logEntries = new List<string>();
             var currentEntry = new StringBuilder();

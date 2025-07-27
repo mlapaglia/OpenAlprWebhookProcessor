@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
 
         public async Task<GetMostSeenPlatesResponse> Handle(
             GetMostSeenPlatesQuery request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var startDate = request.StartDate ?? DateTimeOffset.UtcNow.AddDays(-30);
             var endDate = (request.EndDate ?? DateTimeOffset.UtcNow).AddDays(1).AddTicks(-1);

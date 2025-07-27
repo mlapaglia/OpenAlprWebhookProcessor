@@ -22,8 +22,8 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs
 
         [HttpGet]
         public async Task<ActionResult<List<string>>> GetLogs(
-            ApiLogLevel logLevel = ApiLogLevel.Information,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken,
+            ApiLogLevel logLevel = ApiLogLevel.Information)
         {
             var query = new GetLogsQuery(logLevel);
             var result = await _mediator.Send(query, cancellationToken);

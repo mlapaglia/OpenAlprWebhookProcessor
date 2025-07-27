@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
             _passwordService = passwordService;
         }
 
-        public async Task<AuthenticateResponse> Handle(AuthenticateCommand request, CancellationToken cancellationToken)
+        public async Task<AuthenticateResponse> Handle(AuthenticateCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByUsernameAsync(request.Username, cancellationToken);
 

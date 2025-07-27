@@ -440,7 +440,7 @@ namespace Tests.Features.Alerts
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             // Store request information for verification without interfering with content
             var requestInfo = new RequestInfo

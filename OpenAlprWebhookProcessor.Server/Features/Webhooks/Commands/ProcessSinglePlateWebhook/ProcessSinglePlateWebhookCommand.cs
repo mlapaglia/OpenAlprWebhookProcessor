@@ -1,5 +1,5 @@
 using MediatR;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebhook;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessSinglePlateWebhook
 {

@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             _imageCompressionService = imageCompressionService ?? throw new ArgumentNullException(nameof(imageCompressionService));
         }
 
-        public async Task<Stream> Handle(GetCropImageQuery request, CancellationToken cancellationToken)
+        public async Task<Stream> Handle(GetCropImageQuery request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.FirstOrDefaultAsync(x => x.OpenAlprUuid == request.ImageId, cancellationToken);
 

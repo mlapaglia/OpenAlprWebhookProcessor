@@ -22,6 +22,7 @@ export class SignalrService {
   public openAlprAgentConnectionStatusChanged = new Subject<boolean>()
   public isConnected: boolean
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>()
+  public databaseCleanupCompleted: Subject<boolean> = new Subject<boolean>()
 
   public startConnection() {
     // Only start connection if user is authenticated
@@ -82,6 +83,10 @@ export class SignalrService {
 
     this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {
       this.licensePlateReceived.next(plateNumber)
+    })
+
+    this.hubConnection.on('DatabaseCleanupCompleted', () => {
+      this.snackbarService.create(`Database Cleanup Completed!`, SnackBarType.Successful)
     })
 
     this.hubConnection.on('LicensePlateAlerted', (plateNumber) => {

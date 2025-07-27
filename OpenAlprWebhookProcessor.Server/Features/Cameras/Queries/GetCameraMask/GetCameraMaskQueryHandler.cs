@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<MaskCoordinate>> Handle(GetCameraMaskQuery request, CancellationToken cancellationToken)
+        public async Task<List<MaskCoordinate>> Handle(GetCameraMaskQuery request, CancellationToken cancellationToken = default)
         {
             var cameraMask = await _unitOfWork.CameraMasks.FirstOrDefaultAsync(x => x.CameraId == request.CameraId, cancellationToken);
 

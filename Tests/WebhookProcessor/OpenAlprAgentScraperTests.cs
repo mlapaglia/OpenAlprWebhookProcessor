@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.WebhookProcessor;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebhook;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebhook;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -344,7 +344,7 @@ namespace Tests.WebhookProcessor
                 _responses.Enqueue(response);
             }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
             {
                 LastRequestUri = request.RequestUri.ToString();
                 
