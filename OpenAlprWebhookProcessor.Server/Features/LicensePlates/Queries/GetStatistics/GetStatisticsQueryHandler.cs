@@ -23,10 +23,9 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
             var plateNumber = request.PlateNumber;
 
-            var (seenPlates, seenPossiblePlates) = await _unitOfWork.PlateGroups.GetPlateStatisticsEpochsAsync(
+            var seenPlates = await _unitOfWork.PlateGroups.GetPlateStatisticsEpochsAsync(
                 plateNumber, cancellationToken);
 
-            seenPlates.AddRange(seenPossiblePlates);
             seenPlates = seenPlates.OrderBy(x => x).ToList();
 
             var plateStatistics = new PlateStatistics

@@ -3,7 +3,7 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys
+namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys
 {
     public static class VapidKeyHelper
     {

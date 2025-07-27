@@ -3,7 +3,7 @@ using Lib.Net.Http.WebPush.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions
 {
     public interface IPushServiceClientWrapper
     {

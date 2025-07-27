@@ -9,7 +9,8 @@ using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Alerts;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts
@@ -350,7 +351,7 @@ namespace Tests.Features.Alerts
             // Generate valid VAPID keys if not provided
             if (publicKey == null || privateKey == null)
             {
-                var vapidKeys = OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys.VapidKeyGenerator.GenerateVapidKeys();
+                var vapidKeys = VapidKeyGenerator.GenerateVapidKeys();
                 publicKey ??= vapidKeys.PublicKey;
                 privateKey ??= vapidKeys.PrivateKey;
             }

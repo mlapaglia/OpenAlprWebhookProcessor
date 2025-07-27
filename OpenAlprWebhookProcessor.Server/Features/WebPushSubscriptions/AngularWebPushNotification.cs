@@ -3,7 +3,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions
 {
     public class AngularWebPushNotification
     {

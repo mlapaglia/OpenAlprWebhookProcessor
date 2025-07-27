@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
 using Tests.TestHelpers;
 
 namespace Tests.WebPushSubscriptions

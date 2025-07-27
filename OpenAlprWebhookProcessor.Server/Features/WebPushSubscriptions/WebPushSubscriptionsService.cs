@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions
 {
     internal partial class WebPushSubscriptionsService : IWebPushSubscriptionsService
     {
@@ -70,7 +70,7 @@ namespace OpenAlprWebhookProcessor.WebPushSubscriptions
 
                 if (existingSubscription == null)
                 {
-                    var pushSubscription = new Data.WebPushSubscription
+                    var pushSubscription = new WebPushSubscription
                     {
                         Endpoint = subscription.Endpoint,
                         Keys = new List<WebPushSubscriptionKey>(),

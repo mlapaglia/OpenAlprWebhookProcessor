@@ -9,7 +9,6 @@ using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Infrastructure.Behaviors;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
 using OpenAlprWebhookProcessor.Hydrator;
 using Lib.Net.Http.WebPush;
 using System.Reflection;
@@ -31,6 +30,7 @@ using System.IO.Abstractions;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprAgentScraper;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
 
 namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
 {

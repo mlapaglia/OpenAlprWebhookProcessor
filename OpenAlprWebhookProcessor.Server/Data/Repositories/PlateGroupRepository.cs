@@ -120,23 +120,17 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<(List<long> seenPlates, List<long> seenPossiblePlates)> GetPlateStatisticsEpochsAsync(
+        public async Task<List<long>> GetPlateStatisticsEpochsAsync(
             string plateNumber, 
             CancellationToken cancellationToken = default)
         {
             var seenPlates = await _dbSet
                 .AsNoTracking()
-                .Where(x => x.BestNumber == plateNumber)
+                .Where(x => x.BestNumber == plateNumber || x.PossibleNumbers.Any(x => x.Number == plateNumber))
                 .Select(x => x.ReceivedOnEpoch)
                 .ToListAsync(cancellationToken);
 
-            var seenPossiblePlates = await _context.PlateGroupPossibleNumbers
-                .AsNoTracking()
-                .Where(x => x.Number == plateNumber)
-                .Select(x => x.PlateGroup.ReceivedOnEpoch)
-                .ToListAsync(cancellationToken);
-
-            return (seenPlates, seenPossiblePlates);
+            return seenPlates;
         }
 
         private static List<DayCount> GroupByDay(List<long> plateCounts, TimeSpan timeZoneOffset)

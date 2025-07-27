@@ -3,15 +3,15 @@ using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using OpenAlprWebhookProcessor.Features.Alerts;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys;
 
-namespace OpenAlprWebhookProcessor.WebPushSubscriptions
+namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions
 {
     public class WebPushNotificationProducer : BackgroundService, IAlertClient
     {

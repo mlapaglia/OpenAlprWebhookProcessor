@@ -1,6 +1,6 @@
 using MediatR;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.WebPushSubscriptions.VapidKeys;
+using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys;
 using System.Threading;
 using System.Threading.Tasks;
 

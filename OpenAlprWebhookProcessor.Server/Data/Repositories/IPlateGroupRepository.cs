@@ -47,8 +47,8 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
 
         Task<PlateGroup?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 
-        Task<(List<long> seenPlates, List<long> seenPossiblePlates)> GetPlateStatisticsEpochsAsync(
-            string plateNumber, 
+        Task<List<long>> GetPlateStatisticsEpochsAsync(
+            string plateNumber,
             CancellationToken cancellationToken = default);
     }
 } 
