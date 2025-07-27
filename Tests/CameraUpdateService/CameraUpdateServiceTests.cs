@@ -175,9 +175,7 @@ namespace Tests.CameraUpdateService
             await _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunrise, false);
 
             // Assert
-            await _camera.Received(1).SetCameraTextAsync(
-                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "DAY"),
-                Arg.Any<CancellationToken>());
+            await _camera.Received(1).TriggerDayNightModeAsync(SunriseSunset.Sunrise);
         }
 
         [Test]
@@ -200,9 +198,7 @@ namespace Tests.CameraUpdateService
             await _sut.ProcessSunriseSunsetJobAsync(cameraId, SunriseSunset.Sunset, false);
 
             // Assert
-            await _camera.Received(1).SetCameraTextAsync(
-                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "NIGHT"),
-                Arg.Any<CancellationToken>());
+            await _camera.Received(1).TriggerDayNightModeAsync(SunriseSunset.Sunset);
         }
 
         [Test]
@@ -227,9 +223,7 @@ namespace Tests.CameraUpdateService
             // Assert
             // Note: Testing static method calls might require wrapping CameraScheduling
             // For now, we can verify the camera text was set
-            await _camera.Received(1).SetCameraTextAsync(
-                Arg.Is<CameraUpdateRequest>(x => x.LicensePlate == "DAY"),
-                Arg.Any<CancellationToken>());
+            await _camera.Received(1).TriggerDayNightModeAsync(SunriseSunset.Sunrise);
         }
 
         [Test]
