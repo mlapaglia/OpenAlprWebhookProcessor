@@ -76,11 +76,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 cameraToUpdate.Manufacturer,
                 cameraToUpdate);
 
-            await camera.TriggerDayNightModeAsync(
-                sunriseSunset,
-                cancellationToken);
+            try
+            {
+                await camera.TriggerDayNightModeAsync(
+                    sunriseSunset,
+                    cancellationToken);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unable to process day/night job: {Message}", ex.Message);
+            }
 
             if (scheduleNextJob)
             {
