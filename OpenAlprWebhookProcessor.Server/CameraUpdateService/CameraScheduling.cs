@@ -94,7 +94,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 camera.Id,
                 isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
                 true,
-                isSunUp ? cameraSunsetAt : cameraSunriseAt);
+                isSunUp ? cameraSunsetAt : cameraSunriseAt,
+                cancellationToken);
         }
 
         public static bool IsSunUp(

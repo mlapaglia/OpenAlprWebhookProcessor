@@ -126,13 +126,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var delay = scheduleAt - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
-                await EnqueueProcessSunriseSunsetJobAsync(
-                    cameraId,
-                    sunriseSunset,
-                    scheduleNextJob,
-                    cancellationToken);
-
-                return null;
+                _logger.LogWarning("Time until next {SunriseSunset} is negative, not scheduling.", sunriseSunset.ToString());
             }
 
             var jobId = Guid.NewGuid().ToString();

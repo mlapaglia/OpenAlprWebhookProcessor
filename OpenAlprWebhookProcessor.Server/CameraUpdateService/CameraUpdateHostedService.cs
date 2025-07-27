@@ -26,14 +26,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             try
             {
-                // Schedule initial day/night tasks
-                await _cameraUpdateService.ScheduleDayNightTaskAsync();
+                await _cameraUpdateService.ScheduleDayNightTaskAsync(cancellationToken);
                 _logger.LogDebug("Initial day/night tasks scheduled");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error scheduling initial day/night tasks");
-                // Don't throw - allow the service to start even if initial scheduling fails
             }
         }
 
@@ -43,14 +41,12 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             try
             {
-                // Clear all overlays when stopping
                 await _cameraUpdateService.ForceClearOverlaysAsync(cancellationToken);
                 _logger.LogDebug("All camera overlays cleared");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error clearing camera overlays during shutdown");
-                // Don't throw during shutdown
             }
 
             _logger.LogDebug("CameraUpdateHostedService stopped.");
