@@ -123,7 +123,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
         {
             if (cameraId == Guid.Empty) return null;
 
-            var delay = scheduleAt - DateTimeOffset.UtcNow;
+            var delay = scheduleAt - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
                 _logger.LogWarning("Time until next {SunriseSunset} is negative ({Delay} seconds), not scheduling.", sunriseSunset.ToString(), delay.TotalSeconds);

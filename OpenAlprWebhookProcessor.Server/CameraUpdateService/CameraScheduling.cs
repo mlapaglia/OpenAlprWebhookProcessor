@@ -90,11 +90,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 backgroundJobService.DeleteJob(camera.NextDayNightScheduleId);
             }
 
+            var scheduleTime = isSunUp ? cameraSunsetAt : cameraSunriseAt;
+            var scheduleTimeOffset = new DateTimeOffset(scheduleTime, TimeSpan.FromHours(timeZoneOffset));
+
             camera.NextDayNightScheduleId = await backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
                 camera.Id,
                 isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
                 true,
-                isSunUp ? cameraSunsetAt : cameraSunriseAt,
+                scheduleTimeOffset,
                 cancellationToken);
         }
 
