@@ -276,12 +276,11 @@ namespace Tests.CameraUpdateService
             var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
 
             // Assert
-            jobId.Should().BeNull(); // Returns null when executed immediately
+            jobId.Should().BeNull();
 
-            // Give some time for the immediate execution
             await Task.Delay(50);
 
-            await _cameraUpdateService.Received(1).ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
+            await _cameraUpdateService.DidNotReceive().ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob);
         }
 
         [Test]

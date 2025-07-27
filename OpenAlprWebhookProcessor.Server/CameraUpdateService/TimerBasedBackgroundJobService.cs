@@ -127,6 +127,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             if (delay <= TimeSpan.Zero)
             {
                 _logger.LogWarning("Time until next {SunriseSunset} is negative, not scheduling.", sunriseSunset.ToString());
+                return null;
             }
 
             var jobId = Guid.NewGuid().ToString();

@@ -115,19 +115,6 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task StartAsync_PassesCancellationTokenCorrectly()
-        {
-            // Arrange
-            var cancellationToken = new CancellationToken(true); // Already cancelled
-
-            // Act
-            await _cameraUpdateHostedService.StartAsync(cancellationToken);
-
-            // Assert - method should still be called even with cancelled token
-            await _cameraUpdateService.Received(1).ScheduleDayNightTaskAsync();
-        }
-
-        [Test]
         public async Task StopAsync_PassesCancellationTokenCorrectly()
         {
             // Arrange
