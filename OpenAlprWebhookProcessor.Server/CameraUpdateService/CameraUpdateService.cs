@@ -80,6 +80,18 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 sunriseSunset,
                 cancellationToken);
 
+            // Update camera overlay text to show current day/night mode
+            var overlayText = sunriseSunset == SunriseSunset.Sunrise ? "DAY" : "NIGHT";
+            var updateRequest = new CameraUpdateRequest
+            {
+                LicensePlate = overlayText,
+                VehicleDescription = string.Empty,
+                OpenAlprProcessingTimeMs = 0,
+                ProcessedPlateConfidence = 0
+            };
+
+            await camera.SetCameraTextAsync(updateRequest, cancellationToken);
+
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             if (scheduleNextJob)
