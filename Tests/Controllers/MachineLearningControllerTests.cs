@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

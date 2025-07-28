@@ -1,4 +1,5 @@
 using MediatR;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
@@ -40,6 +41,7 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
 
             var filteredLogs = logEntries
                 .Where(entry => ShouldIncludeLogEntry(entry, request.MinimumSeverity))
+                .Where(entry => ShouldIncludeLogEntryBySearch(entry, request.SearchString))
                 .Take(500)
                 .Reverse()
                 .ToList();
@@ -119,6 +121,12 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
                 "FTL" => ApiLogLevel.Critical,
                 _ => null
             };
+        }
+
+        private static bool ShouldIncludeLogEntryBySearch(string logEntry, string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString)) return true;
+            return logEntry.Contains(searchString, StringComparison.OrdinalIgnoreCase);
         }
 
         [System.Text.RegularExpressions.GeneratedRegex(@"\[([A-Z]{3})\]")]

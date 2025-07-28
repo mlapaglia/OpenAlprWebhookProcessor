@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetUserById;
 using Tests.TestHelpers;

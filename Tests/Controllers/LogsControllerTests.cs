@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.SystemLogs;
@@ -99,6 +99,43 @@ namespace Tests.Controllers
             // Assert
             await Mediator.Received(1).Send(
                 Arg.Is<GetLogsQuery>(q => q.MinimumSeverity == expectedLogLevel), 
+                cancellationToken);
+        }
+
+        [Test]
+        public async Task GetLogs_PassesCorrectSearchString()
+        {
+            // Arrange
+            var cancellationToken = GetCancellationToken();
+            var expectedSearchString = "test search";
+
+            Mediator.Send(Arg.Any<GetLogsQuery>(), cancellationToken)
+                .Returns(new List<string>());
+
+            // Act
+            await _controller.GetLogs(cancellationToken, ApiLogLevel.Information, expectedSearchString);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<GetLogsQuery>(q => q.SearchString == expectedSearchString), 
+                cancellationToken);
+        }
+
+        [Test]
+        public async Task GetLogs_WithNullSearch_PassesNullToQuery()
+        {
+            // Arrange
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetLogsQuery>(), cancellationToken)
+                .Returns(new List<string>());
+
+            // Act
+            await _controller.GetLogs(cancellationToken, ApiLogLevel.Information, null);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<GetLogsQuery>(q => q.SearchString == null), 
                 cancellationToken);
         }
 
@@ -349,6 +386,114 @@ System.InvalidOperationException: Unable to process license plate data
             result.Should().HaveCount(2);
             result.Should().Contain(r => r.Contains("[XYZ] Invalid log level entry"));
             result.Should().Contain(r => r.Contains("[INF] Valid information entry"));
+        }
+
+        [Test]
+        public async Task Handler_WithSearchString_FiltersLogEntriesCorrectly()
+        {
+            // Arrange
+            var logContent = @"2023-01-01 10:01:00.123 -05:00 [INF] Application started successfully
+2023-01-01 10:02:00.456 -05:00 [WRN] High memory usage detected
+2023-01-01 10:03:00.789 -05:00 [ERR] Database connection failed
+2023-01-01 10:04:00.012 -05:00 [INF] Application shutdown complete";
+
+            SetupMockFileSystem(new[] { "./config/log-20250124.txt" }, logContent);
+
+            var query = new GetLogsQuery(ApiLogLevel.Verbose, "Application");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(2);
+            result.Should().Contain(r => r.Contains("Application started successfully"));
+            result.Should().Contain(r => r.Contains("Application shutdown complete"));
+            result.Should().NotContain(r => r.Contains("High memory usage"));
+            result.Should().NotContain(r => r.Contains("Database connection failed"));
+        }
+
+        [Test]
+        public async Task Handler_WithSearchString_CaseInsensitiveSearch()
+        {
+            // Arrange
+            var logContent = @"2023-01-01 10:01:00.123 -05:00 [INF] APPLICATION started successfully
+2023-01-01 10:02:00.456 -05:00 [WRN] High memory usage detected
+2023-01-01 10:03:00.789 -05:00 [ERR] Database connection failed";
+
+            SetupMockFileSystem(new[] { "./config/log-20250124.txt" }, logContent);
+
+            var query = new GetLogsQuery(ApiLogLevel.Verbose, "application");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(1);
+            result.Should().Contain(r => r.Contains("APPLICATION started successfully"));
+        }
+
+        [Test]
+        public async Task Handler_WithEmptySearchString_ReturnsAllLogs()
+        {
+            // Arrange
+            var logContent = @"2023-01-01 10:01:00.123 -05:00 [INF] Application started successfully
+2023-01-01 10:02:00.456 -05:00 [WRN] High memory usage detected";
+
+            SetupMockFileSystem(new[] { "./config/log-20250124.txt" }, logContent);
+
+            var query = new GetLogsQuery(ApiLogLevel.Verbose, "");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task Handler_WithNullSearchString_ReturnsAllLogs()
+        {
+            // Arrange
+            var logContent = @"2023-01-01 10:01:00.123 -05:00 [INF] Application started successfully
+2023-01-01 10:02:00.456 -05:00 [WRN] High memory usage detected";
+
+            SetupMockFileSystem(new[] { "./config/log-20250124.txt" }, logContent);
+
+            var query = new GetLogsQuery(ApiLogLevel.Verbose, null);
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(2);
+        }
+
+        [Test]
+        public async Task Handler_WithSearchStringNoMatches_ReturnsEmptyList()
+        {
+            // Arrange
+            var logContent = @"2023-01-01 10:01:00.123 -05:00 [INF] Application started successfully
+2023-01-01 10:02:00.456 -05:00 [WRN] High memory usage detected";
+
+            SetupMockFileSystem(new[] { "./config/log-20250124.txt" }, logContent);
+
+            var query = new GetLogsQuery(ApiLogLevel.Verbose, "nonexistenttext");
+            var cancellationToken = GetCancellationToken();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
         }
 
         #endregion

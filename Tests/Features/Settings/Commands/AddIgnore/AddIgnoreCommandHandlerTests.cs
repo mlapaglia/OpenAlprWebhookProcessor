@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;

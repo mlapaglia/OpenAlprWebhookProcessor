@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.ML;
 using NSubstitute;
 using NUnit.Framework;

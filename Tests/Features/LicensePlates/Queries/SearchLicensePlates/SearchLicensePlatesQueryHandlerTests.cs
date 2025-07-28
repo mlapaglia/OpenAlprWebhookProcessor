@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;

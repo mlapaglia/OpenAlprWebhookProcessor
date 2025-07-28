@@ -11,6 +11,14 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+                <mat-label>Search Logs</mat-label>
+                <input 
+                    matInput 
+                    [formControl]="searchControl"
+                    placeholder="Enter search text...">
+            </mat-form-field>
         </div>
         
         <div class="plate-controls-section">

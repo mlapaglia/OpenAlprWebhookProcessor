@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwards;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;

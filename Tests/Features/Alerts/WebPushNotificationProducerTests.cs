@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.EntityFrameworkCore;

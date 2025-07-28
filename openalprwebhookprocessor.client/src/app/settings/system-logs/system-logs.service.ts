@@ -17,8 +17,12 @@ export enum ApiLogLevel {
 export class SystemLogsService {
   private http = inject(HttpClient)
 
-  getLogs(logLevel: ApiLogLevel = ApiLogLevel.Information): Observable<string[]> {
-    return this.http.get<string[]>(`/api/logs?logLevel=${logLevel}`)
+  getLogs(logLevel: ApiLogLevel = ApiLogLevel.Information, search?: string): Observable<string[]> {
+    let url = `/api/logs?logLevel=${logLevel}`
+    if (search && search.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`
+    }
+    return this.http.get<string[]>(url)
   }
 
   getPlateGroups(onlyFailedPlateGroups: boolean): Observable<Blob> {

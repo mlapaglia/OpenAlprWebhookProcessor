@@ -11,12 +11,24 @@
     
     .log-level-section {
       margin-bottom: 32px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
       
       mat-form-field {
         width: 240px;
         
         .mat-mdc-form-field-subscript-wrapper {
           display: none;
+        }
+        
+        &:first-child {
+          min-width: 180px;
+        }
+        
+        &:last-child {
+          min-width: 260px;
+          flex: 1;
         }
       }
     }
@@ -107,6 +119,19 @@
   // Responsive design
   @media (max-width: 540px) {
     .controls-section {
+      .log-level-section {
+        flex-direction: column;
+        
+        mat-form-field {
+          width: 100%;
+          
+          &:first-child,
+          &:last-child {
+            min-width: auto;
+          }
+        }
+      }
+      
       .plate-controls-section {
         .plate-download-group {
           flex-direction: column;
