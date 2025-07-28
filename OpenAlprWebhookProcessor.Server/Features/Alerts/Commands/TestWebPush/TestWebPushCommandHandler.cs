@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
@@ -10,20 +10,19 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestWebPush
 {
-    public class TestWebPushCommandHandler : IRequestHandler<TestWebPushCommand>
+    public class TestWebPushCommandHandler : ICommandHandler<TestWebPushCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAlertClient _alertClient;
 
         public TestWebPushCommandHandler(
-            IUnitOfWork unitOfWork,
-            IEnumerable<IAlertClient> alertClients)
+            IUnitOfWork unitOfWork, IEnumerable<IAlertClient> alertClients)
         {
             _unitOfWork = unitOfWork;
             _alertClient = alertClients.First(x => x is WebPushNotificationProducer);
         }
 
-        public async Task Handle(TestWebPushCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestWebPushCommand command, CancellationToken cancellationToken = default)
         {
             var testPlateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .Include(x => x.PlateImage)
@@ -47,6 +46,8 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestWebPush
                 PlateJpegUrl = $"/api/images/crop/{testPlateGroup.OpenAlprUuid}",
                 ReceivedOn = DateTimeOffset.UtcNow,
             }, cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}

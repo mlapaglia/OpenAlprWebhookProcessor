@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats
 {
-    public class GetQuickStatsQuery : IRequest<GetQuickStatsResponse>
+    public class GetQuickStatsQuery : IQuery<GetQuickStatsResponse>
     {
     }
 } 

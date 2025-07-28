@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 {
-    public class GetImageQueryHandler : IRequestHandler<GetImageQuery, Stream>
+    public class GetImageQueryHandler : IQueryHandler<GetImageQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             _imageCompressionService = imageCompressionService ?? throw new ArgumentNullException(nameof(imageCompressionService));
         }
 
-        public async Task<Stream> Handle(
+        public async ValueTask<Stream> Handle(
             GetImageQuery request,
             CancellationToken cancellationToken = default)
         {

@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
 {
-    public class TestCameraOverlayCommand : IRequest
+    public class TestCameraOverlayCommand : ICommand
     {
         public Guid CameraId { get; set; }
 

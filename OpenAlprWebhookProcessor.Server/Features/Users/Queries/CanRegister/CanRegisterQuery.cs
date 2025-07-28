@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister
 {
-    public class CanRegisterQuery : IRequest<bool>
+    public class CanRegisterQuery : IQuery<bool>
     {
     }
 } 

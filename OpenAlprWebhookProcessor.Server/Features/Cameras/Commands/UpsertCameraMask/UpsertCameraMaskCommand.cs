@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
 {
-    public class UpsertCameraMaskCommand : IRequest<bool>
+    public class UpsertCameraMaskCommand : IQuery<bool>
     {
         public CameraMask CameraMask { get; set; }
 

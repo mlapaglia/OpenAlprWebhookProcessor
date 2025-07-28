@@ -17,7 +17,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MediatR" Version="13.0.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
@@ -35,6 +35,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpenAlprWebhookProcessor.Server\OpenAlprWebhookProcessor.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\Behaviors\" />
   </ItemGroup>
 
 </Project>

@@ -143,7 +143,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(repositoryException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await 
                 _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(repositoryException);
@@ -168,14 +168,14 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(ignoreException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await 
                 _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(ignoreException);
         }
 
         [Test]
-        public void Handle_AlertRepositoryThrowsException_PropagatesException()
+        public async Task Handle_AlertRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -201,8 +201,8 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(alertException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() => 
-                _handler.Handle(query, cancellationToken));
+            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => 
+                await _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(alertException);
         }

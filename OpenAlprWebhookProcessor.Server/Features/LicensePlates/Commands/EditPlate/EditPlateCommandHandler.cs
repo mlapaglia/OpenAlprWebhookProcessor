@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate
 {
-    public class EditPlateCommandHandler : IRequestHandler<EditPlateCommand>
+    public class EditPlateCommandHandler : ICommandHandler<EditPlateCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(EditPlateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(EditPlateCommand request, CancellationToken cancellationToken = default)
         {
             var existingPlate = await _unitOfWork.PlateGroups.GetByIdAsync(
                 request.Id,
@@ -31,6 +31,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EditPlate
             {
                 throw new System.ArgumentException($"Plate with ID {request.Id} not found");
             }
+            return Unit.Value;
         }
     }
 } 

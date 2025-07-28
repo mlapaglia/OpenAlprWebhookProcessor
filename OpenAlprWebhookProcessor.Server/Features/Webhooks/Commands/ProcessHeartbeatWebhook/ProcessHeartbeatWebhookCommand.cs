@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWebhook
 {
-    public class ProcessHeartbeatWebhookCommand : IRequest
+    public class ProcessHeartbeatWebhookCommand : ICommand
     {
         public ProcessHeartbeatWebhookCommand()
         {

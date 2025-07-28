@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
 {
-    public class DeleteCameraCommandHandler : IRequestHandler<DeleteCameraCommand>
+    public class DeleteCameraCommandHandler : ICommandHandler<DeleteCameraCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICameraUpdateService _cameraUpdateService;
 
         public DeleteCameraCommandHandler(
-            IUnitOfWork unitOfWork,
-            ICameraUpdateService cameraUpdateService)
+            IUnitOfWork unitOfWork, ICameraUpdateService cameraUpdateService)
         {
             _unitOfWork = unitOfWork;
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task Handle(DeleteCameraCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteCameraCommand command, CancellationToken cancellationToken = default)
         {
-            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
+            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == command.CameraId, cancellationToken);
 
             if (camera != null)
             {
@@ -30,6 +29,8 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
                 _unitOfWork.Cameras.Delete(camera);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
+
+            return Unit.Value;
         }
     }
-} 
+}

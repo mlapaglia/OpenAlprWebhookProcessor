@@ -93,7 +93,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Count must be between 1 and 50");
         }
 
@@ -106,7 +106,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Count must be between 1 and 50");
         }
 
@@ -119,7 +119,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Count must be between 1 and 50");
         }
 
@@ -158,7 +158,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("WithinHours must be between 1 and 8760");
         }
 
@@ -171,7 +171,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("WithinHours must be between 1 and 8760");
         }
 
@@ -184,7 +184,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("WithinHours must be between 1 and 8760");
         }
 
@@ -229,7 +229,7 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowExactlyAsync<InvalidOperationException>()
                 .WithMessage("Test exception");
         }
 

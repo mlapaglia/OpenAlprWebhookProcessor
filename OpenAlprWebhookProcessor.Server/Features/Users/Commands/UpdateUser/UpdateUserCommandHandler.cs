@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
+    public class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
         private readonly IPasswordService _passwordService;
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.UpdateUser
             _passwordService = passwordService;
         }
 
-        public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByIdAsync(request.Id, cancellationToken);
 
@@ -59,6 +59,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.UpdateUser
 
             _usersUnitOfWork.Users.Update(user);
             await _usersUnitOfWork.SaveChangesAsync(cancellationToken);
+            return Unit.Value;
         }
     }
 } 

@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraNightMode
 {
-    public class TestCameraNightModeCommandHandler : IRequestHandler<TestCameraNightModeCommand>
+    public class TestCameraNightModeCommandHandler : ICommandHandler<TestCameraNightModeCommand>
     {
         private readonly ICameraUpdateService _cameraUpdateService;
 
@@ -14,13 +14,13 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraNightMode
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public Task Handle(TestCameraNightModeCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestCameraNightModeCommand request, CancellationToken cancellationToken = default)
         {
-            _cameraUpdateService.EnqueueDayNightAsync(
+            await _cameraUpdateService.EnqueueDayNightAsync(
                 request.CameraId,
                 SunriseSunset.Sunset);
 
-            return Task.CompletedTask;
+            return Unit.Value;
         }
     }
 } 

@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers
 {
-    public class GetEnrichersQueryHandler : IRequestHandler<GetEnrichersQuery, EnricherDto>
+    public class GetEnrichersQueryHandler : IQueryHandler<GetEnrichersQuery, EnricherDto>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<EnricherDto> Handle(GetEnrichersQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<EnricherDto> Handle(GetEnrichersQuery request, CancellationToken cancellationToken = default)
         {
             var enricher = await _unitOfWork.Enrichers.GetFirstAsync(cancellationToken);
 

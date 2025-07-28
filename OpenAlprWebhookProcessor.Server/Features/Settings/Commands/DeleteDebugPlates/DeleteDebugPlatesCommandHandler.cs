@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates
 {
-    public class DeleteDebugPlatesCommandHandler : IRequestHandler<DeleteDebugPlatesCommand>
+    public class DeleteDebugPlatesCommandHandler : ICommandHandler<DeleteDebugPlatesCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -14,11 +14,12 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(DeleteDebugPlatesCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteDebugPlatesCommand request, CancellationToken cancellationToken = default)
         {
             var allRawPlateGroups = await _unitOfWork.RawPlateGroups.GetAllAsync(cancellationToken);
             _unitOfWork.RawPlateGroups.DeleteRange(allRawPlateGroups);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Unit.Value;
         }
     }
 } 

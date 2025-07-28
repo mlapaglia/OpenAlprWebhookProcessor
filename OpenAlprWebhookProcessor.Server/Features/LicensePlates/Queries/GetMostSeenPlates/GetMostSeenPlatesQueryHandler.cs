@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates
 {
-    public class GetMostSeenPlatesQueryHandler : IRequestHandler<GetMostSeenPlatesQuery, GetMostSeenPlatesResponse>
+    public class GetMostSeenPlatesQueryHandler : IQueryHandler<GetMostSeenPlatesQuery, GetMostSeenPlatesResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPla
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetMostSeenPlatesResponse> Handle(
+        public async ValueTask<GetMostSeenPlatesResponse> Handle(
             GetMostSeenPlatesQuery request,
             CancellationToken cancellationToken = default)
         {

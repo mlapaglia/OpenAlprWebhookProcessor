@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus
 {
-    public class GetAgentStatusQuery : IRequest<AgentStatusDto>
+    public class GetAgentStatusQuery : IQuery<AgentStatusDto>
     {
     }
 } 

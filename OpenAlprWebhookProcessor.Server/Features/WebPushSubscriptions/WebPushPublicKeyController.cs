@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Queries.GetWebPushPublicKey;
 using System.Threading;

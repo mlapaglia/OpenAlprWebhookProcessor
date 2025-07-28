@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken
 {
-    public class RevokeTokenCommandHandler : IRequestHandler<RevokeTokenCommand, bool>
+    public class RevokeTokenCommandHandler : IQueryHandler<RevokeTokenCommand, bool>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
 
@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<bool> Handle(RevokeTokenCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(RevokeTokenCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByRefreshTokenAsync(request.Token, cancellationToken);
 

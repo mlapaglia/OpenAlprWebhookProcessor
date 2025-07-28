@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.SetZoomAndFocus
 {
-    public class SetZoomAndFocusCommand : IRequest
+    public class SetZoomAndFocusCommand : ICommand
     {
         public Guid CameraId { get; set; }
 

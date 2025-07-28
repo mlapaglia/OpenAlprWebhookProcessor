@@ -37,7 +37,7 @@ namespace Tests.WebhookProcessor
             
             var act = async () => await _organizer.AddAgentAsync(null, client, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentNullException>()
                 .WithParameterName("agentId");
         }
 
@@ -48,7 +48,7 @@ namespace Tests.WebhookProcessor
             
             var act = async () => await _organizer.AddAgentAsync("", client, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -57,7 +57,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.AddAgentAsync("agent1", null, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentNullException>()
+            await act.Should().ThrowExactlyAsync<ArgumentNullException>()
                 .WithParameterName("webSocketClient");
         }
 
@@ -129,7 +129,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.RemoveAgentAsync(null, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -138,7 +138,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.RemoveAgentAsync("", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -182,7 +182,7 @@ namespace Tests.WebhookProcessor
             
             var act = async () => await _organizer.RemoveAgentAsync(agentId, CancellationToken.None);
             
-            await act.Should().ThrowAsync<Exception>()
+            await act.Should().ThrowExactlyAsync<Exception>()
                 .WithMessage("Disconnect failed");
         }
 
@@ -191,7 +191,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.GetAgentStatusAsync(null, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -200,7 +200,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.GetAgentStatusAsync("", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -257,7 +257,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.DisableEnableAgentAsync(null, AgentStartStopType.Start, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -266,7 +266,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.DisableEnableAgentAsync("", AgentStartStopType.Start, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -327,7 +327,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync(null, "mask", "camera", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -336,7 +336,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync("", "mask", "camera", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("agentId");
         }
 
@@ -345,7 +345,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync("agent1", null, "camera", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("maskImage");
         }
 
@@ -354,7 +354,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync("agent1", "", "camera", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("maskImage");
         }
 
@@ -363,7 +363,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync("agent1", "mask", null, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("openAlprName");
         }
 
@@ -372,7 +372,7 @@ namespace Tests.WebhookProcessor
         {
             var act = async () => await _organizer.UpsertCameraMaskAsync("agent1", "mask", "", CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithParameterName("openAlprName");
         }
 

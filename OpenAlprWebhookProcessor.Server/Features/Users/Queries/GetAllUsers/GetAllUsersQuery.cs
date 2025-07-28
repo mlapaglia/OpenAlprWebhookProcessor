@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers
 {
-    public class GetAllUsersQuery : IRequest<List<User>>
+    public class GetAllUsersQuery : IQuery<List<User>>
     {
     }
 } 

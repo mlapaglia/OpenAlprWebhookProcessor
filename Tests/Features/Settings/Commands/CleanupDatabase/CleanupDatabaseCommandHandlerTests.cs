@@ -342,8 +342,7 @@ namespace Tests.Features.Settings.Commands.CleanupDatabase
             Context.Dispose();
 
             // Act & Assert
-            Assert.ThrowsAsync<ObjectDisposedException>(
-                () => _handler.Handle(command, GetCancellationToken()));
+            Assert.ThrowsAsync<ObjectDisposedException>(async () => await _handler.Handle(command, GetCancellationToken()));
         }
 
         [TearDown]

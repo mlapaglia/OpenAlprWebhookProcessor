@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetAccountInfo;
 using OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket;

@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
 {
-    public class AddAlertCommand : IRequest
+    public class AddAlertCommand : ICommand
     {
         public Alert Alert { get; set; }
 

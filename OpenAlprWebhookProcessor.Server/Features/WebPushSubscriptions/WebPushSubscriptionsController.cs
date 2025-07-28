@@ -1,5 +1,5 @@
 using Lib.Net.Http.WebPush;
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWebPushSubscription;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.DeleteWebPushSubscription;

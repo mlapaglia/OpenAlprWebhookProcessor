@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using System;
 using System.IO;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
 {
-    public class GetSnapshotQuery : IRequest<Stream>
+    public class GetSnapshotQuery : IQuery<Stream>
     {
         public Guid CameraId { get; set; }
 

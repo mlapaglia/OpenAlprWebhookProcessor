@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWebPushSubscription
 {
-    public class AddWebPushSubscriptionCommandHandler : IRequestHandler<AddWebPushSubscriptionCommand>
+    public class AddWebPushSubscriptionCommandHandler : ICommandHandler<AddWebPushSubscriptionCommand>
     {
         private readonly IWebPushSubscriptionsService _pushSubscriptionsService;
 
@@ -13,9 +13,10 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWeb
             _pushSubscriptionsService = pushSubscriptionsService;
         }
 
-        public async Task Handle(AddWebPushSubscriptionCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(AddWebPushSubscriptionCommand request, CancellationToken cancellationToken = default)
         {
             await _pushSubscriptionsService.InsertAsync(request.Subscription, cancellationToken);
+            return Unit.Value;
         }
     }
 } 

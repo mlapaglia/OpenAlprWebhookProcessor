@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores
 {
-    public class GetIgnoresQueryHandler : IRequestHandler<GetIgnoresQuery, List<IgnoreDto>>
+    public class GetIgnoresQueryHandler : IQueryHandler<GetIgnoresQuery, List<IgnoreDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<IgnoreDto>> Handle(GetIgnoresQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<IgnoreDto>> Handle(GetIgnoresQuery query, CancellationToken cancellationToken = default)
         {
             var dbIgnores = await _unitOfWork.Ignores.GetAllAsync(cancellationToken);
             var ignores = new List<IgnoreDto>();

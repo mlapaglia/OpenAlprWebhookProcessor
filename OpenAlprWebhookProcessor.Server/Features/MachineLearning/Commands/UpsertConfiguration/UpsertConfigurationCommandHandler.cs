@@ -1,4 +1,4 @@
-﻿using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfiguration
 {
-    public class UpsertConfigurationCommandHandler : IRequestHandler<UpsertConfigurationCommand, Unit>
+    public class UpsertConfigurationCommandHandler : IQueryHandler<UpsertConfigurationCommand, Unit>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfi
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Unit> Handle(UpsertConfigurationCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertConfigurationCommand request, CancellationToken cancellationToken = default)
         {
             var updateTime = DateTime.UtcNow;
 

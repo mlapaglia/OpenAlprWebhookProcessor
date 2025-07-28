@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwards
 {
-    public class UpsertWebhookForwardsCommandHandler : IRequestHandler<UpsertWebhookForwardsCommand>
+    public class UpsertWebhookForwardsCommandHandler : ICommandHandler<UpsertWebhookForwardsCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,9 +15,9 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwa
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertWebhookForwardsCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertWebhookForwardsCommand command, CancellationToken cancellationToken = default)
         {
-            var webhookForwards = request.WebhookForwards.Where(x => x.Destination != null).ToList();
+            var webhookForwards = command.WebhookForwards.Where(x => x.Destination != null).ToList();
 
             var dbForwards = (await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken)).ToList();
 
@@ -57,6 +57,8 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwa
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}

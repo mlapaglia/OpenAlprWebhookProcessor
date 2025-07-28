@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWebhook
 {
-    public class ProcessHeartbeatWebhookCommandHandler : IRequestHandler<ProcessHeartbeatWebhookCommand>
+    public class ProcessHeartbeatWebhookCommandHandler : ICommandHandler<ProcessHeartbeatWebhookCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWe
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(ProcessHeartbeatWebhookCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(ProcessHeartbeatWebhookCommand request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
@@ -25,6 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessHeartbeatWe
                 _unitOfWork.Agents.Update(agent);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
+            return Unit.Value;
         }
     }
 } 

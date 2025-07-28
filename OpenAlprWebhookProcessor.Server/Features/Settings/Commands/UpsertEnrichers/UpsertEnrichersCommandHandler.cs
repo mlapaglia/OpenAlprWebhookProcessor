@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers
 {
-    public class UpsertEnrichersCommandHandler : IRequestHandler<UpsertEnrichersCommand>
+    public class UpsertEnrichersCommandHandler : ICommandHandler<UpsertEnrichersCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -14,9 +14,9 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertEnrichersCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertEnrichersCommand command, CancellationToken cancellationToken = default)
         {
-            var enricher = request.Enricher;
+            var enricher = command.Enricher;
             var dbEnricher = await _unitOfWork.Enrichers.FirstOrDefaultAsync(x => x.Id == enricher.Id, cancellationToken);
 
             if (dbEnricher == null)
@@ -42,6 +42,8 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}

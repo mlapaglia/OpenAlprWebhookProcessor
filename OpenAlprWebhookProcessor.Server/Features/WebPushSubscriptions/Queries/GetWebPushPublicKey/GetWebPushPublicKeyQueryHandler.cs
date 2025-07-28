@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Queries.GetWebPushPublicKey
 {
-    public class GetWebPushPublicKeyQueryHandler : IRequestHandler<GetWebPushPublicKeyQuery, string>
+    public class GetWebPushPublicKeyQueryHandler : IQueryHandler<GetWebPushPublicKeyQuery, string>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Queries.GetWebP
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<string> Handle(GetWebPushPublicKeyQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<string> Handle(GetWebPushPublicKeyQuery request, CancellationToken cancellationToken = default)
         {
             var keys = await VapidKeyHelper.GetVapidKeysAsync(_unitOfWork, cancellationToken);
             return keys.PublicKey;

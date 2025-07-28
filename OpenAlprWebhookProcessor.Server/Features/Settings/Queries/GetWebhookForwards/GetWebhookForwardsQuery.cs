@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards
 {
-    public class GetWebhookForwardsQuery : IRequest<List<WebhookForwardDto>>
+    public class GetWebhookForwardsQuery : IQuery<List<WebhookForwardDto>>
     {
     }
 } 

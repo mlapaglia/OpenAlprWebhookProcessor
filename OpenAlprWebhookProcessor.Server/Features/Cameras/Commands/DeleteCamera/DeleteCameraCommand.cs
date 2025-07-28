@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
 {
-    public class DeleteCameraCommand : IRequest
+    public class DeleteCameraCommand : ICommand
     {
         public Guid CameraId { get; set; }
 

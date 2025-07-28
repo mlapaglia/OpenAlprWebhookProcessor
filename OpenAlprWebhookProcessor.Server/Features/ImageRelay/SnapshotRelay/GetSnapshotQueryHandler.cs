@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Cameras;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
 {
-    public class GetSnapshotQueryHandler : IRequestHandler<GetSnapshotQuery, Stream>
+    public class GetSnapshotQueryHandler : IQueryHandler<GetSnapshotQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
             _cameraFactory = cameraFactory ?? throw new ArgumentNullException(nameof(cameraFactory));
         }
 
-        public async Task<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken = default)
         {
             var dbCamera = await _unitOfWork.Cameras.GetByIdAsync(
                 request.CameraId,

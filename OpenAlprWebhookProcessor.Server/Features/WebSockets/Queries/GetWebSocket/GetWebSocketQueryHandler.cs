@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
 {
-    public class GetWebSocketQueryHandler : IRequestHandler<GetWebSocketQuery>
+    public class GetWebSocketQueryHandler : ICommandHandler<GetWebSocketQuery>
     {
         private readonly ILogger<GetWebSocketQueryHandler> _logger;
         private readonly IUnitOfWork _unitOfWork;
@@ -31,9 +31,9 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
             _processorHub = processorHub;
         }
 
-        public async Task Handle(GetWebSocketQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(GetWebSocketQuery command, CancellationToken cancellationToken = default)
         {
-            if (request.HttpContext.WebSockets.IsWebSocketRequest)
+            if (command.HttpContext.WebSockets.IsWebSocketRequest)
             {
                 _logger.LogInformation("Websocket connection received.");
 
@@ -43,11 +43,11 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
                 if (agent == null)
                 {
                     _logger.LogError("No agent found");
-                    request.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    return;
+                    command.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    return Unit.Value;
                 }
 
-                var webSocket = await request.HttpContext.WebSockets.AcceptWebSocketAsync();
+                var webSocket = await command.HttpContext.WebSockets.AcceptWebSocketAsync();
 
                 var webSocketClient = new OpenAlprWebsocketClient(
                     _logger,
@@ -62,7 +62,7 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
                 if (!addResult.WasAdded)
                 {
                     _logger.LogError("Unable to disconnect client: {AgentId}", agent.Uid);
-                    return;
+                    return Unit.Value;
                 }
 
                 if (addResult.WasUpdated)
@@ -70,7 +70,7 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
                     _logger.LogWarning("Multiple websocket connections for the same agent, previous agent disconnected: {AgentId}.", agent.Uid);
                 }
 
-                await _processorHub.Clients.All.OpenAlprAgentConnected(agent.Uid, request.HttpContext.Connection.RemoteIpAddress.ToString());
+                await _processorHub.Clients.All.OpenAlprAgentConnected(agent.Uid, command.HttpContext.Connection.RemoteIpAddress.ToString());
 
                 try
                 {
@@ -85,14 +85,16 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
                     _logger.LogError(ex, "Websocket connection closed ungracefully.");
 
                     await _websocketClientOrganizer.RemoveAgentAsync(agent.Uid, cancellationToken);
-                    await _processorHub.Clients.All.OpenAlprAgentDisconnected(agent.Uid, request.HttpContext.Connection.RemoteIpAddress.ToString());
+                    await _processorHub.Clients.All.OpenAlprAgentDisconnected(agent.Uid, command.HttpContext.Connection.RemoteIpAddress.ToString());
                 }
             }
             else
             {
                 _logger.LogInformation("Non websocket connection received.");
-                request.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                command.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
+
+            return Unit.Value;
         }
     }
 } 

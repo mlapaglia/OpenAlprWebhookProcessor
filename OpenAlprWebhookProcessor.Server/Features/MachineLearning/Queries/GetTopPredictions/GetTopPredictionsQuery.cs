@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using System;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredictions
 {
-    public class GetTopPredictionsQuery : IRequest<List<LicensePlatePredictionResult>>
+    public class GetTopPredictionsQuery : IQuery<List<LicensePlatePredictionResult>>
     {
         public int Count { get; set; }
         public TimeSpan WithinHours { get; set; }

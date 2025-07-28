@@ -60,7 +60,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() => 
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be($"Plate with ID {nonExistentPlateId} not found");
@@ -136,7 +136,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(() => 
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be($"Plate with ID {Guid.Empty} not found");

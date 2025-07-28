@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats
 {
-    public class GetQuickStatsQueryHandler : IRequestHandler<GetQuickStatsQuery, GetQuickStatsResponse>
+    public class GetQuickStatsQueryHandler : IQueryHandler<GetQuickStatsQuery, GetQuickStatsResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken = default)
         {
             var now = DateTimeOffset.UtcNow;
             var todayUtc = DateTime.UtcNow.Date;

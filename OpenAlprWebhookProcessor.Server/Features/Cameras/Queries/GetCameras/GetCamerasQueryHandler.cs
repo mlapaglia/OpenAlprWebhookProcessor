@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 {
-    public class GetCamerasQueryHandler : IRequestHandler<GetCamerasQuery, List<CameraUpdateService.Camera>>
+    public class GetCamerasQueryHandler : IQueryHandler<GetCamerasQuery, List<CameraUpdateService.Camera>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBackgroundJobService _backgroundJobService;
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
             _backgroundJobService = backgroundJobService;
         }
 
-        public async Task<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<CameraUpdateService.Camera>> Handle(GetCamerasQuery query, CancellationToken cancellationToken)
         {
             var cameras = new List<CameraUpdateService.Camera>();
 

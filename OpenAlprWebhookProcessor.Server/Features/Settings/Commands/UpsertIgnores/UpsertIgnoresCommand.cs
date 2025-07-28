@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores
 {
-    public class UpsertIgnoresCommand : IRequest
+    public class UpsertIgnoresCommand : ICommand
     {
         public List<IgnoreDto> Ignores { get; set; }
 

@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates
 {
-    public class SearchLicensePlatesQuery : IRequest<SearchLicensePlateResponse>
+    public class SearchLicensePlatesQuery : IQuery<SearchLicensePlateResponse>
     {
         public string? PlateNumber { get; set; }
         public bool StrictMatch { get; set; }

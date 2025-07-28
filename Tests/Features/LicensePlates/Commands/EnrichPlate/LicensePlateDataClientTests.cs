@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using Tests.TestHelpers;
 
+using Mediator;
 namespace Tests.Features.LicensePlates.Commands.EnrichPlate
 {
     [TestFixture]

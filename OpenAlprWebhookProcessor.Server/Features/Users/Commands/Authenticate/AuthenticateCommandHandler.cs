@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
 {
-    public class AuthenticateCommandHandler : IRequestHandler<AuthenticateCommand, AuthenticateResponse>
+    public class AuthenticateCommandHandler : IQueryHandler<AuthenticateCommand, AuthenticateResponse>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
         private readonly IJwtService _jwtService;
@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
             _passwordService = passwordService;
         }
 
-        public async Task<AuthenticateResponse> Handle(AuthenticateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<AuthenticateResponse> Handle(AuthenticateCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByUsernameAsync(request.Username, cancellationToken);
 

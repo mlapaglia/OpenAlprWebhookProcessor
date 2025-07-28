@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate
 {
-    public class DeletePlateCommandHandler : IRequestHandler<DeletePlateCommand>
+    public class DeletePlateCommandHandler : ICommandHandler<DeletePlateCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(DeletePlateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeletePlateCommand request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdAsync(
                 request.Id,
@@ -28,6 +28,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate
 
             _unitOfWork.PlateGroups.Delete(plateGroup);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Unit.Value;
         }
     }
 } 

@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommand : IRequest
+    public class UpdateUserCommand : ICommand
     {
         public int Id { get; set; }
         public string FirstName { get; set; }

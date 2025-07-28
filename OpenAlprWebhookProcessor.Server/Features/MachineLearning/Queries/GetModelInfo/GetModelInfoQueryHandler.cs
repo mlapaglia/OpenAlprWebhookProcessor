@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
 {
-    public class GetModelInfoQueryHandler : IRequestHandler<GetModelInfoQuery, ModelInfoDto>
+    public class GetModelInfoQueryHandler : IQueryHandler<GetModelInfoQuery, ModelInfoDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
             _logger = logger;
         }
 
-        public Task<ModelInfoDto> Handle(
+        public async ValueTask<ModelInfoDto> Handle(
             GetModelInfoQuery request, 
             CancellationToken cancellationToken = default)
         {
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
             {
                 var isAvailable = _predictionService.IsModelAvailable();
                 
-                return Task.FromResult(new ModelInfoDto
+                return await Task.FromResult(new ModelInfoDto
                 {
                     ModelAvailable = isAvailable,
                     ModelType = "FastTree Regression",

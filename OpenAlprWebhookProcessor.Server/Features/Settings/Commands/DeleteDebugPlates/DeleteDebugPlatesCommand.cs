@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates
 {
-    public class DeleteDebugPlatesCommand : IRequest
+    public class DeleteDebugPlatesCommand : ICommand
     {
     }
 } 

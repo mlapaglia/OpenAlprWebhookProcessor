@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraNightMode
 {
-    public class TestCameraNightModeCommand : IRequest
+    public class TestCameraNightModeCommand : ICommand
     {
         public Guid CameraId { get; set; }
 

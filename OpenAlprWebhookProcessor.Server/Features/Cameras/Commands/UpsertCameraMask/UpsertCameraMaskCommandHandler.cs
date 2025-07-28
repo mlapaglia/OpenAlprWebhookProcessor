@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
 {
-    public class UpsertCameraMaskCommandHandler : IRequestHandler<UpsertCameraMaskCommand, bool>
+    public class UpsertCameraMaskCommandHandler : IQueryHandler<UpsertCameraMaskCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async Task<bool> Handle(UpsertCameraMaskCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(UpsertCameraMaskCommand request, CancellationToken cancellationToken = default)
         {
             var cameraMask = request.CameraMask;
 

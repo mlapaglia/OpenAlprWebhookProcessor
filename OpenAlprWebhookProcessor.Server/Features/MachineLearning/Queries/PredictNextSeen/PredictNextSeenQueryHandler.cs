@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextSeen
 {
-    public class PredictNextSeenQueryHandler : IRequestHandler<PredictNextSeenQuery, LicensePlatePredictionResult>
+    public class PredictNextSeenQueryHandler : IQueryHandler<PredictNextSeenQuery, LicensePlatePredictionResult>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextS
             _logger = logger;
         }
 
-        public async Task<LicensePlatePredictionResult> Handle(
+        public async ValueTask<LicensePlatePredictionResult> Handle(
             PredictNextSeenQuery request, 
             CancellationToken cancellationToken = default)
         {

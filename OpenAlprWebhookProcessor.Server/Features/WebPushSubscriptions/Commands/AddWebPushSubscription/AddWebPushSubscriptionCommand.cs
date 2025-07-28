@@ -1,9 +1,9 @@
 using Lib.Net.Http.WebPush;
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWebPushSubscription
 {
-    public class AddWebPushSubscriptionCommand : IRequest
+    public class AddWebPushSubscriptionCommand : ICommand
     {
         public PushSubscription Subscription { get; set; }
 

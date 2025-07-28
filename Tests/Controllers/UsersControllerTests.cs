@@ -279,7 +279,7 @@ namespace Tests.Controllers
             var cancellationToken = GetCancellationToken();
 
             Mediator.Send(Arg.Any<CreateUserCommand>(), cancellationToken)
-                .Returns(Task.FromException<User>(new AppException("Username already exists")));
+                .Returns(ValueTask.FromException<User>(new AppException("Username already exists")));
 
             // Act
             var result = await _controller.AddUser(model, cancellationToken);
@@ -352,7 +352,7 @@ namespace Tests.Controllers
                 .Returns(true);
 
             Mediator.Send(Arg.Any<CreateUserCommand>(), cancellationToken)
-                .Returns(Task.FromException<User>(new AppException("Username already exists")));
+                .Returns(ValueTask.FromException<User>(new AppException("Username already exists")));
 
             // Act
             var result = await _controller.Register(model, cancellationToken);

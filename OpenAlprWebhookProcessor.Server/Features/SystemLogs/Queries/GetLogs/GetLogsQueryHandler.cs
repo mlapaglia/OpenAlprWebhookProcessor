@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
 {
-    public partial class GetLogsQueryHandler : IRequestHandler<GetLogsQuery, List<string>>
+    public partial class GetLogsQueryHandler : IQueryHandler<GetLogsQuery, List<string>>
     {
         private readonly IFileSystem _fileSystem;
 
@@ -19,8 +19,8 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
             _fileSystem = fileSystem;
         }
 
-        public async Task<List<string>> Handle(
-            GetLogsQuery request,
+        public async ValueTask<List<string>> Handle(
+            GetLogsQuery query,
             CancellationToken cancellationToken = default)
         {
             var currentLogFile = _fileSystem.Directory.GetFiles("./config/")
@@ -40,8 +40,8 @@ namespace OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs
             var logEntries = await ParseLogEntriesAsync(sr, cancellationToken);
 
             var filteredLogs = logEntries
-                .Where(entry => ShouldIncludeLogEntry(entry, request.MinimumSeverity))
-                .Where(entry => ShouldIncludeLogEntryBySearch(entry, request.SearchString))
+                .Where(entry => ShouldIncludeLogEntry(entry, query.MinimumSeverity))
+                .Where(entry => ShouldIncludeLogEntryBySearch(entry, query.SearchString))
                 .Take(500)
                 .Reverse()
                 .ToList();

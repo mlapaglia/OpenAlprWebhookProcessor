@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate;
 using OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken;
 using OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken;

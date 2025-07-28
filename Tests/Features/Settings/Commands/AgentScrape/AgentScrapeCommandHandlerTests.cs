@@ -46,7 +46,7 @@ namespace Tests.Features.Settings.Commands.AgentScrape
             // Assert
             task.Should().NotBeNull();
             task.IsCompleted.Should().BeTrue();
-            task.Status.Should().Be(TaskStatus.RanToCompletion);
+            task.IsCompletedSuccessfully.Should().BeTrue();
         }
 
         [Test]

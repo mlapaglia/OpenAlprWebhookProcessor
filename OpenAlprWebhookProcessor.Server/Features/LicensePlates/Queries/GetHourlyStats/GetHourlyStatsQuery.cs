@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetHourlyStats
 {
-    public class GetHourlyStatsQuery : IRequest<GetHourlyStatsResponse>
+    public class GetHourlyStatsQuery : IQuery<GetHourlyStatsResponse>
     {
     }
 } 

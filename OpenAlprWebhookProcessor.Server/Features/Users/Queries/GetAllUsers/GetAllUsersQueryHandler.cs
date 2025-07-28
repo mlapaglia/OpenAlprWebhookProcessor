@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers
 {
-    public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<User>>
+    public class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery, List<User>>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<List<User>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<User>> Handle(GetAllUsersQuery query, CancellationToken cancellationToken = default)
         {
             var users = await _usersUnitOfWork.Users.GetAllAsync(cancellationToken);
             return users.ToList();

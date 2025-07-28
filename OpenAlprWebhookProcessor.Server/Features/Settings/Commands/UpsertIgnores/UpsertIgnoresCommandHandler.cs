@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Linq;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores
 {
-    public class UpsertIgnoresCommandHandler : IRequestHandler<UpsertIgnoresCommand>
+    public class UpsertIgnoresCommandHandler : ICommandHandler<UpsertIgnoresCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,9 +15,9 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertIgnoresCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertIgnoresCommand command, CancellationToken cancellationToken = default)
         {
-            var ignores = request.Ignores.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
+            var ignores = command.Ignores.Where(x => !string.IsNullOrWhiteSpace(x.PlateNumber)).ToList();
 
             var dbIgnores = (await _unitOfWork.Ignores.GetAllAsync(cancellationToken)).ToList();
 
@@ -53,6 +53,8 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}

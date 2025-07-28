@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers
 {
-    public class TestEnrichersCommand : IRequest<bool>
+    public class TestEnrichersCommand : IQuery<bool>
     {
     }
 } 

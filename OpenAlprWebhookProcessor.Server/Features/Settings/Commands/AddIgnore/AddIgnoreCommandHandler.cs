@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore
 {
-    public class AddIgnoreCommandHandler : IRequestHandler<AddIgnoreCommand>
+    public class AddIgnoreCommandHandler : ICommandHandler<AddIgnoreCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,9 +16,9 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(AddIgnoreCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(AddIgnoreCommand command, CancellationToken cancellationToken = default)
         {
-            var ignore = request.Ignore;
+            var ignore = command.Ignore;
 
             var existingIgnores = await _unitOfWork.Ignores.FindAsync(
                 x => x.PlateNumber == ignore.PlateNumber, 
@@ -38,6 +38,8 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore
 
             await _unitOfWork.Ignores.AddAsync(addedIgnore, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}

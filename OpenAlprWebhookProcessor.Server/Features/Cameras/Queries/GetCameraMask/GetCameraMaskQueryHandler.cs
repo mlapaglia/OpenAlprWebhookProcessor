@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask
 {
-    public class GetCameraMaskQueryHandler : IRequestHandler<GetCameraMaskQuery, List<MaskCoordinate>>
+    public class GetCameraMaskQueryHandler : IQueryHandler<GetCameraMaskQuery, List<MaskCoordinate>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,9 +16,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<MaskCoordinate>> Handle(GetCameraMaskQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<MaskCoordinate>> Handle(GetCameraMaskQuery query, CancellationToken cancellationToken = default)
         {
-            var cameraMask = await _unitOfWork.CameraMasks.FirstOrDefaultAsync(x => x.CameraId == request.CameraId, cancellationToken);
+            var cameraMask = await _unitOfWork.CameraMasks.FirstOrDefaultAsync(x => x.CameraId == query.CameraId, cancellationToken);
 
             if (cameraMask?.Coordinates == null)
             {

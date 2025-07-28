@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser
 {
-    public class DeleteUserCommand : IRequest
+    public class DeleteUserCommand : ICommand
     {
         public int Id { get; set; }
 

@@ -4,7 +4,7 @@ using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
-using MediatR;
+using Mediator;
 using NUnit.Framework;
 
 namespace Tests.TestHelpers

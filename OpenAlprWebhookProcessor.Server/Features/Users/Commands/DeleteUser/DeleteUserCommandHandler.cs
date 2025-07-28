@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser
 {
-    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
+    public class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByIdAsync(request.Id, cancellationToken);
 
@@ -23,6 +23,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.DeleteUser
                 _usersUnitOfWork.Users.Delete(user);
                 await _usersUnitOfWork.SaveChangesAsync(cancellationToken);
             }
+            return Unit.Value;
         }
     }
 } 

@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken
 {
-    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthenticateResponse>
+    public class RefreshTokenCommandHandler : IQueryHandler<RefreshTokenCommand, AuthenticateResponse>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
         private readonly IJwtService _jwtService;
@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken
             _jwtService = jwtService;
         }
 
-        public async Task<AuthenticateResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<AuthenticateResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
         {
             var user = await _usersUnitOfWork.Users.GetByRefreshTokenAsync(request.Token, cancellationToken);
 

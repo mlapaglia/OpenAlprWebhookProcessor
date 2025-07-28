@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
 {
-    public class AgentScrapeCommand : IRequest
+    public class AgentScrapeCommand : ICommand
     {
     }
 } 

@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent
 {
-    public class DisableAgentCommandHandler : IRequestHandler<DisableAgentCommand, bool>
+    public class DisableAgentCommandHandler : IQueryHandler<DisableAgentCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebsocketClientOrganizer _websocketClientOrganizer;
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async Task<bool> Handle(DisableAgentCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(DisableAgentCommand request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

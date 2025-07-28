@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetAlerts
 {
-    public class GetAlertsQueryHandler : IRequestHandler<GetAlertsQuery, List<Alert>>
+    public class GetAlertsQueryHandler : IQueryHandler<GetAlertsQuery, List<Alert>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,9 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetAlerts
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<Alert>> Handle(
-            GetAlertsQuery request,
-            CancellationToken cancellationToken = default)
+        public async ValueTask<List<Alert>> Handle(GetAlertsQuery query, CancellationToken cancellationToken)
         {
             var dbAlerts = await _unitOfWork.Alerts.GetAllAsync(cancellationToken);
 

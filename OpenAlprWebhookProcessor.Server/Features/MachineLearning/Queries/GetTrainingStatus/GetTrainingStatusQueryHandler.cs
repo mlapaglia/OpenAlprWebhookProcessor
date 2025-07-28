@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingStatus
 {
-    public class GetTrainingStatusQueryHandler : IRequestHandler<GetTrainingStatusQuery, TrainingStatusDto>
+    public class GetTrainingStatusQueryHandler : IQueryHandler<GetTrainingStatusQuery, TrainingStatusDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlateMlTrainingService _trainingService;
@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
             _logger = logger;
         }
 
-        public Task<TrainingStatusDto> Handle(
+        public async ValueTask<TrainingStatusDto> Handle(
             GetTrainingStatusQuery request, 
             CancellationToken cancellationToken = default)
         {
@@ -33,7 +33,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
             {
                 var status = _trainingService.GetTrainingStatus();
                 
-                return Task.FromResult(new TrainingStatusDto
+                return new TrainingStatusDto
                 {
                     IsTraining = status.IsTraining,
                     LastTrainingStarted = status.LastTrainingStarted,
@@ -59,7 +59,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTrainingS
                         MinimumModelQuality = 0.05,
                         BatchSize = 50000
                     }
-                });
+                };
             }
             catch (Exception ex)
             {

@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertPushover
 {
-    public class UpsertPushoverCommand : IRequest
+    public class UpsertPushoverCommand : ICommand
     {
         public PushoverRequest Request { get; set; }
 

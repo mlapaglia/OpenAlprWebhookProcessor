@@ -65,8 +65,7 @@ namespace Tests.Features.Settings.Commands.AddIgnore
             var command = new AddIgnoreCommand(ignoreDto);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
-                () => _handler.Handle(command, GetCancellationToken()));
+            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await _handler.Handle(command, GetCancellationToken()));
             exception.Message.Should().Be("ignore already exists");
         }
 

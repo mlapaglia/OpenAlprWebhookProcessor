@@ -461,7 +461,7 @@ namespace Tests.Features.MachineLearning.Services
 
             // Act & Assert
             var act = async () => await _predictionService.TriggerTrainingAsync();
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowExactlyAsync<InvalidOperationException>()
                 .WithMessage("Training failed");
         }
 

@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers
 {
-    public class TestEnrichersCommandHandler : IRequestHandler<TestEnrichersCommand, bool>
+    public class TestEnrichersCommandHandler : IQueryHandler<TestEnrichersCommand, bool>
     {
         private readonly ILicensePlateEnricherClient _licensePlateEnricherClient;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 
-        public async Task<bool> Handle(TestEnrichersCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(TestEnrichersCommand request, CancellationToken cancellationToken = default)
         {
             return await _licensePlateEnricherClient.TestAsync(cancellationToken);
         }

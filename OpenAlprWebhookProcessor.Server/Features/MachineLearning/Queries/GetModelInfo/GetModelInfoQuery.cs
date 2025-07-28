@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
 {
-    public class GetModelInfoQuery : IRequest<ModelInfoDto>
+    public class GetModelInfoQuery : IQuery<ModelInfoDto>
     {
     }
 } 

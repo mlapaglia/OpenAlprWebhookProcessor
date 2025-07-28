@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.DeleteWebPushSubscription
 {
-    public class DeleteWebPushSubscriptionCommandHandler : IRequestHandler<DeleteWebPushSubscriptionCommand>
+    public class DeleteWebPushSubscriptionCommandHandler : ICommandHandler<DeleteWebPushSubscriptionCommand>
     {
         private readonly IWebPushSubscriptionsService _pushSubscriptionsService;
 
@@ -13,11 +13,12 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.Delete
             _pushSubscriptionsService = pushSubscriptionsService;
         }
 
-        public async Task Handle(
+        public async ValueTask<Unit> Handle(
             DeleteWebPushSubscriptionCommand request,
             CancellationToken cancellationToken = default)
         {
             await _pushSubscriptionsService.DeleteAsync(request.Endpoint, cancellationToken);
+            return Unit.Value;
         }
     }
 } 

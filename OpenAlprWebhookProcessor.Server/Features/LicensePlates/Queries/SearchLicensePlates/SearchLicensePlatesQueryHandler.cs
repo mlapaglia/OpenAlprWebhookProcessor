@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicensePlates
 {
-    public class SearchLicensePlatesQueryHandler : IRequestHandler<SearchLicensePlatesQuery, SearchLicensePlateResponse>
+    public class SearchLicensePlatesQueryHandler : IQueryHandler<SearchLicensePlatesQuery, SearchLicensePlateResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.SearchLicenseP
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<SearchLicensePlateResponse> Handle(SearchLicensePlatesQuery request, CancellationToken cancellationToken = default)
         {
             var ignoredPlates = await GetIgnoredPlatesAsync(cancellationToken);
             var platesToIgnoreForFiltering = request.FilterIgnoredPlates ? new List<string>() : ignoredPlates;

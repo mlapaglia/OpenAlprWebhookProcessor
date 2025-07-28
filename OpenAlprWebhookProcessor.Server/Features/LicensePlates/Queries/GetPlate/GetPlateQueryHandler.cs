@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
 {
-    public class GetPlateQueryHandler : IRequestHandler<GetPlateQuery, LicensePlate?>
+    public class GetPlateQueryHandler : IQueryHandler<GetPlateQuery, LicensePlate?>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(request.Id, cancellationToken);
             

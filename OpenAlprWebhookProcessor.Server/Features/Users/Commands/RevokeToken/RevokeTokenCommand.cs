@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.RevokeToken
 {
-    public class RevokeTokenCommand : IRequest<bool>
+    public class RevokeTokenCommand : IQuery<bool>
     {
         public string Token { get; set; } = default!;
         public string IpAddress { get; set; } = default!;

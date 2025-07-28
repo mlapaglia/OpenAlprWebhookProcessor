@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken
 {
-    public class RefreshTokenCommand : IRequest<AuthenticateResponse>
+    public class RefreshTokenCommand : IQuery<AuthenticateResponse>
     {
         public string Token { get; set; } = default!;
         public string IpAddress { get; set; } = default!;

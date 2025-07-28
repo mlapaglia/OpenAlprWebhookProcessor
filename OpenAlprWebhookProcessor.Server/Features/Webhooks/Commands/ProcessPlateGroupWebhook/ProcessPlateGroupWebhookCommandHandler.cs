@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessPlateGroupWebhook
 {
-    public class ProcessPlateGroupWebhookCommandHandler : IRequestHandler<ProcessPlateGroupWebhookCommand>
+    public class ProcessPlateGroupWebhookCommandHandler : ICommandHandler<ProcessPlateGroupWebhookCommand>
     {
         private readonly IGroupWebhookHandler _groupWebhookHandler;
 
@@ -15,12 +15,13 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessPlateGroupW
             _groupWebhookHandler = groupWebhookHandler;
         }
 
-        public async Task Handle(ProcessPlateGroupWebhookCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(ProcessPlateGroupWebhookCommand request, CancellationToken cancellationToken = default)
         {
             await _groupWebhookHandler.HandleWebhookAsync(
                 request.Webhook,
                 request.IsBulkImport,
                 cancellationToken);
+            return Unit.Value;
         }
     }
 } 

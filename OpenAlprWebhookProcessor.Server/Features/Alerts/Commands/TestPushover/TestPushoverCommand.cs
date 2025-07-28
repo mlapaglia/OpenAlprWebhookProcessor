@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestPushover
 {
-    public class TestPushoverCommand : IRequest
+    public class TestPushoverCommand : ICommand
     {
         public TestPushoverCommand()
         {

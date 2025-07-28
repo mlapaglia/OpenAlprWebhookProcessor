@@ -85,7 +85,7 @@ namespace Tests.Features.MachineLearning.Queries.GetModelStatus
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowExactlyAsync<InvalidOperationException>()
                 .WithMessage("Test exception");
         }
 

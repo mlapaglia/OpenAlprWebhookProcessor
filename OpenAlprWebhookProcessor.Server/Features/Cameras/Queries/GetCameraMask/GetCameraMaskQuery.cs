@@ -1,10 +1,10 @@
-using MediatR;
+using Mediator;
 using System;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameraMask
 {
-    public class GetCameraMaskQuery : IRequest<List<MaskCoordinate>>
+    public class GetCameraMaskQuery : IQuery<List<MaskCoordinate>>
     {
         public Guid CameraId { get; set; }
 

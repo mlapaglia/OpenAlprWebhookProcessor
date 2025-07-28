@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetCameras
 {
-    public class GetCamerasQuery : IRequest<List<CameraUpdateService.Camera>>
+    public class GetCamerasQuery : IQuery<List<CameraUpdateService.Camera>>
     {
     }
 } 

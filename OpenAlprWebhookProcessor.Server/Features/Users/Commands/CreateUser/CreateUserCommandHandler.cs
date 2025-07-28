@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Users.Services;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User>
+    public class CreateUserCommandHandler : IQueryHandler<CreateUserCommand, User>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
         private readonly IPasswordService _passwordService;
@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser
             _passwordService = passwordService;
         }
 
-        public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<User> Handle(CreateUserCommand request, CancellationToken cancellationToken = default)
         {
             var usernameExists = await _usersUnitOfWork.Users.UsernameExistsAsync(request.Username, cancellationToken);
             if (usernameExists)

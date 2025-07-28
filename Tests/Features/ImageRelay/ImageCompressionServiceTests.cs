@@ -5,6 +5,7 @@ using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using System.Net;
 using Tests.TestHelpers;
 
+using Mediator;
 namespace Tests.Features.ImageRelay
 {
     [TestFixture]
@@ -103,7 +104,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetImageFromAgentAsync(null, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Agent not configured");
         }
 
@@ -117,7 +118,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetImageFromAgentAsync(agent, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Agent not configured");
         }
 
@@ -131,7 +132,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetImageFromAgentAsync(agent, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Agent not configured");
         }
 
@@ -147,7 +148,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetImageFromAgentAsync(agent, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Image not found for that id.");
         }
 
@@ -163,7 +164,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetImageFromAgentAsync(agent, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Image not found for that id.");
         }
 
@@ -277,7 +278,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetCropImageFromAgentAsync(null, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Agent not configured");
         }
 
@@ -293,7 +294,7 @@ namespace Tests.Features.ImageRelay
 
             // Act & Assert
             await FluentActions.Invoking(() => _service.GetCropImageFromAgentAsync(agent, imageId, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Image not found for that id.");
         }
 

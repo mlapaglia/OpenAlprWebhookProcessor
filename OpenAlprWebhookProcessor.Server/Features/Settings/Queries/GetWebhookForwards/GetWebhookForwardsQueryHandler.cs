@@ -1,12 +1,13 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
+using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards
 {
-    public class GetWebhookForwardsQueryHandler : IRequestHandler<GetWebhookForwardsQuery, List<WebhookForwardDto>>
+    public class GetWebhookForwardsQueryHandler : IQueryHandler<GetWebhookForwardsQuery, List<WebhookForwardDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<WebhookForwardDto>> Handle(GetWebhookForwardsQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<WebhookForwardDto>> Handle(GetWebhookForwardsQuery query, CancellationToken cancellationToken)
         {
             var webhookForwards = await _unitOfWork.WebhookForwards.GetAllAsync(cancellationToken);
             var forwards = new List<WebhookForwardDto>();

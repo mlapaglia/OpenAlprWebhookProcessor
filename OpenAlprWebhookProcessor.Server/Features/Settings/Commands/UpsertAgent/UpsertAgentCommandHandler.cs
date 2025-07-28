@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using OpenAlprWebhookProcessor.Hydrator;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
 {
-    public class UpsertAgentCommandHandler : IRequestHandler<UpsertAgentCommand>
+    public class UpsertAgentCommandHandler : ICommandHandler<UpsertAgentCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IImageRetrieverService _imageRetrieverService;
@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
             _hydrationService = hydrationService;
         }
 
-        public async Task Handle(UpsertAgentCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertAgentCommand request, CancellationToken cancellationToken = default)
         {
             var agent = request.Agent;
             var dbAgent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
@@ -82,6 +82,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
             {
                 await _hydrationService.ScheduleHydrationAsync(cancellationToken);
             }
+            return Unit.Value;
         }
     }
 } 

@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Queries.GetWebhookStatus
 {
-    public class GetWebhookStatusQuery : IRequest<string>
+    public class GetWebhookStatusQuery : IQuery<string>
     {
         public GetWebhookStatusQuery()
         {

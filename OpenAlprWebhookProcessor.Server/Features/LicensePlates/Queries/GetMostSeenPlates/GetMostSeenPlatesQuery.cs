@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetMostSeenPlates
 {
-    public class GetMostSeenPlatesQuery : IRequest<GetMostSeenPlatesResponse>
+    public class GetMostSeenPlatesQuery : IQuery<GetMostSeenPlatesResponse>
     {
         public DateTimeOffset? StartDate { get; set; }
         public DateTimeOffset? EndDate { get; set; }

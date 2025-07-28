@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.DeleteWebPushSubscription
 {
-    public class DeleteWebPushSubscriptionCommand : IRequest
+    public class DeleteWebPushSubscriptionCommand : ICommand
     {
         public string Endpoint { get; set; }
 

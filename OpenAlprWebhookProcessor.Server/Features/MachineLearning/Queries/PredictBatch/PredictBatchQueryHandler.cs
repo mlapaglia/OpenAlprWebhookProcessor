@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch
 {
-    public class PredictBatchQueryHandler : IRequestHandler<PredictBatchQuery, List<LicensePlatePredictionResult>>
+    public class PredictBatchQueryHandler : IQueryHandler<PredictBatchQuery, List<LicensePlatePredictionResult>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
@@ -26,28 +26,28 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch
             _logger = logger;
         }
 
-        public async Task<List<LicensePlatePredictionResult>> Handle(
-            PredictBatchQuery request, 
+        public async ValueTask<List<LicensePlatePredictionResult>> Handle(
+            PredictBatchQuery query, 
             CancellationToken cancellationToken = default)
         {
-            if (request.Inputs == null || request.Inputs.Count == 0)
+            if (query.Inputs == null || query.Inputs.Count == 0)
             {
                 throw new ArgumentException("At least one license plate input is required");
             }
 
-            if (request.Inputs.Count > 100)
+            if (query.Inputs.Count > 100)
             {
                 throw new ArgumentException("Maximum 100 predictions per batch");
             }
 
             try
             {
-                var predictions = await _predictionService.PredictBatchAsync(request.Inputs);
+                var predictions = await _predictionService.PredictBatchAsync(query.Inputs);
                 return predictions;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in batch prediction for {Count} license plates", request.Inputs.Count);
+                _logger.LogError(ex, "Error in batch prediction for {Count} license plates", query.Inputs.Count);
                 throw;
             }
         }

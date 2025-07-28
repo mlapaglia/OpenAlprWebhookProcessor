@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
 {
-    public class AddAlertCommandHandler : IRequestHandler<AddAlertCommand>
+    public class AddAlertCommandHandler : ICommandHandler<AddAlertCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,19 +16,19 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(AddAlertCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(AddAlertCommand command, CancellationToken cancellationToken = default)
         {
             var existingAlerts = await _unitOfWork.Alerts.FindAsync(
-                x => x.PlateNumber == request.Alert.PlateNumber.ToUpper(),
+                x => x.PlateNumber == command.Alert.PlateNumber.ToUpper(),
                 cancellationToken);
 
             if (!existingAlerts.Any())
             {
                 var newAlert = new Data.Alert()
                 {
-                    Description = request.Alert.Description,
-                    IsStrictMatch = request.Alert.StrictMatch,
-                    PlateNumber = request.Alert.PlateNumber.ToUpper(),
+                    Description = command.Alert.Description,
+                    IsStrictMatch = command.Alert.StrictMatch,
+                    PlateNumber = command.Alert.PlateNumber.ToUpper(),
                 };
 
                 await _unitOfWork.Alerts.AddAsync(newAlert, cancellationToken);
@@ -38,6 +38,8 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.AddAlert
             {
                 throw new ArgumentException("alert already exists");
             }
+            
+            return Unit.Value;
         }
     }
 } 

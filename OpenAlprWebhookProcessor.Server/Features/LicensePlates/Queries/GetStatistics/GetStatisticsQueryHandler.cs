@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
 {
-    public class GetStatisticsQueryHandler : IRequestHandler<GetStatisticsQuery, PlateStatistics>
+    public class GetStatisticsQueryHandler : IQueryHandler<GetStatisticsQuery, PlateStatistics>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PlateStatistics> Handle(
+        public async ValueTask<PlateStatistics> Handle(
             GetStatisticsQuery request,
             CancellationToken cancellationToken = default)
         {

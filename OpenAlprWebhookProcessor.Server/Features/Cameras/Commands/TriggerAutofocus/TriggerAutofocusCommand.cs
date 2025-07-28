@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TriggerAutofocus
 {
-    public class TriggerAutofocusCommand : IRequest<bool>
+    public class TriggerAutofocusCommand : IQuery<bool>
     {
         public Guid CameraId { get; set; }
 

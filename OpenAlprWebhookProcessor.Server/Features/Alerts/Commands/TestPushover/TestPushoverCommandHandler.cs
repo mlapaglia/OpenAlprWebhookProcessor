@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -9,20 +9,19 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestPushover
 {
-    public class TestPushoverCommandHandler : IRequestHandler<TestPushoverCommand>
+    public class TestPushoverCommandHandler : ICommandHandler<TestPushoverCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAlertClient _alertClient;
 
         public TestPushoverCommandHandler(
-            IUnitOfWork unitOfWork,
-            IEnumerable<IAlertClient> alertClients)
+            IUnitOfWork unitOfWork, IEnumerable<IAlertClient> alertClients)
         {
             _unitOfWork = unitOfWork;
             _alertClient = alertClients.First(x => x is PushoverClient);
         }
 
-        public async Task Handle(TestPushoverCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestPushoverCommand command, CancellationToken cancellationToken = default)
         {
             var testPlateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .Include(x => x.PlateImage)
@@ -46,6 +45,9 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestPushover
                 PlateNumber = testPlateGroup.BestNumber,
                 ReceivedOn = DateTimeOffset.UtcNow,
             }, cancellationToken);
+
+            return Unit.Value;
         }
     }
-} 
+}
+    

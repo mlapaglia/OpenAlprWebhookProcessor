@@ -1,8 +1,8 @@
-﻿using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.UpsertConfiguration
 {
-    public class UpsertConfigurationCommand : IRequest<Unit>
+    public class UpsertConfigurationCommand : IQuery<Unit>
     {
         public MachineLearningConfigDto Configuration { get; set; }
 

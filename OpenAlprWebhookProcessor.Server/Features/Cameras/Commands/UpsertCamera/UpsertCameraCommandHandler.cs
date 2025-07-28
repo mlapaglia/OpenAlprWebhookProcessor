@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
 {
-    public class UpsertCameraCommandHandler : IRequestHandler<UpsertCameraCommand>
+    public class UpsertCameraCommandHandler : ICommandHandler<UpsertCameraCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICameraUpdateService _cameraUpdateService;
 
         public UpsertCameraCommandHandler(
-            IUnitOfWork unitOfWork,
-            ICameraUpdateService cameraUpdateService)
+            IUnitOfWork unitOfWork, ICameraUpdateService cameraUpdateService)
         {
             _unitOfWork = unitOfWork;
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task Handle(UpsertCameraCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertCameraCommand command, CancellationToken cancellationToken = default)
         {
-            var camera = request.Camera;
+            var camera = command.Camera;
 
             var existingCamera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == camera.Id, cancellationToken);
 
@@ -91,6 +90,8 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
             {
                 await _cameraUpdateService.DeleteSunriseSunsetAsync(existingCamera.Id);
             }
+
+            return Unit.Value;
         }
     }
-} 
+}

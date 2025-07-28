@@ -64,8 +64,7 @@ namespace Tests.Features.Users.Commands
             var command = new UpdateUserCommand(999, "Updated", "Name", "updateduser", "newpassword");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, GetCancellationToken()));
+            var exception = Assert.ThrowsAsync<AppException>(async () => await _handler.Handle(command, GetCancellationToken()));
             
             exception.Message.Should().Be("User not found");
         }
@@ -83,8 +82,7 @@ namespace Tests.Features.Users.Commands
             var command = new UpdateUserCommand(existingUser1.Id, "New", "Name", "user2", null);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(
-                () => _handler.Handle(command, GetCancellationToken()));
+            var exception = Assert.ThrowsAsync<AppException>(async () => await _handler.Handle(command, GetCancellationToken()));
             
             exception.Message.Should().Be("Username user2 is already taken");
         }

@@ -62,8 +62,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Camera not found.");
         }
 
@@ -76,8 +76,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Camera not found.");
         }
 
@@ -304,8 +304,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<Exception>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<Exception>()
                 .WithMessage("Camera connection failed");
         }
 
@@ -334,8 +334,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<TimeoutException>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<TimeoutException>()
                 .WithMessage("Unable to get image from camera");
         }
     }

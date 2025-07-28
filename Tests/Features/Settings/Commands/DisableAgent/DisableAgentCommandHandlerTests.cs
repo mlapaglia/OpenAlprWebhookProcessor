@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using Tests.TestHelpers;
 
+using Mediator;
 namespace Tests.Features.Settings.Commands.DisableAgent
 {
     [TestFixture]

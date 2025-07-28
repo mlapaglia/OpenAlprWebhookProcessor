@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertAlerts
 {
-    public class UpsertAlertsCommand : IRequest
+    public class UpsertAlertsCommand : ICommand
     {
         public List<Alert> Alerts { get; set; }
 

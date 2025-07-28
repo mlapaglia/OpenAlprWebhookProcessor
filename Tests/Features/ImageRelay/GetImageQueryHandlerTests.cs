@@ -171,8 +171,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("No image found with that id.");
         }
 
@@ -184,8 +184,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("No image found with that id.");
         }
 
@@ -197,8 +197,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<ArgumentException>()
+           await  FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("No image found with that id.");
         }
 
@@ -221,8 +221,8 @@ namespace Tests.Features.ImageRelay
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            await FluentActions.Invoking(() => _handler.Handle(query, cancellationToken))
-                .Should().ThrowAsync<Exception>()
+            await FluentActions.Invoking(async () => await _handler.Handle(query, cancellationToken))
+                .Should().ThrowExactlyAsync<Exception>()
                 .WithMessage("Agent connection failed");
         }
 

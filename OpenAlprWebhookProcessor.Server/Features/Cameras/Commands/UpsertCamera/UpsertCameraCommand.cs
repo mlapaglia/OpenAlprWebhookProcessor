@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
 {
-    public class UpsertCameraCommand : IRequest
+    public class UpsertCameraCommand : ICommand
     {
         public CameraUpdateService.Camera Camera { get; set; }
 

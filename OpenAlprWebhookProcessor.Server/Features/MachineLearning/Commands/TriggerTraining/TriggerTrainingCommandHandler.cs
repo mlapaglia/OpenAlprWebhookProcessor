@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTraining
 {
-    public class TriggerTrainingCommandHandler : IRequestHandler<TriggerTrainingCommand, TrainingResultDto>
+    public class TriggerTrainingCommandHandler : IQueryHandler<TriggerTrainingCommand, TrainingResultDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlateMlTrainingService _trainingService;
@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTrai
             _logger = logger;
         }
 
-        public async Task<TrainingResultDto> Handle(
+        public async ValueTask<TrainingResultDto> Handle(
             TriggerTrainingCommand request, 
             CancellationToken cancellationToken = default)
         {

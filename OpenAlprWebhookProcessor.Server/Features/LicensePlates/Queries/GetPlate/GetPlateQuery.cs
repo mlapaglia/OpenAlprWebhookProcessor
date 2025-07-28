@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
 {
-    public class GetPlateQuery : IRequest<LicensePlate?>
+    public class GetPlateQuery : IQuery<LicensePlate?>
     {
         public Guid Id { get; set; }
 

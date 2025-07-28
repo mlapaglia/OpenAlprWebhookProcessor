@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers
 {
-    public class GetEnrichersQuery : IRequest<EnricherDto>
+    public class GetEnrichersQuery : IQuery<EnricherDto>
     {
     }
 } 

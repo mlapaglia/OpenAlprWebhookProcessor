@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 {
-    public class GetCropImageQueryHandler : IRequestHandler<GetCropImageQuery, Stream>
+    public class GetCropImageQueryHandler : IQueryHandler<GetCropImageQuery, Stream>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
             _imageCompressionService = imageCompressionService ?? throw new ArgumentNullException(nameof(imageCompressionService));
         }
 
-        public async Task<Stream> Handle(GetCropImageQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<Stream> Handle(GetCropImageQuery request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.FirstOrDefaultAsync(x => x.OpenAlprUuid == request.ImageId, cancellationToken);
 

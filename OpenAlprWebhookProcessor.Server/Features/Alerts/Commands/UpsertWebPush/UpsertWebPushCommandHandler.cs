@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush
 {
-    public class UpsertWebPushCommandHandler : IRequestHandler<UpsertWebPushCommand>
+    public class UpsertWebPushCommandHandler : ICommandHandler<UpsertWebPushCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpsertWebPushCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertWebPushCommand request, CancellationToken cancellationToken = default)
         {
             var webPushClient = await _unitOfWork.WebPushSettings.GetFirstAsync(cancellationToken);
 
@@ -31,6 +31,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertWebPush
 
             _unitOfWork.WebPushSettings.Update(webPushClient);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return Unit.Value;
         }
     }
 } 

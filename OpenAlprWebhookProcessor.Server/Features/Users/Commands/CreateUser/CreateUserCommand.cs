@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser
 {
-    public class CreateUserCommand : IRequest<User>
+    public class CreateUserCommand : IQuery<User>
     {
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;

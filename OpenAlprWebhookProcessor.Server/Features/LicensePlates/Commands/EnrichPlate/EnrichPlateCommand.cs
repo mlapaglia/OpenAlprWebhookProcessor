@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 {
-    public class EnrichPlateCommand : IRequest
+    public class EnrichPlateCommand : ICommand
     {
         public Guid PlateId { get; set; }
 

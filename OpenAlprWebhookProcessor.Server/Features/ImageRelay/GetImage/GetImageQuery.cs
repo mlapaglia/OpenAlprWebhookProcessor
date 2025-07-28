@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System.IO;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 {
-    public class GetImageQuery : IRequest<Stream>
+    public class GetImageQuery : IQuery<Stream>
     {
         public string ImageId { get; set; }
 

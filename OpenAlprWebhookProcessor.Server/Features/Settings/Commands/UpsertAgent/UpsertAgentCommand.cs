@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
 {
-    public class UpsertAgentCommand : IRequest
+    public class UpsertAgentCommand : ICommand
     {
         public AgentDto Agent { get; set; }
 

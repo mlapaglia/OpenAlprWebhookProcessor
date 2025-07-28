@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent
 {
-    public class GetAgentQueryHandler : IRequestHandler<GetAgentQuery, AgentDto>
+    public class GetAgentQueryHandler : IQueryHandler<GetAgentQuery, AgentDto>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<AgentDto> Handle(GetAgentQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AgentDto> Handle(GetAgentQuery request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

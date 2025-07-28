@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase
 {
-    public class CleanupDatabaseCommandHandler : IRequestHandler<CleanupDatabaseCommand>
+    public class CleanupDatabaseCommandHandler : ICommandHandler<CleanupDatabaseCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -29,7 +29,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase
             _logger = logger;
         }
 
-        public async Task Handle(CleanupDatabaseCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(CleanupDatabaseCommand command, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Starting database cleanup operation");
 
@@ -51,6 +51,8 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase
                 _logger.LogError(ex, "Error occurred during database cleanup operation");
                 throw;
             }
+
+            return Unit.Value;
         }
 
         private async Task RemoveWebhookForwardsAsync(CancellationToken cancellationToken)
@@ -128,7 +130,5 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase
             _logger.LogDebug("Obfuscated {PlateGroupCount} plate group numbers and {PossibleNumberCount} possible numbers", 
                 plateGroupCount, possibleNumberCount);
         }
-
-
     }
-} 
+}

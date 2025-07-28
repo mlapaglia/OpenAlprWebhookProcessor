@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover
 {
-    public class GetPushoverQuery : IRequest<PushoverRequest>
+    public class GetPushoverQuery : IQuery<PushoverRequest>
     {
         public GetPushoverQuery()
         {

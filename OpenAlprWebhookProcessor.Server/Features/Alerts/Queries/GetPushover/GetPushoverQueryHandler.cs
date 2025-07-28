@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover
 {
-    public class GetPushoverQueryHandler : IRequestHandler<GetPushoverQuery, PushoverRequest>
+    public class GetPushoverQueryHandler : IQueryHandler<GetPushoverQuery, PushoverRequest>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetPushover
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PushoverRequest> Handle(
+        public async ValueTask<PushoverRequest> Handle(
             GetPushoverQuery request,
             CancellationToken cancellationToken = default)
         {

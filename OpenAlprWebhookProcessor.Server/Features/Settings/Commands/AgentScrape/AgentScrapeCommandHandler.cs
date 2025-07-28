@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Hydrator;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
 {
-    public class AgentScrapeCommandHandler : IRequestHandler<AgentScrapeCommand>
+    public class AgentScrapeCommandHandler : ICommandHandler<AgentScrapeCommand>
     {
         private readonly IHydrationService _hydrationService;
 
@@ -14,10 +14,10 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
             _hydrationService = hydrationService;
         }
 
-        public Task Handle(AgentScrapeCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(AgentScrapeCommand request, CancellationToken cancellationToken = default)
         {
             _hydrationService.StartHydration("hydration");
-            return Task.CompletedTask;
+            return Unit.Value;
         }
     }
 } 

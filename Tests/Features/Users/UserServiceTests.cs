@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Features.Users.Data;
 using System.IdentityModel.Tokens.Jwt;
 using Tests.TestHelpers;
 
+using Mediator;
 namespace Tests.Features.Users
 {
     [TestFixture]
@@ -516,7 +517,7 @@ namespace Tests.Features.Users
             Convert.FromBase64String(updatedKey.Key).Length.Should().Be(128);
         }
 
-        private async Task<User> CreateTestUserAsync(string username, string firstName = "Test", string lastName = "User")
+        private async ValueTask<User> CreateTestUserAsync(string username, string firstName = "Test", string lastName = "User")
         {
             var user = new User
             {
@@ -529,7 +530,7 @@ namespace Tests.Features.Users
             return await _userService.CreateAsync(user, "TestPassword123!");
         }
 
-        private async Task<User> CreateTestUserWithRefreshTokenAsync(string username, string ipAddress)
+        private async ValueTask<User> CreateTestUserWithRefreshTokenAsync(string username, string ipAddress)
         {
             var user = await CreateTestUserAsync(username);
             

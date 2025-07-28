@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetHourlyStats
 {
-    public class GetHourlyStatsQueryHandler : IRequestHandler<GetHourlyStatsQuery, GetHourlyStatsResponse>
+    public class GetHourlyStatsQueryHandler : IQueryHandler<GetHourlyStatsQuery, GetHourlyStatsResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetHourlyStats
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<GetHourlyStatsResponse> Handle(GetHourlyStatsQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<GetHourlyStatsResponse> Handle(GetHourlyStatsQuery request, CancellationToken cancellationToken = default)
         {
             var thirtyDaysAgoEpoch = DateTimeOffset.UtcNow.AddDays(-30).ToUnixTimeMilliseconds();
 

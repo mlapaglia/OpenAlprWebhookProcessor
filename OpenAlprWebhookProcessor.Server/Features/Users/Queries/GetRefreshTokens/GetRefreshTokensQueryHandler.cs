@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Features.Users.Data.Repositories;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetRefreshTokens
 {
-    public class GetRefreshTokensQueryHandler : IRequestHandler<GetRefreshTokensQuery, List<RefreshToken>>
+    public class GetRefreshTokensQueryHandler : IQueryHandler<GetRefreshTokensQuery, List<RefreshToken>>
     {
         private readonly IUsersUnitOfWork _usersUnitOfWork;
 
@@ -15,9 +15,9 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetRefreshTokens
             _usersUnitOfWork = usersUnitOfWork;
         }
 
-        public async Task<List<RefreshToken>> Handle(GetRefreshTokensQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<RefreshToken>> Handle(GetRefreshTokensQuery query, CancellationToken cancellationToken = default)
         {
-            var user = await _usersUnitOfWork.Users.GetByIdWithRefreshTokensAsync(request.UserId, cancellationToken);
+            var user = await _usersUnitOfWork.Users.GetByIdWithRefreshTokensAsync(query.UserId, cancellationToken);
             return user?.RefreshTokens;
         }
     }

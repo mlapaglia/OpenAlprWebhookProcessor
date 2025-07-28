@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
 {
-    public class AuthenticateCommand : IRequest<AuthenticateResponse>
+    public class AuthenticateCommand : IQuery<AuthenticateResponse>
     {
         public string Username { get; set; } = default!;
         public string Password { get; set; } = default!;

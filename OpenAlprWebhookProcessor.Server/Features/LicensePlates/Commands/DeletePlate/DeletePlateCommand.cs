@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 using System;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.DeletePlate
 {
-    public class DeletePlateCommand : IRequest
+    public class DeletePlateCommand : ICommand
     {
         public Guid Id { get; set; }
 

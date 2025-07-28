@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStatus
 {
-    public class GetModelStatusQueryHandler : IRequestHandler<GetModelStatusQuery, ModelStatusDto>
+    public class GetModelStatusQueryHandler : IQueryHandler<GetModelStatusQuery, ModelStatusDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
@@ -25,7 +25,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
             _logger = logger;
         }
 
-        public Task<ModelStatusDto> Handle(
+        public async ValueTask<ModelStatusDto> Handle(
             GetModelStatusQuery request, 
             CancellationToken cancellationToken = default)
         {
@@ -33,12 +33,12 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
             {
                 var isAvailable = _predictionService.IsModelAvailable();
                 
-                return Task.FromResult(new ModelStatusDto
+                return new ModelStatusDto
                 {
                     ModelAvailable = isAvailable,
                     Status = isAvailable ? "Ready" : "Training or Not Available",
                     LastChecked = DateTime.UtcNow
-                });
+                };
             }
             catch (Exception ex)
             {

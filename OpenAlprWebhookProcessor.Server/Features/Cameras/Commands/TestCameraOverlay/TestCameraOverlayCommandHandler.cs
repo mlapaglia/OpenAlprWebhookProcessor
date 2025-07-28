@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
 {
-    public class TestCameraOverlayCommandHandler : IRequestHandler<TestCameraOverlayCommand>
+    public class TestCameraOverlayCommandHandler : ICommandHandler<TestCameraOverlayCommand>
     {
         private readonly ICameraUpdateService _cameraUpdateService;
 
@@ -14,9 +14,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public Task Handle(TestCameraOverlayCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestCameraOverlayCommand request, CancellationToken cancellationToken = default)
         {
-            _cameraUpdateService.ScheduleOverlayRequestAsync(new CameraUpdateService.CameraUpdateRequest()
+            await _cameraUpdateService.ScheduleOverlayRequestAsync(new CameraUpdateService.CameraUpdateRequest()
             {
                 Id = request.CameraId,
                 IsTest = true,
@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
                 VehicleDescription = "test vehicle"
             });
 
-            return Task.CompletedTask;
+            return Unit.Value;
         }
     }
 } 

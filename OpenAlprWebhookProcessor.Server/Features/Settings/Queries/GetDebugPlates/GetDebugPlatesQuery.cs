@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates
 {
-    public class GetDebugPlatesQuery : IRequest<string>
+    public class GetDebugPlatesQuery : IQuery<string>
     {
         public bool OnlyFailedPlateGroups { get; set; }
 

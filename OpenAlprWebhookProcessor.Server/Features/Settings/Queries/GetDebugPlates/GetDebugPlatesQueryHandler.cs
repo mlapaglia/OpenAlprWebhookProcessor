@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates
 {
-    public class GetDebugPlatesQueryHandler : IRequestHandler<GetDebugPlatesQuery, string>
+    public class GetDebugPlatesQueryHandler : IQueryHandler<GetDebugPlatesQuery, string>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<string> Handle(GetDebugPlatesQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<string> Handle(GetDebugPlatesQuery request, CancellationToken cancellationToken = default)
         {
             var query = _unitOfWork.RawPlateGroups.GetQueryable()
                 .AsNoTracking();

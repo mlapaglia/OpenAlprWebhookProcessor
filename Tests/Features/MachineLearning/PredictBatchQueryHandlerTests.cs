@@ -103,7 +103,7 @@ namespace Tests.Features.MachineLearning.Queries.PredictBatch
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("At least one license plate input is required");
         }
 
@@ -117,7 +117,7 @@ namespace Tests.Features.MachineLearning.Queries.PredictBatch
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("At least one license plate input is required");
         }
 
@@ -134,7 +134,7 @@ namespace Tests.Features.MachineLearning.Queries.PredictBatch
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<ArgumentException>()
+            await act.Should().ThrowExactlyAsync<ArgumentException>()
                 .WithMessage("Maximum 100 predictions per batch");
         }
 
@@ -186,7 +186,7 @@ namespace Tests.Features.MachineLearning.Queries.PredictBatch
             // Act & Assert
             var act = async () => await _handler.Handle(query, CancellationToken.None);
             
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowExactlyAsync<InvalidOperationException>()
                 .WithMessage("Test exception");
         }
 

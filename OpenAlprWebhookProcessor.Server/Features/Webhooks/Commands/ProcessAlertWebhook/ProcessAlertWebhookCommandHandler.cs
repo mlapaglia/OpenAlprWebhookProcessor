@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessAlertWebhook
 {
-    public class ProcessAlertWebhookCommandHandler : IRequestHandler<ProcessAlertWebhookCommand>
+    public class ProcessAlertWebhookCommandHandler : ICommandHandler<ProcessAlertWebhookCommand>
     {
         private readonly IGroupWebhookHandler _groupWebhookHandler;
 
@@ -17,12 +17,13 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessAlertWebhoo
             _groupWebhookHandler = groupWebhookHandler;
         }
 
-        public async Task Handle(ProcessAlertWebhookCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(ProcessAlertWebhookCommand request, CancellationToken cancellationToken = default)
         {
             await _groupWebhookHandler.HandleWebhookAsync(
                 request.Webhook,
                 request.IsBulkImport,
                 cancellationToken);
+            return Unit.Value;
         }
     }
 } 

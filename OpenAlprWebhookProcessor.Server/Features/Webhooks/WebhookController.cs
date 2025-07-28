@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessAlertWebhook;

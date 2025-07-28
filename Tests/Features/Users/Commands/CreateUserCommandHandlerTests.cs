@@ -75,8 +75,8 @@ namespace Tests.Features.Users.Commands
             var command = new CreateUserCommand("John", "Doe", "existinguser", "password123");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(() => 
-                _handler.Handle(command, GetCancellationToken()));
+            var exception = Assert.ThrowsAsync<AppException>(async () => 
+                await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be("Username \"existinguser\" is already taken");
         }
@@ -142,8 +142,8 @@ namespace Tests.Features.Users.Commands
             var command = new CreateUserCommand("John", "Doe", "johndoe", "password123");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<AppException>(() => 
-                _handler.Handle(command, GetCancellationToken()));
+            var exception = Assert.ThrowsAsync<AppException>(async () => 
+                await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be("Username \"johndoe\" is already taken");
         }

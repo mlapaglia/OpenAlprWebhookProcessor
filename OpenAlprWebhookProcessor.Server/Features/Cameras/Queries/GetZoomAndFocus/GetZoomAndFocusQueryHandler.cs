@@ -1,11 +1,11 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus
 {
-    public class GetZoomAndFocusQueryHandler : IRequestHandler<GetZoomAndFocusQuery, ZoomFocus>
+    public class GetZoomAndFocusQueryHandler : IQueryHandler<GetZoomAndFocusQuery, ZoomFocus>
     {
         private readonly ICameraUpdateService _cameraUpdateService;
 
@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus
             _cameraUpdateService = cameraUpdateService;
         }
 
-        public async Task<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken = default)
         {
             return await _cameraUpdateService.GetZoomAndFocusAsync(
                 request.CameraId,

@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredictions
 {
-    public class GetTopPredictionsQueryHandler : IRequestHandler<GetTopPredictionsQuery, List<LicensePlatePredictionResult>>
+    public class GetTopPredictionsQueryHandler : IQueryHandler<GetTopPredictionsQuery, List<LicensePlatePredictionResult>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
@@ -26,16 +26,16 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredic
             _logger = logger;
         }
 
-        public async Task<List<LicensePlatePredictionResult>> Handle(
-            GetTopPredictionsQuery request, 
+        public async ValueTask<List<LicensePlatePredictionResult>> Handle(
+            GetTopPredictionsQuery query, 
             CancellationToken cancellationToken = default)
         {
-            if (request.Count <= 0 || request.Count > 50)
+            if (query.Count <= 0 || query.Count > 50)
             {
                 throw new ArgumentException("Count must be between 1 and 50");
             }
 
-            if (request.WithinHours.TotalHours <= 0 || request.WithinHours.TotalHours > 8760) // Max 1 year
+            if (query.WithinHours.TotalHours <= 0 || query.WithinHours.TotalHours > 8760) // Max 1 year
             {
                 throw new ArgumentException("WithinHours must be between 1 and 8760");
             }
@@ -43,8 +43,8 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredic
             try
             {
                 var predictions = await _predictionService.GetTopPredictionsAsync(
-                    request.Count, 
-                    request.WithinHours);
+                    query.Count, 
+                    query.WithinHours);
                 
                 return predictions;
             }

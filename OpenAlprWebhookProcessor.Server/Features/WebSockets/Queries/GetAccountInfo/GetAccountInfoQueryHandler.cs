@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetAccountInfo
 {
-    public class GetAccountInfoQueryHandler : IRequestHandler<GetAccountInfoQuery, AccountInfoResponse>
+    public class GetAccountInfoQueryHandler : IQueryHandler<GetAccountInfoQuery, AccountInfoResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetAccountInfo
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<AccountInfoResponse> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AccountInfoResponse> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken = default)
         {
             var agent = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
             var firstAgent = agent.FirstOrDefault();

@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
 {
-    public class EnrichPlateCommandHandler : IRequestHandler<EnrichPlateCommand>
+    public class EnrichPlateCommandHandler : ICommandHandler<EnrichPlateCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlateEnricherClient _licensePlateEnricherClient;
@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 
-        public async Task Handle(EnrichPlateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(EnrichPlateCommand request, CancellationToken cancellationToken = default)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
                 request.PlateId,
@@ -58,6 +58,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
             {
                 throw new InvalidOperationException("Failed to enrich plate data.");
             }
+            return Unit.Value;
         }
     }
 } 

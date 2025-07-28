@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures
 {
-    public class GetPlateCapturesQueryHandler : IRequestHandler<GetPlateCapturesQuery, List<string>>
+    public class GetPlateCapturesQueryHandler : IQueryHandler<GetPlateCapturesQuery, List<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -17,9 +17,9 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetPlateCaptures
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<string>> Handle(GetPlateCapturesQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<List<string>> Handle(GetPlateCapturesQuery query, CancellationToken cancellationToken = default)
         {
-            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == request.CameraId, cancellationToken);
+            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == query.CameraId, cancellationToken);
             
             if (camera == null)
             {

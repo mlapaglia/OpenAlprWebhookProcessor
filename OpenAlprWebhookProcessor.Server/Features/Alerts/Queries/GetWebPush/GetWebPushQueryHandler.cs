@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Alerts.WebPush;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions.VapidKeys;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetWebPush
 {
-    public class GetWebPushQueryHandler : IRequestHandler<GetWebPushQuery, WebPushRequest>
+    public class GetWebPushQueryHandler : IQueryHandler<GetWebPushQuery, WebPushRequest>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Queries.GetWebPush
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<WebPushRequest> Handle(
+        public async ValueTask<WebPushRequest> Handle(
             GetWebPushQuery request,
             CancellationToken cancellationToken = default)
         {

@@ -1,8 +1,8 @@
-using MediatR;
+using Mediator;
 
 namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
 {
-    public class GetStatisticsQuery : IRequest<PlateStatistics>
+    public class GetStatisticsQuery : IQuery<PlateStatistics>
     {
         public string PlateNumber { get; set; } = string.Empty;
         

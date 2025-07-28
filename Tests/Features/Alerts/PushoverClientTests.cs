@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using Tests.TestHelpers;
 
+using Mediator;
 namespace Tests.Features.Alerts
 {
     [TestFixture]
@@ -382,7 +383,7 @@ namespace Tests.Features.Alerts
             await Context.SaveChangesAsync();
         }
 
-        private async Task<Agent> SeedAgentAsync(string webServerUrl = "https://test.example.com")
+        private async ValueTask<Agent> SeedAgentAsync(string webServerUrl = "https://test.example.com")
         {
             var agent = new Agent
             {

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfiguration
 {
-    public class GetConfigurationQueryHandler : IRequestHandler<GetConfigurationQuery, MachineLearningConfigDto>
+    public class GetConfigurationQueryHandler : IQueryHandler<GetConfigurationQuery, MachineLearningConfigDto>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetConfigura
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<MachineLearningConfigDto> Handle(
+        public async ValueTask<MachineLearningConfigDto> Handle(
             GetConfigurationQuery request,
             CancellationToken cancellationToken = default)
         {
