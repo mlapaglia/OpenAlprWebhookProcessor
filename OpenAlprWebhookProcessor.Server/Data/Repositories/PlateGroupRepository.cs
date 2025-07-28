@@ -152,7 +152,7 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
                 .Where(x => x.pn.Number == plateNumber)
                 .Select(x => x.pg.ReceivedOnEpoch);
 
-            var allEpochsQuery = bestNumberQuery.Union(possibleNumberQuery);
+            var allEpochsQuery = bestNumberQuery.Concat(possibleNumberQuery);
 
             var result = await allEpochsQuery
                 .GroupBy(e => 1)

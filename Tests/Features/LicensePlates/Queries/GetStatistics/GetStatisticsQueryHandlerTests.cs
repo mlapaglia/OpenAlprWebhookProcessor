@@ -203,8 +203,8 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             await SeedPlateGroupsAsync(new[]
             {
                 CreatePlateGroup(plateNumber, sameEpoch),
-                CreatePlateGroup(plateNumber, sameEpoch), // Same epoch
-                CreatePlateGroup(plateNumber, sameEpoch)  // Same epoch
+                CreatePlateGroup(plateNumber, sameEpoch),
+                CreatePlateGroup(plateNumber, sameEpoch)
             });
 
             var query = new GetStatisticsQuery(plateNumber);
