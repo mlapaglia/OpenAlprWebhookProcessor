@@ -1,10 +1,7 @@
-export class Alert {
-  id: string
-  plateNumber: string
-  strictMatch: boolean
-  description: string
+import { PlateSettingBase, IPlateSetting } from '../shared/plate-setting.interface'
 
-  constructor(init?: Partial<Alert>) {
-    Object.assign(this, init)
+export class Alert extends PlateSettingBase {
+  constructor(init?: Partial<IPlateSetting>) {
+    super(init)
   }
 }

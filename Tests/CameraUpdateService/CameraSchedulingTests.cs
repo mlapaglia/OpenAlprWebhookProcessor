@@ -67,7 +67,7 @@ namespace Tests.CameraUpdateService
             await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService, default);
 
             // Assert
-            await _backgroundJobService.Received(2).ScheduleProcessSunriseSunsetJobAsync(
+            _backgroundJobService.Received(2).ScheduleProcessSunriseSunsetJob(
                 Arg.Any<Guid>(),
                 Arg.Any<SunriseSunset>(),
                 Arg.Any<bool>(),
@@ -97,7 +97,7 @@ namespace Tests.CameraUpdateService
             await CameraScheduling.ScheduleDayNightTasksAsync(UnitOfWork, _backgroundJobService);
 
             // Assert
-            await _backgroundJobService.DidNotReceive().ScheduleProcessSunriseSunsetJobAsync(
+            _backgroundJobService.DidNotReceive().ScheduleProcessSunriseSunsetJob(
                 Arg.Any<Guid>(),
                 Arg.Any<SunriseSunset>(),
                 Arg.Any<bool>(),
@@ -105,26 +105,26 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ScheduleDayNightTask_WithValidParameters_SchedulesCorrectJobAsync()
+        public void ScheduleDayNightTask_WithValidParameters_SchedulesCorrectJob()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
             agent.Latitude = 40.7128;
             agent.Longitude = -74.0060;
-            
+
             var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
             camera.UpdateDayNightModeEnabled = true;
             camera.Latitude = 40.7128;
             camera.Longitude = -74.0060;
 
             // Act
-            await CameraScheduling.ScheduleDayNightTaskAsync(
+            CameraScheduling.ScheduleDayNightTask(
                 _backgroundJobService,
                 agent,
                 camera);
 
             // Assert
-            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
+            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,
@@ -132,13 +132,13 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ScheduleDayNightTask_WithCameraSpecificSettings_UsesCameraSettingsAsync()
+        public void ScheduleDayNightTask_WithCameraSpecificSettings_UsesCameraSettings()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
             agent.Latitude = 40.7128;
             agent.Longitude = -74.0060;
-            
+
             var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
             camera.UpdateDayNightModeEnabled = true;
             camera.Latitude = 37.7749;  // San Francisco coordinates - different from agent
@@ -147,13 +147,13 @@ namespace Tests.CameraUpdateService
             camera.SunsetOffset = 60;
 
             // Act
-            await CameraScheduling.ScheduleDayNightTaskAsync(
+            CameraScheduling.ScheduleDayNightTask(
                 _backgroundJobService,
                 agent,
                 camera);
 
             // Assert
-            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
+            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,
@@ -161,13 +161,13 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ScheduleDayNightTask_WithExistingScheduledJob_DeletesOldJobAsync()
+        public void ScheduleDayNightTask_WithExistingScheduledJob_DeletesOldJob()
         {
             // Arrange
             var agent = TestDataFactory.CreateTestAgent();
             agent.Latitude = 40.7128;
             agent.Longitude = -74.0060;
-            
+
             var camera = TestDataFactory.CreateTestCamera(CameraManufacturer.Hikvision);
             camera.UpdateDayNightModeEnabled = true;
             camera.Latitude = 40.7128;
@@ -175,11 +175,11 @@ namespace Tests.CameraUpdateService
             camera.NextDayNightScheduleId = "existing-job-id";
 
             // Act
-            await CameraScheduling.ScheduleDayNightTaskAsync(_backgroundJobService, agent, camera);
+            CameraScheduling.ScheduleDayNightTask(_backgroundJobService, agent, camera);
 
             // Assert
             _backgroundJobService.Received(1).DeleteJob("existing-job-id");
-            await _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJobAsync(
+            _backgroundJobService.Received(1).ScheduleProcessSunriseSunsetJob(
                 camera.Id,
                 Arg.Any<SunriseSunset>(),
                 true,

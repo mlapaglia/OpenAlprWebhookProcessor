@@ -1,6 +1,5 @@
 using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

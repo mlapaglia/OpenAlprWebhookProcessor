@@ -33,12 +33,12 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
             {
                 var isAvailable = _predictionService.IsModelAvailable();
                 
-                return new ModelStatusDto
+                return await Task.FromResult(new ModelStatusDto
                 {
                     ModelAvailable = isAvailable,
                     Status = isAvailable ? "Ready" : "Training or Not Available",
                     LastChecked = DateTime.UtcNow
-                };
+                });
             }
             catch (Exception ex)
             {

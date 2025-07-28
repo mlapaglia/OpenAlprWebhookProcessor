@@ -249,7 +249,7 @@ namespace Tests.CameraUpdateService
             var scheduleAt = DateTimeOffset.Now.AddMilliseconds(50);
 
             // Act
-            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
+            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(
                 cameraId,
                 sunriseSunset,
                 scheduleNextJob,
@@ -274,7 +274,7 @@ namespace Tests.CameraUpdateService
             var scheduleAt = DateTimeOffset.Now.AddMilliseconds(-100);
 
             // Act
-            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
+            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(cameraId, sunriseSunset, scheduleNextJob, scheduleAt);
 
             // Assert
             jobId.Should().BeNull();
@@ -285,13 +285,13 @@ namespace Tests.CameraUpdateService
         }
 
         [Test]
-        public async Task ScheduleProcessSunriseSunsetJob_WithEmptyGuid_ShouldReturnNullAsync()
+        public void ScheduleProcessSunriseSunsetJob_WithEmptyGuid_ShouldReturnNull()
         {
             // Arrange
             var scheduleAt = DateTimeOffset.Now.AddMinutes(1);
 
             // Act
-            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(Guid.Empty, SunriseSunset.Sunrise, true, scheduleAt);
+            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(Guid.Empty, SunriseSunset.Sunrise, true, scheduleAt);
 
             // Assert
             jobId.Should().BeNull();
@@ -310,7 +310,7 @@ namespace Tests.CameraUpdateService
             _cameraUpdateService.ProcessSunriseSunsetJobAsync(cameraId, sunriseSunset, scheduleNextJob).ThrowsAsync(exception);
 
             // Act
-            var jobId = await _backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
+            var jobId = _backgroundJobService.ScheduleProcessSunriseSunsetJob(
                 cameraId,
                 sunriseSunset,
                 scheduleNextJob,

@@ -11,8 +11,6 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Tests.TestHelpers;
-
-using Mediator;
 namespace Tests.WebhookProcessor
 {
     [Parallelizable(ParallelScope.Self)]

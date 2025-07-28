@@ -138,41 +138,6 @@ namespace Tests.Features.MachineLearning.Configuration
         }
 
         [Test]
-        public void GetBackupPath_WithTimestamp_ReturnsExpectedPath()
-        {
-            // Arrange
-            var timestamp = new DateTime(2023, 10, 15, 14, 30, 45);
-
-            // Act
-            var result = _configuration.GetBackupPath(timestamp);
-
-            // Assert
-            var expectedPath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "test-config",
-                "test-ml-models",
-                "backup-20231015-143045-test-model.zip");
-            result.Should().Be(expectedPath);
-        }
-
-        [Test]
-        public void GetBackupPath_WithDifferentTimestamp_GeneratesDifferentPath()
-        {
-            // Arrange
-            var timestamp1 = new DateTime(2023, 10, 15, 14, 30, 45);
-            var timestamp2 = new DateTime(2023, 10, 16, 16, 45, 30);
-
-            // Act
-            var result1 = _configuration.GetBackupPath(timestamp1);
-            var result2 = _configuration.GetBackupPath(timestamp2);
-
-            // Assert
-            result1.Should().NotBe(result2);
-            result1.Should().Contain("backup-20231015-143045");
-            result2.Should().Contain("backup-20231016-164530");
-        }
-
-        [Test]
         public void GetConfigPath_CreatesDirectoryIfNotExists()
         {
             // Arrange
@@ -227,34 +192,10 @@ namespace Tests.Features.MachineLearning.Configuration
             // Act
             var configPath = _configuration.GetConfigPath();
             var modelPath = _configuration.GetModelPath();
-            var backupPath = _configuration.GetBackupPath(DateTime.Now);
 
             // Assert
             configPath.Should().Contain("config with spaces");
             modelPath.Should().Contain("model file.zip");
-            backupPath.Should().Contain("ml-models-special");
-        }
-
-        [Test]
-        public void GetBackupPath_WithMinDateTime_HandlesCorrectly()
-        {
-            // Act
-            var result = _configuration.GetBackupPath(DateTime.MinValue);
-
-            // Assert
-            result.Should().Contain("backup-00010101-000000");
-            result.Should().EndWith("test-model.zip");
-        }
-
-        [Test]
-        public void GetBackupPath_WithMaxDateTime_HandlesCorrectly()
-        {
-            // Act
-            var result = _configuration.GetBackupPath(DateTime.MaxValue);
-
-            // Assert
-            result.Should().Contain("backup-99991231-235959");
-            result.Should().EndWith("test-model.zip");
         }
 
         [Test]

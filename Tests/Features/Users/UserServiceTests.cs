@@ -5,8 +5,6 @@ using OpenAlprWebhookProcessor.Features.Users;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using System.IdentityModel.Tokens.Jwt;
 using Tests.TestHelpers;
-
-using Mediator;
 namespace Tests.Features.Users
 {
     [Parallelizable(ParallelScope.Self)]

@@ -38,7 +38,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             {
                 using var scope = _serviceProvider.CreateScope();
                 var cameraUpdateService = scope.ServiceProvider.GetRequiredService<ICameraUpdateService>();
-                await cameraUpdateService.ProcessJobAsync(request);
+                await cameraUpdateService.ProcessJobAsync(request, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -114,12 +114,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             return jobId;
         }
 
-        public async Task<string> ScheduleProcessSunriseSunsetJobAsync(
+        public string ScheduleProcessSunriseSunsetJob(
             Guid cameraId,
             SunriseSunset sunriseSunset,
             bool scheduleNextJob,
-            DateTimeOffset scheduleAt,
-            CancellationToken cancellationToken = default)
+            DateTimeOffset scheduleAt)
         {
             if (cameraId == Guid.Empty) return null;
 
@@ -214,6 +213,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _scheduledExecutionTimes.Clear();
 
             _disposed = true;
+
+            GC.SuppressFinalize(this);
         }
     }
 } 

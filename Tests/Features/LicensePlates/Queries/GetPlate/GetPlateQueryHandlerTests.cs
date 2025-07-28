@@ -176,7 +176,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
         }
 
         [Test]
-        public async Task Handle_AlertRepositoryThrowsException_PropagatesException()
+        public void Handle_AlertRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();

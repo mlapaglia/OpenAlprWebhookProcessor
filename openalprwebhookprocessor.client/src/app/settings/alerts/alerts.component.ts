@@ -1,65 +1,51 @@
-import { Component, OnInit, inject } from '@angular/core'
-import { MatTableDataSource, MatTableModule } from '@angular/material/table'
+import { Component, OnInit, inject, TemplateRef, ViewChild } from '@angular/core'
 import { Alert } from './alert'
 import { AlertsService } from './alerts.service'
-import { MatButtonModule } from '@angular/material/button'
-import { MatOptionModule } from '@angular/material/core'
-import { MatSelectModule } from '@angular/material/select'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { MatInputModule } from '@angular/material/input'
-import { MatFormFieldModule } from '@angular/material/form-field'
 import { WebpushComponent } from './webpush/webpush.component'
 import { PushoverComponent } from './pushover/pushover.component'
+import { PlateSettingsTableComponent, PlateSettingsConfig } from '../shared/plate-settings-table.component'
+import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.component.html',
   styleUrls: ['./alerts.component.less'],
-  imports: [PushoverComponent, WebpushComponent, MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    PushoverComponent, 
+    WebpushComponent, 
+    PlateSettingsTableComponent
+  ],
 })
 export class AlertsComponent implements OnInit {
+  @ViewChild('additionalContent', { static: true }) additionalContent!: TemplateRef<any>
+  
   private alertsService = inject(AlertsService)
 
-  public alerts: MatTableDataSource<Alert>
-  public isSaving = false
-
-  public rowsToDisplay = [
-    'plateNumber',
-    'matchType',
-    'description',
-    'delete',
-  ]
+  public alertsConfig: PlateSettingsConfig<Alert> = {
+    title: 'License Plate Alerts',
+    subtitle: 'Configure license plates to monitor for alerts. These plates will trigger notifications when detected.',
+    emptyStateTitle: 'No Alert Rules',
+    emptyStateDescription: 'You haven\'t created any alert rules yet. Add your first rule to get started with notifications.',
+    addButtonText: 'Add Alert Rule',
+    entityName: 'alert rule',
+    createNew: () => new Alert({
+      plateNumber: '',
+      strictMatch: true,
+      description: ''
+    }),
+    service: {
+      getAll: () => this.alertsService.getAlerts(),
+      upsert: (items: Alert[]) => this.alertsService.upsertAlerts(items)
+    }
+  }
 
   ngOnInit(): void {
-    this.getAlerts()
+    // Initialization is handled by the shared component
   }
 
-  private getAlerts() {
-    this.alertsService.getAlerts().subscribe((result) => {
-      this.alerts = new MatTableDataSource<Alert>(result)
-    })
-  }
-
-  public deleteAlert(alert: Alert) {
-    this.alerts.data.forEach((item, index) => {
-      if (item === alert) {
-        this.alerts.data.splice(index, 1)
-      }
-    })
-
-    this.alerts._updateChangeSubscription()
-  }
-
-  public addAlert() {
-    this.alerts.data.push(new Alert())
-    this.alerts._updateChangeSubscription()
-  }
-
-  public saveAlerts() {
-    this.isSaving = true
-    this.alertsService.upsertAlerts(this.alerts.data).subscribe(() => {
-      this.getAlerts()
-      this.isSaving = false
-    })
+  public onAlertsChanged(alerts: Alert[]): void {
+    // Handle any specific logic when alerts change if needed
+    console.log('Alerts changed:', alerts)
   }
 }

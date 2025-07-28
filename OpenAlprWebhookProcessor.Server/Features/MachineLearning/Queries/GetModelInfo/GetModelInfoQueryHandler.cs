@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -11,16 +10,22 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
 {
     public class GetModelInfoQueryHandler : IQueryHandler<GetModelInfoQuery, ModelInfoDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
+
         private readonly ILogger<GetModelInfoQueryHandler> _logger;
 
+        private static readonly string[] result = new[]
+        {
+            "HourOfDay", "DayOfWeek", "DayOfMonth", "MonthOfYear",
+            "CameraId", "TimeSinceLastSeen", "HistoricalFrequency",
+            "AverageTimeBetweenVisits", "TotalVisits", "IsWeekend",
+            "IsBusinessHour", "SeasonalFactor", "VehicleType", "VehicleColor"
+        };
+
         public GetModelInfoQueryHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlatePredictionService predictionService,
             ILogger<GetModelInfoQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _predictionService = predictionService;
             _logger = logger;
         }
@@ -37,13 +42,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelInfo
                 {
                     ModelAvailable = isAvailable,
                     ModelType = "FastTree Regression",
-                    Features = new[]
-                    {
-                        "HourOfDay", "DayOfWeek", "DayOfMonth", "MonthOfYear",
-                        "CameraId", "TimeSinceLastSeen", "HistoricalFrequency",
-                        "AverageTimeBetweenVisits", "TotalVisits", "IsWeekend",
-                        "IsBusinessHour", "SeasonalFactor", "VehicleType", "VehicleColor"
-                    },
+                    Features = result,
                     Description = "Predicts when a license plate will next be seen based on historical patterns",
                     TrainingSchedule = "Every 6 hours",
                     LastUpdated = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC")

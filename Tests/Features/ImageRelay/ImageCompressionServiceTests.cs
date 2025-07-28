@@ -4,8 +4,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using System.Net;
 using Tests.TestHelpers;
-
-using Mediator;
 namespace Tests.Features.ImageRelay
 {
     [Parallelizable(ParallelScope.Self)]

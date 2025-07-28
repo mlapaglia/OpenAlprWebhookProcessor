@@ -26,7 +26,6 @@ namespace Tests.Features.MachineLearning.Queries.GetModelInfo
             _logger = Substitute.For<ILogger<GetModelInfoQueryHandler>>();
 
             _handler = new GetModelInfoQueryHandler(
-                UnitOfWork,
                 _predictionService,
                 _logger);
         }

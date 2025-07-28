@@ -26,11 +26,11 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.2" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.7.0" />
+    <PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
     <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*-*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.7" />
@@ -60,11 +60,6 @@
 
 	<ItemGroup>
 		<Folder Include="config\" />
-	</ItemGroup>
-
-	<ItemGroup>
-    <None Include="E:\code\OpenAlprWebhookProcessor\OpenAlprWebhookProcessor\.editorconfig" />
-	  <EditorConfigFiles Remove="E:\code\OpenAlprWebhookProcessor\OpenAlprWebhookProcessor\.editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,63 +1,45 @@
 import { Component, OnInit, inject } from '@angular/core'
-import { MatTableDataSource, MatTableModule } from '@angular/material/table'
+import { CommonModule } from '@angular/common'
 import { SettingsService } from '../settings.service'
 import { Ignore } from './ignore'
-import { MatButtonModule } from '@angular/material/button'
-import { MatOptionModule } from '@angular/material/core'
-import { MatSelectModule } from '@angular/material/select'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { MatInputModule } from '@angular/material/input'
-import { MatFormFieldModule } from '@angular/material/form-field'
+import { PlateSettingsTableComponent, PlateSettingsConfig } from '../shared/plate-settings-table.component'
 
 @Component({
   selector: 'app-ignores',
   templateUrl: './ignores.component.html',
   styleUrls: ['./ignores.component.less'],
-  imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatSelectModule, MatOptionModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    PlateSettingsTableComponent
+  ],
 })
 export class IgnoresComponent implements OnInit {
   private settingsService = inject(SettingsService)
 
-  public ignores: MatTableDataSource<Ignore>
-  public isSaving = false
-
-  public rowsToDisplay = [
-    'plateNumber',
-    'matchType',
-    'description',
-    'delete',
-  ]
+  public ignoresConfig: PlateSettingsConfig<Ignore> = {
+    title: 'License Plate Ignores',
+    subtitle: 'Configure license plates to ignore during processing. These plates will be filtered out from alerts and notifications.',
+    emptyStateTitle: 'No Ignore Rules',
+    emptyStateDescription: 'You haven\'t created any ignore rules yet. Add your first rule above to get started.',
+    addButtonText: 'Add Ignore Rule',
+    entityName: 'ignore rule',
+    createNew: () => new Ignore({
+      plateNumber: '',
+      strictMatch: true,
+      description: ''
+    }),
+    service: {
+      getAll: () => this.settingsService.getIgnores(),
+      upsert: (items: Ignore[]) => this.settingsService.upsertIgnores(items)
+    }
+  }
 
   ngOnInit(): void {
-    this.getIgnores()
+    // Initialization is handled by the shared component
   }
 
-  private getIgnores() {
-    this.settingsService.getIgnores().subscribe((result) => {
-      this.ignores = new MatTableDataSource<Ignore>(result)
-    })
-  }
-
-  public deleteIgnore(ignore: Ignore) {
-    this.ignores.data.forEach((item, index) => {
-      if (item === ignore) {
-        this.ignores.data.splice(index, 1)
-      }
-    })
-
-    this.ignores._updateChangeSubscription()
-  }
-
-  public addIgnore() {
-    this.ignores.data.push(new Ignore())
-    this.ignores._updateChangeSubscription()
-  }
-
-  public saveIgnores() {
-    this.isSaving = true
-    this.settingsService.upsertIgnores(this.ignores.data).subscribe(() => {
-      this.getIgnores()
-      this.isSaving = false
-    })
+  public onIgnoresChanged(ignores: Ignore[]): void {
+    // Handle any specific logic when ignores change if needed
+    console.log('Ignores changed:', ignores)
   }
 }

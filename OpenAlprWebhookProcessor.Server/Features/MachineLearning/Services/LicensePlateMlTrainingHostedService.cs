@@ -34,13 +34,41 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 _trainingService.LoadExistingModel();
                 
                 var trainingInterval = _configuration.TrainingInterval;
+                var trainingStatus = _trainingService.GetTrainingStatus();
+                
+                TimeSpan initialDelay;
+                
+                if (trainingStatus.ModelLastSaved.HasValue)
+                {
+                    var timeSinceLastTraining = DateTime.UtcNow - trainingStatus.ModelLastSaved.Value;
+                    
+                    if (timeSinceLastTraining >= trainingInterval)
+                    {
+                        _logger.LogInformation("Last training was {TimeSinceLastTraining} ago, which exceeds the interval of {TrainingInterval}. Training will start immediately.", 
+                            timeSinceLastTraining, trainingInterval);
+                        initialDelay = TimeSpan.Zero;
+                    }
+                    else
+                    {
+                        initialDelay = trainingInterval - timeSinceLastTraining;
+                        _logger.LogInformation("Last training was {TimeSinceLastTraining} ago. Next training scheduled in {NextTrainingDelay}.", 
+                            timeSinceLastTraining, initialDelay);
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("No previous training found. Training will start immediately.");
+                    initialDelay = TimeSpan.Zero;
+                }
+                
                 _trainingTimer = new Timer(
                     TriggerTrainingAsync,
                     null,
-                    TimeSpan.Zero,
+                    initialDelay,
                     trainingInterval);
 
-                _logger.LogInformation("License Plate ML Training Hosted Service started with interval: {Interval}", trainingInterval);
+                _logger.LogInformation("License Plate ML Training Hosted Service started with interval: {Interval}, initial delay: {InitialDelay}", 
+                    trainingInterval, initialDelay);
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }

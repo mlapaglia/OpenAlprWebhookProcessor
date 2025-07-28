@@ -20,12 +20,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             Guid cameraId,
             TimeSpan delay);
 
-        Task<string> ScheduleProcessSunriseSunsetJobAsync(
+        string ScheduleProcessSunriseSunsetJob(
             Guid cameraId,
             SunriseSunset sunriseSunset,
             bool scheduleNextJob,
-            DateTimeOffset scheduleAt,
-            CancellationToken cancellationToken = default);
+            DateTimeOffset scheduleAt);
 
         void DeleteJob(string jobId);
 

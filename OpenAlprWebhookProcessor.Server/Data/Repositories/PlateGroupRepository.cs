@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetLicensePlateCounts;
+using OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,7 +96,6 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             DateTimeOffset endDate,
             CancellationToken cancellationToken = default)
         {
-            // Preserve the original timezone when creating day boundaries
             var startFloor = new DateTimeOffset(startDate.Date, startDate.Offset);
             var endCeiling = new DateTimeOffset(endDate.Date, endDate.Offset).AddDays(1).AddTicks(-1);
 
@@ -133,12 +133,53 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             return seenPlates;
         }
 
+        public async Task<PlateStatisticsAggregation> GetPlateStatisticsAggregationAsync(
+            string plateNumber,
+            long last90DaysEpoch,
+            CancellationToken cancellationToken = default)
+        {
+            var bestNumberQuery = _dbSet
+                .AsNoTracking()
+                .Where(pg => pg.BestNumber == plateNumber)
+                .Select(pg => pg.ReceivedOnEpoch);
+
+            var possibleNumberQuery = _dbSet
+                .AsNoTracking()
+                .Join(_context.PlateGroupPossibleNumbers,
+                    pg => pg.Id,
+                    pn => pn.PlateGroupId,
+                    (pg, pn) => new { pg, pn })
+                .Where(x => x.pn.Number == plateNumber)
+                .Select(x => x.pg.ReceivedOnEpoch);
+
+            var allEpochsQuery = bestNumberQuery.Union(possibleNumberQuery);
+
+            var result = await allEpochsQuery
+                .GroupBy(e => 1)
+                .Select(g => new PlateStatisticsAggregation
+                {
+                    TotalCount = g.Count(),
+                    Last90DaysCount = g.Count(e => e > last90DaysEpoch),
+                    MinEpoch = g.Min(),
+                    MaxEpoch = g.Max()
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return result ?? new PlateStatisticsAggregation
+            {
+                TotalCount = 0,
+                Last90DaysCount = 0,
+                MinEpoch = 0,
+                MaxEpoch = 0
+            };
+        }
+
         private static List<DayCount> GroupByDay(List<long> plateCounts, TimeSpan timeZoneOffset)
         {
             var groupedResults = plateCounts.GroupBy(x => 
             {
                 var dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(x);
-                // Convert to the original timezone to ensure consistent day grouping
+
                 var adjustedDateTime = dateTimeOffset.ToOffset(timeZoneOffset);
                 return adjustedDateTime.Date;
             });

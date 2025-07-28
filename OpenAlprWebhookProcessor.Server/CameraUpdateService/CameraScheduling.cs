@@ -20,7 +20,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             await backgroundJobService.EnqueueProcessSunriseSunsetJobAsync(
                 cameraId,
                 sunriseSunset,
-                false);
+                false,
+                cancellationToken);
         }
 
         public static async Task ScheduleDayNightTasksAsync(
@@ -36,21 +37,19 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             foreach (var camera in camerasToUpdate)
             {
-                await ScheduleDayNightTaskAsync(
+                ScheduleDayNightTask(
                     backgroundJobService,
                     agent,
-                    camera,
-                    cancellationToken);
+                    camera);
             }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        public static async Task ScheduleDayNightTaskAsync(
+        public static void ScheduleDayNightTask(
             IBackgroundJobService backgroundJobService,
             Agent agent,
-            Data.Camera camera,
-            CancellationToken cancellationToken = default)
+            Data.Camera camera)
         {
             ArgumentNullException.ThrowIfNull(backgroundJobService);
             ArgumentNullException.ThrowIfNull(agent);
@@ -93,12 +92,11 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var scheduleTime = isSunUp ? cameraSunsetAt : cameraSunriseAt;
             var scheduleTimeOffset = new DateTimeOffset(scheduleTime, TimeSpan.FromHours(timeZoneOffset));
 
-            camera.NextDayNightScheduleId = await backgroundJobService.ScheduleProcessSunriseSunsetJobAsync(
+            camera.NextDayNightScheduleId = backgroundJobService.ScheduleProcessSunriseSunsetJob(
                 camera.Id,
                 isSunUp ? SunriseSunset.Sunset : SunriseSunset.Sunrise,
                 true,
-                scheduleTimeOffset,
-                cancellationToken);
+                scheduleTimeOffset);
         }
 
         public static bool IsSunUp(

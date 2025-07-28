@@ -7,8 +7,6 @@ using OpenAlprWebhookProcessor.Features.Alerts;
 using System.Net;
 using System.Text;
 using Tests.TestHelpers;
-
-using Mediator;
 namespace Tests.Features.Alerts
 {
     [Parallelizable(ParallelScope.Self)]

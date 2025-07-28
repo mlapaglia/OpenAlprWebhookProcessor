@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape
         public async ValueTask<Unit> Handle(AgentScrapeCommand request, CancellationToken cancellationToken = default)
         {
             _hydrationService.StartHydration("hydration");
-            return Unit.Value;
+            return await Task.FromResult(Unit.Value);
         }
     }
 } 

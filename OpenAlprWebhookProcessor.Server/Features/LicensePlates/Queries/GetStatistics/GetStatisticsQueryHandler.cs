@@ -23,27 +23,23 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
             var endingEpoch = DateTimeOffset.UtcNow.AddDays(-90).ToUnixTimeMilliseconds();
             var plateNumber = request.PlateNumber;
 
-            var seenPlates = await _unitOfWork.PlateGroups.GetPlateStatisticsEpochsAsync(
-                plateNumber, cancellationToken);
-
-            seenPlates = seenPlates.OrderBy(x => x).ToList();
+            var aggregation = await _unitOfWork.PlateGroups.GetPlateStatisticsAggregationAsync(
+                plateNumber, endingEpoch, cancellationToken);
 
             var plateStatistics = new PlateStatistics
             {
-                TotalSeen = seenPlates.Count,
-                Last90Days = seenPlates.Count(x => x > endingEpoch)
+                TotalSeen = aggregation.TotalCount,
+                Last90Days = aggregation.Last90DaysCount
             };
 
-            var firstSeenEpoch = seenPlates.FirstOrDefault();
-            if (firstSeenEpoch != 0)
+            if (aggregation.MinEpoch != 0)
             {
-                plateStatistics.FirstSeen = DateTimeOffset.FromUnixTimeMilliseconds(firstSeenEpoch);
+                plateStatistics.FirstSeen = DateTimeOffset.FromUnixTimeMilliseconds(aggregation.MinEpoch);
             }
 
-            var lastSeenEpoch = seenPlates.LastOrDefault();
-            if (lastSeenEpoch != 0)
+            if (aggregation.MaxEpoch != 0)
             {
-                plateStatistics.LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(lastSeenEpoch);
+                plateStatistics.LastSeen = DateTimeOffset.FromUnixTimeMilliseconds(aggregation.MaxEpoch);
             }
 
             return plateStatistics;

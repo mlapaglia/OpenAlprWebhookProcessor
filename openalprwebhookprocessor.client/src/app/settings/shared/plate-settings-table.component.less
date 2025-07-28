@@ -1,4 +1,4 @@
-.ignores-page {
+.plate-settings-page {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
@@ -22,6 +22,11 @@
         margin: 0 auto;
       }
     }
+  }
+
+  // Additional Content (for alerts: pushover/webpush)
+  .additional-content {
+    margin-bottom: 24px;
   }
 
   // Loading Overlay
@@ -95,9 +100,9 @@
     gap: 24px;
   }
 
-  // Add Ignore Card
-  .add-ignore-card {
-    .ignore-form {
+  // Add Setting Card
+  .add-setting-card {
+    .setting-form {
       .form-row {
         display: flex;
         gap: 16px;
@@ -150,8 +155,8 @@
     }
   }
 
-  // Ignores List Card
-  .ignores-list-card {
+  // Settings List Card
+  .settings-list-card {
     mat-card-header {
       .header-spacer {
         flex: 1;
@@ -197,7 +202,7 @@
       
       // Table Container
       .table-container {
-        .ignores-table {
+        .settings-table {
           width: 100%;
           
           // Header styling
@@ -371,8 +376,8 @@
       gap: 16px;
     }
     
-    .add-ignore-card {
-      .ignore-form {
+    .add-setting-card {
+      .setting-form {
         .form-actions {
           flex-direction: column;
           
@@ -383,7 +388,7 @@
       }
     }
     
-    .ignores-list-card {
+    .settings-list-card {
       mat-card-header {
         flex-direction: column;
         align-items: flex-start;
@@ -399,7 +404,7 @@
         .table-container {
           overflow-x: auto;
           
-          .ignores-table {
+          .settings-table {
             min-width: 700px;
             
             .plate-cell {
@@ -478,4 +483,4 @@
       border-color: var(--mdc-theme-primary, #1976d2);
     }
   }
-}
+} 

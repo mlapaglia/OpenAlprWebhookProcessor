@@ -1,6 +1,4 @@
 using System.Net;
-
-using Mediator;
 namespace Tests.TestHelpers
 {
     public class TestHttpMessageHandler : HttpMessageHandler

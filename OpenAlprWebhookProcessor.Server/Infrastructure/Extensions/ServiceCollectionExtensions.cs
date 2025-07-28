@@ -1,4 +1,3 @@
-using AutoMapper;
 using FluentValidation;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
