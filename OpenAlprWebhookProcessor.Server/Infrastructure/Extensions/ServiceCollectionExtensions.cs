@@ -1,3 +1,4 @@
+using AutoMapper;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -185,16 +186,15 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
             return services;
         }
 
-        public static IServiceCollection AddAutoMapper(this IServiceCollection services)
+        public static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services)
         {
-            var mapper = new AutoMapper.MapperConfiguration(mc =>
+            services.AddAutoMapper(cfg =>
             {
-                mc.CreateMap<User, UserModel>();
-                mc.CreateMap<RegisterModel, User>();
-                mc.CreateMap<UpdateModel, User>();
+                cfg.CreateMap<User, UserModel>();
+                cfg.CreateMap<RegisterModel, User>();
+                cfg.CreateMap<UpdateModel, User>();
             });
 
-            services.AddSingleton(mapper.CreateMapper());
             return services;
         }
 

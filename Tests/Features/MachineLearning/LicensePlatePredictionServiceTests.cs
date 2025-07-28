@@ -341,7 +341,7 @@ namespace Tests.Features.MachineLearning.Services
 
             // Assert
             results.Should().NotBeNull();
-            results.Should().HaveCountLessOrEqualTo(5);
+            results.Should().HaveCountLessThanOrEqualTo(5);
             
             if (results.Any())
             {

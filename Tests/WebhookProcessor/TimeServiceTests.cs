@@ -41,8 +41,8 @@ namespace Tests.WebhookProcessor
 
             // Assert
             var afterCall = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            result.Should().BeGreaterOrEqualTo(beforeCall);
-            result.Should().BeLessOrEqualTo(afterCall);
+            result.Should().BeGreaterThanOrEqualTo(beforeCall);
+            result.Should().BeLessThanOrEqualTo(afterCall);
         }
 
         [Test]

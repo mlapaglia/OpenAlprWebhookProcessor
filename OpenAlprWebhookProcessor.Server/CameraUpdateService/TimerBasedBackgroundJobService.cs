@@ -164,6 +164,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             }, null, delay, Timeout.InfiniteTimeSpan);
 
             _scheduledJobs[jobId] = timer;
+            _logger.LogDebug("Day/Night job scheduled: {Job}", jobId);
+
             return jobId;
         }
 
