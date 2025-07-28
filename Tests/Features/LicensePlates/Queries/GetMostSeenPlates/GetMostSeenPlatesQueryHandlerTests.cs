@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetMostSeenPlates
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetMostSeenPlatesQueryHandlerTests : TestBase
     {

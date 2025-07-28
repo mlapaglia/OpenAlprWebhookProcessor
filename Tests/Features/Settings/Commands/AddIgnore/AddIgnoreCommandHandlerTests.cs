@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.AddIgnore
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class AddIgnoreCommandHandlerTests : TestBase
     {

@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Queries
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetAlertsQueryHandlerTests : TestBase
     {

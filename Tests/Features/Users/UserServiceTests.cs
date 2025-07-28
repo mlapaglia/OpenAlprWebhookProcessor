@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 using Mediator;
 namespace Tests.Features.Users
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UserServiceTests : TestBase
     {

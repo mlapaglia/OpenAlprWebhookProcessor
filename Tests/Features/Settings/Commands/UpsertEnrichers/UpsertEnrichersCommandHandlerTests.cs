@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertEnrichers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpsertEnrichersCommandHandlerTests : TestBase
     {

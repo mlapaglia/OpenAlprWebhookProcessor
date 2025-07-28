@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetPlateFiltersQueryHandlerTests : TestBase
     {

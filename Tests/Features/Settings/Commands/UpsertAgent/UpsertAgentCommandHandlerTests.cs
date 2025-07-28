@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertAgent
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpsertAgentCommandHandlerTests : TestBase
     {

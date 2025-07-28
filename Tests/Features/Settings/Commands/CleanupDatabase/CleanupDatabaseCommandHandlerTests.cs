@@ -11,6 +11,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.CleanupDatabase
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class CleanupDatabaseCommandHandlerTests : TestBase
     {

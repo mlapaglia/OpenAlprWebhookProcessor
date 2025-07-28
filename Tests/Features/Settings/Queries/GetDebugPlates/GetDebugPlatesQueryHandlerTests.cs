@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetDebugPlates
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetDebugPlatesQueryHandlerTests : TestBase
     {

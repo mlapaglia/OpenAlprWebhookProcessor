@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetEnrichers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetEnrichersQueryHandlerTests : TestBase
     {

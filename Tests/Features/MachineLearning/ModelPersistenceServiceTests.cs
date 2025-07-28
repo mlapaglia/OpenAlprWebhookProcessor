@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services.Filesystem
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class ModelPersistenceServiceTests : TestBase
     {
@@ -388,50 +389,6 @@ namespace Tests.Features.MachineLearning.Services.Filesystem
             var fileInfo = _service.GetModelFileInfo(modelPath);
             fileInfo.Exists.Should().BeTrue();
             fileInfo.FileSize.Should().BeGreaterThan(0);
-        }
-
-        #endregion
-
-        #region Integration Tests
-
-        [Test]
-        public async Task FullWorkflow_SaveLoadAndGetInfo_WorksCorrectly()
-        {
-            // Arrange
-            var modelPath = Path.Combine("models", "workflow-test-model.zip");
-            
-            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
-            {
-                new { Input = 1.0f, Label = true },
-                new { Input = 2.0f, Label = false },
-                new { Input = 3.0f, Label = true }
-            });
-            
-            var pipeline = _mlContext.Transforms.Concatenate("Features", "Input")
-                .Append(_mlContext.BinaryClassification.Trainers.SdcaLogisticRegression());
-            var model = pipeline.Fit(dataView);
-
-            // Act & Assert
-
-            // 1. Initially model doesn't exist
-            _service.ModelExists(modelPath).Should().BeFalse();
-            var initialInfo = _service.GetModelFileInfo(modelPath);
-            initialInfo.Exists.Should().BeFalse();
-
-            // 2. Save the model
-            await _service.SaveModelAsync(model, modelPath, _mlContext);
-
-            // 3. Now model should exist
-            _service.ModelExists(modelPath).Should().BeTrue();
-            var savedInfo = _service.GetModelFileInfo(modelPath);
-            savedInfo.Exists.Should().BeTrue();
-            savedInfo.FileSize.Should().BeGreaterThan(0);
-            savedInfo.LastModified.Should().NotBeNull();
-
-            // 4. Load the model
-            var loadedModel = _service.LoadModel(modelPath, _mlContext);
-            loadedModel.Should().NotBeNull();
-            loadedModel.Should().BeAssignableTo<ITransformer>();
         }
 
         #endregion

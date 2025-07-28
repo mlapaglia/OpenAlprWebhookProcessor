@@ -15,6 +15,7 @@ using Tests.TestHelpers;
 using Mediator;
 namespace Tests.WebhookProcessor
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class OpenAlprAgentScraperTests : TestBase
     {

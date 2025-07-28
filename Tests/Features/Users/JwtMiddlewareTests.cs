@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 
 namespace Tests.Features.Users
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class JwtMiddlewareTests
     {

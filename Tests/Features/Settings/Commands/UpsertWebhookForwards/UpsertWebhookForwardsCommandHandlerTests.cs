@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertWebhookForwards
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpsertWebhookForwardsCommandHandlerTests : TestBase
     {

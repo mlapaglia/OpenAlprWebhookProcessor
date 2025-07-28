@@ -10,6 +10,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetTopPredictionsQueryHandlerTests : TestBase
     {

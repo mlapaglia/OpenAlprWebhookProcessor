@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetIgnores
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetIgnoresQueryHandlerTests : TestBase
     {

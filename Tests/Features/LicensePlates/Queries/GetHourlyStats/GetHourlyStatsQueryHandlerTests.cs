@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.GetHourlyStats
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetHourlyStatsQueryHandlerTests : TestBase
     {

@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.EnableAgent
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class EnableAgentCommandHandlerTests : TestBase
     {

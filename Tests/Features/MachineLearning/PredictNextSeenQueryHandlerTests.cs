@@ -10,6 +10,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.PredictNextSeen
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class PredictNextSeenQueryHandlerTests : TestBase
     {

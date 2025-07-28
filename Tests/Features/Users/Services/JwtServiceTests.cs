@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Tests.Features.Users.Services
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class JwtServiceTests
     {

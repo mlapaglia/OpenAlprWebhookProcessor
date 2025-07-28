@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Configuration for parallel test execution -->
+  <RunConfiguration>
+    <!-- Maximum number of parallel test processes -->
+    <MaxCpuCount>0</MaxCpuCount>
+    
+    <!-- Disable app domains for better performance -->
+    <DisableAppDomain>true</DisableAppDomain>
+    
+    <!-- Disable parallization for debugging (set to false for normal runs) -->
+    <DisableParallelization>false</DisableParallelization>
+  </RunConfiguration>
+
+  <!-- NUnit specific settings -->
+  <NUnit>
+    <!-- Number of test worker threads (0 = auto-detect based on CPU cores) -->
+    <NumberOfTestWorkers>0</NumberOfTestWorkers>
+    
+    <!-- Set to true to run tests in parallel where possible -->
+    <ParallelizeAssembly>true</ParallelizeAssembly>
+    <ParallelizeTestCollections>true</ParallelizeTestCollections>
+    
+    <!-- Timeout for individual tests (30 seconds) -->
+    <DefaultTimeout>30000</DefaultTimeout>
+    
+    <!-- Work item timeout (2 minutes) -->
+    <WorkItemTimeout>120000</WorkItemTimeout>
+  </NUnit>
+
+  <!-- Data collection settings for performance -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <!-- Code coverage is disabled for parallel runs for better performance -->
+      <!-- Enable only when needed for coverage reports -->
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings> 

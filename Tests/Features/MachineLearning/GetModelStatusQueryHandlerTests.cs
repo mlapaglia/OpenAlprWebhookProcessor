@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.GetModelStatus
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetModelStatusQueryHandlerTests : TestBase
     {

@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Hydrator
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class HydrationServiceTests : TestBase
     {

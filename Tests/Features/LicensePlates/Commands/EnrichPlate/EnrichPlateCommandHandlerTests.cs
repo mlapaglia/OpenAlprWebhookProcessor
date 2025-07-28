@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Commands.EnrichPlate
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class EnrichPlateCommandHandlerTests : TestBase
     {

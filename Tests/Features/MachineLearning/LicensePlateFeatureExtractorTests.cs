@@ -1,4 +1,4 @@
-﻿using AwesomeAssertions;
+using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Services
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class LicensePlateFeatureExtractorTests : TestBase
     {

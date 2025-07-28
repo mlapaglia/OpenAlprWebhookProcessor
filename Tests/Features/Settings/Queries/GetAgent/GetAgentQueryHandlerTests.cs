@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetAgent
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetAgentQueryHandlerTests : TestBase
     {

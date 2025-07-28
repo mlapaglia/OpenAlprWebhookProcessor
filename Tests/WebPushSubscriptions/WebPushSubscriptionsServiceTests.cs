@@ -10,6 +10,7 @@ using Tests.TestHelpers;
 
 namespace Tests.WebPushSubscriptions
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class WebPushSubscriptionsServiceTests : TestBase
     {

@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.TestEnrichers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class TestEnrichersCommandHandlerTests : TestBase
     {

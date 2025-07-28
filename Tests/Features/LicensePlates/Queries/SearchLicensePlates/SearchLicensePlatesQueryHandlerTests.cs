@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Queries.SearchLicensePlates
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class SearchLicensePlatesQueryHandlerTests : TestBase
     {

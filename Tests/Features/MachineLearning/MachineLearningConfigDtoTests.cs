@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tests.Features.MachineLearning
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class MachineLearningConfigDtoTests
     {

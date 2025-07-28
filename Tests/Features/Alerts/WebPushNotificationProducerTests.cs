@@ -15,6 +15,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class WebPushNotificationProducerTests : TestBase
     {

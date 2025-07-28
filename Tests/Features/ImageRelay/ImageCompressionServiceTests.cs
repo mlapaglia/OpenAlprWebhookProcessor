@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 using Mediator;
 namespace Tests.Features.ImageRelay
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class ImageCompressionServiceTests : TestBase
     {

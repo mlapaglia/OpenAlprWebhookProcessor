@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.CameraUpdateService.Hikvision;
 
 namespace Tests.CameraUpdateService.Hikvision
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class HikvisionCameraTests
     {

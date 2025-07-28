@@ -12,6 +12,7 @@ using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GroupWebhookHandlerTests : TestBase
     {

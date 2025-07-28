@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.GetConfiguration
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetConfigurationQueryHandlerTests : TestBase
     {

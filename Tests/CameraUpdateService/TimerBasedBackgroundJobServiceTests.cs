@@ -8,6 +8,7 @@ using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace Tests.CameraUpdateService
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class TimerBasedBackgroundJobServiceTests
     {

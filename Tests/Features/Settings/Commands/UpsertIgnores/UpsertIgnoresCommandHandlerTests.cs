@@ -6,6 +6,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Commands.UpsertIgnores
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpsertIgnoresCommandHandlerTests : TestBase
     {

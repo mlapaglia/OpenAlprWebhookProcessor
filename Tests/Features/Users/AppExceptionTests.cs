@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Features.Users;
 
 namespace Tests.Features.Users
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class AppExceptionTests
     {

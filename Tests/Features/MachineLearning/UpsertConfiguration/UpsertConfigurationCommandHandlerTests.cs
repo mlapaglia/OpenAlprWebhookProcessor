@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.UpsertConfiguration
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpsertConfigurationCommandHandlerTests : TestBase
     {

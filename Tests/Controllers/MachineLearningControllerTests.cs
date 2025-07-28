@@ -21,6 +21,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Controllers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class MachineLearningControllerTests : TestBase
     {

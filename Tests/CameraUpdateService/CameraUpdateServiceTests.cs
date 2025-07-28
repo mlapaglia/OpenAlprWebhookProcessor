@@ -11,6 +11,7 @@ using Tests.TestHelpers;
 
 namespace Tests.CameraUpdateService
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class CameraUpdateServiceTests : TestBase
     {

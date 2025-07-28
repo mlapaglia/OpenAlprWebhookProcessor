@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Commands.EditPlate
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class EditPlateCommandHandlerTests : TestBase
     {

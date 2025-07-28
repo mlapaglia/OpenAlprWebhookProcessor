@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Commands
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UpdateUserCommandHandlerTests : TestBase
     {

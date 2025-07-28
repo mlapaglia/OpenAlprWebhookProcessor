@@ -7,6 +7,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Data
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UserRepositoryTests
     {

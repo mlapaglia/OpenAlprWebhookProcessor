@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.ImageRelay
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetCropImageQueryHandlerTests : TestBase
     {

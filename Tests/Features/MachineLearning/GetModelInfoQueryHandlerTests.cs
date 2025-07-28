@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.GetModelInfo
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetModelInfoQueryHandlerTests : TestBase
     {

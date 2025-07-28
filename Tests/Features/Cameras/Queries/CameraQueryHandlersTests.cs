@@ -12,6 +12,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Cameras.Queries
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetCamerasQueryHandlerTests : TestBase
     {
@@ -163,6 +164,7 @@ namespace Tests.Features.Cameras.Queries
         }
     }
 
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetCameraMaskQueryHandlerTests : TestBase
     {
@@ -264,6 +266,7 @@ namespace Tests.Features.Cameras.Queries
         }
     }
 
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetPlateCapturesQueryHandlerTests : TestBase
     {
@@ -396,6 +399,7 @@ namespace Tests.Features.Cameras.Queries
         }
     }
 
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetZoomAndFocusQueryHandlerTests : TestBase
     {

@@ -9,6 +9,7 @@ using NUnit.Framework;
 
 namespace Tests.TestHelpers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public abstract class TestBase
     {

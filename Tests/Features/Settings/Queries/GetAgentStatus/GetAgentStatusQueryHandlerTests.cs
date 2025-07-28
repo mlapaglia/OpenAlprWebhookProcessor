@@ -8,6 +8,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetAgentStatus
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetAgentStatusQueryHandlerTests : TestBase
     {

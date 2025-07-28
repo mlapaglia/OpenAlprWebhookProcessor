@@ -9,6 +9,7 @@ using Tests.TestHelpers;
 using Mediator;
 namespace Tests.Features.Settings.Commands.DisableAgent
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class DisableAgentCommandHandlerTests : TestBase
     {

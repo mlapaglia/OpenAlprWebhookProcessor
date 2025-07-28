@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Features.MachineLearning.Configuration;
 
 namespace Tests.Features.MachineLearning.Configuration
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class MachineLearningConfigurationTests
     {

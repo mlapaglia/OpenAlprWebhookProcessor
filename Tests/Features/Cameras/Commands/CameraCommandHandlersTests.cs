@@ -18,6 +18,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Cameras.Commands
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class CameraCommandHandlersTests : TestBase
     {

@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
 
 namespace Tests.WebhookProcessor
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class TimeServiceTests
     {

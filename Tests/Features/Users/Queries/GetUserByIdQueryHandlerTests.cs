@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Users.Queries
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class GetUserByIdQueryHandlerTests : TestBase
     {

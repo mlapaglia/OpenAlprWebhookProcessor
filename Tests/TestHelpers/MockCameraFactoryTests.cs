@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.Features.Cameras.Configuration;
 
 namespace Tests.TestHelpers
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class MockCameraFactoryTests
     {

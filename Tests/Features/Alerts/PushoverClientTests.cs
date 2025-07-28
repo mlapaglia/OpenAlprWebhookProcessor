@@ -11,6 +11,7 @@ using Tests.TestHelpers;
 using Mediator;
 namespace Tests.Features.Alerts
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class PushoverClientTests : TestBase
     {

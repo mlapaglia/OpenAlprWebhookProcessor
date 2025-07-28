@@ -10,6 +10,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.MachineLearning.Queries.PredictBatch
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class PredictBatchQueryHandlerTests : TestBase
     {

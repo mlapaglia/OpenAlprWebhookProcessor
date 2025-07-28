@@ -1,4 +1,4 @@
-﻿using AwesomeAssertions;
+using AwesomeAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,6 +13,7 @@ using Tests.TestHelpers;
 
 namespace Tests.WebhookProcessor
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class ImageRetrieverHostedServiceTests : TestBase
     {

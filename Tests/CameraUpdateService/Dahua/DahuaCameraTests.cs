@@ -6,6 +6,7 @@ using OpenAlprWebhookProcessor.CameraUpdateService;
 
 namespace Tests.CameraUpdateService.Dahua
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class DahuaCameraTests
     {

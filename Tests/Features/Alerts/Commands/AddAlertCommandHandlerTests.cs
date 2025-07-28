@@ -5,6 +5,7 @@ using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Commands
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class AddAlertCommandHandlerTests : TestBase
     {

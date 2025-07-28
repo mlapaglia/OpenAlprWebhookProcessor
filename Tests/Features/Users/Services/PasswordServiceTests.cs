@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Features.Users.Services;
 
 namespace Tests.Features.Users.Services
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class PasswordServiceTests
     {

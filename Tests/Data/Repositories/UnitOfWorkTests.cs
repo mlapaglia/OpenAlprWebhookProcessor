@@ -5,6 +5,7 @@ using OpenAlprWebhookProcessor.Data.Repositories;
 
 namespace Tests.Data.Repositories
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class UnitOfWorkTests
     {

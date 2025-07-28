@@ -4,6 +4,7 @@ using OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser;
 
 namespace Tests.Features.Users.Commands
 {
+    [Parallelizable(ParallelScope.Self)]
     [TestFixture]
     public class CreateUserCommandValidatorTests
     {
