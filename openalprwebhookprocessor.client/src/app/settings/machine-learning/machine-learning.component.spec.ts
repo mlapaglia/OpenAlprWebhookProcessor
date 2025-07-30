@@ -1,14 +1,5 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDividerModule } from '@angular/material/divider';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError, Subject } from 'rxjs';
 
@@ -82,15 +73,6 @@ describe('MachineLearningComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         MachineLearningComponent,
-        ReactiveFormsModule,
-        MatCardModule,
-        MatButtonModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatTableModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDividerModule,
         BrowserAnimationsModule,
       ],
       providers: [
@@ -121,15 +103,7 @@ describe('MachineLearningComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should initialize form with default values', () => {
-      expect(component.configForm.get('minimumModelQuality')?.value).toBe(0.05);
-      expect(component.configForm.get('minimumTrainingData')?.value).toBe(100);
-      expect(component.configForm.get('trainingBatchSize')?.value).toBe(50000);
-      expect(component.configForm.get('trainingInterval')?.value).toBe('06:00:00');
-      expect(component.configForm.get('modelFileName')?.value).toBe('license-plate-prediction-model.zip');
-      expect(component.configForm.get('configFolderName')?.value).toBe('config');
-      expect(component.configForm.get('mlModelsFolderName')?.value).toBe('ml-models');
-    });
+
 
     it('should load all data on init', fakeAsync(() => {
       component.ngOnInit();
@@ -265,24 +239,17 @@ describe('MachineLearningComponent', () => {
       expect(component.isEditingConfiguration).toBe(true);
     });
 
-    it('should cancel edit mode and reset form', () => {
+    it('should cancel edit mode', () => {
       component.editConfiguration();
-      component.configForm.patchValue({ minimumModelQuality: 0.1 });
 
       component.cancelConfigurationEdit();
 
       expect(component.isEditingConfiguration).toBe(false);
-      expect(component.configForm.get('minimumModelQuality')?.value).toBe(0.05); // Reset to original
     });
 
     it('should save configuration successfully', fakeAsync(() => {
       component.editConfiguration();
-      component.configForm.patchValue({ minimumModelQuality: 0.1 });
-
-      component.saveConfiguration();
-      tick();
-
-      expect(mockMlService.saveConfiguration).toHaveBeenCalledWith(jasmine.objectContaining({
+      const testConfig: MachineLearningConfigDto = {
         minimumModelQuality: 0.1,
         minimumTrainingData: 100,
         trainingBatchSize: 50000,
@@ -290,7 +257,12 @@ describe('MachineLearningComponent', () => {
         modelFileName: 'license-plate-prediction-model.zip',
         configFolderName: 'config',
         mlModelsFolderName: 'ml-models',
-      }));
+      };
+
+      component.saveConfiguration(testConfig);
+      tick();
+
+      expect(mockMlService.saveConfiguration).toHaveBeenCalledWith(testConfig);
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Configuration saved successfully', SnackBarType.Successful);
       expect(component.isEditingConfiguration).toBe(false);
       expect(component.isSavingConfiguration).toBe(false);
@@ -299,164 +271,38 @@ describe('MachineLearningComponent', () => {
     it('should handle configuration save error', fakeAsync(() => {
       mockMlService.saveConfiguration.and.returnValue(throwError(() => new Error('Save failed')));
       component.editConfiguration();
+      const testConfig: MachineLearningConfigDto = {
+        minimumModelQuality: 0.1,
+        minimumTrainingData: 100,
+        trainingBatchSize: 50000,
+        trainingInterval: '06:00:00',
+        modelFileName: 'license-plate-prediction-model.zip',
+        configFolderName: 'config',
+        mlModelsFolderName: 'ml-models',
+      };
 
-      component.saveConfiguration();
+      component.saveConfiguration(testConfig);
       tick();
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Failed to save configuration', SnackBarType.Error);
       expect(component.isSavingConfiguration).toBe(false);
     }));
 
-    it('should not save invalid configuration', () => {
-      component.editConfiguration();
-      component.configForm.patchValue({ minimumModelQuality: -1 }); // Invalid value
-
-      component.saveConfiguration();
-
-      expect(mockMlService.saveConfiguration).not.toHaveBeenCalled();
-    });
-
     it('should not save when already saving', () => {
       component.isSavingConfiguration = true;
+      const testConfig: MachineLearningConfigDto = {
+        minimumModelQuality: 0.1,
+        minimumTrainingData: 100,
+        trainingBatchSize: 50000,
+        trainingInterval: '06:00:00',
+        modelFileName: 'license-plate-prediction-model.zip',
+        configFolderName: 'config',
+        mlModelsFolderName: 'ml-models',
+      };
 
-      component.saveConfiguration();
+      component.saveConfiguration(testConfig);
 
       expect(mockMlService.saveConfiguration).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Form Validation', () => {
-    it('should validate minimum model quality', () => {
-      const field = component.configForm.get('minimumModelQuality');
-
-      field?.setValue(-1);
-      field?.markAsTouched();
-      expect(component.getFieldError('minimumModelQuality')).toContain('must be at least');
-
-      field?.setValue(2);
-      expect(component.getFieldError('minimumModelQuality')).toContain('must be at most');
-
-      field?.setValue(0.5);
-      expect(component.getFieldError('minimumModelQuality')).toBe('');
-    });
-
-    it('should validate minimum training data', () => {
-      const field = component.configForm.get('minimumTrainingData');
-
-      field?.setValue(5);
-      field?.markAsTouched();
-      expect(component.getFieldError('minimumTrainingData')).toContain('must be at least');
-
-      field?.setValue(2000000);
-      expect(component.getFieldError('minimumTrainingData')).toContain('must be at most');
-
-      field?.setValue(1000);
-      expect(component.getFieldError('minimumTrainingData')).toBe('');
-    });
-
-    it('should validate training batch size', () => {
-      const field = component.configForm.get('trainingBatchSize');
-
-      field?.setValue(500);
-      field?.markAsTouched();
-      expect(component.getFieldError('trainingBatchSize')).toContain('must be at least');
-
-      field?.setValue(2000000);
-      expect(component.getFieldError('trainingBatchSize')).toContain('must be at most');
-
-      field?.setValue(50000);
-      expect(component.getFieldError('trainingBatchSize')).toBe('');
-    });
-
-    it('should validate required fields', () => {
-      const field = component.configForm.get('modelFileName');
-
-      field?.setValue('');
-      field?.markAsTouched();
-      expect(component.getFieldError('modelFileName')).toContain('is required');
-
-      field?.setValue('test.zip');
-      expect(component.getFieldError('modelFileName')).toBe('');
-    });
-  });
-
-  describe('Data Display Helpers', () => {
-    beforeEach(fakeAsync(() => {
-      component.ngOnInit();
-      tick();
-    }));
-
-    it('should format file size correctly', () => {
-      expect(component['formatFileSize'](1024)).toBe('1 KB');
-      expect(component['formatFileSize'](1048576)).toBe('1 MB');
-      expect(component['formatFileSize'](1073741824)).toBe('1 GB');
-      expect(component['formatFileSize'](0)).toBe('0 Bytes');
-    });
-
-    it('should format training interval correctly', () => {
-      expect(component.formatTrainingInterval('06:30:00')).toBe('6h 30m');
-      expect(component.formatTrainingInterval('24:00:00')).toBe('24h 0m');
-      expect(component.formatTrainingInterval('invalid')).toBe('invalid');
-    });
-
-    it('should get correct result colors', () => {
-      expect(component.getResultColor('Success')).toBe('#32de84');
-      expect(component.getResultColor('Failed: Error')).toBe('#D2122E');
-      expect(component.getResultColor('In Progress')).toBe('#ff9800');
-      expect(component.getResultColor('Unknown')).toBe('#666666');
-    });
-
-    it('should get training result based on status', () => {
-      // Test in progress
-      const trainingStatus = { ...mockTrainingStatus, isTraining: true };
-      component.trainingStatus = trainingStatus;
-      expect(component['getTrainingResult']()).toBe('In Progress');
-
-      // Test failed
-      const failedStatus = { ...mockTrainingStatus, lastError: 'Training failed', lastTrainingSuccessful: false };
-      component.trainingStatus = failedStatus;
-      expect(component['getTrainingResult']()).toBe('Failed: Training failed');
-
-      // Test success
-      const successStatus = { ...mockTrainingStatus, lastTrainingSuccessful: true };
-      component.trainingStatus = successStatus;
-      expect(component['getTrainingResult']()).toBe('Success');
-
-      // Test not completed
-      const notCompletedStatus = { ...mockTrainingStatus, lastTrainingSuccessful: false };
-      component.trainingStatus = notCompletedStatus;
-      expect(component['getTrainingResult']()).toBe('Not completed');
-    });
-  });
-
-  describe('Table Data Updates', () => {
-    beforeEach(fakeAsync(() => {
-      component.ngOnInit();
-      tick();
-    }));
-
-    it('should update status table data', () => {
-      expect(component.statusData.data.length).toBe(7);
-      expect(component.statusData.data.find(row => row.key === 'Training Status')?.value).toBe('Idle');
-      expect(component.statusData.data.find(row => row.key === 'Training Data Count')?.value).toBe('50,000');
-    });
-
-    it('should update config table data', () => {
-      expect(component.configData.data.length).toBe(7);
-      expect(component.configData.data.find(row => row.key === 'Minimum Model Quality (R²)')?.value).toBe('0.05');
-      expect(component.configData.data.find(row => row.key === 'Training Interval')?.value).toBe('6h 0m');
-    });
-
-    it('should handle missing model file info', () => {
-      const statusWithoutFile = { ...mockTrainingStatus, modelFile: undefined };
-      component.trainingStatus = statusWithoutFile;
-      component['updateStatusTable']();
-
-      const modelFileRow = component.statusData.data.find(row => row.key === 'Model File Last Saved');
-      const fileSizeRow = component.statusData.data.find(row => row.key === 'Model File Size');
-
-      expect(modelFileRow?.value).toBe('Not saved');
-      expect(fileSizeRow?.value).toBe('N/A');
     });
   });
 

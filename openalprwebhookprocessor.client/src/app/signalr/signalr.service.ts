@@ -30,7 +30,7 @@ export class SignalrService {
     }
 
     const user = this.accountService.userValue;
-    if (!user.jwtToken) {
+    if (!user || !user.jwtToken) {
       return;
     }
 
@@ -109,7 +109,7 @@ export class SignalrService {
   }
 
   public stopConnection() {
-    if (!this.isConnected) {
+    if (!this.hubConnection) {
       return;
     }
 
