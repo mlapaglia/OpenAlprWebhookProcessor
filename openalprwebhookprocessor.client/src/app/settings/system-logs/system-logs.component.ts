@@ -18,7 +18,10 @@ import { MatInputModule } from '@angular/material/input';
   selector: 'app-logs',
   templateUrl: './system-logs.component.html',
   styleUrls: ['./system-logs.component.less'],
-  imports: [CommonModule, MatButtonModule, MatCheckboxModule, ReactiveFormsModule, FormsModule, Highlight, MatSelectModule, MatFormFieldModule, MatInputModule],
+  imports: [
+    CommonModule, MatButtonModule, MatCheckboxModule, ReactiveFormsModule,
+    FormsModule, Highlight, MatSelectModule, MatFormFieldModule, MatInputModule,
+  ],
 })
 export class SystemLogsComponent implements AfterViewInit, OnDestroy {
   private readonly signalRHub = inject(SignalrService);
@@ -68,7 +71,7 @@ export class SystemLogsComponent implements AfterViewInit, OnDestroy {
 
   public populateLogs() {
     this.unsubscribeFromLogs();
-    this.systemLogsService.getLogs(this.selectedLogLevel, this.searchControl.value || '').subscribe((result) => {
+    this.systemLogsService.getLogs(this.selectedLogLevel, this.searchControl.value ?? '').subscribe((result) => {
       this.logMessages = result;
       this.formatLogs();
       this.subscribeForLogs();
@@ -77,7 +80,7 @@ export class SystemLogsComponent implements AfterViewInit, OnDestroy {
 
   public subscribeForLogs() {
     this.subscriptions.add(this.signalRHub.processInformationLogged.subscribe((logInformation) => {
-      if (logInformation && logInformation.logLevel >= this.selectedLogLevel && this.shouldIncludeLogBySearch(logInformation.logMessage)) {
+      if (logInformation.logLevel >= this.selectedLogLevel && this.shouldIncludeLogBySearch(logInformation.logMessage)) {
         this.logMessages.unshift(logInformation.logMessage);
         this.formatLogs();
       }
@@ -113,7 +116,7 @@ export class SystemLogsComponent implements AfterViewInit, OnDestroy {
   }
 
   private shouldIncludeLogBySearch(logMessage: string): boolean {
-    const searchText = this.searchControl.value || '';
+    const searchText = this.searchControl.value ?? '';
     if (!searchText.trim()) {
       return true;
     }

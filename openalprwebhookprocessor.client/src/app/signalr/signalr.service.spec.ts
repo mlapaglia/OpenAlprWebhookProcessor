@@ -4,7 +4,6 @@ import { SignalrService } from './signalr.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { AccountService } from 'app/_services';
-import { SnackBarType } from 'app/snackbar/snackbartype';
 import * as signalR from '@microsoft/signalr';
 
 describe('SignalrService', () => {

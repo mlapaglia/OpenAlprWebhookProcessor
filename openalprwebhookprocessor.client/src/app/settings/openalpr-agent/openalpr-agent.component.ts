@@ -23,7 +23,11 @@ import { NgStyle } from '@angular/common';
   selector: 'app-openalpr-agent',
   templateUrl: './openalpr-agent.component.html',
   styleUrls: ['./openalpr-agent.component.less'],
-  imports: [MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatTooltipModule, MatCheckboxModule],
+  imports: [
+    MatCardModule, MatIconModule, NgStyle, MatProgressSpinnerModule, MatTableModule,
+    MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule,
+    MatTooltipModule, MatCheckboxModule,
+  ],
 })
 export class OpenalprAgentComponent implements OnInit, OnDestroy {
   private readonly settingsService = inject(SettingsService);
@@ -32,7 +36,7 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
 
   @ViewChild('agentStatusTable') table: MatTable<PlateStatisticsData[]>;
 
-  public agent: Agent;
+  public agent?: Agent;
   public agentStatus: AgentStatus;
   public agentStatusData: PlateStatisticsData[] = [];
   public displayedColumns: string[] = ['key', 'value'];
@@ -59,10 +63,12 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
   public saveAgent() {
     this.isSaving = true;
 
-    this.settingsService.upsertAgent(this.agent).subscribe(() => {
-      this.isSaving = false;
-      this.getAgent();
-    });
+    if (this.agent) {
+      this.settingsService.upsertAgent(this.agent).subscribe(() => {
+        this.isSaving = false;
+        this.getAgent();
+      });
+    }
   }
 
   public scrapeAgent() {
@@ -82,79 +88,98 @@ export class OpenalprAgentComponent implements OnInit, OnDestroy {
 
   private getAgentStatus() {
     this.isLoadingAgentStatus = true;
-    this.settingsService.getAgentStatus().subscribe((result) => {
-      this.agentStatus = result;
-      this.agentStatusData = new Array<PlateStatisticsData>();
+    this.settingsService.getAgentStatus().subscribe({
+      next: (result) => {
+        this.agentStatus = result;
+        this.agentStatusData = [];
 
-      if (this.agentStatus.isConnected) {
-        this.agentStatusData.push({
-          key: 'Cpu Cores',
-          value: this.agentStatus.cpuCores.toString(),
-        });
+        if (this.agentStatus.isConnected) {
+          this.buildConnectedAgentData();
+        } else {
+          this.buildDisconnectedAgentData();
+        }
 
-        this.agentStatusData.push({
-          key: 'Cpu Usage',
-          value: `${this.agentStatus.cpuUsagePercent.toString()}%`,
-        });
-
-        this.agentStatusData.push({
-          key: 'ALPR Daemon Active',
-          value: this.agentStatus.alprdActive ? 'Yes' : 'No',
-        });
-
-        this.agentStatusData.push({
-          key: 'Daemon Uptime',
-          value: `${this.agentStatus.daemonUptimeSeconds.toString()} seconds`,
-        });
-
-        this.agentStatusData.push({
-          key: 'Free Disk Space',
-          value: this.formatBytes(this.agentStatus.diskFreeBytes),
-        });
-
-        this.agentStatusData.push({
-          key: 'Hostname',
-          value: this.agentStatus.hostname,
-        });
-
-        this.agentStatusData.push({
-          key: 'Current Time',
-          value: new Date(this.agentStatus.agentEpochMs).toString(),
-        });
-
-        this.agentStatusData.push({
-          key: 'Version',
-          value: this.agentStatus.version,
-        });
-      } else {
-        this.agentStatusData.push({
-          key: 'Last Heartbeat',
-          value: new Date(this.agent.lastHeartbeatEpochMs).toString(),
-        });
-      }
-
-      this.isLoadingAgentStatus = false;
-      this.table.renderRows();
-    },
-    () => {
-      this.isLoadingAgentStatus = false;
-      this.agentStatus = new AgentStatus();
-      this.agentStatus.isConnected = false;
-      this.agentStatusData = new Array<PlateStatisticsData>();
-      this.table.renderRows();
+        this.finalizeAgentStatusUpdate();
+      },
+      error: () => {
+        this.handleAgentStatusError();
+      },
     });
+  }
+
+  private buildConnectedAgentData(): void {
+    this.agentStatusData.push(
+      {
+        key: 'Cpu Cores',
+        value: this.agentStatus.cpuCores.toString(),
+      },
+      {
+        key: 'Cpu Usage',
+        value: `${this.agentStatus.cpuUsagePercent.toString()}%`,
+      },
+      {
+        key: 'ALPR Daemon Active',
+        value: this.agentStatus.alprdActive ? 'Yes' : 'No',
+      },
+      {
+        key: 'Daemon Uptime',
+        value: `${this.agentStatus.daemonUptimeSeconds.toString()} seconds`,
+      },
+      {
+        key: 'Free Disk Space',
+        value: this.formatBytes(this.agentStatus.diskFreeBytes),
+      },
+      {
+        key: 'Hostname',
+        value: this.agentStatus.hostname,
+      },
+      {
+        key: 'Current Time',
+        value: new Date(this.agentStatus.agentEpochMs).toString(),
+      },
+      {
+        key: 'Version',
+        value: this.agentStatus.version,
+      },
+    );
+  }
+
+  private buildDisconnectedAgentData(): void {
+    this.agentStatusData.push({
+      key: 'Last Heartbeat',
+      value: this.agent?.lastHeartbeatEpochMs
+        ? new Date(this.agent.lastHeartbeatEpochMs).toString()
+        : 'Unknown',
+    });
+  }
+
+  private finalizeAgentStatusUpdate(): void {
+    this.isLoadingAgentStatus = false;
+    this.table.renderRows();
+  }
+
+  private handleAgentStatusError(): void {
+    this.isLoadingAgentStatus = false;
+    this.agentStatus = new AgentStatus();
+    this.agentStatus.isConnected = false;
+    this.agentStatusData = [];
+    this.table.renderRows();
   }
 
   public enableAgent() {
-    this.settingsService.enableAgent(this.agent.id).subscribe(() => {
-      this.getAgentStatus();
-    });
+    if (this.agent) {
+      this.settingsService.enableAgent(this.agent.id).subscribe(() => {
+        this.getAgentStatus();
+      });
+    }
   }
 
   public disableAgent() {
-    this.settingsService.disableAgent(this.agent.id).subscribe(() => {
-      this.getAgentStatus();
-    });
+    if (this.agent) {
+      this.settingsService.disableAgent(this.agent.id).subscribe(() => {
+        this.getAgentStatus();
+      });
+    }
   }
 
   private formatBytes(bytes: number, decimals = 2) {

@@ -12,8 +12,8 @@ export class Alert {
 }
 
 export enum AlertType {
-  Success,
-  Error,
-  Info,
-  Warning,
+  Success = 0,
+  Error = 1,
+  Info = 2,
+  Warning = 3,
 }

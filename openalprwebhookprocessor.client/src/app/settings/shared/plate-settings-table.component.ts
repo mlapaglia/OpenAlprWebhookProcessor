@@ -4,7 +4,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, type FormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -29,7 +29,7 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
   createNew: () => T
   service: {
     getAll: () => Observable<T[]>
-    upsert: (items: T[]) => Observable<any>
+    upsert: (items: T[]) => Observable<unknown>
   }
 }
 
@@ -59,7 +59,7 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
 })
 export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnInit, OnDestroy {
   @Input() config!: PlateSettingsConfig<T>;
-  @Input() additionalContent?: TemplateRef<any>;
+  @Input() additionalContent?: TemplateRef<unknown>;
   @Output() settingsChanged = new EventEmitter<T[]>();
 
   private readonly snackBar = inject(MatSnackBar);
@@ -81,13 +81,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     'actions',
   ];
 
-  constructor() {
-  }
-
   ngOnInit(): void {
-    if (!this.config) {
-      throw new Error('PlateSettingsTableComponent requires a config input');
-    }
     this.loadSettings();
   }
 
@@ -156,7 +150,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
   public saveEdit(setting: T): void {
     if (!this.editingSetting) return;
 
-    if (!this.editingSetting.plateNumber?.trim()) {
+    if (!this.editingSetting.plateNumber.trim()) {
       this.snackBar.open('Plate number is required.', 'Close', {
         duration: 3000,
       });
@@ -180,7 +174,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     Object.assign(setting, {
       plateNumber: this.editingSetting.plateNumber.trim(),
       strictMatch: this.editingSetting.strictMatch,
-      description: this.editingSetting.description?.trim() || '',
+      description: this.editingSetting.description.trim() || '',
     });
 
     this.cancelEdit();
@@ -271,7 +265,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     this.subscriptions.add(subscription);
   }
 
-  public trackByFn(index: number, item: T): any {
+  public trackByFn(index: number, item: T): string | number {
     return item.id || index;
   }
 
@@ -279,7 +273,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     if (!plateNumber) return false;
 
     return this.settings.data.some(setting =>
-      setting.plateNumber?.toLowerCase() === plateNumber.toLowerCase(),
+      setting.plateNumber.toLowerCase() === plateNumber.toLowerCase(),
     );
   }
 
@@ -288,7 +282,7 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
 
     return this.settings.data.some(setting =>
       setting !== currentSetting &&
-      setting.plateNumber?.toLowerCase() === plateNumber.toLowerCase(),
+      setting.plateNumber.toLowerCase() === plateNumber.toLowerCase(),
     );
   }
 

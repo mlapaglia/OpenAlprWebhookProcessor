@@ -11,7 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   templateUrl: 'add-edit.component.html',
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, RouterModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, MatCardModule, RouterModule,
+    FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+  ],
 })
 export class AddEditComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
@@ -99,7 +102,7 @@ export class AddEditComponent implements OnInit {
       .subscribe({
         next: () => {
           this.alertService.success('User added successfully', true);
-          this.router.navigate(['../'], { relativeTo: this.route });
+          void this.router.navigate(['../'], { relativeTo: this.route });
         },
         error: (error) => {
           this.alertService.error(error);
@@ -114,7 +117,7 @@ export class AddEditComponent implements OnInit {
       .subscribe({
         next: () => {
           this.alertService.success('Update successful', true);
-          this.router.navigate(['../../'], { relativeTo: this.route });
+          void this.router.navigate(['../../'], { relativeTo: this.route });
         },
         error: (error) => {
           this.alertService.error(error);

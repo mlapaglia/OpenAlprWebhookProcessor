@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, type OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, type FormGroup } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -29,7 +29,7 @@ import type { PlateSettingsConfig } from './plate-settings-table.component';
     MatCardModule,
   ],
 })
-export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnInit {
+export class AddNewSettingFormComponent<T extends IPlateSetting> {
   @Input() config!: PlateSettingsConfig<T>;
   @Input() existingSettings: T[] = [];
   @Input() isAddingSetting = false;
@@ -46,12 +46,6 @@ export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnIn
       strictMatch: [true, [Validators.required]],
       description: [''],
     });
-  }
-
-  ngOnInit(): void {
-    if (!this.config) {
-      throw new Error('AddNewSettingFormComponent requires a config input');
-    }
   }
 
   public onAddSetting(): void {
@@ -91,7 +85,7 @@ export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnIn
     Object.assign(newSetting, {
       plateNumber: this.settingForm.get('plateNumber')?.value?.trim(),
       strictMatch: this.settingForm.get('strictMatch')?.value,
-      description: this.settingForm.get('description')?.value?.trim() || null,
+      description: this.settingForm.get('description')?.value?.trim() ?? null,
     });
     return newSetting;
   }
@@ -117,6 +111,6 @@ export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnIn
   }
 
   public get descriptionLength(): number {
-    return this.settingForm.get('description')?.value?.length || 0;
+    return this.settingForm.get('description')?.value?.length ?? 0;
   }
 }
