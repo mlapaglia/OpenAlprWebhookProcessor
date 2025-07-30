@@ -1,0 +1,53 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title i18n>
+      Training Status
+      @if (isLoadingTrainingStatus) {
+        <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" i18n-mode diameter="20" />
+      }
+    </mat-card-title>
+    <mat-card-subtitle i18n>Current training service status and history</mat-card-subtitle>
+  </mat-card-header>
+  @if (trainingStatus) {
+    <mat-card-content>
+      <table mat-table [dataSource]="statusData" class="mat-elevation-z2" style="width: 100%;">
+        <ng-container matColumnDef="key" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef style="min-width: 200px;">Property</th>
+          <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
+        </ng-container>
+        <ng-container matColumnDef="value" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let element">
+            @if (element.key === 'Training Status') {
+              <span [style.color]="trainingStatus.isTraining ? '#ff9800' : '#32de84'">
+                {{ element.value }}
+              </span>
+            }
+            @else if (element.key === 'Last Training Result') {
+              <span [style.color]="getResultColor(element.value)">
+                {{ element.value }}
+              </span>
+            }
+            @else {
+              {{ element.value }}
+            }
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  }
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="onTriggerTraining()" [disabled]="isTriggering || trainingStatus?.isTraining">
+      @if (isTriggering) {
+        <mat-progress-spinner color="primary" mode="indeterminate" i18n-mode diameter="20" style="margin-right: 8px;" />
+      }
+      {{ isTriggering ? 'Training...' : 'Trigger Training' }}
+    </button>
+    <button mat-button (click)="onRefreshData()" [disabled]="isLoadingTrainingStatus">
+      <mat-icon i18n>refresh</mat-icon>
+      Refresh
+    </button>
+  </mat-card-actions>
+</mat-card> 

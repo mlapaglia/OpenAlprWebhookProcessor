@@ -441,24 +441,10 @@ describe('MachineLearningComponent', () => {
       expect(component.statusData.data.find(row => row.key === 'Training Data Count')?.value).toBe('50,000');
     });
 
-    it('should update metrics table data', () => {
-      expect(component.metricsData.data.length).toBe(3);
-      expect(component.metricsData.data.find(row => row.key === 'R-Squared (R²)')?.value).toBe('0.8500');
-      expect(component.metricsData.data.find(row => row.key === 'Mean Absolute Error')?.value).toBe('2.50 hours');
-    });
-
     it('should update config table data', () => {
       expect(component.configData.data.length).toBe(7);
       expect(component.configData.data.find(row => row.key === 'Minimum Model Quality (R²)')?.value).toBe('0.05');
       expect(component.configData.data.find(row => row.key === 'Training Interval')?.value).toBe('6h 0m');
-    });
-
-    it('should handle missing model metrics', () => {
-      const statusWithoutMetrics = { ...mockTrainingStatus, modelMetrics: undefined };
-      component.trainingStatus = statusWithoutMetrics;
-      component['updateMetricsTable']();
-
-      expect(component.metricsData.data.length).toBe(0);
     });
 
     it('should handle missing model file info', () => {

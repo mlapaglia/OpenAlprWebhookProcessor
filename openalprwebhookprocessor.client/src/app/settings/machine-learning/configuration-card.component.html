@@ -1,0 +1,126 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title i18n>
+      Training Configuration
+      @if (isLoadingConfiguration) {
+        <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" i18n-mode diameter="20" />
+      }
+    </mat-card-title>
+    <mat-card-subtitle i18n>
+      @if (isEditingConfiguration) {
+        Edit ML training parameters
+      } @else {
+        Current ML training parameters
+      }
+      @if (configuration?.lastUpdated) {
+        <div style="margin-top: 8px; font-size: 12px; color: #666;">
+          Last updated: {{ configuration?.lastUpdated | date:'medium' }}
+          @if (configuration?.updatedBy) {
+            by {{ configuration?.updatedBy }}
+          }
+        </div>
+      }
+    </mat-card-subtitle>
+  </mat-card-header>
+  
+  @if (configuration) {
+    <mat-card-content>
+      <form [formGroup]="configForm">
+        <table mat-table [dataSource]="configData" class="mat-elevation-z2" style="width: 100%;">
+          <ng-container matColumnDef="key" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef style="min-width: 200px;">Setting</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="value" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef>Value</th>
+            <td mat-cell *matCellDef="let element" style="padding: 8px;">
+              @if (isEditingConfiguration) {
+                <div style="width: 100%;">
+                  @if (element.key === 'Minimum Model Quality (R²)') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput type="number" step="0.001" min="0.001" max="1.0" 
+                             formControlName="minimumModelQuality">
+                      @if (getFieldError('minimumModelQuality')) {
+                        <mat-error>{{ getFieldError('minimumModelQuality') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'Minimum Training Data') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput type="number" min="10" max="1000000" 
+                             formControlName="minimumTrainingData">
+                      @if (getFieldError('minimumTrainingData')) {
+                        <mat-error>{{ getFieldError('minimumTrainingData') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'Training Batch Size') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput type="number" min="1000" max="1000000" 
+                             formControlName="trainingBatchSize">
+                      @if (getFieldError('trainingBatchSize')) {
+                        <mat-error>{{ getFieldError('trainingBatchSize') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'Training Interval') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput type="text" formControlName="trainingInterval" 
+                             placeholder="06:00:00">
+                      @if (getFieldError('trainingInterval')) {
+                        <mat-error>{{ getFieldError('trainingInterval') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'Model File Name') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput formControlName="modelFileName">
+                      @if (getFieldError('modelFileName')) {
+                        <mat-error>{{ getFieldError('modelFileName') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'Config Folder') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput formControlName="configFolderName">
+                      @if (getFieldError('configFolderName')) {
+                        <mat-error>{{ getFieldError('configFolderName') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else if (element.key === 'ML Models Folder') {
+                    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+                      <input matInput formControlName="mlModelsFolderName">
+                      @if (getFieldError('mlModelsFolderName')) {
+                        <mat-error>{{ getFieldError('mlModelsFolderName') }}</mat-error>
+                      }
+                    </mat-form-field>
+                  }
+                </div>
+              } @else {
+                {{ element.value }}
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </form>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      @if (isEditingConfiguration) {
+        <button mat-raised-button color="primary" 
+                (click)="onSaveConfiguration()" 
+                [disabled]="configForm.invalid || isSavingConfiguration">
+          @if (isSavingConfiguration) {
+            <mat-progress-spinner color="primary" mode="indeterminate" i18n-mode diameter="20" style="margin-right: 8px;" />
+          }
+          {{ isSavingConfiguration ? 'Saving...' : 'Save Configuration' }}
+        </button>
+        <button i18n mat-button (click)="onCancelConfigurationEdit()" [disabled]="isSavingConfiguration">
+          Cancel
+        </button>
+      } @else {
+        <button mat-raised-button color="accent" (click)="onEditConfiguration()" [disabled]="isLoadingConfiguration">
+          <mat-icon i18n>edit</mat-icon>
+          Edit Configuration
+        </button>
+      }
+    </mat-card-actions>
+  }
+</mat-card> 

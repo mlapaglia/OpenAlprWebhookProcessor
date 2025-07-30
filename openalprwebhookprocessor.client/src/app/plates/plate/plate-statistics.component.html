@@ -1,0 +1,35 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title i18n>Statistics</mat-card-title>
+    <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    @if (loadingStatistics) {
+      <mat-progress-spinner
+        color="primary"
+        mode="indeterminate" i18n-mode
+        diameter="100"
+        style="margin: auto;"
+      />
+    }
+    @if (loadingStatisticsFailed) {
+      <mat-icon i18n style="font-size: 100px;"
+        [inline]="true"
+      matTooltip="Unable to retrieve statistics from server" i18n-matTooltip>help_center</mat-icon>
+    }
+    @if (plateStatistics.length > 0) {
+      <table
+        mat-table [dataSource]="plateStatistics"
+        class="mat-elevation-z8"
+        style="width: 100%">
+        <ng-container matColumnDef="key" i18n-matColumnDef>
+          <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
+        </ng-container>
+        <ng-container matColumnDef="value" i18n-matColumnDef>
+          <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+        </ng-container>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </mat-card-content>
+</mat-card> 

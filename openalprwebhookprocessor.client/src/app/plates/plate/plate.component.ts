@@ -1,36 +1,32 @@
-import { DatePipe } from '@angular/common';
 import { Component, Input, inject, type OnChanges, type OnDestroy, type OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
 import { PlateService } from '../plate.service';
 import type { Plate } from './plate';
-import type { PlateStatisticsData } from './plateStatistics';
-import { Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { PlateStatisticsComponent } from './plate-statistics.component';
 
 @Component({
   selector: 'app-plate',
   templateUrl: './plate.component.html',
   styleUrls: ['./plate.component.less'],
   imports: [
-    MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule,
+    MatCardModule, MatProgressSpinnerModule, MatIconModule,
     MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule,
-    FormsModule, MatButtonModule,
+    FormsModule, MatButtonModule, PlateStatisticsComponent,
   ],
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   private readonly lightbox = inject(Lightbox);
   private readonly plateService = inject(PlateService);
-  private readonly datePipe = inject(DatePipe);
   private readonly snackbarService = inject(SnackbarService);
 
   @Input() plate: Plate;
@@ -46,19 +42,11 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   public loadingPlateImageFailed: boolean;
   public plateImageUrl: string;
 
-  public loadingStatistics: boolean;
-  public loadingStatisticsFailed: boolean;
   public isSavingNotes: boolean;
-
-  public plateStatistics: PlateStatisticsData[] = [];
-  public displayedColumns: string[] = ['key', 'value'];
-
-  private readonly statisticsSubscription = new Subscription();
 
   ngOnInit(): void {
     this.loadingVehicleImage = true;
     this.loadingPlateImage = true;
-    this.getPlateStatistics();
     this.getPlateImages();
     this.isInitialized = true;
   }
@@ -66,10 +54,6 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(): void {
     if (this.isInitialized) {
       if (!this.isVisible) {
-        this.loadingStatistics = false;
-        this.loadingStatisticsFailed = false;
-        this.statisticsSubscription.unsubscribe();
-
         if (this.loadingVehicleImage) {
           this.vehicleImageUrl = '';
         }
@@ -78,72 +62,14 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
           this.plateImageUrl = '';
         }
       } else {
-        if (this.plateStatistics.length == 0) {
-          this.getPlateStatistics();
-        }
-
         this.getPlateImages();
       }
     }
   }
 
   ngOnDestroy(): void {
-    this.statisticsSubscription.unsubscribe();
     this.vehicleImageUrl = '';
     this.plateImageUrl = '';
-  }
-
-  private getPlateStatistics() {
-    this.loadingStatistics = true;
-    this.statisticsSubscription.closed = false;
-    this.statisticsSubscription.add(this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe((result) => {
-      this.loadingStatistics = false;
-      this.loadingStatisticsFailed = false;
-
-      this.plateStatistics.push({
-        key: 'Confidence',
-        value: `${this.plate.processedPlateConfidence}%`,
-      });
-
-      this.plateStatistics.push({
-        key: 'Seen past 90 days',
-        value: result.last90Days.toString(),
-      });
-
-      this.plateStatistics.push({
-        key: 'Total Seen',
-        value: result.totalSeen.toString(),
-      });
-
-      this.plateStatistics.push({
-        key: 'First seen',
-        value: this.datePipe.transform(result.firstSeen, 'medium') ?? '',
-      });
-
-      this.plateStatistics.push({
-        key: 'Last seen',
-        value: this.datePipe.transform(result.lastSeen, 'medium') ?? '',
-      });
-
-      this.plateStatistics.push({
-        key: 'Processing time',
-        value: `${this.plate.openAlprProcessingTimeMs.toString()}ms`,
-      });
-
-      this.plateStatistics.push({
-        key: 'Possible plates',
-        value: this.plate.possiblePlateNumbers,
-      });
-
-      this.plateStatistics.push({
-        key: 'Region',
-        value: this.plate.region,
-      });
-    },
-    () => {
-      this.loadingStatistics = false;
-      this.loadingStatisticsFailed = true;
-    }));
   }
 
   private getPlateImages() {
