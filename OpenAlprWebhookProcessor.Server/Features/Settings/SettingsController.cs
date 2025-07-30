@@ -17,6 +17,7 @@ using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
+using OpenAlprWebhookProcessor.Features.Settings.Queries.GetVersion;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
 using System;
 using System.Collections.Generic;
@@ -165,6 +166,13 @@ namespace OpenAlprWebhookProcessor.Features.Settings
             var command = new CleanupDatabaseCommand();
             await _mediator.Send(command, cancellationToken);
             return StatusCode(202);
+        }
+
+        [HttpGet("version")]
+        public async Task<VersionDto> GetVersion(CancellationToken cancellationToken)
+        {
+            var query = new GetVersionQuery();
+            return await _mediator.Send(query, cancellationToken);
         }
     }
 } 

@@ -6,6 +6,7 @@ import type { Camera } from './cameras/camera';
 import type { Ignore } from './ignores/ignore';
 import type { Agent } from './openalpr-agent/agent';
 import type { AgentStatus } from './openalpr-agent/agentStatus';
+import type { Version } from './version';
 
 @Injectable({
   providedIn: 'root',
@@ -71,5 +72,9 @@ export class SettingsService {
 
   cleanupDatabase(): Observable<null> {
     return this.http.post<null>('/api/settings/cleanup/database', null);
+  }
+
+  getVersion(): Observable<Version> {
+    return this.http.get<Version>('/api/settings/version');
   }
 }

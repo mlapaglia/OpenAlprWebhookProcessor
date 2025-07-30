@@ -13,6 +13,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
 import type { PredictionResult } from './prediction-response';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { PredictionsSectionComponent } from './predictions-section.component';
 import type { ChartConfiguration } from 'chart.js';
 import { Chart, registerables } from 'chart.js';
 
@@ -29,6 +30,7 @@ Chart.register(...registerables);
     MatProgressSpinnerModule,
     MatChipsModule,
     CommonModule,
+    PredictionsSectionComponent,
   ],
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
@@ -324,35 +326,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // Utility methods
-  formatTimeUntil(predictedTime: Date): string {
-    const now = new Date();
-    const predicted = new Date(predictedTime);
-    const diffMs = predicted.getTime() - now.getTime();
-    const diffHours = Math.round(diffMs / (1000 * 60 * 60));
 
-    if (diffHours < 1) {
-      const diffMins = Math.round(diffMs / (1000 * 60));
-      return diffMins > 0 ? `${diffMins}m` : 'Now';
-    } else if (diffHours < 24) {
-      return `${diffHours}h`;
-    } else {
-      const diffDays = Math.round(diffHours / 24);
-      return `${diffDays}d`;
-    }
-  }
-
-  getConfidenceColor(confidence: number): string {
-    if (confidence >= 0.7) return '#4CAF50'; // Green
-    if (confidence >= 0.4) return '#FF9800'; // Orange
-    return '#F44336'; // Red
-  }
-
-  getConfidenceText(confidence: number): string {
-    if (confidence >= 0.7) return 'High';
-    if (confidence >= 0.4) return 'Medium';
-    return 'Low';
-  }
 
   private createMockHourlyChart() {
     const hours = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];

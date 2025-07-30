@@ -1,0 +1,19 @@
+@if (isEditing && fieldConfig) {
+  <div style="width: 100%;">
+    <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
+      <input 
+        matInput 
+        [type]="fieldConfig.inputType"
+        [formControlName]="fieldConfig.controlName"
+        [step]="fieldConfig.step"
+        [min]="fieldConfig.min"
+        [max]="fieldConfig.max"
+        [placeholder]="fieldConfig.placeholder || ''">
+      @if (hasError) {
+        <mat-error>{{ errorMessage }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+} @else {
+  {{ fieldValue }}
+} 

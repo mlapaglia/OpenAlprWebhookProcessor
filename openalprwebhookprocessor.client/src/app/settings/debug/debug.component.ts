@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
+import { Version } from '../version';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,11 +23,32 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule,
   ],
 })
-export class DebugComponent {
+export class DebugComponent implements OnInit {
   private readonly settingsService = inject(SettingsService);
   private readonly snackBarService = inject(SnackbarService);
 
   public isCleaningDatabase = false;
+  public version: Version | null = null;
+  public isLoadingVersion = false;
+
+  ngOnInit(): void {
+    void this.loadVersion();
+  }
+
+  private async loadVersion(): Promise<void> {
+    try {
+      this.isLoadingVersion = true;
+      this.version = await this.settingsService.getVersion().toPromise() ?? null;
+    } catch (error) {
+      console.error('Failed to load version:', error);
+      this.snackBarService.create(
+        'Failed to load version information',
+        SnackBarType.Error,
+      );
+    } finally {
+      this.isLoadingVersion = false;
+    }
+  }
 
   async cleanupDatabase(): Promise<void> {
     if (this.isCleaningDatabase) {

@@ -1,5 +1,42 @@
 <div style="margin:16px; display: flex; flex-wrap: wrap; justify-content: flex-start; flex-direction: column; row-gap: 10px; column-gap: 15px;">
   
+  <!-- Version Information Section -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon i18n style="margin-right: 8px;">info</mat-icon>
+        Application Version
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (isLoadingVersion) {
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <mat-progress-spinner 
+            color="primary" 
+            mode="indeterminate" 
+            diameter="20" />
+          <span i18n>Loading version information...</span>
+        </div>
+      } @else if (version) {
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; align-items: center;">
+          <strong>Version:</strong>
+          <span>{{ version.version }}</span>
+          
+          <strong>Assembly Version:</strong>
+          <span>{{ version.assemblyVersion }}</span>
+          
+          <strong>File Version:</strong>
+          <span>{{ version.fileVersion }}</span>
+          
+          <strong>Informational Version:</strong>
+          <span>{{ version.informationalVersion }}</span>
+        </div>
+      } @else {
+        <span style="color: #666; font-style: italic;" i18n>Version information unavailable</span>
+      }
+    </mat-card-content>
+  </mat-card>
+
   <!-- Database Cleanup Section -->
   <mat-card>
     <mat-card-header>

@@ -87,83 +87,24 @@
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="predictions-section" *ngIf="nextExpected || isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0) || (predictablePlates && predictablePlates.length > 0)">
-    <mat-card class="featured-prediction-card" *ngIf="nextExpected">
-      <mat-card-header>
-        <mat-card-title i18n>Next Expected Arrival</mat-card-title>
-        <mat-card-subtitle i18n>ML Prediction</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="featured-content">
-          <h2 class="plate-number">{{ nextExpected.licensePlate }}</h2>
-          <div class="prediction-details">
-            <div class="detail-item">
-              <mat-icon i18n>schedule</mat-icon>
-              <span>{{ formatTimeUntil(nextExpected.predictedNextSeen) }}</span>
-            </div>
-            <mat-chip i18n [style.background-color]="getConfidenceColor(nextExpected.confidenceScore)">
-              {{ getConfidenceText(nextExpected.confidenceScore) }} Confidence
-            </mat-chip>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="predictions-card" *ngIf="isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0)">
-      <mat-card-header>
-        <mat-card-title i18n>Upcoming Predictions</mat-card-title>
-        <mat-card-subtitle i18n>Next 24 hours</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-spinner *ngIf="isLoadingPredictions" diameter="40" />
-        <mat-list *ngIf="!isLoadingPredictions">
-          <mat-list-item *ngFor="let prediction of upcomingPredictions">
-            <div matListItemTitle>{{ prediction.licensePlate }}</div>
-            <div matListItemLine>
-              <span class="time-badge">{{ formatTimeUntil(prediction.predictedNextSeen) }}</span>
-              <span i18n class="location">Unknown</span>
-            </div>
-            <mat-chip matListItemMeta
-                      [style.background-color]="getConfidenceColor(prediction.confidenceScore)">
-              {{ (prediction.confidenceScore * 100).toFixed(0) }}%
-            </mat-chip>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="predictions-card" *ngIf="predictablePlates && predictablePlates.length > 0">
-      <mat-card-header>
-        <mat-card-title i18n>Most Predictable</mat-card-title>
-        <mat-card-subtitle i18n>Highest confidence patterns</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-list>
-          <mat-list-item *ngFor="let prediction of predictablePlates">
-            <div matListItemTitle>{{ prediction.licensePlate }}</div>
-            <div matListItemLine>
-              <span i18n class="pattern">{{ prediction.totalHistoricalVisits }} visits</span>
-            </div>
-            <mat-chip matListItemMeta
-                      [style.background-color]="getConfidenceColor(prediction.confidenceScore)">
-              {{ (prediction.confidenceScore * 100).toFixed(0) }}%
-            </mat-chip>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  <app-predictions-section 
+    [nextExpected]="nextExpected"
+    [upcomingPredictions]="upcomingPredictions"
+    [predictablePlates]="predictablePlates"
+    [isLoadingPredictions]="isLoadingPredictions" />
   <mat-card class="most-seen-card">
     <mat-card-header>
       <mat-card-title i18n>Most Frequently Seen</mat-card-title>
       <mat-card-subtitle i18n>Top plates by occurrence</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-              <mat-list>
-          <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
-            <span matListItemTitle class="rank">#{{ i + 1 }}</span>
-            <div matListItemTitle>{{ plate.name }}</div>
-            <mat-chip i18n matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
-          </mat-list-item>
-        </mat-list>
+      <mat-list>
+        <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
+          <span matListItemTitle class="rank">#{{ i + 1 }}</span>
+          <div matListItemTitle>{{ plate.name }}</div>
+          <mat-chip i18n matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
+        </mat-list-item>
+      </mat-list>
     </mat-card-content>
   </mat-card>
 </div>

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { type MachineLearningConfigDto } from './machine-learning.service';
+import { ConfigurationFieldComponent } from './configuration-field.component';
 
 @Component({
   selector: 'app-configuration-card',
@@ -24,6 +25,7 @@ import { type MachineLearningConfigDto } from './machine-learning.service';
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
+    ConfigurationFieldComponent,
   ],
 })
 export class ConfigurationCardComponent implements OnChanges {

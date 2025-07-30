@@ -105,10 +105,18 @@ jobs:
       - name: Build Artifact
         run: |
           tag=$(git describe --tags --abbrev=0)
+          version=${tag#v}  # Remove 'v' prefix
+          assembly_version="${version}.0"
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
           dotnet restore "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
-          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name"
+          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release \
+            -p:GitVersion="$version" \
+            -p:GitAssemblyVersion="$assembly_version" \
+            -p:GitFileVersion="$assembly_version"
+          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name" \
+            -p:GitVersion="$version" \
+            -p:GitAssemblyVersion="$assembly_version" \
+            -p:GitFileVersion="$assembly_version"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
@@ -136,14 +144,24 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Get git tag
+      - name: Get git tag and version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: |
+          tag=${GITHUB_REF/refs\/tags\//}
+          version=${tag#v}  # Remove 'v' prefix
+          assembly_version="${version}.0"
+          echo ::set-output name=VERSION::$tag
+          echo ::set-output name=GIT_VERSION::$version
+          echo ::set-output name=ASSEMBLY_VERSION::$assembly_version
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
           file: ./OpenAlprWebhookProcessor.Server/Dockerfile
+          build-args: |
+            GIT_VERSION=${{ steps.get_version.outputs.GIT_VERSION }}
+            GIT_ASSEMBLY_VERSION=${{ steps.get_version.outputs.ASSEMBLY_VERSION }}
+            GIT_FILE_VERSION=${{ steps.get_version.outputs.ASSEMBLY_VERSION }}
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}

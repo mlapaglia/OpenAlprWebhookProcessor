@@ -9,6 +9,12 @@
     <SpaProxyServerUrl>https://localhost:4200</SpaProxyServerUrl>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <RootNamespace>OpenAlprWebhookProcessor</RootNamespace>
+    <Version Condition="'$(GitVersion)' != ''">$(GitVersion)</Version>
+    <Version Condition="'$(GitVersion)' == ''">1.0.0-dev</Version>
+    <AssemblyVersion Condition="'$(GitAssemblyVersion)' != ''">$(GitAssemblyVersion)</AssemblyVersion>
+    <AssemblyVersion Condition="'$(GitAssemblyVersion)' == ''">1.0.0.0</AssemblyVersion>
+    <FileVersion Condition="'$(GitFileVersion)' != ''">$(GitFileVersion)</FileVersion>
+    <FileVersion Condition="'$(GitFileVersion)' == ''">1.0.0.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

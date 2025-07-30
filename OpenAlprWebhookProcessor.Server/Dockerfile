@@ -8,6 +8,9 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 ARG BUILD_CONFIGURATION
+ARG GIT_VERSION
+ARG GIT_ASSEMBLY_VERSION
+ARG GIT_FILE_VERSION
 WORKDIR /src
 
 RUN apk add --no-cache curl nodejs npm && \
@@ -34,7 +37,10 @@ COPY ["openalprwebhookprocessor.client/e2e/", "openalprwebhookprocessor.client/e
 
 WORKDIR "/src/OpenAlprWebhookProcessor.Server"
 
-RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURATION && \
+RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURATION \
+    -p:GitVersion="$GIT_VERSION" \
+    -p:GitAssemblyVersion="$GIT_ASSEMBLY_VERSION" \
+    -p:GitFileVersion="$GIT_FILE_VERSION" && \
     /root/.dotnet/tools/dotnet-ef migrations bundle \
         --context ProcessorContext \
         --output /app/build/processor-migrator \
@@ -48,11 +54,17 @@ RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURAT
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION
+ARG GIT_VERSION
+ARG GIT_ASSEMBLY_VERSION
+ARG GIT_FILE_VERSION
 RUN dotnet publish "./OpenAlprWebhookProcessor.Server.csproj" \
     -c $BUILD_CONFIGURATION \
     -o /app/publish \
     /p:UseAppHost=false \
-    /p:PublishSingleFile=false
+    /p:PublishSingleFile=false \
+    -p:GitVersion="$GIT_VERSION" \
+    -p:GitAssemblyVersion="$GIT_ASSEMBLY_VERSION" \
+    -p:GitFileVersion="$GIT_FILE_VERSION"
 
 FROM base AS final
 WORKDIR /app
