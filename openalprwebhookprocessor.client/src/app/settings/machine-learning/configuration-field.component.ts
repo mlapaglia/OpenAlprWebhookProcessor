@@ -64,7 +64,7 @@ export class ConfigurationFieldComponent {
     'ML Models Folder': {
       controlName: 'mlModelsFolderName',
       inputType: 'text',
-    }
+    },
   };
 
   public get fieldConfig() {

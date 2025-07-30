@@ -99,7 +99,7 @@ export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnIn
   private isDuplicatePlate(plateNumber: string): boolean {
     if (!plateNumber) return false;
     return this.existingSettings.some(
-      setting => setting.plateNumber.toLowerCase() === plateNumber.toLowerCase()
+      setting => setting.plateNumber.toLowerCase() === plateNumber.toLowerCase(),
     );
   }
 
@@ -119,4 +119,4 @@ export class AddNewSettingFormComponent<T extends IPlateSetting> implements OnIn
   public get descriptionLength(): number {
     return this.settingForm.get('description')?.value?.length || 0;
   }
-} 
+}

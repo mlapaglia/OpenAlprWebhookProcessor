@@ -1,2 +1,131 @@
-<app-plate-settings-table 
-  [config]="ignoresConfig" />
+<div class="ignores-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="mat-headline-4">License Plate Ignores</h1>
+    <p class="mat-body-1">Configure license plates to ignore during processing. These plates will be filtered out from alerts and notifications.</p>
+  </div>
+
+  <!-- Quick Add Ignore -->
+  <mat-card class="quick-add-card">
+    <mat-card-header>
+      <mat-card-title>Add New Ignore Rule</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="quickAddForm" (ngSubmit)="addIgnore()" class="quick-add-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="plate-field">
+            <mat-label>License Plate</mat-label>
+            <input matInput formControlName="plateNumber" placeholder="ABC123" 
+                   [class.error]="quickAddForm.get('plateNumber')?.invalid && quickAddForm.get('plateNumber')?.touched">
+            <mat-error *ngIf="quickAddForm.get('plateNumber')?.hasError('required')">
+              License plate is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="description-field">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" placeholder="Reason for ignoring">
+          </mat-form-field>
+
+          <mat-checkbox formControlName="strictMatch" class="strict-match-checkbox">
+            Exact match only
+          </mat-checkbox>
+
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="quickAddForm.invalid || isSaving" class="add-button">
+            <mat-icon>add</mat-icon>
+            Add Ignore Rule
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Ignores List -->
+  <div class="ignores-list">
+    @if (isLoading) {
+      <div class="loading-container">
+        <mat-spinner diameter="48" />
+        <p class="mat-body-1">Loading ignore rules...</p>
+      </div>
+    } @else if (hasError) {
+      <mat-card class="error-card">
+        <mat-card-content>
+          <div class="error-content">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3 class="mat-headline-6">Unable to Load Ignore Rules</h3>
+            <p class="mat-body-1">There was a problem loading your ignore rules. Please try again.</p>
+            <button mat-raised-button color="primary" (click)="loadIgnores()">
+              <mat-icon>refresh</mat-icon>
+              Retry
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @else if (ignores.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">block</mat-icon>
+        <h3 class="mat-headline-6">No Ignore Rules</h3>
+        <p class="mat-body-1">You haven't created any ignore rules yet. Add your first rule above to get started.</p>
+      </div>
+    } @else {
+      <div class="ignores-grid">
+        @for (ignore of ignores; track ignore.id) {
+          <mat-card class="ignore-card" [class.editing]="editingIgnore?.id === ignore.id">
+            @if (editingIgnore?.id === ignore.id) {
+              <!-- Edit Mode -->
+              <mat-card-header>
+                <mat-card-title>Edit Ignore Rule</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="editForm" class="edit-form">
+                  <mat-form-field appearance="outline">
+                    <mat-label>License Plate</mat-label>
+                    <input matInput formControlName="plateNumber">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Description</mat-label>
+                    <input matInput formControlName="description">
+                  </mat-form-field>
+                  <mat-checkbox formControlName="strictMatch">
+                    Exact match only
+                  </mat-checkbox>
+                </form>
+              </mat-card-content>
+              <mat-card-actions align="end">
+                <button mat-button (click)="cancelEdit()">Cancel</button>
+                <button mat-raised-button color="primary" (click)="saveEdit()" 
+                        [disabled]="editForm.invalid || isSaving">
+                  Save
+                </button>
+              </mat-card-actions>
+            } @else {
+              <!-- View Mode -->
+              <mat-card-content>
+                <div class="ignore-info">
+                  <div class="plate-number">{{ignore.plateNumber}}</div>
+                  @if (ignore.description) {
+                    <div class="description">{{ignore.description}}</div>
+                  }
+                  <div class="match-type">
+                    <mat-chip [color]="ignore.strictMatch ? 'primary' : 'accent'" selected>
+                      {{ignore.strictMatch ? 'Exact Match' : 'Partial Match'}}
+                    </mat-chip>
+                  </div>
+                </div>
+              </mat-card-content>
+              <mat-card-actions align="end">
+                <button mat-icon-button (click)="startEdit(ignore)" matTooltip="Edit">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteIgnore(ignore)" matTooltip="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-actions>
+            }
+          </mat-card>
+        }
+      </div>
+    }
+  </div>
+</div>

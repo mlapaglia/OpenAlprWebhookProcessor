@@ -1,8 +1,161 @@
-<ng-template #additionalContent>
-  <app-pushover />
-  <app-webpush />
-</ng-template>
+<div class="alerts-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="mat-headline-4">License Plate Alerts</h1>
+    <p class="mat-body-1">Configure alert rules and notification settings for license plate monitoring</p>
+  </div>
 
-<app-plate-settings-table 
-  [config]="alertsConfig"
-  [additionalContent]="additionalContent" />
+  <!-- Tabs -->
+  <mat-tab-group class="alerts-tabs" [(selectedIndex)]="selectedTabIndex">
+    
+    <!-- Alert Rules Tab -->
+    <mat-tab label="Alert Rules">
+      <div class="tab-content">
+        <div class="section-header">
+          <h2 class="mat-headline-6">Alert Rules</h2>
+          <p class="mat-body-2">Configure which license plates should trigger alerts when detected</p>
+        </div>
+
+        <!-- Quick Add Alert -->
+        <mat-card class="quick-add-card">
+          <mat-card-header>
+            <mat-card-title>Add New Alert Rule</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="quickAddForm" (ngSubmit)="addAlert()" class="quick-add-form">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="plate-field">
+                  <mat-label>License Plate</mat-label>
+                  <input matInput formControlName="plateNumber" placeholder="ABC123" 
+                         [class.error]="quickAddForm.get('plateNumber')?.invalid && quickAddForm.get('plateNumber')?.touched">
+                  <mat-error *ngIf="quickAddForm.get('plateNumber')?.hasError('required')">
+                    License plate is required
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="description-field">
+                  <mat-label>Description</mat-label>
+                  <input matInput formControlName="description" placeholder="Owner name or note">
+                </mat-form-field>
+
+                <mat-checkbox formControlName="strictMatch" class="strict-match-checkbox">
+                  Exact match only
+                </mat-checkbox>
+
+                <button mat-raised-button color="primary" type="submit" 
+                        [disabled]="quickAddForm.invalid || isSaving" class="add-button">
+                  <mat-icon>add</mat-icon>
+                  Add Alert
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Alerts List -->
+        <div class="alerts-list">
+          @if (isLoading) {
+            <div class="loading-container">
+              <mat-spinner diameter="48" />
+              <p class="mat-body-1">Loading alert rules...</p>
+            </div>
+          } @else if (hasError) {
+            <mat-card class="error-card">
+              <mat-card-content>
+                <div class="error-content">
+                  <mat-icon class="error-icon">error_outline</mat-icon>
+                  <h3 class="mat-headline-6">Unable to Load Alert Rules</h3>
+                  <p class="mat-body-1">There was a problem loading your alert rules. Please try again.</p>
+                  <button mat-raised-button color="primary" (click)="loadAlerts()">
+                    <mat-icon>refresh</mat-icon>
+                    Retry
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          } @else if (alerts.length === 0) {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">notifications_off</mat-icon>
+              <h3 class="mat-headline-6">No Alert Rules</h3>
+              <p class="mat-body-1">You haven't created any alert rules yet. Add your first rule above to get started with notifications.</p>
+            </div>
+          } @else {
+            <div class="alerts-grid">
+              @for (alert of alerts; track alert.id) {
+                <mat-card class="alert-card" [class.editing]="editingAlert?.id === alert.id">
+                  @if (editingAlert?.id === alert.id) {
+                    <!-- Edit Mode -->
+                    <mat-card-header>
+                      <mat-card-title>Edit Alert Rule</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <form [formGroup]="editForm" class="edit-form">
+                        <mat-form-field appearance="outline">
+                          <mat-label>License Plate</mat-label>
+                          <input matInput formControlName="plateNumber">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                          <mat-label>Description</mat-label>
+                          <input matInput formControlName="description">
+                        </mat-form-field>
+                        <mat-checkbox formControlName="strictMatch">
+                          Exact match only
+                        </mat-checkbox>
+                      </form>
+                    </mat-card-content>
+                    <mat-card-actions align="end">
+                      <button mat-button (click)="cancelEdit()">Cancel</button>
+                      <button mat-raised-button color="primary" (click)="saveEdit()" 
+                              [disabled]="editForm.invalid || isSaving">
+                        Save
+                      </button>
+                    </mat-card-actions>
+                  } @else {
+                    <!-- View Mode -->
+                    <mat-card-content>
+                      <div class="alert-info">
+                        <div class="plate-number">{{alert.plateNumber}}</div>
+                        @if (alert.description) {
+                          <div class="description">{{alert.description}}</div>
+                        }
+                        <div class="match-type">
+                          <mat-chip [color]="alert.strictMatch ? 'primary' : 'accent'" selected>
+                            {{alert.strictMatch ? 'Exact Match' : 'Partial Match'}}
+                          </mat-chip>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                    <mat-card-actions align="end">
+                      <button mat-icon-button (click)="startEdit(alert)" matTooltip="Edit">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" (click)="deleteAlert(alert)" matTooltip="Delete">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </mat-card-actions>
+                  }
+                </mat-card>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Notification Settings Tab -->
+    <mat-tab label="Notification Settings">
+      <div class="tab-content">
+        <div class="section-header">
+          <h2 class="mat-headline-6">Notification Settings</h2>
+          <p class="mat-body-2">Configure where and how you want to receive alert notifications</p>
+        </div>
+
+        <div class="notification-providers">
+          <app-pushover />
+          <app-webpush />
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

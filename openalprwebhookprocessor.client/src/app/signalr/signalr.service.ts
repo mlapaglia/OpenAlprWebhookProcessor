@@ -30,7 +30,7 @@ export class SignalrService {
     }
 
     const user = this.accountService.userValue;
-    if (!user || !user.jwtToken) {
+    if (!user?.jwtToken) {
       return;
     }
 
