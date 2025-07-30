@@ -1,5 +1,4 @@
-﻿import type { OnInit, OnDestroy } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+﻿import { Component, Input, inject, type OnInit, type OnDestroy } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 import type { Subscription } from 'rxjs';
 import type { Alert } from 'app/_models';

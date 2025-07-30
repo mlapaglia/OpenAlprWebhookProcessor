@@ -1,10 +1,8 @@
-import type { OnInit } from '@angular/core';
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SettingsService } from '../settings.service';
 import { Ignore } from './ignore';
-import type { PlateSettingsConfig } from '../shared/plate-settings-table.component';
-import { PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
+import { type PlateSettingsConfig, PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
 
 @Component({
   selector: 'app-ignores',
@@ -15,7 +13,7 @@ import { PlateSettingsTableComponent } from '../shared/plate-settings-table.comp
     PlateSettingsTableComponent,
   ],
 })
-export class IgnoresComponent implements OnInit {
+export class IgnoresComponent {
   private readonly settingsService = inject(SettingsService);
 
   public ignoresConfig: PlateSettingsConfig<Ignore> = {
@@ -35,13 +33,4 @@ export class IgnoresComponent implements OnInit {
       upsert: (items: Ignore[]) => this.settingsService.upsertIgnores(items),
     },
   };
-
-  ngOnInit(): void {
-    // Initialization is handled by the shared component
-  }
-
-  public onIgnoresChanged(ignores: Ignore[]): void {
-    // Handle any specific logic when ignores change if needed
-    console.log('Ignores changed:', ignores);
-  }
 }

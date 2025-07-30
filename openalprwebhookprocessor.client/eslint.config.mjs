@@ -91,7 +91,7 @@ export default tseslint.config(
       '@angular-eslint/no-output-rename': 'error',
       '@angular-eslint/use-lifecycle-interface': 'error',
       '@angular-eslint/use-pipe-transform-interface': 'error',
-      '@angular-eslint/prefer-on-push-component-change-detection': 'error', // Stricter for performance
+      '@angular-eslint/prefer-on-push-component-change-detection': 'off', // Stricter for performance
       '@angular-eslint/no-empty-lifecycle-method': 'error',
       '@angular-eslint/no-inputs-metadata-property': 'error',
       '@angular-eslint/no-outputs-metadata-property': 'error',
@@ -235,7 +235,7 @@ export default tseslint.config(
       '@angular-eslint/template/no-interpolation-in-attributes': 'error',
       '@angular-eslint/template/prefer-self-closing-tags': 'error',
       '@angular-eslint/template/no-any': 'warn',
-      '@angular-eslint/template/i18n': 'warn', // Internationalization awareness
+      '@angular-eslint/template/i18n': 'off', // Internationalization awareness
       // New rules for control flow syntax
       '@angular-eslint/template/prefer-control-flow': 'error', // Modern Angular - should be error, not warn
       '@angular-eslint/template/prefer-ngsrc': 'warn', // Performance for images

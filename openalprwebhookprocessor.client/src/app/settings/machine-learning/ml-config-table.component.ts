@@ -1,12 +1,9 @@
-import type { OnChanges } from '@angular/core';
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy, type OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import type { FormGroup, FormControl } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, type FormGroup, type FormControl } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import type { MachineLearningConfigDto } from './machine-learning.service';
-import type { FieldConfig } from './ml-config-field.component';
-import { MlConfigFieldComponent } from './ml-config-field.component';
+import { MlConfigFieldComponent, type FieldConfig } from './ml-config-field.component';
 
 interface ConfigData {
   key: string;

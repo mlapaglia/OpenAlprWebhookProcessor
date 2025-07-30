@@ -1,12 +1,10 @@
-import type { OnInit, OnDestroy, TemplateRef } from '@angular/core';
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, type OnInit, type OnDestroy, type TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import type { FormGroup } from '@angular/forms';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, type FormGroup } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -16,8 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import type { IPlateSetting } from './plate-setting.interface';
-import type { Observable } from 'rxjs';
-import { Subscription } from 'rxjs';
+import { Subscription, type Observable } from 'rxjs';
 
 export interface PlateSettingsConfig<T extends IPlateSetting> {
   title: string

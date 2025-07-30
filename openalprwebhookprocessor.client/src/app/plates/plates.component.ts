@@ -1,15 +1,12 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import type { AfterViewInit, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
-import type { FormGroupDirective, NgForm } from '@angular/forms';
-import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Component, Input, ViewChild, inject, type AfterViewInit, type OnDestroy, type OnInit } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, FormsModule, type FormGroupDirective, type NgForm } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
 import type { Plate } from './plate/plate';
 import { PlateRequest, PlateService } from './plate.service';
-import type { ErrorStateMatcher } from '@angular/material/core';
-import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule, type ErrorStateMatcher } from '@angular/material/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Ignore } from 'app/settings/ignores/ignore';
@@ -219,7 +216,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   public onPaginatorPage($event) {
     this.pageSize = $event.pageSize;
-    this.localStorageService.setData(this.pageSizeCacheKey, this.pageSize);
+    this.localStorageService.setData(this.pageSizeCacheKey, this.pageSize.toString());
 
     this.pageNumber = $event.pageIndex;
 
@@ -247,7 +244,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public searchPlates(plateNumber = '') {
-    this.router.navigate(['/plates']);
+    void this.router.navigate(['/plates']);
 
     if (!this.filterPlateNumberIsValid) {
       return;
@@ -257,8 +254,8 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
       this.filterPlateNumber = plateNumber;
     }
 
-    this.filterStartOn?.setUTCHours(0, 0, 0, 0);
-    this.filterEndOn?.setUTCHours(23, 59, 59, 999);
+    this.filterStartOn.setUTCHours(0, 0, 0, 0);
+    this.filterEndOn.setUTCHours(23, 59, 59, 999);
 
     const request = new PlateRequest();
 
@@ -417,7 +414,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-    const isSubmitted = form && form.submitted;
+    const isSubmitted = form?.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }
 }

@@ -1,5 +1,4 @@
-import type { AfterViewInit, OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type AfterViewInit, type OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SignalrService } from 'app/signalr/signalr.service';

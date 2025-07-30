@@ -1,5 +1,4 @@
-import type { OnInit, OnDestroy } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnInit, type OnDestroy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,14 +8,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
-import type { FormGroup } from '@angular/forms';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import type { ModelInfo, TrainingStatus, MachineLearningConfigDto } from './machine-learning.service';
-import { MachineLearningService } from './machine-learning.service';
+import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
+import { MachineLearningService, type ModelInfo, type TrainingStatus, type MachineLearningConfigDto } from './machine-learning.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
-import type { Subscription } from 'rxjs';
-import { interval } from 'rxjs';
+import { interval, type Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Component({

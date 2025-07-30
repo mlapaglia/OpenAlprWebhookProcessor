@@ -1,5 +1,4 @@
-import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, inject, type OnDestroy, type OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';
@@ -8,8 +7,7 @@ import { AgentStatus } from './agentStatus';
 import type { PlateStatisticsData } from 'app/plates/plate/plateStatistics';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { Subscription } from 'rxjs';
-import type { MatTable } from '@angular/material/table';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, type MatTable } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';

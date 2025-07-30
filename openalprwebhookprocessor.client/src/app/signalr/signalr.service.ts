@@ -25,22 +25,13 @@ export class SignalrService {
   public databaseCleanupCompleted: Subject<boolean> = new Subject<boolean>();
 
   public startConnection() {
-    // Only start connection if user is authenticated
+    if (this.isConnected) {
+      return;
+    }
+
     const user = this.accountService.userValue;
-    if (!user?.jwtToken) {
+    if (!user.jwtToken) {
       return;
-    }
-
-    // Don't start if already connected or connecting
-    if (this.hubConnection
-      && (this.hubConnection.state === signalR.HubConnectionState.Connected
-        || this.hubConnection.state === signalR.HubConnectionState.Connecting)) {
-      return;
-    }
-
-    // Stop existing connection if it exists
-    if (this.hubConnection) {
-      this.hubConnection.stop();
     }
 
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -61,6 +52,10 @@ export class SignalrService {
         this.snackbarService.create('Connection lost', SnackBarType.Disconnected);
       });
 
+    this.setupEventHandlers();
+  }
+
+  private setupEventHandlers() {
     this.hubConnection.on('ProcessInformationLogged', (logLevel: ApiLogLevel, logMessage: string) => {
       this.processInformationLogged.next({ logLevel, logMessage });
     });
@@ -114,16 +109,19 @@ export class SignalrService {
   }
 
   public stopConnection() {
-    if (this.hubConnection) {
-      this.hubConnection
-        .stop()
-        .then(() => {
-          this.snackbarService.create('Connection closed', SnackBarType.Disconnected);
-          this.triggerConnectionStatusChange(false);
-        })
-        .catch(_ => {
-        });
+    if (!this.isConnected) {
+      return;
     }
+
+    this.hubConnection
+      .stop()
+      .then(() => {
+        this.snackbarService.create('Connection closed', SnackBarType.Disconnected);
+        this.triggerConnectionStatusChange(false);
+      })
+      .catch(_ => {
+        // do nothing
+      });
   }
 
   public triggerConnectionStatusChange(isConencted: boolean) {

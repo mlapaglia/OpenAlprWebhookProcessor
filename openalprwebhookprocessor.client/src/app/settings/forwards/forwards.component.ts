@@ -1,5 +1,4 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Forward } from './forward';
 import { ForwardsService } from './forwards.service';
@@ -13,7 +12,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   selector: 'app-forwards',
   templateUrl: './forwards.component.html',
   styleUrls: ['./forwards.component.less'],
-  imports: [MatTableModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule],
+  imports: [
+    MatTableModule, MatFormFieldModule, MatInputModule,
+    ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule,
+  ],
 })
 export class ForwardsComponent implements OnInit {
   private readonly forwardsService = inject(ForwardsService);

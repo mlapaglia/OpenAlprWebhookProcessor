@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
-import type { OnChanges, OnDestroy, OnInit } from '@angular/core';
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, type OnChanges, type OnDestroy, type OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { Lightbox } from 'ngx-lightbox';
@@ -22,7 +21,11 @@ import { MatCardModule } from '@angular/material/card';
   selector: 'app-plate',
   templateUrl: './plate.component.html',
   styleUrls: ['./plate.component.less'],
-  imports: [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule],
+  imports: [
+    MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule,
+    MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule,
+    FormsModule, MatButtonModule,
+  ],
 })
 export class PlateComponent implements OnInit, OnChanges, OnDestroy {
   private readonly lightbox = inject(Lightbox);
@@ -114,12 +117,12 @@ export class PlateComponent implements OnInit, OnChanges, OnDestroy {
 
       this.plateStatistics.push({
         key: 'First seen',
-        value: this.datePipe.transform(result.firstSeen, 'medium') || '',
+        value: this.datePipe.transform(result.firstSeen, 'medium') ?? '',
       });
 
       this.plateStatistics.push({
         key: 'Last seen',
-        value: this.datePipe.transform(result.lastSeen, 'medium') || '',
+        value: this.datePipe.transform(result.lastSeen, 'medium') ?? '',
       });
 
       this.plateStatistics.push({

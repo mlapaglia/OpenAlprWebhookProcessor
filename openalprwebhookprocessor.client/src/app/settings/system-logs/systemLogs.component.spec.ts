@@ -1,5 +1,4 @@
-import type { ComponentFixture } from '@angular/core/testing';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, type ComponentFixture } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { SystemLogsComponent } from './system-logs.component';
 import { SystemLogsService, ApiLogLevel } from './system-logs.service';
@@ -53,13 +52,13 @@ describe(SystemLogsComponent.name, () => {
                 top: null,
                 secondBest: null,
               }),
-              configure: () => {},
+              configure: () => { /* mocked */ },
               listLanguages: () => ['plaintext'],
-              registerLanguage: () => {},
+              registerLanguage: () => { /* mocked */ },
               getLanguage: () => ({ name: 'plaintext' }),
-              highlightAll: () => {},
-              debugMode: () => {},
-              safeMode: () => {},
+              highlightAll: () => { /* mocked */ },
+              debugMode: () => { /* mocked */ },
+              safeMode: () => { /* mocked */ },
               versionString: '11.0.0',
             }),
             languages: {

@@ -1,8 +1,6 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import type { FormGroup } from '@angular/forms';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AccountService, AlertService } from 'app/_services';
@@ -62,8 +60,8 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           // get return url from query parameters or default to home page
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-          this.router.navigateByUrl(returnUrl);
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
+          void this.router.navigateByUrl(returnUrl);
         },
         error: (error) => {
           this.alertService.error(error);

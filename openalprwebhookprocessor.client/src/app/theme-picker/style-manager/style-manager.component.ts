@@ -25,7 +25,7 @@ export class StyleManager {
 }
 
 function getLinkElementForKey(key: string) {
-  return getExistingLinkElementByKey(key) || createLinkElementWithKey(key);
+  return getExistingLinkElementByKey(key) ?? createLinkElementWithKey(key);
 }
 
 function getExistingLinkElementByKey(key: string) {

@@ -1,8 +1,6 @@
-﻿import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+﻿import { Component, inject, type OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import type { FormGroup } from '@angular/forms';
-import { FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, FormsModule, type FormGroup } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AccountService, AlertService } from 'app/_services';
 import { CommonModule } from '@angular/common';

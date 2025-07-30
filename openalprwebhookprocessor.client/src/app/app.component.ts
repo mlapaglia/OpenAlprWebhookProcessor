@@ -1,11 +1,9 @@
-import type { OnDestroy, OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnDestroy, type OnInit } from '@angular/core';
 import { AccountService } from './_services';
 import type { User } from './_models';
 import { SignalrService } from './signalr/signalr.service';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import type { VersionEvent } from '@angular/service-worker';
-import { SwUpdate } from '@angular/service-worker';
+import { SwUpdate, type VersionEvent } from '@angular/service-worker';
 import { PushSubscriberService } from './_services/push-subscriber.service';
 import { AlertComponent } from './_components/alert.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,23 +13,28 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { ThemePickerComponent } from './theme-picker/theme-picker.component';
 import { Subscription } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-app',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css'],
-  imports: [MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent],
+  imports: [
+    MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet,
+    MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent,
+  ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly signalRService = inject(SignalrService);
   private readonly accountService = inject(AccountService);
   private readonly swUpdate = inject(SwUpdate);
   private readonly pushSubscriberService = inject(PushSubscriberService);
+  private readonly snackBar = inject(MatSnackBar);
 
   user: User;
   appSettingsVisible: boolean;
   menuButtonVisible: boolean;
-  topBarVisible: boolean;
+  topBarVisible = false;
   navBarVisible = false;
   isSignalrConnected: boolean;
 
@@ -54,29 +57,24 @@ export class AppComponent implements OnInit, OnDestroy {
     this.accountService.user.subscribe((x) => {
       this.topBarVisible = x.id !== undefined;
 
-      // Start SignalR connection when user is authenticated
-      if (x.id !== undefined && x.jwtToken) {
+      if (x.jwtToken) {
         this.signalRService.startConnection();
       } else {
-        // Stop SignalR connection when user is not authenticated
         this.signalRService.stopConnection();
       }
     });
 
     this.swUpdate.unrecoverable.subscribe(() => {
-      confirm('An error occurred, please reload the page.');
-      {
-        window.location.reload();
-      }
+      this.snackBar.open('An error occurred, please reload the page.', 'Reload', { duration: 0 })
+        .onAction().subscribe(() => window.location.reload());
     });
 
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
         switch (event.type) {
           case 'VERSION_READY':
-            if (confirm('You\'re using an old version of the control panel. Want to update?')) {
-              window.location.reload();
-            }
+            this.snackBar.open('A new version is available', 'Update', { duration: 0 })
+              .onAction().subscribe(() => window.location.reload());
             break;
           case 'VERSION_INSTALLATION_FAILED':
             break;

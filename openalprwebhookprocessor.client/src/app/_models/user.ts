@@ -1,6 +1,6 @@
 ﻿export class User {
   isDeleting: boolean;
-  id: string;
+  id?: string;
   username: string;
   password: string;
   firstName: string;
