@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetVersion;
 
-public class GetVersionQueryHandler : IRequestHandler<GetVersionQuery, VersionDto>
+public class GetVersionQueryHandler : IQueryHandler<GetVersionQuery, VersionDto>
 {
     public ValueTask<VersionDto> Handle(GetVersionQuery request, CancellationToken cancellationToken)
     {
