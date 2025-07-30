@@ -106,8 +106,9 @@ jobs:
       - name: Build Artifact
         run: |
           tag=$(git describe --tags --abbrev=0)
-          version=${tag#v}  # Remove 'v' prefix
-          assembly_version="${version}.0"
+          version=${tag#v}  # Remove 'v' prefix (e.g., 6.0.0-alpha25)
+          numeric_version=$(echo "$version" | sed 's/-.*//')  # Extract numeric part (e.g., 6.0.0)
+          assembly_version="${numeric_version}.0"  # Make it 4-part numeric (e.g., 6.0.0.0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
           dotnet restore "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
           dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release \
@@ -149,11 +150,12 @@ jobs:
         id: get_version
         run: |
           tag=${GITHUB_REF/refs\/tags\//}
-          version=${tag#v}  # Remove 'v' prefix
-          assembly_version="${version}.0"
-          echo ::set-output name=VERSION::$tag
-          echo ::set-output name=GIT_VERSION::$version
-          echo ::set-output name=ASSEMBLY_VERSION::$assembly_version
+          version=${tag#v}  # Remove 'v' prefix (e.g., 6.0.0-alpha25)
+          numeric_version=$(echo "$version" | sed 's/-.*//')  # Extract numeric part (e.g., 6.0.0)
+          assembly_version="${numeric_version}.0"  # Make it 4-part numeric (e.g., 6.0.0.0)
+          echo "VERSION=$tag" >> $GITHUB_OUTPUT
+          echo "GIT_VERSION=$version" >> $GITHUB_OUTPUT
+          echo "ASSEMBLY_VERSION=$assembly_version" >> $GITHUB_OUTPUT
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
