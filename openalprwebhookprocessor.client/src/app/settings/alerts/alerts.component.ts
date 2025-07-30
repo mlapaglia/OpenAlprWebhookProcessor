@@ -1,11 +1,9 @@
-import type { OnInit, TemplateRef } from '@angular/core';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, type TemplateRef } from '@angular/core';
 import { Alert } from './alert';
 import { AlertsService } from './alerts.service';
 import { WebpushComponent } from './webpush/webpush.component';
 import { PushoverComponent } from './pushover/pushover.component';
-import type { PlateSettingsConfig } from '../shared/plate-settings-table.component';
-import { PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
+import { type PlateSettingsConfig, PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -19,7 +17,7 @@ import { CommonModule } from '@angular/common';
     PlateSettingsTableComponent,
   ],
 })
-export class AlertsComponent implements OnInit {
+export class AlertsComponent {
   @ViewChild('additionalContent', { static: true }) additionalContent!: TemplateRef<any>;
 
   private readonly alertsService = inject(AlertsService);
@@ -41,13 +39,4 @@ export class AlertsComponent implements OnInit {
       upsert: (items: Alert[]) => this.alertsService.upsertAlerts(items),
     },
   };
-
-  ngOnInit(): void {
-    // Initialization is handled by the shared component
-  }
-
-  public onAlertsChanged(alerts: Alert[]): void {
-    // Handle any specific logic when alerts change if needed
-    console.log('Alerts changed:', alerts);
-  }
 }

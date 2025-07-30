@@ -1,0 +1,89 @@
+<!-- Add New Setting Form -->
+<mat-card class="add-setting-card">
+  <mat-card-header>
+    <mat-card-title i18n class="mat-headline-6">Add New {{config.entityName | titlecase}}</mat-card-title>
+    <mat-card-subtitle i18n>Create a new rule to {{config.entityName === 'ignore rule' ? 'ignore' : 'monitor'}} specific license plates</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="settingForm" (ngSubmit)="onAddSetting()" class="setting-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" i18n-appearance class="plate-field">
+          <mat-label i18n>License Plate Number</mat-label>
+          <input 
+            matInput 
+            formControlName="plateNumber"
+            placeholder="e.g., ABC123" i18n-placeholder
+            maxlength="20"
+            autocomplete="off">
+          <mat-icon i18n matSuffix>local_police</mat-icon>
+          @if(plateNumberRequired) {
+            <mat-error i18n>Plate number is required</mat-error>
+          }
+          @if(plateNumberMinLength) {
+            <mat-error i18n>Plate number must be at least 2 characters</mat-error>
+          }
+          @if(plateNumberDuplicate) {
+            <mat-error i18n>This plate number already exists</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" i18n-appearance class="match-type-field">
+          <mat-label i18n>Match Type</mat-label>
+          <mat-select formControlName="strictMatch">
+            <mat-option [value]="true">
+              <div class="option-content">
+                <span i18n class="option-title">Strict Match</span>
+                <span i18n class="option-subtitle">Exact character match required</span>
+              </div>
+            </mat-option>
+            <mat-option [value]="false">
+              <div class="option-content">
+                <span i18n class="option-title">Lenient Match</span>
+                <span i18n class="option-subtitle">Allows for OCR variations</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-icon i18n matSuffix>tune</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" i18n-appearance class="description-field">
+        <mat-label i18n>Description (Optional)</mat-label>
+        <textarea 
+          matInput 
+          formControlName="description"
+          [placeholder]="'Add a note about this ' + config.entityName + '...'"
+          rows="2"
+          maxlength="200">
+        </textarea>
+        <mat-icon i18n matSuffix>notes</mat-icon>
+        <mat-hint align="end" i18n-align>{{descriptionLength}}/200</mat-hint>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          [disabled]="settingForm.invalid || isAddingSetting">
+          @if(!isAddingSetting) {
+            <mat-icon i18n>add</mat-icon>
+          }
+          @if(isAddingSetting) {
+            <mat-spinner diameter="20" />
+          }
+          {{ isAddingSetting ? 'Adding...' : config.addButtonText }}
+        </button>
+        
+        <button i18n 
+          mat-button 
+          type="button" 
+          (click)="onResetForm()"
+          [disabled]="isAddingSetting">
+          Reset
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card> 

@@ -1,0 +1,184 @@
+<!-- Settings List -->
+<mat-card class="settings-list-card">
+  <mat-card-header>
+    <mat-card-title i18n class="mat-headline-6">Current {{config.title}}</mat-card-title>
+    <mat-card-subtitle i18n>
+      {{settings.data.length}} {{settings.data.length === 1 ? (config.entityName) : (config.entityName + 's')}} configured
+    </mat-card-subtitle>
+    <div class="header-spacer"></div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      [disabled]="isSaving || settings.data.length === 0"
+      (click)="onSaveSettings()"
+      class="save-button">
+      @if(!isSaving) {
+        <mat-icon i18n>save</mat-icon>
+      }
+      @if(isSaving) {
+        <mat-spinner diameter="20" />
+      }
+      {{ isSaving ? 'Saving...' : 'Save All Changes' }}
+    </button>
+  </mat-card-header>
+
+  <mat-card-content class="table-content">
+    <!-- Empty State -->
+    @if(settings.data.length === 0) {
+      <div class="empty-state">
+        <div class="empty-state-content">
+          <mat-icon class="empty-icon">{{config.entityName === 'ignore rule' ? 'block' : 'notifications'}}</mat-icon>
+          <h3 class="mat-headline-6">{{config.emptyStateTitle}}</h3>
+          <p class="mat-body-1">{{config.emptyStateDescription}}</p>
+          <button mat-stroked-button color="primary" (click)="onScrollToForm()">
+            <mat-icon i18n>add</mat-icon>
+            Add First {{config.entityName | titlecase}}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Settings Table -->
+    @if(settings.data.length > 0) {
+      <div class="table-container">
+        <table 
+          mat-table 
+          [dataSource]="settings" 
+          [trackBy]="trackByFn"
+          class="settings-table"
+          multiTemplateDataRows>
+          
+          <ng-container matColumnDef="plateNumber" i18n-matColumnDef>
+            <th mat-header-cell *matHeaderCellDef class="plate-header">
+              <mat-icon i18n class="column-icon">local_police</mat-icon>
+              Plate Number
+            </th>
+            <td mat-cell *matCellDef="let element" class="plate-cell">
+              <!-- Display Mode -->
+              @if(!isEditing(element)) {
+                <div class="plate-display">
+                  <span class="plate-number">{{element.plateNumber}}</span>
+                  <mat-chip-set>
+                    <mat-chip [color]="element.strictMatch ? 'accent' : 'primary'" selected>
+                      {{element.strictMatch ? 'Strict' : 'Lenient'}}
+                    </mat-chip>
+                  </mat-chip-set>
+                </div>
+              }
+              
+              <!-- Edit Mode -->
+              @if(isEditing(element)) {
+                <div class="plate-edit">
+                  <mat-form-field appearance="outline" i18n-appearance class="plate-edit-field">
+                    <mat-label i18n>Plate Number</mat-label>
+                    <input 
+                      matInput 
+                      [(ngModel)]="editingSetting!.plateNumber"
+                      placeholder="Enter plate number" i18n-placeholder
+                      maxlength="20"
+                      autocomplete="off">
+                  </mat-form-field>
+                  
+                  <mat-form-field appearance="outline" i18n-appearance class="match-edit-field">
+                    <mat-label i18n>Match Type</mat-label>
+                    <mat-select [(ngModel)]="editingSetting!.strictMatch">
+                      <mat-option i18n [value]="true">Strict Match</mat-option>
+                      <mat-option i18n [value]="false">Lenient Match</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description" i18n-matColumnDef>
+            <th mat-header-cell *matHeaderCellDef class="description-header">
+              <mat-icon i18n class="column-icon">notes</mat-icon>
+              Description
+            </th>
+            <td mat-cell *matCellDef="let element" class="description-cell">
+              <!-- Display Mode -->
+              @if(!isEditing(element)) {
+                <span class="description-text" [class.no-description]="!element.description">
+                  {{element.description || 'No description provided'}}
+                </span>
+              }
+              
+              <!-- Edit Mode -->
+              @if(isEditing(element)) {
+                <mat-form-field appearance="outline" i18n-appearance class="description-edit-field">
+                  <mat-label i18n>Description</mat-label>
+                  <textarea 
+                    matInput 
+                    [(ngModel)]="editingSetting!.description"
+                    placeholder="Add description..." i18n-placeholder
+                    rows="2"
+                    maxlength="200">
+                  </textarea>
+                </mat-form-field>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef class="actions-header">
+              Actions
+            </th>
+            <td mat-cell *matCellDef="let element" class="actions-cell">
+              <!-- Display Mode Actions -->
+              @if(!isEditing(element)) {
+                <div class="display-actions">
+                  <button 
+                    mat-icon-button 
+                    color="primary"
+                    (click)="onStartEdit(element)"
+                    [matTooltip]="'Edit this ' + config.entityName"
+                    [attr.aria-label]="'Edit ' + config.entityName + ' for ' + element.plateNumber">
+                    <mat-icon i18n>edit</mat-icon>
+                  </button>
+                  
+                  <button 
+                    mat-icon-button 
+                    color="warn"
+                    (click)="onConfirmDelete(element)"
+                    [matTooltip]="'Delete this ' + config.entityName"
+                    [attr.aria-label]="'Delete ' + config.entityName + ' for ' + element.plateNumber">
+                    <mat-icon i18n>delete</mat-icon>
+                  </button>
+                </div>
+              }
+              
+              <!-- Edit Mode Actions -->
+              @if(isEditing(element)) {
+                <div class="edit-actions">
+                  <button 
+                    mat-icon-button 
+                    color="primary"
+                    (click)="onSaveEdit(element)"
+                    matTooltip="Save changes" i18n-matTooltip
+                    [attr.aria-label]="'Save changes for ' + element.plateNumber">
+                    <mat-icon i18n>check</mat-icon>
+                  </button>
+                  
+                  <button 
+                    mat-icon-button 
+                    color="warn"
+                    (click)="onCancelEdit()"
+                    matTooltip="Cancel editing" i18n-matTooltip
+                    [attr.aria-label]="'Cancel editing for ' + element.plateNumber">
+                    <mat-icon i18n>close</mat-icon>
+                  </button>
+                </div>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" 
+              class="table-row" 
+              [class.editing-row]="isEditing(element)"></tr>
+        </table>
+      </div>
+    }
+  </mat-card-content>
+</mat-card> 

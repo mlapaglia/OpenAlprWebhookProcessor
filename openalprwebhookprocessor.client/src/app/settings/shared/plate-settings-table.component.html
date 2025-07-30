@@ -8,287 +8,66 @@
   </div>
 
   <!-- Additional Content (for alerts: pushover/webpush components) -->
-  <div *ngIf="additionalContent" class="additional-content">
-    <ng-container *ngTemplateOutlet="additionalContent" />
-  </div>
+  @if(additionalContent) {
+    <div class="additional-content">
+      <ng-container *ngTemplateOutlet="additionalContent" />
+    </div>
+  }
 
   <!-- Loading Overlay -->
-  <div *ngIf="isLoading" class="loading-overlay">
-    <mat-card class="loading-card">
-      <mat-card-content class="loading-content">
-        <mat-spinner diameter="48" />
-        <p i18n class="mat-body-1 loading-text">Loading {{config.entityName}}s...</p>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  @if(isLoading) {
+    <div class="loading-overlay">
+      <mat-card class="loading-card">
+        <mat-card-content class="loading-content">
+          <mat-spinner diameter="48" />
+          <p i18n class="mat-body-1 loading-text">Loading {{config.entityName}}s...</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 
   <!-- Error State -->
-  <mat-card *ngIf="hasError && !isLoading" class="error-card">
-    <mat-card-content>
-      <div class="error-content">
-        <mat-icon i18n class="error-icon">error_outline</mat-icon>
-        <h3 i18n class="mat-headline-6">Unable to Load {{config.title}}</h3>
-        <p i18n class="mat-body-1">There was a problem loading your {{config.entityName}}s. Please check your connection and try again.</p>
-        <button mat-raised-button color="primary" (click)="loadSettings()" class="retry-button">
-          <mat-icon i18n>refresh</mat-icon>
-          Retry
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Main Content -->
-  <div *ngIf="!isLoading && !hasError" class="main-content">
-    
-    <!-- Add New Setting Form -->
-    <mat-card class="add-setting-card">
-      <mat-card-header>
-        <mat-card-title i18n class="mat-headline-6">Add New {{config.entityName | titlecase}}</mat-card-title>
-        <mat-card-subtitle i18n>Create a new rule to {{config.entityName === 'ignore rule' ? 'ignore' : 'monitor'}} specific license plates</mat-card-subtitle>
-      </mat-card-header>
-      
+  @if(hasError && !isLoading) {
+    <mat-card class="error-card">
       <mat-card-content>
-        <form [formGroup]="settingForm" (ngSubmit)="onAddSetting()" class="setting-form">
-          <div class="form-row">
-            <mat-form-field appearance="outline" i18n-appearance class="plate-field">
-              <mat-label i18n>License Plate Number</mat-label>
-              <input 
-                matInput 
-                formControlName="plateNumber"
-                placeholder="e.g., ABC123" i18n-placeholder
-                maxlength="20"
-                autocomplete="off">
-              <mat-icon i18n matSuffix>local_police</mat-icon>
-              <mat-error i18n *ngIf="settingForm.get('plateNumber')?.hasError('required')">
-                Plate number is required
-              </mat-error>
-              <mat-error i18n *ngIf="settingForm.get('plateNumber')?.hasError('minlength')">
-                Plate number must be at least 2 characters
-              </mat-error>
-              <mat-error i18n *ngIf="settingForm.get('plateNumber')?.hasError('duplicate')">
-                This plate number already exists
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" i18n-appearance class="match-type-field">
-              <mat-label i18n>Match Type</mat-label>
-              <mat-select formControlName="strictMatch">
-                <mat-option [value]="true">
-                  <div class="option-content">
-                    <span i18n class="option-title">Strict Match</span>
-                    <span i18n class="option-subtitle">Exact character match required</span>
-                  </div>
-                </mat-option>
-                <mat-option [value]="false">
-                  <div class="option-content">
-                    <span i18n class="option-title">Lenient Match</span>
-                    <span i18n class="option-subtitle">Allows for OCR variations</span>
-                  </div>
-                </mat-option>
-              </mat-select>
-              <mat-icon i18n matSuffix>tune</mat-icon>
-            </mat-form-field>
-          </div>
-
-          <mat-form-field appearance="outline" i18n-appearance class="description-field">
-            <mat-label i18n>Description (Optional)</mat-label>
-            <textarea 
-              matInput 
-              formControlName="description"
-              placeholder="Add a note about this {{config.entityName}}..."
-              rows="2"
-              maxlength="200">
-            </textarea>
-            <mat-icon i18n matSuffix>notes</mat-icon>
-            <mat-hint align="end" i18n-align>{{settingForm.get('description')?.value?.length || 0}}/200</mat-hint>
-          </mat-form-field>
-
-          <div class="form-actions">
-            <button 
-              mat-raised-button 
-              color="primary" 
-              type="submit"
-              [disabled]="settingForm.invalid || isAddingSetting">
-              <mat-icon i18n *ngIf="!isAddingSetting">add</mat-icon>
-              <mat-spinner *ngIf="isAddingSetting" diameter="20" />
-              {{ isAddingSetting ? 'Adding...' : config.addButtonText }}
-            </button>
-            
-            <button i18n 
-              mat-button 
-              type="button" 
-              (click)="resetForm()"
-              [disabled]="isAddingSetting">
-              Reset
-            </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Settings List -->
-    <mat-card class="settings-list-card">
-      <mat-card-header>
-        <mat-card-title i18n class="mat-headline-6">Current {{config.title}}</mat-card-title>
-        <mat-card-subtitle i18n>
-          {{settings.data.length}} {{settings.data.length === 1 ? (config.entityName) : (config.entityName + 's')}} configured
-        </mat-card-subtitle>
-        <div class="header-spacer"></div>
-        <button 
-          mat-raised-button 
-          color="primary" 
-          [disabled]="isSaving || settings.data.length === 0"
-          (click)="saveSettings()"
-          class="save-button">
-          <mat-icon i18n *ngIf="!isSaving">save</mat-icon>
-          <mat-spinner *ngIf="isSaving" diameter="20" />
-          {{ isSaving ? 'Saving...' : 'Save All Changes' }}
-        </button>
-      </mat-card-header>
-
-      <mat-card-content class="table-content">
-        <!-- Empty State -->
-        <div *ngIf="settings.data.length === 0" class="empty-state">
-          <div class="empty-state-content">
-            <mat-icon class="empty-icon">{{config.entityName === 'ignore rule' ? 'block' : 'notifications'}}</mat-icon>
-            <h3 class="mat-headline-6">{{config.emptyStateTitle}}</h3>
-            <p class="mat-body-1">{{config.emptyStateDescription}}</p>
-            <button mat-stroked-button color="primary" (click)="scrollToForm()">
-              <mat-icon i18n>add</mat-icon>
-              Add First {{config.entityName | titlecase}}
-            </button>
-          </div>
-        </div>
-
-        <!-- Settings Table -->
-        <div *ngIf="settings.data.length > 0" class="table-container">
-          <table 
-            mat-table 
-            [dataSource]="settings" 
-            [trackBy]="trackByFn"
-            class="settings-table"
-            multiTemplateDataRows>
-            
-            <ng-container matColumnDef="plateNumber" i18n-matColumnDef>
-              <th mat-header-cell *matHeaderCellDef class="plate-header">
-                <mat-icon i18n class="column-icon">local_police</mat-icon>
-                Plate Number
-              </th>
-              <td mat-cell *matCellDef="let element" class="plate-cell">
-                <!-- Display Mode -->
-                <div *ngIf="!isEditing(element)" class="plate-display">
-                  <span class="plate-number">{{element.plateNumber}}</span>
-                  <mat-chip-set>
-                    <mat-chip [color]="element.strictMatch ? 'accent' : 'primary'" selected>
-                      {{element.strictMatch ? 'Strict' : 'Lenient'}}
-                    </mat-chip>
-                  </mat-chip-set>
-                </div>
-                
-                <!-- Edit Mode -->
-                <div *ngIf="isEditing(element)" class="plate-edit">
-                  <mat-form-field appearance="outline" i18n-appearance class="plate-edit-field">
-                    <mat-label i18n>Plate Number</mat-label>
-                    <input 
-                      matInput 
-                      [(ngModel)]="editingSetting!.plateNumber"
-                      placeholder="Enter plate number" i18n-placeholder
-                      maxlength="20"
-                      autocomplete="off">
-                  </mat-form-field>
-                  
-                  <mat-form-field appearance="outline" i18n-appearance class="match-edit-field">
-                    <mat-label i18n>Match Type</mat-label>
-                    <mat-select [(ngModel)]="editingSetting!.strictMatch">
-                      <mat-option i18n [value]="true">Strict Match</mat-option>
-                      <mat-option i18n [value]="false">Lenient Match</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="description" i18n-matColumnDef>
-              <th mat-header-cell *matHeaderCellDef class="description-header">
-                <mat-icon i18n class="column-icon">notes</mat-icon>
-                Description
-              </th>
-              <td mat-cell *matCellDef="let element" class="description-cell">
-                <!-- Display Mode -->
-                <span *ngIf="!isEditing(element)" class="description-text" [class.no-description]="!element.description">
-                  {{element.description || 'No description provided'}}
-                </span>
-                
-                <!-- Edit Mode -->
-                <mat-form-field *ngIf="isEditing(element)" appearance="outline" i18n-appearance class="description-edit-field">
-                  <mat-label i18n>Description</mat-label>
-                  <textarea 
-                    matInput 
-                    [(ngModel)]="editingSetting!.description"
-                    placeholder="Add description..." i18n-placeholder
-                    rows="2"
-                    maxlength="200">
-                  </textarea>
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions" i18n-matColumnDef>
-              <th i18n mat-header-cell *matHeaderCellDef class="actions-header">
-                Actions
-              </th>
-              <td mat-cell *matCellDef="let element" class="actions-cell">
-                <!-- Display Mode Actions -->
-                <div *ngIf="!isEditing(element)" class="display-actions">
-                  <button 
-                    mat-icon-button 
-                    color="primary"
-                    (click)="startEdit(element)"
-                    matTooltip="Edit this {{config.entityName}}"
-                    [attr.aria-label]="'Edit ' + config.entityName + ' for ' + element.plateNumber">
-                    <mat-icon i18n>edit</mat-icon>
-                  </button>
-                  
-                  <button 
-                    mat-icon-button 
-                    color="warn"
-                    (click)="confirmDelete(element)"
-                    matTooltip="Delete this {{config.entityName}}"
-                    [attr.aria-label]="'Delete ' + config.entityName + ' for ' + element.plateNumber">
-                    <mat-icon i18n>delete</mat-icon>
-                  </button>
-                </div>
-                
-                <!-- Edit Mode Actions -->
-                <div *ngIf="isEditing(element)" class="edit-actions">
-                  <button 
-                    mat-icon-button 
-                    color="primary"
-                    (click)="saveEdit(element)"
-                    matTooltip="Save changes" i18n-matTooltip
-                    [attr.aria-label]="'Save changes for ' + element.plateNumber">
-                    <mat-icon i18n>check</mat-icon>
-                  </button>
-                  
-                  <button 
-                    mat-icon-button 
-                    color="warn"
-                    (click)="cancelEdit()"
-                    matTooltip="Cancel editing" i18n-matTooltip
-                    [attr.aria-label]="'Cancel editing for ' + element.plateNumber">
-                    <mat-icon i18n>close</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let element; columns: displayedColumns;" 
-                class="table-row" 
-                [class.editing-row]="isEditing(element)"></tr>
-          </table>
+        <div class="error-content">
+          <mat-icon i18n class="error-icon">error_outline</mat-icon>
+          <h3 i18n class="mat-headline-6">Unable to Load {{config.title}}</h3>
+          <p i18n class="mat-body-1">There was a problem loading your {{config.entityName}}s. Please check your connection and try again.</p>
+          <button mat-raised-button color="primary" (click)="loadSettings()" class="retry-button">
+            <mat-icon i18n>refresh</mat-icon>
+            Retry
+          </button>
         </div>
       </mat-card-content>
     </mat-card>
-  </div>
+  }
+  <!-- Main Content -->
+   @if(!isLoading && !hasError) {
+    <div class="main-content">
+      
+      <!-- Add New Setting Form -->
+      <app-add-new-setting-form 
+        [config]="config"
+        [existingSettings]="settings.data"
+        [isAddingSetting]="isAddingSetting"
+        (addSetting)="onAddSetting($event)"
+        (resetForm)="onResetForm()" />
+
+      <!-- Settings List -->
+      <app-settings-list
+        [config]="config"
+        [settings]="settings"
+        [isSaving]="isSaving"
+        [editingId]="editingId"
+        [editingSetting]="editingSetting"
+        [trackByFn]="trackByFn"
+        (saveSettings)="saveSettings()"
+        (scrollToForm)="scrollToForm()"
+        (startEdit)="startEdit($event)"
+        (confirmDelete)="confirmDelete($event)"
+        (saveEdit)="saveEdit($event)"
+        (cancelEdit)="cancelEdit()" />
+    </div>
+  }
 </div> 

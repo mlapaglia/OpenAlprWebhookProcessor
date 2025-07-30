@@ -12,9 +12,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import type { IPlateSetting } from './plate-setting.interface';
 import { Subscription, type Observable } from 'rxjs';
+import { AddNewSettingFormComponent } from './add-new-setting-form.component';
+import { SettingsListComponent } from './settings-list.component';
 
 export interface PlateSettingsConfig<T extends IPlateSetting> {
   title: string
@@ -22,7 +25,7 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
   emptyStateTitle: string
   emptyStateDescription: string
   addButtonText: string
-  entityName: string // e.g., 'alert rule', 'ignore rule'
+  entityName: string
   createNew: () => T
   service: {
     getAll: () => Observable<T[]>
@@ -49,6 +52,9 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
     MatTooltipModule,
     MatCardModule,
     MatChipsModule,
+    MatDialogModule,
+    AddNewSettingFormComponent,
+    SettingsListComponent,
   ],
 })
 export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnInit, OnDestroy {
@@ -57,11 +63,11 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
   @Output() settingsChanged = new EventEmitter<T[]>();
 
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly formBuilder = inject(FormBuilder);
   private readonly subscriptions = new Subscription();
 
   public settings = new MatTableDataSource<T>([]);
-  public settingForm: FormGroup;
   public isSaving = false;
   public isLoading = false;
   public hasError = false;
@@ -76,11 +82,6 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
   ];
 
   constructor() {
-    this.settingForm = this.formBuilder.group({
-      plateNumber: ['', [Validators.required, Validators.minLength(2)]],
-      strictMatch: [true, [Validators.required]],
-      description: [''],
-    });
   }
 
   ngOnInit(): void {
@@ -116,47 +117,29 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     this.subscriptions.add(subscription);
   }
 
-  public onAddSetting(): void {
-    if (this.settingForm.invalid || this.isAddingSetting) {
-      return;
-    }
-
-    const plateNumber = this.settingForm.get('plateNumber')?.value?.trim();
-
-    if (this.isDuplicatePlate(plateNumber)) {
-      this.settingForm.get('plateNumber')?.setErrors({ duplicate: true });
-      return;
-    }
-
+  public onAddSetting(newSetting: T): void {
     this.isAddingSetting = true;
+    this.addSettingToData(newSetting);
+    this.handleAddSettingSuccess();
+  }
 
-    const newSetting = this.config.createNew();
-    Object.assign(newSetting, {
-      plateNumber,
-      strictMatch: this.settingForm.get('strictMatch')?.value ?? true,
-      description: this.settingForm.get('description')?.value?.trim() || '',
-    });
+  public onResetForm(): void {
+    // Child component handles its own form reset
+  }
 
+  private addSettingToData(newSetting: T): void {
     const currentData = [...this.settings.data];
     currentData.push(newSetting);
     this.settings.data = currentData;
     this.settingsChanged.emit(this.settings.data);
+  }
 
-    this.resetForm();
+  private handleAddSettingSuccess(): void {
     this.isAddingSetting = false;
 
     this.snackBar.open(`${this.config.entityName} added. Remember to save your changes.`, 'Close', {
       duration: 3000,
     });
-  }
-
-  public resetForm(): void {
-    this.settingForm.reset({
-      plateNumber: '',
-      strictMatch: true,
-      description: '',
-    });
-    this.settingForm.get('plateNumber')?.setErrors(null);
   }
 
   public startEdit(setting: T): void {
@@ -212,6 +195,8 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
     return this.editingId === id;
   }
 
+
+
   public deleteSetting(settingToDelete: T): void {
     const currentData = [...this.settings.data];
     const filteredData = currentData.filter(setting => setting !== settingToDelete);
@@ -222,12 +207,24 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
   public confirmDelete(setting: T): void {
     const plateNumber = setting.plateNumber || 'Unknown';
 
-    if (confirm(`Are you sure you want to delete the ${this.config.entityName} for "${plateNumber}"?`)) {
-      this.deleteSetting(setting);
-      this.snackBar.open(`${this.config.entityName} removed. Remember to save your changes.`, 'Close', {
-        duration: 3000,
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirm Delete',
+        message: `Are you sure you want to delete the ${this.config.entityName} for "${plateNumber}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.deleteSetting(setting);
+        this.snackBar.open(`${this.config.entityName} removed. Remember to save your changes.`, 'Close', {
+          duration: 3000,
+        });
+      }
+    });
   }
 
   public scrollToForm(): void {
@@ -297,5 +294,39 @@ export class PlateSettingsTableComponent<T extends IPlateSetting> implements OnI
 
   private generateTempId(setting: T): string {
     return `temp_${setting.plateNumber}_${setting.strictMatch}_${Date.now()}`;
+  }
+}
+
+export interface ConfirmDeleteDialogData {
+  title: string;
+  message: string;
+  confirmText: string;
+  cancelText: string;
+}
+
+@Component({
+  selector: 'app-confirm-delete-dialog',
+  template: `
+    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <mat-dialog-content>
+      <p>{{ data.message }}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">{{ data.cancelText }}</button>
+      <button mat-raised-button color="warn" (click)="onConfirm()">{{ data.confirmText }}</button>
+    </mat-dialog-actions>
+  `,
+  imports: [MatDialogModule, MatButtonModule],
+})
+export class ConfirmDeleteDialogComponent {
+  private readonly dialogRef = inject(MatDialogRef<ConfirmDeleteDialogComponent>);
+  public readonly data = inject<ConfirmDeleteDialogData>(MAT_DIALOG_DATA);
+
+  onCancel(): void {
+    this.dialogRef.close(false);
+  }
+
+  onConfirm(): void {
+    this.dialogRef.close(true);
   }
 }
