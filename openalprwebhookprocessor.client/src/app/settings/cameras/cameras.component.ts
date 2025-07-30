@@ -1,11 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core'
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'
-import { Camera } from './camera'
-import { SettingsService } from '../settings.service'
-import { EditCameraComponent } from './edit-camera/edit-camera.component'
-import { CameraComponent } from './camera/camera.component'
+import type { OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Camera } from './camera';
+import { SettingsService } from '../settings.service';
+import { EditCameraComponent } from './edit-camera/edit-camera.component';
+import { CameraComponent } from './camera/camera.component';
 
-import { MatGridListModule } from '@angular/material/grid-list'
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @Component({
   selector: 'app-cameras',
@@ -14,59 +15,59 @@ import { MatGridListModule } from '@angular/material/grid-list'
   imports: [MatGridListModule, CameraComponent, MatDialogModule],
 })
 export class CamerasComponent implements OnInit {
-  private settingsService = inject(SettingsService)
-  dialog = inject(MatDialog)
+  private readonly settingsService = inject(SettingsService);
+  dialog = inject(MatDialog);
 
-  public cameras: Camera[]
+  public cameras: Camera[];
 
   ngOnInit(): void {
-    this.getCameras()
+    this.getCameras();
   }
 
   public getCameras() {
     this.settingsService.getCameras().subscribe((result) => {
-      result.unshift(new Camera())
-      this.cameras = result
-    })
+      result.unshift(new Camera());
+      this.cameras = result;
+    });
   }
 
   openEditDialog(cameraId: string): void {
-    let cameraToEdit = this.cameras.find(x => x.id == cameraId)
+    let cameraToEdit = this.cameras.find(x => x.id == cameraId);
 
     if (!cameraToEdit) {
-      cameraToEdit = this.cameras[0]
+      cameraToEdit = this.cameras[0];
     }
 
     const dialogRef = this.dialog.open(EditCameraComponent, {
       data: cameraToEdit,
-    })
+    });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        let cameraToSave = this.cameras.find(x => x.id == cameraId)
+        let cameraToSave = this.cameras.find(x => x.id == cameraId);
 
         if (!cameraToSave) {
-          cameraToSave = this.cameras[0]
+          cameraToSave = this.cameras[0];
         }
 
         this.settingsService.upsertCamera(cameraToSave).subscribe(() => {
-          this.getCameras()
-        })
+          this.getCameras();
+        });
       }
-    })
+    });
   }
 
   public addCamera() {
-    this.openEditDialog('')
+    this.openEditDialog('');
   }
 
   public deleteCamera($event: string) {
     this.settingsService.deleteCamera($event).subscribe(() => {
-      this.getCameras()
-    })
+      this.getCameras();
+    });
   }
 
   public editCamera($event: string) {
-    this.openEditDialog($event)
+    this.openEditDialog($event);
   }
 }

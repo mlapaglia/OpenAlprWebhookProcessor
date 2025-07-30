@@ -6,12 +6,12 @@ export interface IPlateSetting {
 }
 
 export abstract class PlateSettingBase implements IPlateSetting {
-  id: string
-  plateNumber: string
-  strictMatch: boolean
-  description: string
+  id: string;
+  plateNumber: string;
+  strictMatch: boolean;
+  description: string;
 
   constructor(init?: Partial<IPlateSetting>) {
-    Object.assign(this, init)
+    Object.assign(this, init);
   }
-} 
+}

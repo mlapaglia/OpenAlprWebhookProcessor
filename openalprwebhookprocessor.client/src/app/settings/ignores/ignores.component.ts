@@ -1,8 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { SettingsService } from '../settings.service'
-import { Ignore } from './ignore'
-import { PlateSettingsTableComponent, PlateSettingsConfig } from '../shared/plate-settings-table.component'
+import type { OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SettingsService } from '../settings.service';
+import { Ignore } from './ignore';
+import type { PlateSettingsConfig } from '../shared/plate-settings-table.component';
+import { PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
 
 @Component({
   selector: 'app-ignores',
@@ -10,11 +12,11 @@ import { PlateSettingsTableComponent, PlateSettingsConfig } from '../shared/plat
   styleUrls: ['./ignores.component.less'],
   imports: [
     CommonModule,
-    PlateSettingsTableComponent
+    PlateSettingsTableComponent,
   ],
 })
 export class IgnoresComponent implements OnInit {
-  private settingsService = inject(SettingsService)
+  private readonly settingsService = inject(SettingsService);
 
   public ignoresConfig: PlateSettingsConfig<Ignore> = {
     title: 'License Plate Ignores',
@@ -26,13 +28,13 @@ export class IgnoresComponent implements OnInit {
     createNew: () => new Ignore({
       plateNumber: '',
       strictMatch: true,
-      description: ''
+      description: '',
     }),
     service: {
       getAll: () => this.settingsService.getIgnores(),
-      upsert: (items: Ignore[]) => this.settingsService.upsertIgnores(items)
-    }
-  }
+      upsert: (items: Ignore[]) => this.settingsService.upsertIgnores(items),
+    },
+  };
 
   ngOnInit(): void {
     // Initialization is handled by the shared component
@@ -40,6 +42,6 @@ export class IgnoresComponent implements OnInit {
 
   public onIgnoresChanged(ignores: Ignore[]): void {
     // Handle any specific logic when ignores change if needed
-    console.log('Ignores changed:', ignores)
+    console.log('Ignores changed:', ignores);
   }
 }

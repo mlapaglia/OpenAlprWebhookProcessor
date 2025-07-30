@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core'
-import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar'
-import { SnackBarType } from './snackbartype'
-import { MatIconModule } from '@angular/material/icon'
-import { SnackBar } from './snackbar'
+import { Component, inject } from '@angular/core';
+import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
+import { SnackBarType } from './snackbartype';
+import { MatIconModule } from '@angular/material/icon';
+import type { SnackBar } from './snackbar';
 
 @Component({
   selector: 'app-snackbar',
@@ -11,26 +11,26 @@ import { SnackBar } from './snackbar'
   imports: [MatIconModule],
 })
 export class SnackbarComponent {
-  data = inject<SnackBar>(MAT_SNACK_BAR_DATA)
+  data = inject<SnackBar>(MAT_SNACK_BAR_DATA);
 
   get getIcon() {
     switch (this.data.snackType) {
       case SnackBarType.Alert:
-        return 'taxi_alert'
+        return 'taxi_alert';
       case SnackBarType.Info:
-        return 'info'
+        return 'info';
       case SnackBarType.Connected:
-        return 'signal_wifi_4_bar'
+        return 'signal_wifi_4_bar';
       case SnackBarType.Disconnected:
-        return 'signal_cellular_off'
+        return 'signal_cellular_off';
       case SnackBarType.Saved:
-        return 'saved'
+        return 'saved';
       case SnackBarType.Deleted:
-        return 'delete'
+        return 'delete';
       case SnackBarType.Successful:
-        return 'check'
+        return 'check';
       case SnackBarType.Error:
-        return 'error'
+        return 'error';
     }
   }
 }

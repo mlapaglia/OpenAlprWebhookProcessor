@@ -4,27 +4,27 @@
   @if (modelInfo) {
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Model Information</mat-card-title>
+        <mat-card-title i18n>Model Information</mat-card-title>
         <mat-card-subtitle>{{ modelInfo.description }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div style="display: flex; flex-direction: row; gap: 16px; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 300px;">
-            <p><strong>Model Type:</strong> {{ modelInfo.modelType }}</p>
-            <p><strong>Status:</strong>
+            <p><strong i18n>Model Type:</strong> {{ modelInfo.modelType }}</p>
+            <p><strong i18n>Status:</strong>
               <span [style.color]="modelInfo.modelAvailable ? '#32de84' : '#D2122E'">
                 {{ modelInfo.modelAvailable ? 'Available' : 'Not Available' }}
               </span>
             </p>
-            <p><strong>Training Schedule:</strong> {{ modelInfo.trainingSchedule }}</p>
-            <p><strong>Last Updated:</strong> {{ modelInfo.lastUpdated }}</p>
+            <p><strong i18n>Training Schedule:</strong> {{ modelInfo.trainingSchedule }}</p>
+            <p><strong i18n>Last Updated:</strong> {{ modelInfo.lastUpdated }}</p>
           </div>
           <div style="flex: 1; min-width: 300px;">
-            <p><strong>Features Used ({{ featuresData.data.length }}):</strong></p>
+            <p><strong i18n>Features Used ({{ featuresData.data.length }}):</strong></p>
             <div style="max-height: 200px; overflow-y: auto;">
               <table mat-table [dataSource]="featuresData" class="mat-elevation-z1">
-                <ng-container matColumnDef="feature">
-                  <th mat-header-cell *matHeaderCellDef>Feature</th>
+                <ng-container matColumnDef="feature" i18n-matColumnDef>
+                  <th i18n mat-header-cell *matHeaderCellDef>Feature</th>
                   <td mat-cell *matCellDef="let element">{{ element.feature }}</td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="featuresColumns"></tr>
@@ -40,23 +40,23 @@
   <!-- Training Status Card -->
   <mat-card>
     <mat-card-header>
-      <mat-card-title>
+      <mat-card-title i18n>
         Training Status
         @if (isLoadingTrainingStatus) {
-          <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" diameter="20"></mat-progress-spinner>
+          <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" i18n-mode diameter="20" />
         }
       </mat-card-title>
-      <mat-card-subtitle>Current training service status and history</mat-card-subtitle>
+      <mat-card-subtitle i18n>Current training service status and history</mat-card-subtitle>
     </mat-card-header>
     @if (trainingStatus) {
       <mat-card-content>
         <table mat-table [dataSource]="statusData" class="mat-elevation-z2" style="width: 100%;">
-          <ng-container matColumnDef="key">
-            <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Property</th>
+          <ng-container matColumnDef="key" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef style="min-width: 200px;">Property</th>
             <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
           </ng-container>
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef>Value</th>
+          <ng-container matColumnDef="value" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef>Value</th>
             <td mat-cell *matCellDef="let element">
               @if (element.key === 'Training Status') {
                 <span [style.color]="trainingStatus.isTraining ? '#ff9800' : '#32de84'">
@@ -81,12 +81,12 @@
     <mat-card-actions>
       <button mat-raised-button color="primary" (click)="triggerTraining()" [disabled]="isTriggering || trainingStatus?.isTraining">
         @if (isTriggering) {
-          <mat-progress-spinner color="primary" mode="indeterminate" diameter="20" style="margin-right: 8px;"></mat-progress-spinner>
+          <mat-progress-spinner color="primary" mode="indeterminate" i18n-mode diameter="20" style="margin-right: 8px;" />
         }
         {{ isTriggering ? 'Training...' : 'Trigger Training' }}
       </button>
       <button mat-button (click)="refreshData()" [disabled]="isLoadingTrainingStatus">
-        <mat-icon>refresh</mat-icon>
+        <mat-icon i18n>refresh</mat-icon>
         Refresh
       </button>
     </mat-card-actions>
@@ -96,17 +96,17 @@
   @if (trainingStatus?.modelMetrics) {
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Model Performance Metrics</mat-card-title>
-        <mat-card-subtitle>Quality metrics from the last successful training</mat-card-subtitle>
+        <mat-card-title i18n>Model Performance Metrics</mat-card-title>
+        <mat-card-subtitle i18n>Quality metrics from the last successful training</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <table mat-table [dataSource]="metricsData" class="mat-elevation-z2" style="width: 100%;">
-          <ng-container matColumnDef="key">
-            <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Metric</th>
+          <ng-container matColumnDef="key" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef style="min-width: 200px;">Metric</th>
             <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
           </ng-container>
-          <ng-container matColumnDef="value">
-            <th mat-header-cell *matHeaderCellDef>Value</th>
+          <ng-container matColumnDef="value" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef>Value</th>
             <td mat-cell *matCellDef="let element">{{ element.value }}</td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -119,13 +119,13 @@
   <!-- Configuration Card -->
   <mat-card>
     <mat-card-header>
-      <mat-card-title>
+      <mat-card-title i18n>
         Training Configuration
         @if (isLoadingConfiguration) {
-          <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" diameter="20"></mat-progress-spinner>
+          <mat-progress-spinner style="margin-left: 16px;" color="primary" mode="indeterminate" i18n-mode diameter="20" />
         }
       </mat-card-title>
-      <mat-card-subtitle>
+      <mat-card-subtitle i18n>
         @if (isEditingConfiguration) {
           Edit ML training parameters
         } @else {
@@ -146,17 +146,17 @@
             <mat-card-content>
         <form [formGroup]="configForm">
           <table mat-table [dataSource]="configData" class="mat-elevation-z2" style="width: 100%;">
-            <ng-container matColumnDef="key">
-              <th mat-header-cell *matHeaderCellDef style="min-width: 200px;">Setting</th>
+            <ng-container matColumnDef="key" i18n-matColumnDef>
+              <th i18n mat-header-cell *matHeaderCellDef style="min-width: 200px;">Setting</th>
               <td mat-cell *matCellDef="let element"><strong>{{ element.key }}</strong></td>
             </ng-container>
-            <ng-container matColumnDef="value">
-              <th mat-header-cell *matHeaderCellDef>Value</th>
+            <ng-container matColumnDef="value" i18n-matColumnDef>
+              <th i18n mat-header-cell *matHeaderCellDef>Value</th>
               <td mat-cell *matCellDef="let element" style="padding: 8px;">
                 @if (isEditingConfiguration) {
                   <div style="width: 100%;">
                     @if (element.key === 'Minimum Model Quality (R²)') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput type="number" step="0.001" min="0.001" max="1.0" 
                                formControlName="minimumModelQuality">
                         @if (getFieldError('minimumModelQuality')) {
@@ -164,7 +164,7 @@
                         }
                       </mat-form-field>
                     } @else if (element.key === 'Minimum Training Data') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput type="number" min="10" max="1000000" 
                                formControlName="minimumTrainingData">
                         @if (getFieldError('minimumTrainingData')) {
@@ -172,7 +172,7 @@
                         }
                       </mat-form-field>
                     } @else if (element.key === 'Training Batch Size') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput type="number" min="1000" max="1000000" 
                                formControlName="trainingBatchSize">
                         @if (getFieldError('trainingBatchSize')) {
@@ -180,7 +180,7 @@
                         }
                       </mat-form-field>
                     } @else if (element.key === 'Training Interval') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput type="text" formControlName="trainingInterval" 
                                placeholder="06:00:00">
                         @if (getFieldError('trainingInterval')) {
@@ -188,21 +188,21 @@
                         }
                       </mat-form-field>
                     } @else if (element.key === 'Model File Name') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput formControlName="modelFileName">
                         @if (getFieldError('modelFileName')) {
                           <mat-error>{{ getFieldError('modelFileName') }}</mat-error>
                         }
                       </mat-form-field>
                     } @else if (element.key === 'Config Folder') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput formControlName="configFolderName">
                         @if (getFieldError('configFolderName')) {
                           <mat-error>{{ getFieldError('configFolderName') }}</mat-error>
                         }
                       </mat-form-field>
                     } @else if (element.key === 'ML Models Folder') {
-                      <mat-form-field appearance="outline" style="width: 100%;" subscriptSizing="dynamic">
+                      <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
                         <input matInput formControlName="mlModelsFolderName">
                         @if (getFieldError('mlModelsFolderName')) {
                           <mat-error>{{ getFieldError('mlModelsFolderName') }}</mat-error>
@@ -227,16 +227,16 @@
                   (click)="saveConfiguration()" 
                   [disabled]="configForm.invalid || isSavingConfiguration">
             @if (isSavingConfiguration) {
-              <mat-progress-spinner color="primary" mode="indeterminate" diameter="20" style="margin-right: 8px;"></mat-progress-spinner>
+              <mat-progress-spinner color="primary" mode="indeterminate" i18n-mode diameter="20" style="margin-right: 8px;" />
             }
             {{ isSavingConfiguration ? 'Saving...' : 'Save Configuration' }}
           </button>
-          <button mat-button (click)="cancelConfigurationEdit()" [disabled]="isSavingConfiguration">
+          <button i18n mat-button (click)="cancelConfigurationEdit()" [disabled]="isSavingConfiguration">
             Cancel
           </button>
         } @else {
           <button mat-raised-button color="accent" (click)="editConfiguration()" [disabled]="isLoadingConfiguration">
-            <mat-icon>edit</mat-icon>
+            <mat-icon i18n>edit</mat-icon>
             Edit Configuration
           </button>
         }

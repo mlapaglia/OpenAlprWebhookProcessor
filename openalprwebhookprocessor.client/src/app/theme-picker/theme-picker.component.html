@@ -1,8 +1,8 @@
 <mat-list-item [mat-menu-trigger-for]="themeMenu">
-  <mat-icon matListItemIcon>format_color_fill</mat-icon>
-  <span class="mobile-shrink">Theme</span>
+  <mat-icon i18n matListItemIcon>format_color_fill</mat-icon>
+  <span i18n class="mobile-shrink">Theme</span>
 </mat-list-item>
-<mat-menu #themeMenu="matMenu" xPosition="before" class="docs-theme-picker-menu">
+<mat-menu #themeMenu="matMenu" xPosition="before" i18n-xPosition class="docs-theme-picker-menu">
   @for (theme of themes; track theme) {
     <button mat-menu-item (click)="selectTheme(theme.name)">
       <mat-icon [class.docs-theme-selected-icon]="currentTheme === theme"

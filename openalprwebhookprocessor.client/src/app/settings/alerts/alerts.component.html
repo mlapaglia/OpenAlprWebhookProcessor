@@ -1,10 +1,9 @@
 <ng-template #additionalContent>
-  <app-pushover></app-pushover>
-  <app-webpush></app-webpush>
+  <app-pushover />
+  <app-webpush />
 </ng-template>
 
 <app-plate-settings-table 
   [config]="alertsConfig"
   [additionalContent]="additionalContent"
-  (settingsChanged)="onAlertsChanged($event)">
-</app-plate-settings-table>
+  (settingsChanged)="onAlertsChanged($event)" />

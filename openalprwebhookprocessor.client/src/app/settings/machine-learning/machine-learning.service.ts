@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
-import { Observable } from 'rxjs'
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
 
 export interface ModelStatus {
   modelAvailable: boolean
@@ -63,29 +63,29 @@ export interface MachineLearningConfigDto {
   providedIn: 'root',
 })
 export class MachineLearningService {
-  private http = inject(HttpClient)
+  private readonly http = inject(HttpClient);
 
   getModelStatus(): Observable<ModelStatus> {
-    return this.http.get<ModelStatus>('/api/machinelearning/model/status')
+    return this.http.get<ModelStatus>('/api/machinelearning/model/status');
   }
 
   getModelInfo(): Observable<ModelInfo> {
-    return this.http.get<ModelInfo>('/api/machinelearning/model/info')
+    return this.http.get<ModelInfo>('/api/machinelearning/model/info');
   }
 
   getTrainingStatus(): Observable<TrainingStatus> {
-    return this.http.get<TrainingStatus>('/api/machinelearning/training/status')
+    return this.http.get<TrainingStatus>('/api/machinelearning/training/status');
   }
 
   triggerTraining(): Observable<{ message: string; timestamp: string }> {
-    return this.http.post<{ message: string; timestamp: string }>('/api/machinelearning/model/retrain', {})
+    return this.http.post<{ message: string; timestamp: string }>('/api/machinelearning/model/retrain', {});
   }
 
   getConfiguration(): Observable<MachineLearningConfigDto> {
-    return this.http.get<MachineLearningConfigDto>('/api/machinelearning/configuration')
+    return this.http.get<MachineLearningConfigDto>('/api/machinelearning/configuration');
   }
 
   saveConfiguration(config: MachineLearningConfigDto): Observable<any> {
-    return this.http.put('/api/machinelearning/configuration', config)
+    return this.http.put('/api/machinelearning/configuration', config);
   }
 }

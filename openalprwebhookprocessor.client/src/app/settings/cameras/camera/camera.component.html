@@ -9,11 +9,11 @@
       <img
         mat-card-image
         class="sample-image"
-        src="{{camera.sampleImageUrl}}"
+        [src]="camera.sampleImageUrl"
         [hidden]="isLoadingImage || isLoadingFailed"
         (load)="imageLoaded()"
         (error)="imageFailedToLoad()"
-        alt="last capture from camera">
+        alt="last capture from camera" i18n-alt>
     }
     <mat-card-content>
       @if (isLoadingImage) {
@@ -21,57 +21,56 @@
           style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; height:200px;">
           <mat-progress-spinner
             color="primary"
-            mode="indeterminate">
-          </mat-progress-spinner>
+            mode="indeterminate" i18n-mode />
         </div>
       }
       @if (!camera.sampleImageUrl || isLoadingFailed) {
         <div
           style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height:200px;">
-          <mat-icon
+          <mat-icon i18n
             style="font-size: 100px; height: 90px; width: 90px;"
-          matTooltip="Image will display after first plate capture">help_center</mat-icon>
+          matTooltip="Image will display after first plate capture" i18n-matTooltip>help_center</mat-icon>
         </div>
       }
       <div>
-        <b>Camera Manufacturer: </b> {{camera.manufacturer}}
+        <b i18n>Camera Manufacturer: </b> {{camera.manufacturer}}
       </div>
       @if (camera.updateOverlayEnabled) {
         <div>
           <div>
-            <b>OpenALPR Name:</b> {{camera.openAlprName}}
+            <b i18n>OpenALPR Name:</b> {{camera.openAlprName}}
           </div>
           <div>
-            <b>Plates Seen:</b> {{camera.platesSeen}}
+            <b i18n>Plates Seen:</b> {{camera.platesSeen}}
           </div>
         </div>
       }
       @if (camera.dayNightModeEnabled) {
         <div>
           <div>
-            <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
+            <b i18n>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
           </div>
           <div>
-            <b>Next Day/Night Toggle:</b> {{camera.dayNightNextScheduledCommand | date:"medium"}}
+            <b i18n>Next Day/Night Toggle:</b> {{camera.dayNightNextScheduledCommand | date:"medium"}}
           </div>
         </div>
       }
     </mat-card-content>
-    <mat-card-actions align="end" style="margin: auto 0 0;">
-      <button mat-button (click)="editCamera()">Edit</button>
-      <button mat-button (click)="removeCamera()" color="warn">Remove</button>
+    <mat-card-actions align="end" i18n-align style="margin: auto 0 0;">
+      <button i18n mat-button (click)="editCamera()">Edit</button>
+      <button i18n mat-button (click)="removeCamera()" color="warn">Remove</button>
     </mat-card-actions>
   </mat-card>
 }
 @if (!camera.id) {
   <mat-card class="example-card">
     <mat-card-header>
-      <mat-card-title>Add new camera</mat-card-title>
+      <mat-card-title i18n>Add new camera</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div class="sample-image"
         style="height:200px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
-        <mat-icon
+        <mat-icon i18n
           style="font-size: 100px; height: 90px; width: 90px;"
           (click)="addCamera()"
         color="primary">add_box</mat-icon>

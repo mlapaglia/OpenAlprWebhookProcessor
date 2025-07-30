@@ -1,33 +1,33 @@
 <div style="display: flex; justify-content: space-around; margin: 50px;">
     <mat-card>
         <mat-card-header>
-            <mat-card-title>Register</mat-card-title>
+            <mat-card-title i18n>Register</mat-card-title>
         </mat-card-header>
         <mat-card-content>
             <form [formGroup]="form" (ngSubmit)="onSubmit()">
                 <p>
                     <mat-form-field>
-                        <input type="text" matInput placeholder="First Name" formControlName="firstName">
+                        <input type="text" matInput placeholder="First Name" i18n-placeholder formControlName="firstName">
                     </mat-form-field>
                 </p>
                 <p>
                     <mat-form-field>
-                        <input type="text" matInput placeholder="Last Name" formControlName="lastName">
+                        <input type="text" matInput placeholder="Last Name" i18n-placeholder formControlName="lastName">
                     </mat-form-field>
                 </p>
                 <p>
                     <mat-form-field>
-                        <input type="text" matInput placeholder="Username" formControlName="username">
+                        <input type="text" matInput placeholder="Username" i18n-placeholder formControlName="username">
                     </mat-form-field>
                 </p>
                 <p>
                     <mat-form-field>
-                        <input type="password" matInput placeholder="Password" formControlName="password">
+                        <input type="password" matInput placeholder="Password" i18n-placeholder formControlName="password">
                     </mat-form-field>
                 </p>
                 <div>
-                    <button mat-button type="submit" [disabled]="loading">Register</button>
-                    <button mat-button routerLink="../login">Cancel</button>
+                    <button i18n mat-button type="submit" [disabled]="loading">Register</button>
+                    <button i18n mat-button routerLink="../login">Cancel</button>
                 </div>
             </form>
         </mat-card-content>

@@ -1,10 +1,12 @@
-import { Component, OnInit, inject, TemplateRef, ViewChild } from '@angular/core'
-import { Alert } from './alert'
-import { AlertsService } from './alerts.service'
-import { WebpushComponent } from './webpush/webpush.component'
-import { PushoverComponent } from './pushover/pushover.component'
-import { PlateSettingsTableComponent, PlateSettingsConfig } from '../shared/plate-settings-table.component'
-import { CommonModule } from '@angular/common'
+import type { OnInit, TemplateRef } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
+import { Alert } from './alert';
+import { AlertsService } from './alerts.service';
+import { WebpushComponent } from './webpush/webpush.component';
+import { PushoverComponent } from './pushover/pushover.component';
+import type { PlateSettingsConfig } from '../shared/plate-settings-table.component';
+import { PlateSettingsTableComponent } from '../shared/plate-settings-table.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-alerts',
@@ -12,15 +14,15 @@ import { CommonModule } from '@angular/common'
   styleUrls: ['./alerts.component.less'],
   imports: [
     CommonModule,
-    PushoverComponent, 
-    WebpushComponent, 
-    PlateSettingsTableComponent
+    PushoverComponent,
+    WebpushComponent,
+    PlateSettingsTableComponent,
   ],
 })
 export class AlertsComponent implements OnInit {
-  @ViewChild('additionalContent', { static: true }) additionalContent!: TemplateRef<any>
-  
-  private alertsService = inject(AlertsService)
+  @ViewChild('additionalContent', { static: true }) additionalContent!: TemplateRef<any>;
+
+  private readonly alertsService = inject(AlertsService);
 
   public alertsConfig: PlateSettingsConfig<Alert> = {
     title: 'License Plate Alerts',
@@ -32,13 +34,13 @@ export class AlertsComponent implements OnInit {
     createNew: () => new Alert({
       plateNumber: '',
       strictMatch: true,
-      description: ''
+      description: '',
     }),
     service: {
       getAll: () => this.alertsService.getAlerts(),
-      upsert: (items: Alert[]) => this.alertsService.upsertAlerts(items)
-    }
-  }
+      upsert: (items: Alert[]) => this.alertsService.upsertAlerts(items),
+    },
+  };
 
   ngOnInit(): void {
     // Initialization is handled by the shared component
@@ -46,6 +48,6 @@ export class AlertsComponent implements OnInit {
 
   public onAlertsChanged(alerts: Alert[]): void {
     // Handle any specific logic when alerts change if needed
-    console.log('Alerts changed:', alerts)
+    console.log('Alerts changed:', alerts);
   }
 }

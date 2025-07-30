@@ -1,5 +1,5 @@
 ﻿@for (alert of alerts; track alert) {
-  <div class="{{cssClass(alert)}}">
+  <div [class]="cssClass(alert)">
     <a class="close" tabindex="0" (click)="removeAlert(alert)" (keydown)="removeAlert(alert)">&times;</a>
     <span [innerHTML]="alert.message"></span>
   </div>

@@ -1,18 +1,20 @@
-import { animate, style, transition, trigger } from '@angular/animations'
-import { Component, OnInit, inject } from '@angular/core'
-import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle'
-import { SnackbarService } from 'app/snackbar/snackbar.service'
-import { SnackBarType } from 'app/snackbar/snackbartype'
-import { Pushover } from './pushover'
-import { PushoverService } from './pushover.service'
-import { MatButtonModule } from '@angular/material/button'
-import { MatCheckboxModule } from '@angular/material/checkbox'
-import { MatTooltipModule } from '@angular/material/tooltip'
-import { MatIconModule } from '@angular/material/icon'
-import { MatInputModule } from '@angular/material/input'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { MatCardModule } from '@angular/material/card'
+import { animate, style, transition, trigger } from '@angular/animations';
+import type { OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import type { Pushover } from './pushover';
+import { PushoverService } from './pushover.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-pushover',
@@ -33,46 +35,46 @@ import { MatCardModule } from '@angular/material/card'
   imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatCheckboxModule, MatButtonModule],
 })
 export class PushoverComponent implements OnInit {
-  private pushoverService = inject(PushoverService)
-  private snackbarService = inject(SnackbarService)
+  private readonly pushoverService = inject(PushoverService);
+  private readonly snackbarService = inject(SnackbarService);
 
-  public client: Pushover
-  public isSaving: boolean
-  public isTesting: boolean
+  public client: Pushover;
+  public isSaving: boolean;
+  public isTesting: boolean;
 
   ngOnInit(): void {
     this.pushoverService.getPushover().subscribe((result) => {
-      this.client = result
-    })
+      this.client = result;
+    });
   }
 
   public saveClient() {
-    this.isSaving = true
+    this.isSaving = true;
     this.pushoverService.upsertPushover(this.client).subscribe(() => {
-      this.snackbarService.create('Pushover client saved.', SnackBarType.Saved)
-      this.isSaving = false
-    })
+      this.snackbarService.create('Pushover client saved.', SnackBarType.Saved);
+      this.isSaving = false;
+    });
   }
 
   public testClient() {
-    this.isTesting = true
+    this.isTesting = true;
     this.pushoverService.testPushover().subscribe(() => {
-      this.snackbarService.create('Pushover client test successful.', SnackBarType.Successful)
-      this.isTesting = false
+      this.snackbarService.create('Pushover client test successful.', SnackBarType.Successful);
+      this.isTesting = false;
     },
     () => {
-      this.snackbarService.create('Pushover client test failed.', SnackBarType.Error)
-      this.isTesting = false
-    })
+      this.snackbarService.create('Pushover client test failed.', SnackBarType.Error);
+      this.isTesting = false;
+    });
   }
 
   public onPushoverToggle(event: MatSlideToggleChange) {
     if (!event.checked) {
-      this.client.isEnabled = event.checked
-      this.isSaving = true
+      this.client.isEnabled = event.checked;
+      this.isSaving = true;
       this.pushoverService.upsertPushover(this.client).subscribe(() => {
-        this.isSaving = false
-      })
+        this.isSaving = false;
+      });
     }
   }
 }

@@ -1,8 +1,8 @@
 <div class="system-logs-container">
     <div class="controls-section">
         <div class="log-level-section">
-            <mat-form-field appearance="outline">
-                <mat-label>Log Level</mat-label>
+            <mat-form-field appearance="outline" i18n-appearance>
+                <mat-label i18n>Log Level</mat-label>
                 <mat-select [(value)]="selectedLogLevel" (selectionChange)="onLogLevelChange()">
                     <mat-option
                         *ngFor="let option of logLevelOptions"
@@ -12,24 +12,24 @@
                 </mat-select>
             </mat-form-field>
             
-            <mat-form-field appearance="outline">
-                <mat-label>Search Logs</mat-label>
+            <mat-form-field appearance="outline" i18n-appearance>
+                <mat-label i18n>Search Logs</mat-label>
                 <input 
                     matInput 
                     [formControl]="searchControl"
-                    placeholder="Enter search text...">
+                    placeholder="Enter search text..." i18n-placeholder>
             </mat-form-field>
         </div>
         
         <div class="plate-controls-section">
             <div class="plate-download-group">
-                <button
+                <button i18n
                     mat-raised-button 
                     color="primary"
                     (click)="downloadPlates()">
                     Download Past 24 Hours Plates
                 </button>
-                <mat-checkbox 
+                <mat-checkbox i18n 
                     color="primary"
                     [(ngModel)]="onlyFailedPlateGroups">
                     Include ONLY failed plate groups
@@ -51,7 +51,7 @@
         <pre>
             <code
                 [highlight]="logMessagesDisplay"
-                language="dotnetlogs">
+                language="dotnetlogs" i18n-language>
             </code>
         </pre>
     </div>

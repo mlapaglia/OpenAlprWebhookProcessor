@@ -4,12 +4,12 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon">
-          <mat-icon>today</mat-icon>
+          <mat-icon i18n>today</mat-icon>
         </div>
         <div class="stat-content">
-          <h3>Today</h3>
+          <h3 i18n>Today</h3>
           <p class="stat-value" *ngIf="quickStats">{{ quickStats.todayCount }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
         </div>
       </mat-card-content>
     </mat-card>
@@ -19,12 +19,12 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon">
-          <mat-icon>date_range</mat-icon>
+          <mat-icon i18n>date_range</mat-icon>
         </div>
         <div class="stat-content">
-          <h3>This Week</h3>
+          <h3 i18n>This Week</h3>
           <p class="stat-value" *ngIf="quickStats">{{ quickStats.weekCount }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
         </div>
       </mat-card-content>
     </mat-card>
@@ -34,12 +34,12 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon">
-          <mat-icon>directions_car</mat-icon>
+          <mat-icon i18n>directions_car</mat-icon>
         </div>
         <div class="stat-content">
-          <h3>Unique Plates</h3>
+          <h3 i18n>Unique Plates</h3>
           <p class="stat-value" *ngIf="quickStats">{{ quickStats.uniquePlatesThisWeek }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
         </div>
       </mat-card-content>
     </mat-card>
@@ -49,12 +49,12 @@
     <mat-card class="stat-card">
       <mat-card-content>
         <div class="stat-icon">
-          <mat-icon>videocam</mat-icon>
+          <mat-icon i18n>videocam</mat-icon>
         </div>
         <div class="stat-content">
-          <h3>Active Cameras</h3>
+          <h3 i18n>Active Cameras</h3>
           <p class="stat-value" *ngIf="quickStats">{{ quickStats.activeCameras }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
         </div>
       </mat-card-content>
     </mat-card>
@@ -64,25 +64,25 @@
   <div class="charts-row">
     <mat-card class="chart-card">
       <mat-card-header>
-        <mat-card-title>Daily Activity</mat-card-title>
-        <mat-card-subtitle>Plates detected per day</mat-card-subtitle>
+        <mat-card-title i18n>Daily Activity</mat-card-title>
+        <mat-card-subtitle i18n>Plates detected per day</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="chart-container" style="position: relative; height: 300px;">
           <canvas #dailyChart></canvas>
-          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
         </div>
       </mat-card-content>
     </mat-card>
     <mat-card class="chart-card">
       <mat-card-header>
-        <mat-card-title>Hourly Distribution</mat-card-title>
-        <mat-card-subtitle>Peak detection times</mat-card-subtitle>
+        <mat-card-title i18n>Hourly Distribution</mat-card-title>
+        <mat-card-subtitle i18n>Peak detection times</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="chart-container" style="position: relative; height: 300px;">
           <canvas #hourlyChart></canvas>
-          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner"></mat-spinner>
+          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
         </div>
       </mat-card-content>
     </mat-card>
@@ -90,18 +90,18 @@
   <div class="predictions-section" *ngIf="nextExpected || isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0) || (predictablePlates && predictablePlates.length > 0)">
     <mat-card class="featured-prediction-card" *ngIf="nextExpected">
       <mat-card-header>
-        <mat-card-title>Next Expected Arrival</mat-card-title>
-        <mat-card-subtitle>ML Prediction</mat-card-subtitle>
+        <mat-card-title i18n>Next Expected Arrival</mat-card-title>
+        <mat-card-subtitle i18n>ML Prediction</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="featured-content">
           <h2 class="plate-number">{{ nextExpected.licensePlate }}</h2>
           <div class="prediction-details">
             <div class="detail-item">
-              <mat-icon>schedule</mat-icon>
+              <mat-icon i18n>schedule</mat-icon>
               <span>{{ formatTimeUntil(nextExpected.predictedNextSeen) }}</span>
             </div>
-            <mat-chip [style.background-color]="getConfidenceColor(nextExpected.confidenceScore)">
+            <mat-chip i18n [style.background-color]="getConfidenceColor(nextExpected.confidenceScore)">
               {{ getConfidenceText(nextExpected.confidenceScore) }} Confidence
             </mat-chip>
           </div>
@@ -110,17 +110,17 @@
     </mat-card>
     <mat-card class="predictions-card" *ngIf="isLoadingPredictions || (upcomingPredictions && upcomingPredictions.length > 0)">
       <mat-card-header>
-        <mat-card-title>Upcoming Predictions</mat-card-title>
-        <mat-card-subtitle>Next 24 hours</mat-card-subtitle>
+        <mat-card-title i18n>Upcoming Predictions</mat-card-title>
+        <mat-card-subtitle i18n>Next 24 hours</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <mat-spinner *ngIf="isLoadingPredictions" diameter="40"></mat-spinner>
+        <mat-spinner *ngIf="isLoadingPredictions" diameter="40" />
         <mat-list *ngIf="!isLoadingPredictions">
           <mat-list-item *ngFor="let prediction of upcomingPredictions">
             <div matListItemTitle>{{ prediction.licensePlate }}</div>
             <div matListItemLine>
               <span class="time-badge">{{ formatTimeUntil(prediction.predictedNextSeen) }}</span>
-              <span class="location">Unknown</span>
+              <span i18n class="location">Unknown</span>
             </div>
             <mat-chip matListItemMeta
                       [style.background-color]="getConfidenceColor(prediction.confidenceScore)">
@@ -132,15 +132,15 @@
     </mat-card>
     <mat-card class="predictions-card" *ngIf="predictablePlates && predictablePlates.length > 0">
       <mat-card-header>
-        <mat-card-title>Most Predictable</mat-card-title>
-        <mat-card-subtitle>Highest confidence patterns</mat-card-subtitle>
+        <mat-card-title i18n>Most Predictable</mat-card-title>
+        <mat-card-subtitle i18n>Highest confidence patterns</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <mat-list>
           <mat-list-item *ngFor="let prediction of predictablePlates">
             <div matListItemTitle>{{ prediction.licensePlate }}</div>
             <div matListItemLine>
-              <span class="pattern">{{ prediction.totalHistoricalVisits }} visits</span>
+              <span i18n class="pattern">{{ prediction.totalHistoricalVisits }} visits</span>
             </div>
             <mat-chip matListItemMeta
                       [style.background-color]="getConfidenceColor(prediction.confidenceScore)">
@@ -153,15 +153,15 @@
   </div>
   <mat-card class="most-seen-card">
     <mat-card-header>
-      <mat-card-title>Most Frequently Seen</mat-card-title>
-      <mat-card-subtitle>Top plates by occurrence</mat-card-subtitle>
+      <mat-card-title i18n>Most Frequently Seen</mat-card-title>
+      <mat-card-subtitle i18n>Top plates by occurrence</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
               <mat-list>
           <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
             <span matListItemTitle class="rank">#{{ i + 1 }}</span>
             <div matListItemTitle>{{ plate.name }}</div>
-            <mat-chip matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
+            <mat-chip i18n matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
           </mat-list-item>
         </mat-list>
     </mat-card-content>

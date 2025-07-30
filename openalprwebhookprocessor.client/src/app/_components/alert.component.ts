@@ -1,22 +1,24 @@
-﻿import { Component, OnInit, OnDestroy, Input, inject } from '@angular/core'
-import { Router, NavigationStart } from '@angular/router'
-import { Subscription } from 'rxjs'
-import { Alert, AlertType } from 'app/_models'
-import { AlertService } from 'app/_services'
+﻿import type { OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { Router, NavigationStart } from '@angular/router';
+import type { Subscription } from 'rxjs';
+import type { Alert } from 'app/_models';
+import { AlertType } from 'app/_models';
+import { AlertService } from 'app/_services';
 
 @Component({
   selector: 'app-alert',
   templateUrl: 'alert.component.html',
 })
 export class AlertComponent implements OnInit, OnDestroy {
-  private router = inject(Router)
-  private alertService = inject(AlertService)
+  private readonly router = inject(Router);
+  private readonly alertService = inject(AlertService);
 
-  @Input() id = 'default-alert'
-  @Input() fade = true
-  alerts: Alert[] = []
-  alertSubscription: Subscription
-  routeSubscription: Subscription
+  @Input() id = 'default-alert';
+  @Input() fade = true;
+  alerts: Alert[] = [];
+  alertSubscription: Subscription;
+  routeSubscription: Subscription;
 
   ngOnInit() {
     // subscribe to new alert notifications
@@ -25,73 +27,72 @@ export class AlertComponent implements OnInit, OnDestroy {
         // clear alerts when an empty alert is received
         if (!alert.message) {
           // filter out alerts without 'keepAfterRouteChange' flag
-          this.alerts = this.alerts.filter(x => x.keepAfterRouteChange)
+          this.alerts = this.alerts.filter(x => x.keepAfterRouteChange);
 
           // remove 'keepAfterRouteChange' flag on the rest
-          this.alerts.forEach(x => delete x.keepAfterRouteChange)
-          return
+          this.alerts.forEach(x => delete x.keepAfterRouteChange);
+          return;
         }
 
         // add alert to array
-        this.alerts.push(alert)
+        this.alerts.push(alert);
 
         // auto close alert if required
         if (alert.autoClose) {
-          setTimeout(() => this.removeAlert(alert), 3000)
+          setTimeout(() => this.removeAlert(alert), 3000);
         }
-      })
+      });
 
     // clear alerts on location change
     this.routeSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        this.alertService.clear(this.id)
+        this.alertService.clear(this.id);
       }
-    })
+    });
   }
 
   ngOnDestroy() {
     // unsubscribe to avoid memory leaks
-    this.alertSubscription.unsubscribe()
-    this.routeSubscription.unsubscribe()
+    this.alertSubscription.unsubscribe();
+    this.routeSubscription.unsubscribe();
   }
 
   removeAlert(alert: Alert) {
     // check if already removed to prevent error on auto close
-    if (!this.alerts.includes(alert)) return
+    if (!this.alerts.includes(alert)) return;
 
     if (this.fade) {
       // fade out alert
-      alert.fade = true
+      alert.fade = true;
 
       // remove alert after faded out
       setTimeout(() => {
-        this.alerts = this.alerts.filter(x => x !== alert)
-      }, 250)
-    }
-    else {
+        this.alerts = this.alerts.filter(x => x !== alert);
+      }, 250);
+    } else {
       // remove alert
-      this.alerts = this.alerts.filter(x => x !== alert)
+      this.alerts = this.alerts.filter(x => x !== alert);
     }
   }
 
   cssClass(alert: Alert) {
-    if (!alert) return
+    if (!alert) return;
 
-    const classes = ['alert', 'alert-dismissable', 'mt-4', 'container']
+    const classes = ['alert', 'alert-dismissable', 'mt-4', 'container'];
 
     const alertTypeClass = {
       [AlertType.Success]: 'alert alert-success',
       [AlertType.Error]: 'alert alert-danger',
       [AlertType.Info]: 'alert alert-info',
       [AlertType.Warning]: 'alert alert-warning',
-    }
+    };
 
-    classes.push(alertTypeClass[alert.type])
+    classes.push(alertTypeClass[alert.type]);
 
     if (alert.fade) {
-      classes.push('fade')
+      classes.push('fade');
     }
 
-    return classes.join(' ')
+    return classes.join(' ');
   }
 }

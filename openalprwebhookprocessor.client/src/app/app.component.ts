@@ -1,18 +1,20 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core'
-import { AccountService } from './_services'
-import { User } from './_models'
-import { SignalrService } from './signalr/signalr.service'
-import { RouterLink, RouterOutlet } from '@angular/router'
-import { SwUpdate, VersionEvent } from '@angular/service-worker'
-import { PushSubscriberService } from './_services/push-subscriber.service'
-import { AlertComponent } from './_components/alert.component'
-import { MatIconModule } from '@angular/material/icon'
-import { MatTabsModule } from '@angular/material/tabs'
-import { CommonModule } from '@angular/common'
-import { MatSidenavModule } from '@angular/material/sidenav'
-import { MatListModule } from '@angular/material/list'
-import { ThemePickerComponent } from './theme-picker/theme-picker.component'
-import { Subscription } from 'rxjs'
+import type { OnDestroy, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AccountService } from './_services';
+import type { User } from './_models';
+import { SignalrService } from './signalr/signalr.service';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import type { VersionEvent } from '@angular/service-worker';
+import { SwUpdate } from '@angular/service-worker';
+import { PushSubscriberService } from './_services/push-subscriber.service';
+import { AlertComponent } from './_components/alert.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
+import { CommonModule } from '@angular/common';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { ThemePickerComponent } from './theme-picker/theme-picker.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-app',
@@ -21,17 +23,17 @@ import { Subscription } from 'rxjs'
   imports: [MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet, MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private signalRService = inject(SignalrService)
-  private accountService = inject(AccountService)
-  private swUpdate = inject(SwUpdate)
-  private pushSubscriberService = inject(PushSubscriberService)
+  private readonly signalRService = inject(SignalrService);
+  private readonly accountService = inject(AccountService);
+  private readonly swUpdate = inject(SwUpdate);
+  private readonly pushSubscriberService = inject(PushSubscriberService);
 
-  user: User
-  appSettingsVisible: boolean
-  menuButtonVisible: boolean
-  topBarVisible: boolean
-  navBarVisible = false
-  isSignalrConnected: boolean
+  user: User;
+  appSettingsVisible: boolean;
+  menuButtonVisible: boolean;
+  topBarVisible: boolean;
+  navBarVisible = false;
+  isSignalrConnected: boolean;
 
   public navItems = [
     { linkTitle: 'Cameras', icon: 'videocam', link: '/settings/cameras' },
@@ -44,72 +46,71 @@ export class AppComponent implements OnInit, OnDestroy {
     { linkTitle: 'Enrichers', icon: 'merge_type', link: '/settings/enrichers' },
     { linkTitle: 'Users', icon: 'person', link: '/settings/users' },
     { linkTitle: 'Debug', icon: 'bug_report', link: '/settings/debug' },
-  ]
+  ];
 
-  private eventSubscriptions = new Subscription()
+  private readonly eventSubscriptions = new Subscription();
 
   constructor() {
     this.accountService.user.subscribe((x) => {
-      this.topBarVisible = x.id !== undefined
+      this.topBarVisible = x.id !== undefined;
 
       // Start SignalR connection when user is authenticated
       if (x.id !== undefined && x.jwtToken) {
-        this.signalRService.startConnection()
-      }
-      else {
+        this.signalRService.startConnection();
+      } else {
         // Stop SignalR connection when user is not authenticated
-        this.signalRService.stopConnection()
+        this.signalRService.stopConnection();
       }
-    })
+    });
 
     this.swUpdate.unrecoverable.subscribe(() => {
-      confirm('An error occurred, please reload the page.')
+      confirm('An error occurred, please reload the page.');
       {
-        window.location.reload()
+        window.location.reload();
       }
-    })
+    });
 
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates.subscribe((event: VersionEvent) => {
         switch (event.type) {
           case 'VERSION_READY':
             if (confirm('You\'re using an old version of the control panel. Want to update?')) {
-              window.location.reload()
+              window.location.reload();
             }
-            break
+            break;
           case 'VERSION_INSTALLATION_FAILED':
-            break
+            break;
         }
-      })
+      });
     }
   }
 
   public ngOnInit() {
-    this.subscribeForUpdates()
-    this.pushSubscriberService.subscribe()
+    this.subscribeForUpdates();
+    this.pushSubscriberService.subscribe();
   }
 
   public ngOnDestroy() {
-    this.signalRService.stopConnection()
+    this.signalRService.stopConnection();
   }
 
   public logout() {
-    this.accountService.logout()
+    this.accountService.logout();
   }
 
   public subscribeForUpdates() {
     this.eventSubscriptions.add(this.signalRService.connectionStatusChanged.subscribe((status) => {
-      this.isSignalrConnected = status
-    }))
+      this.isSignalrConnected = status;
+    }));
   }
 
   public settingsButtonClicked() {
-    this.navBarVisible = !this.navBarVisible
+    this.navBarVisible = !this.navBarVisible;
   }
 
   public handleSideNavClick() {
-    this.navBarVisible = false
+    this.navBarVisible = false;
   }
 
-  title = 'openalprwebhookprocessor.client'
+  title = 'openalprwebhookprocessor.client';
 }

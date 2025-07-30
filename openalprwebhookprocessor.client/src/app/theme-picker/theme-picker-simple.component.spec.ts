@@ -1,11 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NO_ERRORS_SCHEMA } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import { of } from 'rxjs'
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
-import { ThemePickerComponent } from './theme-picker.component'
-import { ThemeStorage } from './theme-storage/theme-storage'
-import { StyleManager } from './style-manager/style-manager.component'
+import { ThemePickerComponent } from './theme-picker.component';
+import { ThemeStorage } from './theme-storage/theme-storage';
+import { StyleManager } from './style-manager/style-manager.component';
 
 /**
  * SIMPLER APPROACH TO ANGULAR TESTING
@@ -17,15 +18,15 @@ import { StyleManager } from './style-manager/style-manager.component'
  * 4. Use real services where possible
  */
 describe('ThemePickerComponent (Simplified Testing)', () => {
-  let component: ThemePickerComponent
-  let fixture: ComponentFixture<ThemePickerComponent>
-  let mockThemeStorage: jasmine.SpyObj<ThemeStorage>
-  let mockStyleManager: jasmine.SpyObj<StyleManager>
+  let component: ThemePickerComponent;
+  let fixture: ComponentFixture<ThemePickerComponent>;
+  let mockThemeStorage: jasmine.SpyObj<ThemeStorage>;
+  let mockStyleManager: jasmine.SpyObj<StyleManager>;
 
   beforeEach(async () => {
     // Create minimal spies - only what we actually need
-    const themeStorageSpy = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName', 'storeTheme'])
-    const styleManagerSpy = jasmine.createSpyObj('StyleManager', ['setStyle', 'removeStyle'])
+    const themeStorageSpy = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName', 'storeTheme']);
+    const styleManagerSpy = jasmine.createSpyObj('StyleManager', ['setStyle', 'removeStyle']);
 
     await TestBed.configureTestingModule({
       imports: [ThemePickerComponent],
@@ -34,176 +35,176 @@ describe('ThemePickerComponent (Simplified Testing)', () => {
         { provide: StyleManager, useValue: styleManagerSpy },
         {
           provide: ActivatedRoute,
-          useValue: { queryParamMap: of(new Map()) }
-        }
+          useValue: { queryParamMap: of(new Map()) },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]  // This ignores Material Design components we don't need to test
-    }).compileComponents()
+      schemas: [NO_ERRORS_SCHEMA],  // This ignores Material Design components we don't need to test
+    }).compileComponents();
 
-    mockThemeStorage = TestBed.inject(ThemeStorage) as jasmine.SpyObj<ThemeStorage>
-    mockStyleManager = TestBed.inject(StyleManager) as jasmine.SpyObj<StyleManager>
+    mockThemeStorage = TestBed.inject(ThemeStorage) as jasmine.SpyObj<ThemeStorage>;
+    mockStyleManager = TestBed.inject(StyleManager) as jasmine.SpyObj<StyleManager>;
 
-    fixture = TestBed.createComponent(ThemePickerComponent)
-    component = fixture.componentInstance
-  })
+    fixture = TestBed.createComponent(ThemePickerComponent);
+    component = fixture.componentInstance;
+  });
 
-    describe('Component Logic (Focus on Business Logic)', () => {
+  describe('Component Logic (Focus on Business Logic)', () => {
     it('should create component', () => {
-      expect(component).toBeTruthy()
-    })
+      expect(component).toBeTruthy();
+    });
 
     it('should have predefined themes', () => {
-      expect(component.themes.length).toBe(4)
-      expect(component.themes.find(t => t.isDefault)?.name).toBe('indigo-pink')
-    })
+      expect(component.themes.length).toBe(4);
+      expect(component.themes.find(t => t.isDefault)?.name).toBe('indigo-pink');
+    });
 
-        it('should initialize with stored theme when available', () => {
-      mockThemeStorage.getStoredThemeName.and.returnValue('pink-bluegrey')
+    it('should initialize with stored theme when available', () => {
+      mockThemeStorage.getStoredThemeName.and.returnValue('pink-bluegrey');
 
       // Create new fixture to test initialization
-      const testFixture = TestBed.createComponent(ThemePickerComponent)
-      const testComponent = testFixture.componentInstance
-      testFixture.detectChanges()
+      const testFixture = TestBed.createComponent(ThemePickerComponent);
+      const testComponent = testFixture.componentInstance;
+      testFixture.detectChanges();
 
-      expect(testComponent.currentTheme?.name).toBe('pink-bluegrey')
-      expect(mockThemeStorage.getStoredThemeName).toHaveBeenCalled()
-    })
+      expect(testComponent.currentTheme?.name).toBe('pink-bluegrey');
+      expect(mockThemeStorage.getStoredThemeName).toHaveBeenCalled();
+    });
 
     it('should initialize with default theme when no stored theme', () => {
-      mockThemeStorage.getStoredThemeName.and.returnValue(null)
+      mockThemeStorage.getStoredThemeName.and.returnValue(null);
 
       // Create new fixture to test initialization
-      const testFixture = TestBed.createComponent(ThemePickerComponent)
-      const testComponent = testFixture.componentInstance
-      testFixture.detectChanges()
+      const testFixture = TestBed.createComponent(ThemePickerComponent);
+      const testComponent = testFixture.componentInstance;
+      testFixture.detectChanges();
 
-      expect(testComponent.currentTheme?.name).toBe('indigo-pink')
-    })
+      expect(testComponent.currentTheme?.name).toBe('indigo-pink');
+    });
 
     it('should select theme and update dependencies', () => {
-      component.selectTheme('pink-bluegrey')
+      component.selectTheme('pink-bluegrey');
 
-      expect(component.currentTheme?.name).toBe('pink-bluegrey')
-      expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', 'pink-bluegrey.css')
-      expect(mockThemeStorage.storeTheme).toHaveBeenCalled()
-    })
+      expect(component.currentTheme?.name).toBe('pink-bluegrey');
+      expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', 'pink-bluegrey.css');
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalled();
+    });
 
     it('should handle default theme by removing styles', () => {
-      component.selectTheme('indigo-pink')
+      component.selectTheme('indigo-pink');
 
-      expect(mockStyleManager.removeStyle).toHaveBeenCalledWith('theme')
-      expect(mockStyleManager.setStyle).not.toHaveBeenCalled()
-    })
+      expect(mockStyleManager.removeStyle).toHaveBeenCalledWith('theme');
+      expect(mockStyleManager.setStyle).not.toHaveBeenCalled();
+    });
 
     it('should ignore invalid theme names', () => {
-      const originalTheme = component.currentTheme
+      const originalTheme = component.currentTheme;
 
-      component.selectTheme('invalid-theme')
+      component.selectTheme('invalid-theme');
 
-      expect(component.currentTheme).toBe(originalTheme)
-      expect(mockStyleManager.setStyle).not.toHaveBeenCalled()
-    })
-  })
+      expect(component.currentTheme).toBe(originalTheme);
+      expect(mockStyleManager.setStyle).not.toHaveBeenCalled();
+    });
+  });
 
   describe('Theme Management', () => {
     it('should have correct theme properties', () => {
-      const theme = component.themes[0]
-      expect(theme.name).toBeDefined()
-      expect(theme.primary).toBeDefined()
-      expect(theme.accent).toBeDefined()
-      expect(theme.displayName).toBeDefined()
-    })
+      const theme = component.themes[0];
+      expect(theme.name).toBeDefined();
+      expect(theme.primary).toBeDefined();
+      expect(theme.accent).toBeDefined();
+      expect(theme.displayName).toBeDefined();
+    });
 
     it('should distinguish light and dark themes', () => {
-      const lightThemes = component.themes.filter(t => !t.isDark)
-      const darkThemes = component.themes.filter(t => t.isDark)
+      const lightThemes = component.themes.filter(t => !t.isDark);
+      const darkThemes = component.themes.filter(t => t.isDark);
 
-      expect(lightThemes.length).toBeGreaterThan(0)
-      expect(darkThemes.length).toBeGreaterThan(0)
-    })
-  })
+      expect(lightThemes.length).toBeGreaterThan(0);
+      expect(darkThemes.length).toBeGreaterThan(0);
+    });
+  });
 
   describe('Service Integration', () => {
     it('should store selected theme', () => {
-      const theme = component.themes[2] // pink-bluegrey
+      const theme = component.themes[2]; // pink-bluegrey
 
-      component.selectTheme(theme.name)
+      component.selectTheme(theme.name);
 
-      expect(mockThemeStorage.storeTheme).toHaveBeenCalledWith(theme)
-    })
+      expect(mockThemeStorage.storeTheme).toHaveBeenCalledWith(theme);
+    });
 
     it('should apply correct CSS file for non-default themes', () => {
       component.themes.filter(t => !t.isDefault).forEach(theme => {
-        component.selectTheme(theme.name)
-        expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', `${theme.name}.css`)
-      })
-    })
-  })
-})
+        component.selectTheme(theme.name);
+        expect(mockStyleManager.setStyle).toHaveBeenCalledWith('theme', `${theme.name}.css`);
+      });
+    });
+  });
+});
 
 /**
  * Lifecycle and Query Parameter Testing
  */
 describe('ThemePickerComponent (Lifecycle & Route Integration)', () => {
-  let component: ThemePickerComponent
-  let fixture: ComponentFixture<ThemePickerComponent>
-  let mockThemeStorage: jasmine.SpyObj<ThemeStorage>
-  let mockActivatedRoute: any
+  let component: ThemePickerComponent;
+  let fixture: ComponentFixture<ThemePickerComponent>;
+  let mockThemeStorage: jasmine.SpyObj<ThemeStorage>;
+  let mockActivatedRoute: any;
 
   beforeEach(async () => {
-    const themeStorageSpy = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName', 'storeTheme'])
-    const styleManagerSpy = jasmine.createSpyObj('StyleManager', ['setStyle', 'removeStyle'])
+    const themeStorageSpy = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName', 'storeTheme']);
+    const styleManagerSpy = jasmine.createSpyObj('StyleManager', ['setStyle', 'removeStyle']);
 
     // Create a Subject to control query parameter emissions
     mockActivatedRoute = {
       queryParamMap: of({
-        get: jasmine.createSpy('get').and.returnValue(null)
-      })
-    }
+        get: jasmine.createSpy('get').and.returnValue(null),
+      }),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ThemePickerComponent],
       providers: [
         { provide: ThemeStorage, useValue: themeStorageSpy },
         { provide: StyleManager, useValue: styleManagerSpy },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents()
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
 
-    mockThemeStorage = TestBed.inject(ThemeStorage) as jasmine.SpyObj<ThemeStorage>
-    fixture = TestBed.createComponent(ThemePickerComponent)
-    component = fixture.componentInstance
-  })
+    mockThemeStorage = TestBed.inject(ThemeStorage) as jasmine.SpyObj<ThemeStorage>;
+    fixture = TestBed.createComponent(ThemePickerComponent);
+    component = fixture.componentInstance;
+  });
 
   it('should unsubscribe from route params on destroy', () => {
-    mockThemeStorage.getStoredThemeName.and.returnValue(null)
-    fixture.detectChanges()
-    component.ngOnInit()
+    mockThemeStorage.getStoredThemeName.and.returnValue(null);
+    fixture.detectChanges();
+    component.ngOnInit();
 
-    spyOn(component['_queryParamSubscription'], 'unsubscribe')
+    spyOn(component['_queryParamSubscription'], 'unsubscribe');
 
-    component.ngOnDestroy()
+    component.ngOnDestroy();
 
-    expect(component['_queryParamSubscription'].unsubscribe).toHaveBeenCalled()
-  })
+    expect(component['_queryParamSubscription'].unsubscribe).toHaveBeenCalled();
+  });
 
   it('should handle query parameter theme changes', () => {
-    mockThemeStorage.getStoredThemeName.and.returnValue(null)
-    fixture.detectChanges()
+    mockThemeStorage.getStoredThemeName.and.returnValue(null);
+    fixture.detectChanges();
 
-    spyOn(component, 'selectTheme')
+    spyOn(component, 'selectTheme');
 
     // Simulate query param with theme
     mockActivatedRoute.queryParamMap = of({
-      get: jasmine.createSpy('get').and.returnValue('deeppurple-amber')
-    })
+      get: jasmine.createSpy('get').and.returnValue('deeppurple-amber'),
+    });
 
-    component.ngOnInit()
+    component.ngOnInit();
 
-    expect(component.selectTheme).toHaveBeenCalledWith('deeppurple-amber')
-  })
-})
+    expect(component.selectTheme).toHaveBeenCalledWith('deeppurple-amber');
+  });
+});
 
 /**
  * SUMMARY: Easier Angular Testing Approaches

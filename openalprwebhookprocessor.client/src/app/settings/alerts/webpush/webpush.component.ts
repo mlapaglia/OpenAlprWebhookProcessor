@@ -1,19 +1,21 @@
-import { animate, style, transition, trigger } from '@angular/animations'
-import { Component, OnInit, inject } from '@angular/core'
-import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle'
-import { SnackbarService } from 'app/snackbar/snackbar.service'
-import { SnackBarType } from 'app/snackbar/snackbartype'
-import { Webpush } from './webpush'
-import { WebpushService } from './webpush.service'
-import { MatButtonModule } from '@angular/material/button'
-import { MatTooltipModule } from '@angular/material/tooltip'
-import { MatIconModule } from '@angular/material/icon'
-import { MatInputModule } from '@angular/material/input'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { MatCardModule } from '@angular/material/card'
+import { animate, style, transition, trigger } from '@angular/animations';
+import type { OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import type { Webpush } from './webpush';
+import { WebpushService } from './webpush.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 
-import { MatCheckboxModule } from '@angular/material/checkbox'
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-webpush',
@@ -34,47 +36,47 @@ import { MatCheckboxModule } from '@angular/material/checkbox'
   imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatButtonModule, MatCheckboxModule],
 })
 export class WebpushComponent implements OnInit {
-  private webpushService = inject(WebpushService)
-  private snackbarService = inject(SnackbarService)
+  private readonly webpushService = inject(WebpushService);
+  private readonly snackbarService = inject(SnackbarService);
 
-  public client: Webpush
-  public isSaving: boolean
-  public isTesting: boolean
-  public hidePrivateKey = true
+  public client: Webpush;
+  public isSaving: boolean;
+  public isTesting: boolean;
+  public hidePrivateKey = true;
 
   ngOnInit(): void {
     this.webpushService.getWebpush().subscribe((result) => {
-      this.client = result
-    })
+      this.client = result;
+    });
   }
 
   public saveClient() {
-    this.isSaving = true
+    this.isSaving = true;
     this.webpushService.upsertWebpush(this.client).subscribe(() => {
-      this.snackbarService.create('WebPush client saved.', SnackBarType.Saved)
-      this.isSaving = false
-    })
+      this.snackbarService.create('WebPush client saved.', SnackBarType.Saved);
+      this.isSaving = false;
+    });
   }
 
   public testClient() {
-    this.isTesting = true
+    this.isTesting = true;
     this.webpushService.testWebpush().subscribe(() => {
-      this.snackbarService.create('WebPush client test successful.', SnackBarType.Successful)
-      this.isTesting = false
+      this.snackbarService.create('WebPush client test successful.', SnackBarType.Successful);
+      this.isTesting = false;
     },
     () => {
-      this.snackbarService.create('WebPush client test failed.', SnackBarType.Error)
-      this.isTesting = false
-    })
+      this.snackbarService.create('WebPush client test failed.', SnackBarType.Error);
+      this.isTesting = false;
+    });
   }
 
   public onWebPushToggle(event: MatSlideToggleChange) {
     if (!event.checked) {
-      this.client.isEnabled = event.checked
-      this.isSaving = true
+      this.client.isEnabled = event.checked;
+      this.isSaving = true;
       this.webpushService.upsertWebpush(this.client).subscribe(() => {
-        this.isSaving = false
-      })
+        this.isSaving = false;
+      });
     }
   }
 }

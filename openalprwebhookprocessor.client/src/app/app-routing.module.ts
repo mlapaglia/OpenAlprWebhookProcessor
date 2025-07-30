@@ -1,21 +1,22 @@
-import { NgModule } from '@angular/core'
-import { Routes, RouterModule } from '@angular/router'
-import { HomeComponent } from './home'
-import { AuthGuard } from './_helpers'
-import { OpenalprAgentComponent } from './settings/openalpr-agent/openalpr-agent.component'
-import { CamerasComponent } from './settings/cameras/cameras.component'
-import { AlertsComponent } from './settings/alerts/alerts.component'
-import { EnrichersComponent } from './settings/enrichers/enrichers.component'
-import { ForwardsComponent } from './settings/forwards/forwards.component'
-import { IgnoresComponent } from './settings/ignores/ignores.component'
-import { MachineLearningComponent } from './settings/machine-learning/machine-learning.component'
-import { SystemLogsComponent } from './settings/system-logs/system-logs.component'
-import { PlatesComponent } from './plates/plates.component'
-import { AddEditComponent } from './settings/users/add-edit.component'
-import { UsersComponent } from './settings/users/users.component'
-import { LoginComponent } from './account/login.component'
-import { RegisterComponent } from './account/register.component'
-import { DebugComponent } from './settings/debug/debug.component'
+import { NgModule } from '@angular/core';
+import type { Routes } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { HomeComponent } from './home';
+import { AuthGuard } from './_helpers';
+import { OpenalprAgentComponent } from './settings/openalpr-agent/openalpr-agent.component';
+import { CamerasComponent } from './settings/cameras/cameras.component';
+import { AlertsComponent } from './settings/alerts/alerts.component';
+import { EnrichersComponent } from './settings/enrichers/enrichers.component';
+import { ForwardsComponent } from './settings/forwards/forwards.component';
+import { IgnoresComponent } from './settings/ignores/ignores.component';
+import { MachineLearningComponent } from './settings/machine-learning/machine-learning.component';
+import { SystemLogsComponent } from './settings/system-logs/system-logs.component';
+import { PlatesComponent } from './plates/plates.component';
+import { AddEditComponent } from './settings/users/add-edit.component';
+import { UsersComponent } from './settings/users/users.component';
+import { LoginComponent } from './account/login.component';
+import { RegisterComponent } from './account/register.component';
+import { DebugComponent } from './settings/debug/debug.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
@@ -54,7 +55,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: '**', redirectTo: '/', pathMatch: 'full' },
-]
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

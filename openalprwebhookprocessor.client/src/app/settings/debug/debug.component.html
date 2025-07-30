@@ -4,31 +4,31 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>
-        <mat-icon style="margin-right: 8px;">delete_sweep</mat-icon>
+        <mat-icon i18n style="margin-right: 8px;">delete_sweep</mat-icon>
         Database Cleanup
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p>
+      <p i18n>
         This operation will clean up sensitive data from the database for privacy and storage purposes.
         Use this when preparing the system for sharing or reducing storage usage.
       </p>
       
       <div style="margin: 16px 0;">
-        <h4>This operation will:</h4>
+        <h4 i18n>This operation will:</h4>
         <ul>
-          <li>Remove all webhook forward configurations</li>
-          <li>Remove all web push subscription data</li>
-          <li>Remove all pushover client configurations</li>
-          <li>Clear all stored JPEG images (plates and vehicles)</li>
-          <li>Obfuscate all license plate numbers in the database</li>
+          <li i18n>Remove all webhook forward configurations</li>
+          <li i18n>Remove all web push subscription data</li>
+          <li i18n>Remove all pushover client configurations</li>
+          <li i18n>Clear all stored JPEG images (plates and vehicles)</li>
+          <li i18n>Obfuscate all license plate numbers in the database</li>
         </ul>
       </div>
 
       <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 12px; margin: 16px 0;">
-        <mat-icon style="color: #856404; margin-right: 8px;">warning</mat-icon>
-        <strong style="color: #856404;">Warning:</strong>
-        <span style="color: #856404;">This action cannot be undone. All cleaned data will be permanently lost.</span>
+        <mat-icon i18n style="color: #856404; margin-right: 8px;">warning</mat-icon>
+        <strong i18n style="color: #856404;">Warning:</strong>
+        <span i18n style="color: #856404;">This action cannot be undone. All cleaned data will be permanently lost.</span>
       </div>
 
       <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
@@ -37,23 +37,22 @@
           color="warn"
           [disabled]="isCleaningDatabase"
           (click)="cleanupDatabase()"
-          matTooltip="Clean up database - removes sensitive data permanently">
+          matTooltip="Clean up database - removes sensitive data permanently" i18n-matTooltip>
           @if (isCleaningDatabase) {
             <mat-progress-spinner 
               style="margin-right:8px;" 
               color="primary" 
-              mode="indeterminate" 
-              diameter="20">
-            </mat-progress-spinner>
+              mode="indeterminate" i18n-mode 
+              diameter="20" />
           }
           @if (!isCleaningDatabase) {
-            <mat-icon style="margin-right: 8px;">delete_sweep</mat-icon>
+            <mat-icon i18n style="margin-right: 8px;">delete_sweep</mat-icon>
           }
           {{ isCleaningDatabase ? 'Cleaning Database...' : 'Cleanup Database' }}
         </button>
         
         @if (isCleaningDatabase) {
-          <span style="color: #666; font-style: italic;">
+          <span i18n style="color: #666; font-style: italic;">
             This may take a few moments depending on database size...
           </span>
         }

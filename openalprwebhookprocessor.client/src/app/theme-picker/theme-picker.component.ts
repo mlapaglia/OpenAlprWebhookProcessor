@@ -1,19 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core'
-
-import { DocsSiteTheme, ThemeStorage } from './theme-storage/theme-storage'
-import { MatButtonModule } from '@angular/material/button'
-import { MatIconModule, MatIconRegistry } from '@angular/material/icon'
-import { MatMenuModule } from '@angular/material/menu'
-import { MatTooltipModule } from '@angular/material/tooltip'
-
-import { ActivatedRoute, ParamMap } from '@angular/router'
-import { Subscription } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { DomSanitizer } from '@angular/platform-browser'
-import { LiveAnnouncer } from '@angular/cdk/a11y'
-import { StyleManager } from './style-manager/style-manager.component'
-import { MatRadioModule } from '@angular/material/radio'
-import { MatListModule } from '@angular/material/list'
+import { ChangeDetectionStrategy, Component, ViewEncapsulation, inject, type OnDestroy, type OnInit } from '@angular/core';
+import { ThemeStorage, type DocsSiteTheme } from './theme-storage/theme-storage';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ActivatedRoute, type ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { DomSanitizer } from '@angular/platform-browser';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { StyleManager } from './style-manager/style-manager.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-theme-picker',
@@ -24,13 +22,13 @@ import { MatListModule } from '@angular/material/list'
   imports: [MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, MatRadioModule, MatListModule],
 })
 export class ThemePickerComponent implements OnInit, OnDestroy {
-  styleManager = inject(StyleManager)
-  private _themeStorage = inject(ThemeStorage)
-  private _activatedRoute = inject(ActivatedRoute)
-  private liveAnnouncer = inject(LiveAnnouncer)
+  styleManager = inject(StyleManager);
+  private readonly _themeStorage = inject(ThemeStorage);
+  private readonly _activatedRoute = inject(ActivatedRoute);
+  private readonly liveAnnouncer = inject(LiveAnnouncer);
 
-  private _queryParamSubscription = Subscription.EMPTY
-  currentTheme: DocsSiteTheme | undefined
+  private _queryParamSubscription = Subscription.EMPTY;
+  currentTheme: DocsSiteTheme | undefined;
 
   // The below colors need to align with the themes defined in theme-picker.scss
   themes: DocsSiteTheme[] = [
@@ -63,26 +61,24 @@ export class ThemePickerComponent implements OnInit, OnDestroy {
       name: 'purple-green',
       isDark: true,
     },
-  ]
+  ];
 
   constructor() {
-    const iconRegistry = inject(MatIconRegistry)
-    const sanitizer = inject(DomSanitizer)
+    const iconRegistry = inject(MatIconRegistry);
+    const sanitizer = inject(DomSanitizer);
 
     iconRegistry.addSvgIcon('theme-example',
       sanitizer.bypassSecurityTrustResourceUrl(
-        'assets/img/theme-demo-icon.svg'))
+        'assets/img/theme-demo-icon.svg'));
 
-    const themeName = this._themeStorage.getStoredThemeName()
+    const themeName = this._themeStorage.getStoredThemeName();
     if (themeName) {
-      this.selectTheme(themeName)
-    }
-    else {
-      this.themes.find((themes) => {
-        if (themes.isDefault === true) {
-          this.selectTheme(themes.name)
-        }
-      })
+      this.selectTheme(themeName);
+    } else {
+      const defaultTheme = this.themes.find(theme => theme.isDefault);
+      if (defaultTheme) {
+        this.selectTheme(defaultTheme.name);
+      }
     }
   }
 
@@ -91,34 +87,31 @@ export class ThemePickerComponent implements OnInit, OnDestroy {
       .pipe(map((params: ParamMap) => params.get('theme')))
       .subscribe((themeName: string | null) => {
         if (themeName) {
-          this.selectTheme(themeName)
+          this.selectTheme(themeName);
         }
-      })
+      });
   }
 
   ngOnDestroy() {
-    this._queryParamSubscription.unsubscribe()
+    this._queryParamSubscription.unsubscribe();
   }
 
   selectTheme(themeName: string) {
-    const theme = this.themes.find(currentTheme => currentTheme.name === themeName)
+    const theme = this.themes.find(currentTheme => currentTheme.name === themeName);
 
     if (!theme) {
-      return
+      return;
     }
 
-    this.currentTheme = theme
+    this.currentTheme = theme;
 
     if (theme.isDefault) {
-      this.styleManager.removeStyle('theme')
-    }
-    else {
-      this.styleManager.setStyle('theme', `${theme.name}.css`)
+      this.styleManager.removeStyle('theme');
+    } else {
+      this.styleManager.setStyle('theme', `${theme.name}.css`);
     }
 
-    if (this.currentTheme) {
-      this.liveAnnouncer.announce(`${theme.displayName} theme selected.`, 'polite', 3000)
-      this._themeStorage.storeTheme(this.currentTheme)
-    }
+    void this.liveAnnouncer.announce(`${theme.displayName} theme selected.`, 'polite', 3000);
+    this._themeStorage.storeTheme(this.currentTheme);
   }
 }
