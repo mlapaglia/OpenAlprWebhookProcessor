@@ -116,6 +116,7 @@ jobs:
             -p:GitAssemblyVersion="$assembly_version" \
             -p:GitFileVersion="$assembly_version"
           dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name" \
+            -r win-x64 --self-contained false \
             -p:GitVersion="$version" \
             -p:GitAssemblyVersion="$assembly_version" \
             -p:GitFileVersion="$assembly_version"
