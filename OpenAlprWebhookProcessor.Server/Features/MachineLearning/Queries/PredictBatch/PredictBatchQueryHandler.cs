@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -12,16 +11,13 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictBatch
 {
     public class PredictBatchQueryHandler : IQueryHandler<PredictBatchQuery, List<LicensePlatePredictionResult>>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
         private readonly ILogger<PredictBatchQueryHandler> _logger;
 
         public PredictBatchQueryHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlatePredictionService predictionService,
             ILogger<PredictBatchQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _predictionService = predictionService;
             _logger = logger;
         }

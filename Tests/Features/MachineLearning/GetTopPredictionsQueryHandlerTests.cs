@@ -27,7 +27,6 @@ namespace Tests.Features.MachineLearning.Queries.GetTopPredictions
             _logger = Substitute.For<ILogger<GetTopPredictionsQueryHandler>>();
 
             _handler = new GetTopPredictionsQueryHandler(
-                UnitOfWork,
                 _predictionService,
                 _logger);
         }

@@ -26,7 +26,6 @@ namespace Tests.Features.MachineLearning.Commands.TriggerTraining
             _logger = Substitute.For<ILogger<TriggerTrainingCommandHandler>>();
 
             _handler = new TriggerTrainingCommandHandler(
-                UnitOfWork,
                 _trainingService,
                 _logger);
         }

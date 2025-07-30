@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -11,16 +10,13 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Commands.TriggerTrai
 {
     public class TriggerTrainingCommandHandler : IQueryHandler<TriggerTrainingCommand, TrainingResultDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlateMlTrainingService _trainingService;
         private readonly ILogger<TriggerTrainingCommandHandler> _logger;
 
         public TriggerTrainingCommandHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlateMlTrainingService trainingService,
             ILogger<TriggerTrainingCommandHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _trainingService = trainingService;
             _logger = logger;
         }

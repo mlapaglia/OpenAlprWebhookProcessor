@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -11,16 +10,13 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetModelStat
 {
     public class GetModelStatusQueryHandler : IQueryHandler<GetModelStatusQuery, ModelStatusDto>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
         private readonly ILogger<GetModelStatusQueryHandler> _logger;
 
         public GetModelStatusQueryHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlatePredictionService predictionService,
             ILogger<GetModelStatusQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _predictionService = predictionService;
             _logger = logger;
         }

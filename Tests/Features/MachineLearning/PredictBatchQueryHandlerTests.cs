@@ -27,7 +27,6 @@ namespace Tests.Features.MachineLearning.Queries.PredictBatch
             _logger = Substitute.For<ILogger<PredictBatchQueryHandler>>();
 
             _handler = new PredictBatchQueryHandler(
-                UnitOfWork,
                 _predictionService,
                 _logger);
         }

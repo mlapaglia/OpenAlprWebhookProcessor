@@ -26,7 +26,6 @@ namespace Tests.Features.MachineLearning.Queries.GetTrainingStatus
             _logger = Substitute.For<ILogger<GetTrainingStatusQueryHandler>>();
 
             _handler = new GetTrainingStatusQueryHandler(
-                UnitOfWork,
                 _trainingService,
                 _logger);
         }

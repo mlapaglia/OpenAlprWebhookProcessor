@@ -26,7 +26,6 @@ namespace Tests.Features.MachineLearning.Queries.GetModelStatus
             _logger = Substitute.For<ILogger<GetModelStatusQueryHandler>>();
 
             _handler = new GetModelStatusQueryHandler(
-                UnitOfWork,
                 _predictionService,
                 _logger);
         }

@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -11,16 +10,13 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.PredictNextS
 {
     public class PredictNextSeenQueryHandler : IQueryHandler<PredictNextSeenQuery, LicensePlatePredictionResult>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
         private readonly ILogger<PredictNextSeenQueryHandler> _logger;
 
         public PredictNextSeenQueryHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlatePredictionService predictionService,
             ILogger<PredictNextSeenQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _predictionService = predictionService;
             _logger = logger;
         }

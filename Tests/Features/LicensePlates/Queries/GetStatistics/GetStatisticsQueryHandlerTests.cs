@@ -71,7 +71,6 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             // Arrange
             var plateNumber = "ABC123";
             var now = DateTimeOffset.UtcNow;
-            var threeDaysAgo = now.AddDays(-3);
             
             // Create plate group with different best number but matching possible number
             var plateGroup = CreatePlateGroup("XYZ789", now.ToUnixTimeMilliseconds());
@@ -102,7 +101,6 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             var plateNumber = "ABC123";
             var now = DateTimeOffset.UtcNow;
             var tenDaysAgo = now.AddDays(-10);
-            var twentyDaysAgo = now.AddDays(-20);
             var oneHundredDaysAgo = now.AddDays(-100);
 
             // Best number matches
@@ -285,7 +283,7 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             result.LastSeen.Should().BeCloseTo(now, TimeSpan.FromMinutes(1));
         }
 
-        private PlateGroup CreatePlateGroup(string plateNumber, long epoch)
+        private static PlateGroup CreatePlateGroup(string plateNumber, long epoch)
         {
             return new PlateGroup
             {

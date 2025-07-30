@@ -1,6 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Models;
 using OpenAlprWebhookProcessor.Features.MachineLearning.Services;
 using System;
@@ -12,16 +11,13 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredic
 {
     public class GetTopPredictionsQueryHandler : IQueryHandler<GetTopPredictionsQuery, List<LicensePlatePredictionResult>>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILicensePlatePredictionService _predictionService;
         private readonly ILogger<GetTopPredictionsQueryHandler> _logger;
 
         public GetTopPredictionsQueryHandler(
-            IUnitOfWork unitOfWork,
             ILicensePlatePredictionService predictionService,
             ILogger<GetTopPredictionsQueryHandler> logger)
         {
-            _unitOfWork = unitOfWork;
             _predictionService = predictionService;
             _logger = logger;
         }
@@ -44,7 +40,8 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Queries.GetTopPredic
             {
                 var predictions = await _predictionService.GetTopPredictionsAsync(
                     query.Count, 
-                    query.WithinHours);
+                    query.WithinHours,
+                    cancellationToken);
                 
                 return predictions;
             }

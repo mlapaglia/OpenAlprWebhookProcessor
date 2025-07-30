@@ -27,7 +27,6 @@ namespace Tests.Features.MachineLearning.Queries.PredictNextSeen
             _logger = Substitute.For<ILogger<PredictNextSeenQueryHandler>>();
 
             _handler = new PredictNextSeenQueryHandler(
-                UnitOfWork,
                 _predictionService,
                 _logger);
         }
