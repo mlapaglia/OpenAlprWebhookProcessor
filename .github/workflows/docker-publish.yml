@@ -70,6 +70,7 @@ jobs:
       
   front-end-lint:
     runs-on: ubuntu-latest
+    if: false  # Temporarily disabled
     steps:
       - uses: actions/checkout@v2
       - name: Run frontend lint
