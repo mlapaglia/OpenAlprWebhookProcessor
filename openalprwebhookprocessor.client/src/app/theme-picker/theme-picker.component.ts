@@ -105,6 +105,12 @@ export class ThemePickerComponent implements OnInit, OnDestroy {
 
     this.currentTheme = theme;
 
+    document.body.classList.remove('deeppurple-amber-theme', 'indigo-pink-theme', 'pink-bluegrey-theme', 'purple-green-theme');
+
+    if (!theme.isDefault) {
+      document.body.classList.add(`${theme.name}-theme`);
+    }
+
     if (theme.isDefault) {
       this.styleManager.removeStyle('theme');
     } else {

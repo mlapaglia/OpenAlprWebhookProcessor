@@ -11,9 +11,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
 import { ThemePickerComponent } from './theme-picker/theme-picker.component';
 import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-app',
@@ -21,7 +26,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['app.component.css'],
   imports: [
     MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet,
-    MatSidenavModule, MatListModule, CommonModule, ThemePickerComponent,
+    MatSidenavModule, MatListModule, MatDividerModule, CommonModule, ThemePickerComponent,
+    MatButtonModule, MatMenuModule, MatToolbarModule,
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
@@ -30,15 +36,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private readonly swUpdate = inject(SwUpdate);
   private readonly pushSubscriberService = inject(PushSubscriberService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly breakpointObserver = inject(BreakpointObserver);
 
   user: User;
-  appSettingsVisible: boolean;
-  menuButtonVisible: boolean;
   topBarVisible = false;
-  navBarVisible = false;
   isSignalrConnected: boolean;
+  isMobile = false;
+  sidenavOpened = true;
 
-  public navItems = [
+  public settingsNavItems = [
     { linkTitle: 'Cameras', icon: 'videocam', link: '/settings/cameras' },
     { linkTitle: 'OpenALPR Agent', icon: 'api', link: '/settings/agent' },
     { linkTitle: 'Alerts', icon: 'notifications_active', link: '/settings/alerts' },
@@ -63,6 +69,19 @@ export class AppComponent implements OnInit, OnDestroy {
         this.signalRService.stopConnection();
       }
     });
+
+    // Setup mobile detection
+    this.eventSubscriptions.add(
+      this.breakpointObserver.observe([Breakpoints.HandsetPortrait, Breakpoints.TabletPortrait])
+        .subscribe(result => {
+          this.isMobile = result.matches;
+          if (this.isMobile) {
+            this.sidenavOpened = false;
+          } else {
+            this.sidenavOpened = true;
+          }
+        })
+    );
 
     this.swUpdate.unrecoverable.subscribe(() => {
       this.snackBar.open('An error occurred, please reload the page.', 'Reload', { duration: 0 })
@@ -102,12 +121,14 @@ export class AppComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public settingsButtonClicked() {
-    this.navBarVisible = !this.navBarVisible;
+  public toggleSidenav() {
+    this.sidenavOpened = !this.sidenavOpened;
   }
 
-  public handleSideNavClick() {
-    this.navBarVisible = false;
+  public closeSidenavOnMobile() {
+    if (this.isMobile) {
+      this.sidenavOpened = false;
+    }
   }
 
   title = 'openalprwebhookprocessor.client';

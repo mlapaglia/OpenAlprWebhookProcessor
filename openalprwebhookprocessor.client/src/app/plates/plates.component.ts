@@ -29,6 +29,7 @@ import { PlateComponent } from './plate/plate.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -61,6 +62,7 @@ import { ActivatedRoute, Router } from '@angular/router';
     MatSelectModule,
     MatOptionModule,
     MatCheckboxModule,
+    MatTooltipModule,
     DatePipe,
   ],
 })
@@ -120,6 +122,7 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
   public filterStrictMatchEnabled = true;
   public filterIgnoredPlates: boolean;
   public filterIgnoredPlatesEnabled = true;
+  public showAdvancedFilters = false;
   public filterPlatesSeenLessThan: boolean;
   public regexSearchEnabled: boolean;
   public filterVehicleMake: string;
@@ -409,6 +412,10 @@ export class PlatesComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     });
+  }
+
+  public toggleAdvancedFilters() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 }
 

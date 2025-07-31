@@ -1,12 +1,11 @@
-import type { AfterViewInit, OnDestroy } from '@angular/core';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, type AfterViewInit, type OnDestroy } from '@angular/core';
 import type { User } from 'app/_models';
 import { AccountService } from 'app/_services';
-import type { QuickStats } from './home.service';
-import { HomeService } from './home.service';
+import { HomeService, type QuickStats } from './home.service';
 import { CommonModule } from '@angular/common';
 import type { PredictionResult } from './prediction-response';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import type { Subscription } from 'rxjs';
 import { PredictionsSectionComponent } from './predictions-section.component';
 import { QuickStatsComponent } from './quick-stats.component';
 import { ChartsComponent } from './charts.component';
@@ -23,17 +22,15 @@ import { MostSeenPlatesComponent } from './most-seen-plates.component';
   ],
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
-  @ViewChild(ChartsComponent) chartsComponent!: ChartsComponent;
+  @ViewChild(ChartsComponent) chartsComponent?: ChartsComponent;
 
   private readonly accountService = inject(AccountService);
   private readonly homeService = inject(HomeService);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private breakpointSubscription?: Subscription;
 
   user: User;
 
-
-
-  // Data
   public mostSeenCounts: { name: string, value: number }[] = [];
 
   // ML Predictions
@@ -41,7 +38,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   public upcomingPredictions: PredictionResult[] = [];
   public predictablePlates: PredictionResult[] = [];
 
-  // Quick Stats
   public quickStats: QuickStats | null = null;
 
   // Loading states
@@ -69,13 +65,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Charts cleanup is handled by ChartsComponent
+    this.breakpointSubscription?.unsubscribe();
   }
 
-
-
   private setupResponsiveLayout() {
-    this.breakpointObserver.observe([
+    this.breakpointSubscription = this.breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
       Breakpoints.Medium,
@@ -126,6 +120,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         }));
       },
       error: _ => {
+        /* nothing */
       },
     });
 
@@ -151,16 +146,15 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   private loadPredictions() {
     this.isLoadingPredictions = true;
 
-    // Get next expected plate (featured)
     this.homeService.getNextExpectedPlate().subscribe({
       next: (prediction) => {
         this.nextExpected = prediction;
       },
       error: _ => {
+        /* nothing */
       },
     });
 
-    // Get upcoming predictions (next 24 hours)
     this.homeService.getUpcomingPredictions(6, 24).subscribe({
       next: (predictions) => {
         this.upcomingPredictions = predictions;
@@ -171,12 +165,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
       },
     });
 
-    // Get most predictable plates
     this.homeService.getMostPredictablePlates(6).subscribe({
       next: (predictions) => {
         this.predictablePlates = predictions.sort((a, b) => b.confidenceScore - a.confidenceScore);
       },
       error: _ => {
+        /* nothing */
       },
     });
   }

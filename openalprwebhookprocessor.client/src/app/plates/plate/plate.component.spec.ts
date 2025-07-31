@@ -47,8 +47,9 @@ describe('PlateComponent', () => {
     });
 
     // Initialize image URLs to prevent 404s in tests
-    component.vehicleImageUrl = 'http://test.com/image.jpg';
-    component.plateImageUrl = 'http://test.com/crop.jpg';
+    // Image URLs are now handled by PlateImagesComponent
+    // component.vehicleImageUrl = 'http://test.com/image.jpg';
+    // component.plateImageUrl = 'http://test.com/crop.jpg';
     component.isVisible = false; // Prevent automatic image loading
 
     fixture.detectChanges();

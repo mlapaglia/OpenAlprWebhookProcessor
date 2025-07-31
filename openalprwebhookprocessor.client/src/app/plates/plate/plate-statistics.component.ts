@@ -12,6 +12,8 @@ import type { PlateStatisticsData } from './plateStatistics';
 @Component({
   selector: 'app-plate-statistics',
   templateUrl: './plate-statistics.component.html',
+  styleUrls: ['./plate-statistics.component.css'],
+  standalone: true,
   imports:
   [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule],
 })

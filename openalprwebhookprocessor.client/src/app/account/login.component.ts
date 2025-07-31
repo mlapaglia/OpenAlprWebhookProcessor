@@ -3,24 +3,38 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
   templateUrl: 'login.component.html',
-  imports: [ReactiveFormsModule, RouterLink, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  styleUrl: 'login.component.css',
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+  ],
 })
 export class LoginComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
-  private readonly alertService = inject(AlertService);
+  private readonly snackbarService = inject(SnackbarService);
 
   form: FormGroup;
   loading = false;
@@ -38,7 +52,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // convenience getter for easy access to form fields
   get f() {
     return this.form.controls;
   }
@@ -46,10 +59,6 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
 
-    // reset alerts on submit
-    this.alertService.clear();
-
-    // stop here if form is invalid
     if (this.form.invalid) {
       return;
     }
@@ -59,12 +68,11 @@ export class LoginComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          // get return url from query parameters or default to home page
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
           void this.router.navigateByUrl(returnUrl);
         },
         error: (error) => {
-          this.alertService.error(error);
+          this.snackbarService.create(error, SnackBarType.Error);
           this.loading = false;
         },
       });

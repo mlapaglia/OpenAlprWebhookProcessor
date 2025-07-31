@@ -1,0 +1,443 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.floating-ball {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  backdrop-filter: blur(1px);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.ball-1 {
+  width: 8px;
+  height: 8px;
+  top: 15%;
+  left: 10%;
+  animation: float1 20s ease-in-out infinite;
+}
+
+.ball-2 {
+  width: 6px;
+  height: 6px;
+  top: 25%;
+  right: 15%;
+  animation: float2 25s ease-in-out infinite;
+}
+
+.ball-3 {
+  width: 10px;
+  height: 10px;
+  top: 40%;
+  left: 5%;
+  animation: float3 18s ease-in-out infinite;
+}
+
+.ball-4 {
+  width: 4px;
+  height: 4px;
+  top: 60%;
+  right: 8%;
+  animation: float4 22s ease-in-out infinite;
+}
+
+.ball-5 {
+  width: 7px;
+  height: 7px;
+  top: 70%;
+  left: 20%;
+  animation: float5 28s ease-in-out infinite;
+}
+
+.ball-6 {
+  width: 5px;
+  height: 5px;
+  top: 80%;
+  right: 25%;
+  animation: float6 15s ease-in-out infinite;
+}
+
+.ball-7 {
+  width: 9px;
+  height: 9px;
+  top: 30%;
+  left: 50%;
+  animation: float7 32s ease-in-out infinite;
+}
+
+.ball-8 {
+  width: 3px;
+  height: 3px;
+  top: 10%;
+  right: 30%;
+  animation: float8 24s ease-in-out infinite;
+}
+
+.ball-9 {
+  width: 6px;
+  height: 6px;
+  top: 50%;
+  right: 40%;
+  animation: float9 19s ease-in-out infinite;
+}
+
+.ball-10 {
+  width: 8px;
+  height: 8px;
+  top: 85%;
+  left: 40%;
+  animation: float10 26s ease-in-out infinite;
+}
+
+.ball-11 {
+  width: 4px;
+  height: 4px;
+  top: 20%;
+  left: 75%;
+  animation: float11 21s ease-in-out infinite;
+}
+
+.ball-12 {
+  width: 7px;
+  height: 7px;
+  top: 90%;
+  right: 10%;
+  animation: float12 30s ease-in-out infinite;
+}
+
+.login-card-wrapper {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-card {
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+}
+
+.login-card mat-card-content {
+  padding: 48px 40px !important;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.login-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  font-weight: 400;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.form-fields {
+  margin-bottom: 32px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.full-width:last-child {
+  margin-bottom: 0;
+}
+
+::ng-deep .mat-mdc-form-field {
+  margin-bottom: 16px;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  border-radius: 12px !important;
+}
+
+::ng-deep .mat-mdc-form-field-outline {
+  border-radius: 12px !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline-thick {
+  border-width: 2px;
+}
+
+::ng-deep .mat-mdc-form-field input {
+  font-size: 16px;
+  padding: 16px 14px;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.login-actions {
+  margin-top: 24px;
+}
+
+.login-button {
+  height: 56px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+.login-button:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+.login-button[disabled] {
+  opacity: 0.7;
+}
+
+.button-spinner {
+  margin-right: 12px;
+  display: inline-block;
+}
+
+.register-section {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.register-text {
+  margin: 0 0 12px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.register-button {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  border-radius: 8px !important;
+  padding: 8px 24px !important;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px;
+  }
+  
+  .login-card mat-card-content {
+    padding: 32px 24px !important;
+  }
+  
+  .login-title {
+    font-size: 24px;
+  }
+  
+  .login-subtitle {
+    font-size: 14px;
+  }
+  
+  ::ng-deep .mat-mdc-form-field input {
+    font-size: 16px;
+    padding: 14px 12px;
+  }
+  
+  .login-button {
+    height: 48px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .login-container {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  }
+  
+  .login-card {
+    background-color: #1a202c !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .login-title {
+    color: #ffffff;
+  }
+  
+  .login-subtitle {
+    color: #cbd5e0;
+  }
+  
+  .register-text {
+    color: #a0aec0;
+  }
+  
+  .register-section {
+    border-top-color: #4a5568;
+  }
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  z-index: 1;
+}
+
+::ng-deep .login-button .mat-mdc-button-ripple {
+  border-radius: 12px;
+}
+
+.form-fields .mat-mdc-form-field:hover ::ng-deep .mat-mdc-form-field-outline {
+  opacity: 0.8;
+}
+
+::ng-deep .mat-mdc-form-field-error {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.login-form {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card {
+  animation: fadeInScale 0.8s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(15px, -10px); }
+  50% { transform: translate(-8px, -20px); }
+  75% { transform: translate(-20px, 8px); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(-12px, 15px); }
+  66% { transform: translate(18px, -5px); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(10px, 20px); }
+  40% { transform: translate(-15px, -8px); }
+  60% { transform: translate(8px, -18px); }
+  80% { transform: translate(-10px, 12px); }
+}
+
+@keyframes float4 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 25px); }
+}
+
+@keyframes float5 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-18px, -15px); }
+  50% { transform: translate(12px, 20px); }
+  75% { transform: translate(25px, -8px); }
+}
+
+@keyframes float6 {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(20px, -12px); }
+  70% { transform: translate(-15px, 18px); }
+}
+
+@keyframes float7 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-10px, 25px); }
+  50% { transform: translate(15px, -15px); }
+  75% { transform: translate(-25px, -10px); }
+}
+
+@keyframes float8 {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(25px, 10px); }
+  66% { transform: translate(-10px, -20px); }
+}
+
+@keyframes float9 {
+  0%, 100% { transform: translate(0, 0); }
+  40% { transform: translate(-20px, -18px); }
+  80% { transform: translate(18px, 15px); }
+}
+
+@keyframes float10 {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(12px, -25px); }
+  50% { transform: translate(-18px, 10px); }
+  75% { transform: translate(8px, 20px); }
+}
+
+@keyframes float11 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-15px, -15px); }
+}
+
+@keyframes float12 {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(20px, -10px); }
+  40% { transform: translate(-5px, 25px); }
+  60% { transform: translate(-20px, -8px); }
+  80% { transform: translate(10px, -20px); }
+}

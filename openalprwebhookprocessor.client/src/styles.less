@@ -1,4 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
+
+// If you wanted to switch to custom themes with full CSS variables support:
+// @use '@angular/material' as mat;
+// 
+// $light-theme: mat.define-theme((
+//   color: (
+//     theme-type: light,
+//     primary: mat.$indigo-palette,
+//     tertiary: mat.$pink-palette,
+//     use-system-variables: true,
+//   )
+// ));
+//
+// :root {
+//   @include mat.all-component-themes($light-theme);
+//   @include mat.system-level-colors($light-theme);
+// }
+
 a { cursor: pointer }
 
 html,body{
@@ -6,3 +24,103 @@ html,body{
 }
 
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Theme detection is now working! */
+
+/* Light themes - default styling - Force override with !important */
+.plate-content,
+.mat-mdc-card,
+mat-card,
+.mat-card,
+.filter-card,
+.notes-preview {
+  background-color: #fafafa !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* Light theme stat items - distinct from card background */
+.stat-item {
+  background-color: white !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  border-left-color: #667eea !important;
+}
+
+/* Dark themes (pink-bluegrey, purple-green) */
+body.pink-bluegrey-theme .plate-content,
+body.pink-bluegrey-theme .mat-mdc-card,
+body.pink-bluegrey-theme mat-card,
+body.pink-bluegrey-theme .mat-card,
+body.pink-bluegrey-theme .filter-card,
+body.pink-bluegrey-theme .notes-preview,
+body.purple-green-theme .plate-content,
+body.purple-green-theme .mat-mdc-card,
+body.purple-green-theme mat-card,
+body.purple-green-theme .mat-card,
+body.purple-green-theme .filter-card,
+body.purple-green-theme .notes-preview {
+  background-color: #424242 !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+/* Dark theme stat items - lighter than card background for contrast */
+body.pink-bluegrey-theme .stat-item,
+body.purple-green-theme .stat-item {
+  background-color: #555555 !important;
+  color: rgba(255, 255, 255, 0.87) !important;
+  border-left-color: #E91E63 !important; /* Use pink accent for dark themes */
+}
+
+/* Dark theme text colors */
+body.pink-bluegrey-theme .stat-label,
+body.pink-bluegrey-theme .section-title,
+body.pink-bluegrey-theme .notes-text,
+body.purple-green-theme .stat-label,
+body.purple-green-theme .section-title,
+body.purple-green-theme .notes-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body.pink-bluegrey-theme .stat-value,
+body.purple-green-theme .stat-value {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+/* Remove padding from expansion panel body so cards take full width */
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+/* Also remove any default padding from mat-expansion-panel-content */
+.mat-expansion-panel-content {
+  padding: 0 !important;
+}
+
+/* Sidebar layout - let Material themes handle colors */
+.main-sidenav {
+  /* Use Material theme classes */
+}
+
+.sidebar-header {
+  /* Use mat-toolbar styles to inherit theme colors */
+}
+
+.mobile-header {
+  /* Use mat-toolbar styles to inherit theme colors */  
+}
+
+/* Theme picker alignment - layout only, no colors */
+app-theme-picker .mat-mdc-list-item {
+  margin: 0 12px 4px !important;
+  border-radius: 8px !important;
+  height: 48px !important;
+  transition: all 0.2s ease !important;
+}
+
+app-theme-picker .mat-mdc-list-item .mat-icon {
+  margin-right: 16px !important;
+}
+
+app-theme-picker .mat-mdc-list-item span {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}

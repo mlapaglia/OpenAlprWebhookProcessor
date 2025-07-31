@@ -1,27 +1,87 @@
-<div style="display: flex; justify-content: space-around; margin: 50px;">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title i18n>Login</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <p>
-          <mat-form-field>
-            <input type="text" matInput placeholder="Username" i18n-placeholder formControlName="username">
-          </mat-form-field>
-        </p>
-        <p>
-          <mat-form-field>
-            <input type="password" matInput placeholder="Password" i18n-placeholder formControlName="password">
-          </mat-form-field>
-        </p>
-        <div class="form-group">
-          <button i18n mat-button [disabled]="loading">Login</button>
-          @if (canRegister) {
-            <button i18n mat-button color="accent" routerLink="../register">Register</button>
-          }
+<div class="login-container">
+  <div class="floating-ball ball-1"></div>
+  <div class="floating-ball ball-2"></div>
+  <div class="floating-ball ball-3"></div>
+  <div class="floating-ball ball-4"></div>
+  <div class="floating-ball ball-5"></div>
+  <div class="floating-ball ball-6"></div>
+  <div class="floating-ball ball-7"></div>
+  <div class="floating-ball ball-8"></div>
+  <div class="floating-ball ball-9"></div>
+  <div class="floating-ball ball-10"></div>
+  <div class="floating-ball ball-11"></div>
+  <div class="floating-ball ball-12"></div>
+  <div class="login-card-wrapper">
+    <mat-card class="login-card">
+      <mat-card-content>
+        <div class="login-header">
+          <h1 class="login-title" i18n>Welcome Back</h1>
+          <p class="login-subtitle" i18n>Sign in to your account</p>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+          <div class="form-fields">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Username</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                formControlName="username"
+                [class.mat-form-field-invalid]="submitted && f.username.errors"
+                autocomplete="username">
+              <mat-icon matSuffix>person</mat-icon>
+              @if (submitted && f.username.errors) {
+                <mat-error i18n>Username is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Password</mat-label>
+              <input 
+                type="password" 
+                matInput 
+                formControlName="password"
+                [class.mat-form-field-invalid]="submitted && f.password.errors"
+                autocomplete="current-password">
+              <mat-icon matSuffix>lock</mat-icon>
+              @if (submitted && f.password.errors) {
+                <mat-error i18n>Password is required</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="login-actions">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              class="login-button full-width"
+              [disabled]="loading"
+              i18n>
+              @if (loading) {
+                <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                Signing In...
+              } @else {
+                Sign In
+              }
+            </button>
+
+            @if (canRegister) {
+              <div class="register-section">
+                <p class="register-text" i18n>Don't have an account?</p>
+                <button 
+                  mat-button 
+                  color="accent"
+                  routerLink="../register"
+                  class="register-button"
+                  i18n>
+                  Create Account
+                </button>
+              </div>
+            }
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>
