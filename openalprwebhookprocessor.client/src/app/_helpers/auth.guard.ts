@@ -1,6 +1,5 @@
 ﻿import { Injectable, inject } from '@angular/core';
-import type { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { Router } from '@angular/router';
+import { type CanActivate, type ActivatedRouteSnapshot, Router, type RouterStateSnapshot } from '@angular/router';
 
 import { AccountService } from 'app/_services';
 
@@ -15,7 +14,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/account/login'], { queryParams: { returnUrl: state.url } });
+    void this.router.navigate(['/account/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
 }

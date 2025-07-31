@@ -12,17 +12,17 @@ import type { PlateSettingsConfig } from './plate-settings-table.component';
     <!-- Display Mode Actions -->
     @if(!isEditing) {
       <div class="display-actions">
-        <button 
-          mat-icon-button 
+        <button
+          mat-icon-button
           color="primary"
           (click)="onStartEdit()"
           [matTooltip]="'Edit this ' + config.entityName"
           [attr.aria-label]="'Edit ' + config.entityName + ' for ' + setting.plateNumber">
           <mat-icon i18n>edit</mat-icon>
         </button>
-        
-        <button 
-          mat-icon-button 
+
+        <button
+          mat-icon-button
           color="warn"
           (click)="onConfirmDelete()"
           [matTooltip]="'Delete this ' + config.entityName"
@@ -31,21 +31,21 @@ import type { PlateSettingsConfig } from './plate-settings-table.component';
         </button>
       </div>
     }
-    
+
     <!-- Edit Mode Actions -->
     @if(isEditing) {
       <div class="edit-actions">
-        <button 
-          mat-icon-button 
+        <button
+          mat-icon-button
           color="primary"
           (click)="onSaveEdit()"
           matTooltip="Save changes" i18n-matTooltip
           [attr.aria-label]="'Save changes for ' + setting.plateNumber">
           <mat-icon i18n>check</mat-icon>
         </button>
-        
-        <button 
-          mat-icon-button 
+
+        <button
+          mat-icon-button
           color="warn"
           (click)="onCancelEdit()"
           matTooltip="Cancel editing" i18n-matTooltip

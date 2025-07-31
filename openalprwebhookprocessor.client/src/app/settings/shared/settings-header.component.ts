@@ -16,9 +16,9 @@ import type { IPlateSetting } from './plate-setting.interface';
         {{itemCount}} {{itemCount === 1 ? (config.entityName) : (config.entityName + 's')}} configured
       </mat-card-subtitle>
       <div class="header-spacer"></div>
-      <button 
-        mat-raised-button 
-        color="primary" 
+      <button
+        mat-raised-button
+        color="primary"
         [disabled]="isSaving || itemCount === 0"
         (click)="onSaveSettings()"
         class="save-button">

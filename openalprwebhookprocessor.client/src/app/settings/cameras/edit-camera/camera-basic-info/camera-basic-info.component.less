@@ -1,0 +1,49 @@
+.camera-basic-form {
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    mat-form-field {
+      flex: 1;
+      min-width: 240px;
+    }
+    
+    .password-field {
+      flex: 2;
+      
+      .password-toggle {
+        cursor: pointer;
+        color: rgba(0, 0, 0, 0.54);
+        
+        &:hover {
+          color: rgba(0, 0, 0, 0.87);
+        }
+      }
+    }
+  }
+}
+
+mat-card {
+  margin-bottom: 24px;
+  
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+  
+  mat-card-title {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  mat-card-subtitle {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+}

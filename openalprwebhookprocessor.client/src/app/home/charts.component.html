@@ -1,0 +1,26 @@
+<div class="charts-row">
+  <mat-card class="chart-card">
+    <mat-card-header>
+      <mat-card-title i18n>Daily Activity</mat-card-title>
+      <mat-card-subtitle i18n>Plates detected per day</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container">
+        <canvas #dailyChart></canvas>
+        <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="chart-card">
+    <mat-card-header>
+      <mat-card-title i18n>Hourly Distribution</mat-card-title>
+      <mat-card-subtitle i18n>Peak detection times</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container">
+        <canvas #hourlyChart></canvas>
+        <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

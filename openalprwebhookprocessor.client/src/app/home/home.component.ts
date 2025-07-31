@@ -1,41 +1,29 @@
-import type { AfterViewInit, OnDestroy, ElementRef } from '@angular/core';
+import type { AfterViewInit, OnDestroy } from '@angular/core';
 import { Component, inject, ViewChild } from '@angular/core';
 import type { User } from 'app/_models';
 import { AccountService } from 'app/_services';
 import type { QuickStats } from './home.service';
 import { HomeService } from './home.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
 import { CommonModule } from '@angular/common';
 import type { PredictionResult } from './prediction-response';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PredictionsSectionComponent } from './predictions-section.component';
-import type { ChartConfiguration } from 'chart.js';
-import { Chart, registerables } from 'chart.js';
-
-// Register Chart.js components
-Chart.register(...registerables);
+import { QuickStatsComponent } from './quick-stats.component';
+import { ChartsComponent } from './charts.component';
+import { MostSeenPlatesComponent } from './most-seen-plates.component';
 
 @Component({
   templateUrl: 'home.component.html',
   imports: [
-    MatCardModule,
-    MatListModule,
-    MatIconModule,
-    MatGridListModule,
-    MatProgressSpinnerModule,
-    MatChipsModule,
     CommonModule,
     PredictionsSectionComponent,
+    QuickStatsComponent,
+    ChartsComponent,
+    MostSeenPlatesComponent,
   ],
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('dailyChart') dailyChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('hourlyChart') hourlyChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild(ChartsComponent) chartsComponent!: ChartsComponent;
 
   private readonly accountService = inject(AccountService);
   private readonly homeService = inject(HomeService);
@@ -43,9 +31,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
 
   user: User;
 
-  // Chart instances
-  private dailyChart: Chart | null = null;
-  private hourlyChart: Chart | null = null;
+
 
   // Data
   public mostSeenCounts: { name: string, value: number }[] = [];
@@ -76,7 +62,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.initializeCharts();
     // Defer data loading to next tick to avoid ExpressionChangedAfterItHasBeenCheckedError
     setTimeout(() => {
       this.loadAllData();
@@ -84,120 +69,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Cleanup charts
-    if (this.dailyChart) {
-      this.dailyChart.destroy();
-    }
-    if (this.hourlyChart) {
-      this.hourlyChart.destroy();
-    }
+    // Charts cleanup is handled by ChartsComponent
   }
 
-  private initializeCharts() {
-    // Initialize daily chart
-    const dailyCtx = this.dailyChartRef.nativeElement.getContext('2d');
-    if (dailyCtx) {
-      const dailyConfig: ChartConfiguration = {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: 'Daily Plates',
-              data: [],
-              backgroundColor: '#2196F3',
-              borderRadius: 4,
-              barPercentage: 0.6,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-            },
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                autoSkip: false,
-                maxRotation: 45,
-                minRotation: 45,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: 'rgba(0, 0, 0, 0.1)',
-              },
-            },
-          },
-        },
-      };
-      this.dailyChart = new Chart(dailyCtx, dailyConfig);
-    }
 
-    // Initialize hourly chart
-    const hourlyCtx = this.hourlyChartRef.nativeElement.getContext('2d');
-    if (hourlyCtx) {
-      const hourlyConfig: ChartConfiguration = {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: 'Hourly Distribution',
-              data: [],
-              backgroundColor: '#4CAF50',
-              borderRadius: 4,
-              barPercentage: 0.6,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-            },
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                autoSkip: false,
-                maxRotation: 45,
-                minRotation: 45,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              grid: {
-                color: 'rgba(0, 0, 0, 0.1)',
-              },
-            },
-          },
-        },
-      };
-      this.hourlyChart = new Chart(hourlyCtx, hourlyConfig);
-    }
-  }
 
   private setupResponsiveLayout() {
     this.breakpointObserver.observe([
@@ -233,10 +108,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         const labels = result.counts.map(x => new Date(x.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
         const data = result.counts.map(x => x.count);
 
-        if (this.dailyChart) {
-          this.dailyChart.data.labels = labels;
-          this.dailyChart.data.datasets[0].data = data;
-          this.dailyChart.update();
+        if (this.chartsComponent) {
+          this.chartsComponent.updateDailyChart(labels, data);
         }
       },
       error: _ => {
@@ -262,10 +135,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         const labels = stats.map(x => x.displayHour);
         const data = stats.map(x => x.count);
 
-        if (this.hourlyChart) {
-          this.hourlyChart.data.labels = labels;
-          this.hourlyChart.data.datasets[0].data = data;
-          this.hourlyChart.update();
+        if (this.chartsComponent) {
+          this.chartsComponent.updateHourlyChart(labels, data);
         }
         this.isLoadingCharts = false;
       },
@@ -332,10 +203,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
     const hours = ['12 AM', '3 AM', '6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'];
     const data = hours.map(() => Math.floor(Math.random() * 50) + 10);
 
-    if (this.hourlyChart) {
-      this.hourlyChart.data.labels = hours;
-      this.hourlyChart.data.datasets[0].data = data;
-      this.hourlyChart.update();
+    if (this.chartsComponent) {
+      this.chartsComponent.updateHourlyChart(hours, data);
     }
   }
 

@@ -1,0 +1,137 @@
+mat-card {
+  margin-bottom: 24px;
+  
+  mat-card-header {
+    margin-bottom: 16px;
+    
+    mat-card-title {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    mat-card-subtitle {
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+    }
+  }
+}
+
+.toggle-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  
+  .toggle-switch {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.daynight-settings {
+  .settings-section {
+    margin-bottom: 32px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0 0 16px 0;
+      color: rgba(0, 0, 0, 0.87);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      padding-bottom: 8px;
+    }
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    mat-form-field {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .url-field {
+      flex: 2;
+      min-width: 320px;
+    }
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .form-group {
+      .group-title {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 0 0 12px 0;
+        color: rgba(0, 0, 0, 0.74);
+        
+        &:before {
+          content: '';
+          display: inline-block;
+          width: 4px;
+          height: 16px;
+          background-color: #3f51b5;
+          margin-right: 8px;
+          vertical-align: middle;
+        }
+      }
+      
+      mat-form-field {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+  }
+  
+  .form-actions {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    
+    .button-group {
+      margin-bottom: 20px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .group-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0 0 12px 0;
+        color: rgba(0, 0, 0, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      button {
+        margin-right: 12px;
+        margin-bottom: 8px;
+        
+        @media (max-width: 768px) {
+          width: 100%;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}

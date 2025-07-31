@@ -1,320 +1,74 @@
 <div class="dashboard-container">
-<mat-grid-list [cols]="quickStatCols" rowHeight="120px" gutterSize="16px" class="quick-stats-grid">
-  <mat-grid-tile>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon">
-          <mat-icon i18n>today</mat-icon>
-        </div>
-        <div class="stat-content">
-          <h3 i18n>Today</h3>
-          <p class="stat-value" *ngIf="quickStats">{{ quickStats.todayCount }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
+  <!-- Quick Stats Section -->
+  <section class="stats-section">
+    <app-quick-stats 
+      [quickStats]="quickStats"
+      [isLoadingStats]="isLoadingStats"
+      [quickStatCols]="quickStatCols" />
+  </section>
 
-  <mat-grid-tile>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon">
-          <mat-icon i18n>date_range</mat-icon>
-        </div>
-        <div class="stat-content">
-          <h3 i18n>This Week</h3>
-          <p class="stat-value" *ngIf="quickStats">{{ quickStats.weekCount }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
+  <!-- Charts Section -->
+  <section class="charts-section">
+    <app-charts [isLoadingCharts]="isLoadingCharts" />
+  </section>
 
-  <mat-grid-tile>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon">
-          <mat-icon i18n>directions_car</mat-icon>
-        </div>
-        <div class="stat-content">
-          <h3 i18n>Unique Plates</h3>
-          <p class="stat-value" *ngIf="quickStats">{{ quickStats.uniquePlatesThisWeek }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
-
-  <mat-grid-tile>
-    <mat-card class="stat-card">
-      <mat-card-content>
-        <div class="stat-icon">
-          <mat-icon i18n>videocam</mat-icon>
-        </div>
-        <div class="stat-content">
-          <h3 i18n>Active Cameras</h3>
-          <p class="stat-value" *ngIf="quickStats">{{ quickStats.activeCameras }}</p>
-          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </mat-grid-tile>
-</mat-grid-list>
-<div class="content-grid">
-  <div class="charts-row">
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title i18n>Daily Activity</mat-card-title>
-        <mat-card-subtitle i18n>Plates detected per day</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="chart-container" style="position: relative; height: 300px;">
-          <canvas #dailyChart></canvas>
-          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title i18n>Hourly Distribution</mat-card-title>
-        <mat-card-subtitle i18n>Peak detection times</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="chart-container" style="position: relative; height: 300px;">
-          <canvas #hourlyChart></canvas>
-          <mat-spinner *ngIf="isLoadingCharts" class="chart-spinner" />
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-  <app-predictions-section 
-    [nextExpected]="nextExpected"
-    [upcomingPredictions]="upcomingPredictions"
-    [predictablePlates]="predictablePlates"
-    [isLoadingPredictions]="isLoadingPredictions" />
-  <mat-card class="most-seen-card">
-    <mat-card-header>
-      <mat-card-title i18n>Most Frequently Seen</mat-card-title>
-      <mat-card-subtitle i18n>Top plates by occurrence</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
-          <span matListItemTitle class="rank">#{{ i + 1 }}</span>
-          <div matListItemTitle>{{ plate.name }}</div>
-          <mat-chip i18n matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
-</div>
+  <!-- Predictions and Most Seen Section -->
+  <section class="predictions-and-insights-section">
+    <app-predictions-section 
+      [nextExpected]="nextExpected"
+      [upcomingPredictions]="upcomingPredictions"
+      [predictablePlates]="predictablePlates"
+      [isLoadingPredictions]="isLoadingPredictions" />
+    <app-most-seen-plates [mostSeenCounts]="mostSeenCounts" />
+  </section>
 </div>
 
 <style>
   .dashboard-container {
     padding: 1.5rem;
     max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .dashboard-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-    .dashboard-header h1 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: 500;
-    }
-
-  .subtitle {
-    color: rgba(0, 0, 0, 0.6);
-    margin-top: 0.5rem;
-  }
-
-  .quick-stats-grid {
-    margin-bottom: 2rem;
-  }
-
-  .stat-card {
-    display: flex;
-    align-items: center;
-  }
-
-    .stat-card mat-card-content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      width: 100%;
-    }
-
-  .stat-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    background-color: #e3f2fd;
-    border-radius: 50%;
-    color: #2196f3;
-  }
-
-  .stat-content h3 {
-    margin: 0;
-    font-size: 0.875rem;
-    color: rgba(0, 0, 0, 0.6);
-  }
-
-  .stat-value {
-    margin: 0.25rem 0 0 0;
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-
-  .content-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: 1fr;
-  }
-
-  .charts-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .chart-card {
-    height: 400px;
-  }
-
-  .chart-container {
-    position: relative;
-    height: 300px;
     width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-x: hidden;
   }
 
-  .chart-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  .charts-section {
+    margin-bottom: 1rem;
   }
 
-  .predictions-section {
+  .predictions-and-insights-section {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    margin-bottom: 1rem;
+    align-items: start;
   }
 
-  .featured-prediction-card {
-    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-    color: white;
+  /* Responsive layout improvements */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      padding: 1rem;
+      gap: 1.5rem;
+    }
   }
 
-    .featured-prediction-card mat-card-header {
-      color: white;
+  @media (max-width: 480px) {
+    .dashboard-container {
+      padding: 0.75rem;
+      gap: 1rem;
     }
 
-    .featured-prediction-card mat-card-subtitle {
-      color: rgba(255, 255, 255, 0.8);
+    .stats-section,
+    .charts-section,
+    .predictions-and-insights-section {
+      margin-bottom: 0.5rem;
     }
-
-  .featured-content {
-    text-align: center;
-    padding: 1rem 0;
-  }
-
-  .plate-number {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 1rem 0;
-    letter-spacing: 2px;
-  }
-
-  .prediction-details {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .detail-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .predictions-card {
-    max-height: 400px;
-    overflow-y: auto;
-  }
-
-  .time-badge {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    margin-right: 0.5rem;
-  }
-
-  .location {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 0.875rem;
-  }
-
-  .pattern {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 0.875rem;
-  }
-
-  .most-seen-card mat-list-item {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-  }
-
-  .most-seen-card mat-list-item:hover {
-    background-color: rgba(33, 150, 243, 0.08);
-  }
-
-  .most-seen-card mat-list-item [matListItemMeta] {
-    display: flex;
-    align-items: center;
-  }
-
-  .rank {
-    font-weight: 600;
-    color: #2196f3;
-    margin-right: 1rem;
-    transition: color 0.2s ease;
-  }
-
-  .most-seen-card mat-list-item:hover .rank {
-    color: #2196f3;
-  }
-
-  .count-chip {
-    background-color: #e3f2fd !important;
-    color: #1976d2 !important;
-    font-size: 0.75rem;
-    align-self: center !important;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
-    .charts-row {
+    
+    .predictions-and-insights-section {
       grid-template-columns: 1fr;
-    }
-
-    .predictions-section {
-      grid-template-columns: 1fr;
-    }
-
-    .dashboard-header h1 {
-      font-size: 1.5rem;
     }
   }
 </style>

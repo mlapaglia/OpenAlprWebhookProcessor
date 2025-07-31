@@ -10,6 +10,7 @@ import type { PredictionResult } from './prediction-response';
 @Component({
   selector: 'app-predictions-section',
   templateUrl: './predictions-section.component.html',
+  styleUrls: ['./predictions-section.component.css'],
   imports: [
     CommonModule,
     MatCardModule,

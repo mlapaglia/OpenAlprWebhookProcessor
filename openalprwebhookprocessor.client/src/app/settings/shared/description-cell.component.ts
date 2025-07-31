@@ -14,13 +14,13 @@ import type { IPlateSetting } from './plate-setting.interface';
         {{setting.description || 'No description provided'}}
       </span>
     }
-    
+
     <!-- Edit Mode -->
     @if(isEditing && editingSetting) {
       <mat-form-field appearance="outline" i18n-appearance class="description-edit-field">
         <mat-label i18n>Description</mat-label>
-        <textarea 
-          matInput 
+        <textarea
+          matInput
           [(ngModel)]="editingSetting.description"
           placeholder="Add description..." i18n-placeholder
           rows="2"

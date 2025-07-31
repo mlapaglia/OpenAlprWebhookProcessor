@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,20 +22,20 @@ import type { IPlateSetting } from './plate-setting.interface';
         </mat-chip-set>
       </div>
     }
-    
+
     <!-- Edit Mode -->
     @if(isEditing && editingSetting) {
       <div class="plate-edit">
         <mat-form-field appearance="outline" i18n-appearance class="plate-edit-field">
           <mat-label i18n>Plate Number</mat-label>
-          <input 
-            matInput 
+          <input
+            matInput
             [(ngModel)]="editingSetting.plateNumber"
             placeholder="Enter plate number" i18n-placeholder
             maxlength="20"
             autocomplete="off">
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" i18n-appearance class="match-edit-field">
           <mat-label i18n>Match Type</mat-label>
           <mat-select [(ngModel)]="editingSetting.strictMatch">

@@ -72,7 +72,7 @@ export class ConfigurationFieldComponent {
   }
 
   public get formControl() {
-    return this.fieldConfig ? this.configForm.get(this.fieldConfig.controlName) : null;
+    return this.configForm.get(this.fieldConfig.controlName);
   }
 
   public get hasError(): boolean {
@@ -82,7 +82,7 @@ export class ConfigurationFieldComponent {
   public get errorMessage(): string {
     const control = this.formControl;
     if (control?.errors && control.touched) {
-      const fieldName = this.fieldConfig?.controlName || this.fieldKey;
+      const fieldName = this.fieldConfig.controlName || this.fieldKey;
       if (control.errors['required']) return `${fieldName} is required`;
       if (control.errors['min']) return `${fieldName} must be at least ${control.errors['min'].min}`;
       if (control.errors['max']) return `${fieldName} must be at most ${control.errors['max'].max}`;

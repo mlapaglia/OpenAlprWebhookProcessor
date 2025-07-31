@@ -1,0 +1,61 @@
+<mat-grid-list [cols]="quickStatCols" rowHeight="120px" gutterSize="16px" class="quick-stats-grid">
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>today</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Today</h3>
+          <p class="stat-value" *ngIf="quickStats">{{ quickStats.todayCount }}</p>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>date_range</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>This Week</h3>
+          <p class="stat-value" *ngIf="quickStats">{{ quickStats.weekCount }}</p>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>directions_car</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Unique Plates</h3>
+          <p class="stat-value" *ngIf="quickStats">{{ quickStats.uniquePlatesThisWeek }}</p>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>videocam</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Active Cameras</h3>
+          <p class="stat-value" *ngIf="quickStats">{{ quickStats.activeCameras }}</p>
+          <mat-spinner *ngIf="isLoadingStats" diameter="30" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+</mat-grid-list>

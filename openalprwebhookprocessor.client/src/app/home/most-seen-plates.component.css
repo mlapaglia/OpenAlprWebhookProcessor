@@ -1,0 +1,86 @@
+.most-seen-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+  max-height: 400px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.most-seen-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.most-seen-card mat-card-header {
+  padding-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.most-seen-card mat-card-content {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.most-seen-card mat-list-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  padding: 1rem;
+  min-height: 64px;
+}
+
+.most-seen-card mat-list-item:hover {
+  background-color: rgba(33, 150, 243, 0.08);
+}
+
+.most-seen-card mat-list-item:last-child {
+  border-bottom: none;
+}
+
+.most-seen-card mat-list-item [matListItemMeta] {
+  display: flex;
+  align-items: center;
+}
+
+.rank {
+  font-weight: 600;
+  color: #2196f3;
+  margin-right: 1rem;
+  transition: color 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.most-seen-card mat-list-item:hover .rank {
+  color: #1976d2;
+}
+
+.count-chip {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+  font-size: 0.75rem;
+  align-self: center !important;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .most-seen-card {
+    max-height: 350px;
+  }
+  
+  .most-seen-card mat-card-header {
+    padding-bottom: 0.75rem;
+  }
+  
+  .most-seen-card mat-list-item {
+    padding: 0.75rem;
+    min-height: 56px;
+  }
+}

@@ -5,14 +5,10 @@
       <mat-card-title>{{camera.ipAddress}}</mat-card-title>
       <mat-card-subtitle>{{camera.manufacturer}} {{camera.modelNumber}}</mat-card-subtitle>
     </mat-card-header>
-    @if (camera.sampleImageUrl) {
+    @if (imageDataUrl && !isLoadingImage && !isLoadingFailed) {
       <img
         mat-card-image
         class="sample-image"
-        [src]="camera.sampleImageUrl"
-        [hidden]="isLoadingImage || isLoadingFailed"
-        (load)="imageLoaded()"
-        (error)="imageFailedToLoad()"
         alt="last capture from camera" i18n-alt>
     }
     <mat-card-content>
@@ -24,7 +20,7 @@
             mode="indeterminate" i18n-mode />
         </div>
       }
-      @if (!camera.sampleImageUrl || isLoadingFailed) {
+      @if (!camera.sampleImageUrl || (isLoadingFailed && !isLoadingImage)) {
         <div
           style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height:200px;">
           <mat-icon i18n

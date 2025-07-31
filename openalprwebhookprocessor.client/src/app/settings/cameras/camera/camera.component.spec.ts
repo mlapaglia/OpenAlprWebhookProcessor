@@ -1,5 +1,6 @@
-import type { ComponentFixture } from '@angular/core/testing';
-import { TestBed } from '@angular/core/testing';
+import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { CameraComponent } from './camera.component';
 import { Camera } from '../camera';
@@ -11,6 +12,7 @@ describe('CameraComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CameraComponent],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
     }).compileComponents();
   });
 

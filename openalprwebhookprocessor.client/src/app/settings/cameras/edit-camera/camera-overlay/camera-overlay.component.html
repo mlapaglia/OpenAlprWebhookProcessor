@@ -1,0 +1,50 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <span i18n>Overlays</span>
+    </mat-card-title>
+    <mat-card-subtitle i18n>Configure camera overlay text updates</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="overlayForm">
+      <div class="toggle-section">
+        <mat-slide-toggle 
+          class="toggle-switch" 
+          formControlName="updateOverlayEnabled"
+          color="primary">
+          <span i18n>Enable Overlay Updates</span>
+        </mat-slide-toggle>
+      </div>
+      @if (overlayForm.get('updateOverlayEnabled')?.value) {
+        <div [@inOutAnimation] class="overlay-settings">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="url-field">
+              <mat-label i18n>Camera Overlay Text URL</mat-label>
+              <input matInput formControlName="updateOverlayTextUrl" 
+                     placeholder="https://camera-ip/overlay-endpoint" 
+                     i18n-placeholder>
+              <mat-error *ngIf="overlayForm.get('updateOverlayTextUrl')?.hasError('required')" i18n>
+                Overlay URL is required
+              </mat-error>
+              <mat-error *ngIf="overlayForm.get('updateOverlayTextUrl')?.hasError('pattern')" i18n>
+                Please enter a valid URL starting with http:// or https://
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button 
+                    color="accent" 
+                    type="button" 
+                    (click)="onTestOverlay()"
+                    [disabled]="!overlayForm.get('updateOverlayTextUrl')?.value" 
+                    i18n>
+              Trigger Overlay Test
+            </button>
+          </div>
+        </div>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>

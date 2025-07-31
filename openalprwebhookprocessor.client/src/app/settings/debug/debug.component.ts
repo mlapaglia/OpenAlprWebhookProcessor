@@ -1,5 +1,4 @@
-import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnInit } from '@angular/core';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { SettingsService } from '../settings.service';

@@ -76,8 +76,8 @@ export class MlConfigTableComponent implements OnChanges {
           type: 'number',
           step: 0.001,
           min: 0.001,
-          max: 1.0
-        }
+          max: 1.0,
+        },
       },
       {
         key: 'Minimum Training Data',
@@ -87,8 +87,8 @@ export class MlConfigTableComponent implements OnChanges {
           key: 'Minimum Training Data',
           type: 'number',
           min: 10,
-          max: 1000000
-        }
+          max: 1000000,
+        },
       },
       {
         key: 'Training Batch Size',
@@ -98,8 +98,8 @@ export class MlConfigTableComponent implements OnChanges {
           key: 'Training Batch Size',
           type: 'number',
           min: 1000,
-          max: 1000000
-        }
+          max: 1000000,
+        },
       },
       {
         key: 'Training Interval',
@@ -108,8 +108,8 @@ export class MlConfigTableComponent implements OnChanges {
         fieldConfig: {
           key: 'Training Interval',
           type: 'text',
-          placeholder: '06:00:00'
-        }
+          placeholder: '06:00:00',
+        },
       },
       {
         key: 'Model File Name',
@@ -117,8 +117,8 @@ export class MlConfigTableComponent implements OnChanges {
         fieldName: 'modelFileName',
         fieldConfig: {
           key: 'Model File Name',
-          type: 'text'
-        }
+          type: 'text',
+        },
       },
       {
         key: 'Config Folder',
@@ -126,8 +126,8 @@ export class MlConfigTableComponent implements OnChanges {
         fieldName: 'configFolderName',
         fieldConfig: {
           key: 'Config Folder',
-          type: 'text'
-        }
+          type: 'text',
+        },
       },
       {
         key: 'ML Models Folder',
@@ -135,8 +135,8 @@ export class MlConfigTableComponent implements OnChanges {
         fieldName: 'mlModelsFolderName',
         fieldConfig: {
           key: 'ML Models Folder',
-          type: 'text'
-        }
+          type: 'text',
+        },
       },
     ];
 

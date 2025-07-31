@@ -27,7 +27,7 @@ import { MlConfigActionsComponent } from './ml-config-actions.component';
         </mat-card-content>
 
         <app-ml-config-actions
-          [isEditingConfiguration]="isEditingConfiguration"   
+          [isEditingConfiguration]="isEditingConfiguration"
           [isSavingConfiguration]="isSavingConfiguration"
           [isLoadingConfiguration]="isLoadingConfiguration"
           [configForm]="configForm"

@@ -1,11 +1,8 @@
-import type { ComponentFixture } from '@angular/core/testing';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { type ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError, Subject } from 'rxjs';
-
+import { of, throwError } from 'rxjs';
 import { MachineLearningComponent } from './machine-learning.component';
-import type { ModelInfo, TrainingStatus, MachineLearningConfigDto } from './machine-learning.service';
-import { MachineLearningService } from './machine-learning.service';
+import { MachineLearningService, type ModelInfo, type TrainingStatus, type MachineLearningConfigDto } from './machine-learning.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 

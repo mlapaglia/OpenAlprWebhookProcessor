@@ -1,10 +1,11 @@
-import { type ElementRef, type OnInit, Component, Input, ViewChild, inject } from '@angular/core';
+import { type ElementRef, type OnInit, type OnDestroy, Component, Input, ViewChild, inject } from '@angular/core';
 import { CameraMaskService } from './camera-mask.service';
 import { CameraMask } from './camera-mask';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import type { Camera } from '../../camera';
 import type { Coordinate } from './coordinate';
+import { Subscription } from 'rxjs';
 import { MatPaginatorModule, type PageEvent } from '@angular/material/paginator';
 import { type MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,14 +17,14 @@ import { MatCardModule } from '@angular/material/card';
   styleUrls: ['./camera-mask.component.css'],
   imports: [MatCardModule, MatButtonToggleModule, MatButtonModule, MatPaginatorModule],
 })
-export class CameraMaskComponent implements OnInit {
+export class CameraMaskComponent implements OnInit, OnDestroy {
   private readonly snackbarService = inject(SnackbarService);
   private readonly cameraMaskService = inject(CameraMaskService);
+  private readonly subscriptions = new Subscription();
 
   @Input() camera: Camera;
 
   @ViewChild('canvas', { static: true }) canvas: ElementRef<HTMLCanvasElement>;
-  @ViewChild('sampleCanvas', { static: true }) sampleCanvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('savingCanvas', { static: true }) savingCanvas: ElementRef<HTMLCanvasElement>;
   @ViewChild('measureDiv', { static: true }) measureDiv: ElementRef<HTMLDivElement>;
 
@@ -56,6 +57,10 @@ export class CameraMaskComponent implements OnInit {
     this.addEventHandlers();
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   public handlePageEvent(pageEvent: PageEvent) {
     this.loadImageIntoCanvas(this.samplePlates[pageEvent.pageIndex]);
   }
@@ -71,66 +76,70 @@ export class CameraMaskComponent implements OnInit {
 
   private loadImageIntoCanvas(url: string) {
     this.isLoadingSnapshot = true;
-    this.cameraMaskService.getPlateCapture(url).subscribe((image: Blob) => {
-      const reader = new FileReader();
+    this.subscriptions.add(
+      this.cameraMaskService.getPlateCapture(url).subscribe((image: Blob) => {
+        const reader = new FileReader();
 
-      reader.onload = () => {
-        this.image = new Image();
+        reader.onload = () => {
+          this.image = new Image();
 
-        this.image.onload = () => {
-          this.imageInValidState = true;
-          this.scaleFactor = this.image.width / this.targetWidth;
+          this.image.onload = () => {
+            this.imageInValidState = true;
+            this.scaleFactor = this.image.width / this.targetWidth;
 
-          this.measureDiv.nativeElement.appendChild(this.image);
-          const wrh = this.image.width / this.image.height;
-          this.imageWidth = this.canvas.nativeElement.width;
-          this.imageHeight = this.imageWidth / wrh;
+            this.measureDiv.nativeElement.appendChild(this.image);
+            const wrh = this.image.width / this.image.height;
+            this.imageWidth = this.canvas.nativeElement.width;
+            this.imageHeight = this.imageWidth / wrh;
 
-          if (this.imageHeight > this.canvas.nativeElement.height) {
-            this.imageHeight = this.canvas.nativeElement.height;
-            this.imageWidth = this.imageHeight * wrh;
-          }
+            if (this.imageHeight > this.canvas.nativeElement.height) {
+              this.imageHeight = this.canvas.nativeElement.height;
+              this.imageWidth = this.imageHeight * wrh;
+            }
 
-          if (this.canvas.nativeElement.width > this.imageWidth) {
-            this.canvas.nativeElement.width = this.imageWidth;
-          }
+            if (this.canvas.nativeElement.width > this.imageWidth) {
+              this.canvas.nativeElement.width = this.imageWidth;
+            }
 
-          if (this.canvas.nativeElement.height > this.imageHeight) {
-            this.canvas.nativeElement.height = this.imageHeight;
-          }
+            if (this.canvas.nativeElement.height > this.imageHeight) {
+              this.canvas.nativeElement.height = this.imageHeight;
+            }
 
-          this.measureDiv.nativeElement.removeChild(this.image);
-          this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
+            this.measureDiv.nativeElement.removeChild(this.image);
+            this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
 
-          this.loadMaskCoordinates();
+            this.loadMaskCoordinates();
+          };
+
+          this.image.onerror = () => {
+            this.imageInValidState = false;
+          };
+
+          this.image.src = reader.result as string;
         };
 
-        this.image.onerror = () => {
-          this.imageInValidState = false;
-        };
-
-        this.image.src = reader.result as string;
-      };
-
-      reader.readAsDataURL(image);
-    });
+        reader.readAsDataURL(image);
+      }),
+    );
   }
 
   private loadMaskCoordinates() {
     this.currentPos = { x: 0, y: 0 };
 
     if (this.coordinates.length === 0) {
-      this.cameraMaskService.getCameraMaskCoordinates(this.camera.id).subscribe((coordinates) => {
-        coordinates.forEach((coordinate) => {
-          coordinate.x /= this.scaleFactor;
-          coordinate.y /= this.scaleFactor;
-        });
+      this.subscriptions.add(
+        this.cameraMaskService.getCameraMaskCoordinates(this.camera.id).subscribe((coordinates) => {
+          coordinates.forEach((coordinate) => {
+            coordinate.x /= this.scaleFactor;
+            coordinate.y /= this.scaleFactor;
+          });
 
-        this.coordinates = coordinates;
-        this.closePolygon();
-        this.draw();
-        this.isLoadingSnapshot = false;
-      });
+          this.coordinates = coordinates;
+          this.closePolygon();
+          this.draw();
+          this.isLoadingSnapshot = false;
+        }),
+      );
     } else {
       this.closePolygon();
       this.draw();
@@ -169,12 +178,14 @@ export class CameraMaskComponent implements OnInit {
 
     cameraMask.imageMask = this.savingCanvas.nativeElement.toDataURL('image/png');
 
-    this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {
-      this.snackbarService.create('Camera mask saved.', SnackBarType.Saved);
-    },
-    () => {
-      this.snackbarService.create('Camera mask failed.', SnackBarType.Error);
-    });
+    this.subscriptions.add(
+      this.cameraMaskService.upsertImageMask(cameraMask).subscribe(() => {
+        this.snackbarService.create('Camera mask saved.', SnackBarType.Saved);
+      },
+      () => {
+        this.snackbarService.create('Camera mask failed.', SnackBarType.Error);
+      }),
+    );
   }
 
   public cancelMask() {
@@ -231,8 +242,6 @@ export class CameraMaskComponent implements OnInit {
         this.ctx.arc(point.x, point.y, tempDotRadius, 0, Math.PI * 2);
         this.ctx.fill();
       });
-
-      this.drawSampleMaskImage();
     }
   }
 
@@ -279,26 +288,7 @@ export class CameraMaskComponent implements OnInit {
     if (this.coordinates.length > 2) {
       this.isClosed = true;
       this.draw();
-      this.drawSampleMaskImage();
     }
-  }
-
-  private drawSampleMaskImage() {
-    this.sampleCtx.drawImage(this.image, this.imageWidth / 4, this.imageHeight / 4);
-    this.sampleCtx.fillStyle = 'white';
-    this.sampleCtx.fillRect(0, 0, this.sampleCanvas.nativeElement.width, this.sampleCanvas.nativeElement.height);
-
-    this.sampleCtx.beginPath();
-    this.sampleCtx.moveTo(this.coordinates[0].x * this.scaleFactor / 4, this.coordinates[0].y * this.scaleFactor / 4);
-
-    for (let i = 1; i < this.coordinates.length; i++) {
-      this.sampleCtx.lineTo(this.coordinates[i].x * this.scaleFactor / 4, this.coordinates[i].y * this.scaleFactor / 4);
-    }
-
-    this.sampleCtx.closePath();
-    this.sampleCtx.globalCompositeOperation = 'source-over';
-    this.sampleCtx.fillStyle = 'black';
-    this.sampleCtx.fill();
   }
 
   public resetCanvas() {
@@ -352,17 +342,16 @@ export class CameraMaskComponent implements OnInit {
   }
 
   private getSamplePlates() {
-    this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
-      this.samplePlates = plates;
-      this.loadImageIntoCanvas(this.camera.sampleImageUrl);
-    });
+    this.subscriptions.add(
+      this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
+        this.samplePlates = plates;
+        this.loadImageIntoCanvas(this.camera.sampleImageUrl);
+      }),
+    );
   }
 
   private prepareCanvases() {
     this.ctx = this.canvas.nativeElement.getContext('2d') ?? (() => {
-      throw new Error('ctx is null');
-    })();
-    this.sampleCtx = this.sampleCanvas.nativeElement.getContext('2d') ?? (() => {
       throw new Error('ctx is null');
     })();
     this.savingCtx = this.savingCanvas.nativeElement.getContext('2d') ?? (() => {

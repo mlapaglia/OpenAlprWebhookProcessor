@@ -1,0 +1,15 @@
+<mat-card class="most-seen-card">
+  <mat-card-header>
+    <mat-card-title i18n>Most Frequently Seen</mat-card-title>
+    <mat-card-subtitle i18n>Top plates by occurrence</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let plate of mostSeenCounts; let i = index">
+        <span matListItemTitle class="rank">#{{ i + 1 }}</span>
+        <div matListItemTitle>{{ plate.name }}</div>
+        <mat-chip i18n matListItemMeta class="count-chip">{{ plate.value }} times</mat-chip>
+      </mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>
