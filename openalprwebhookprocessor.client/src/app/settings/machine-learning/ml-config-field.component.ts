@@ -18,12 +18,12 @@ export interface FieldConfig {
   template: `
     <mat-form-field appearance="outline" i18n-appearance style="width: 100%;" subscriptSizing="dynamic" i18n-subscriptSizing>
       <input matInput
-             [type]="fieldConfig.type"
-             [formControl]="control"
-             [placeholder]="fieldConfig.placeholder || ''"
-             [min]="fieldConfig.min"
-             [max]="fieldConfig.max"
-             [step]="fieldConfig.step">
+        [type]="fieldConfig.type"
+        [formControl]="control"
+        [placeholder]="fieldConfig.placeholder || ''"
+        [min]="fieldConfig.min"
+        [max]="fieldConfig.max"
+        [step]="fieldConfig.step">
       @if (errorMessage) {
         <mat-error>{{ errorMessage }}</mat-error>
       }
@@ -42,7 +42,7 @@ export class MlConfigFieldComponent {
   @Input() control!: FormControl;
 
   public get errorMessage(): string {
-    if (this.control?.errors && this.control.touched) {
+    if (this.control.errors && this.control.touched) {
       if (this.control.errors['required']) return `${this.fieldConfig.key} is required`;
       if (this.control.errors['min']) return `${this.fieldConfig.key} must be at least ${this.control.errors['min'].min}`;
       if (this.control.errors['max']) return `${this.fieldConfig.key} must be at most ${this.control.errors['max'].max}`;

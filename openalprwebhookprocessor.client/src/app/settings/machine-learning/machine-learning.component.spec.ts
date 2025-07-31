@@ -91,7 +91,7 @@ describe('MachineLearningComponent', () => {
     mockMlService.getTrainingStatus.and.returnValue(of(mockTrainingStatus));
     mockMlService.getConfiguration.and.returnValue(of(mockConfiguration));
     mockMlService.triggerTraining.and.returnValue(of({ message: 'Training triggered', timestamp: new Date().toISOString() }));
-    mockMlService.saveConfiguration.and.returnValue(of({}));
+    mockMlService.saveConfiguration.and.returnValue(of());
   });
 
   afterEach(() => {

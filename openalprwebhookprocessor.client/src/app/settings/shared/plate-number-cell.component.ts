@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,10 +10,9 @@ import type { IPlateSetting } from './plate-setting.interface';
 
 @Component({
   selector: 'app-plate-number-cell',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <!-- Display Mode -->
-    @if (!isEditing) {
+    @if(!isEditing) {
       <div class="plate-display">
         <span class="plate-number">{{setting.plateNumber}}</span>
         <mat-chip-set>
@@ -23,24 +22,23 @@ import type { IPlateSetting } from './plate-setting.interface';
         </mat-chip-set>
       </div>
     }
-
+    
     <!-- Edit Mode -->
-    @if (isEditing && editingSetting) {
+    @if(isEditing && editingSetting) {
       <div class="plate-edit">
         <mat-form-field appearance="outline" i18n-appearance class="plate-edit-field">
           <mat-label i18n>Plate Number</mat-label>
-          <input
-            matInput
+          <input 
+            matInput 
             [(ngModel)]="editingSetting.plateNumber"
-            (ngModelChange)="onEditingChange()"
             placeholder="Enter plate number" i18n-placeholder
             maxlength="20"
             autocomplete="off">
         </mat-form-field>
-
+        
         <mat-form-field appearance="outline" i18n-appearance class="match-edit-field">
           <mat-label i18n>Match Type</mat-label>
-          <mat-select [(ngModel)]="editingSetting.strictMatch" (ngModelChange)="onEditingChange()">
+          <mat-select [(ngModel)]="editingSetting.strictMatch">
             <mat-option i18n [value]="true">Strict Match</mat-option>
             <mat-option i18n [value]="false">Lenient Match</mat-option>
           </mat-select>
@@ -48,7 +46,6 @@ import type { IPlateSetting } from './plate-setting.interface';
       </div>
     }
   `,
-  styleUrls: ['./plate-settings-table.component.less'],
   imports: [
     CommonModule,
     FormsModule,
@@ -61,22 +58,6 @@ import type { IPlateSetting } from './plate-setting.interface';
 })
 export class PlateNumberCellComponent<T extends IPlateSetting> {
   @Input() setting!: T;
-  @Input() editingId: string | null = null;
+  @Input() isEditing = false;
   @Input() editingSetting: T | null = null;
-  @Output() editingSettingChange = new EventEmitter<T>();
-
-  public get isEditing(): boolean {
-    const id = this.setting.id || this.generateTempId(this.setting);
-    return this.editingId === id;
-  }
-
-  public onEditingChange(): void {
-    if (this.editingSetting) {
-      this.editingSettingChange.emit(this.editingSetting);
-    }
-  }
-
-  private generateTempId(setting: T): string {
-    return `temp_${setting.plateNumber}_${setting.strictMatch}_${Date.now()}`;
-  }
 }

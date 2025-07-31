@@ -85,7 +85,7 @@ export class MachineLearningService {
     return this.http.get<MachineLearningConfigDto>('/api/machinelearning/configuration');
   }
 
-  saveConfiguration(config: MachineLearningConfigDto): Observable<any> {
-    return this.http.put('/api/machinelearning/configuration', config);
+  saveConfiguration(config: MachineLearningConfigDto): Observable<void> {
+    return this.http.put<void>('/api/machinelearning/configuration', config);
   }
 }

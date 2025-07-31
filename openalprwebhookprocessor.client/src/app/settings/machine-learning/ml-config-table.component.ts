@@ -1,6 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy, type OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, type FormGroup, type FormControl } from '@angular/forms';
+import { ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import type { MachineLearningConfigDto } from './machine-learning.service';
 import { MlConfigFieldComponent, type FieldConfig } from './ml-config-field.component';
@@ -8,8 +8,8 @@ import { MlConfigFieldComponent, type FieldConfig } from './ml-config-field.comp
 interface ConfigData {
   key: string;
   value: string;
-  fieldConfig?: FieldConfig;
-  formControlName?: string;
+  fieldName: string;
+  fieldConfig: FieldConfig;
 }
 
 @Component({
@@ -24,11 +24,11 @@ interface ConfigData {
         <ng-container matColumnDef="value" i18n-matColumnDef>
           <th i18n mat-header-cell *matHeaderCellDef>Value</th>
           <td mat-cell *matCellDef="let element" style="padding: 8px;">
-            @if (isEditingConfiguration && element.fieldConfig && element.formControlName) {
+            @if (isEditingConfiguration) {
               <div style="width: 100%;">
                 <app-ml-config-field
                   [fieldConfig]="element.fieldConfig"
-                  [control]="getFormControl(element.formControlName)" />
+                  [control]="configForm.get(element.fieldName)!" />
               </div>
             } @else {
               {{ element.value }}
@@ -60,10 +60,6 @@ export class MlConfigTableComponent implements OnChanges {
     this.updateConfigTable();
   }
 
-  public getFormControl(controlName: string): FormControl {
-    return this.configForm.get(controlName) as FormControl;
-  }
-
   private updateConfigTable(): void {
     if (!this.configuration) {
       this.configData = new MatTableDataSource<ConfigData>([]);
@@ -74,44 +70,73 @@ export class MlConfigTableComponent implements OnChanges {
       {
         key: 'Minimum Model Quality (R²)',
         value: this.configuration.minimumModelQuality.toString(),
-        fieldConfig: { key: 'Minimum Model Quality (R²)', type: 'number', step: 0.001, min: 0.001, max: 1.0 },
-        formControlName: 'minimumModelQuality',
+        fieldName: 'minimumModelQuality',
+        fieldConfig: {
+          key: 'Minimum Model Quality (R²)',
+          type: 'number',
+          step: 0.001,
+          min: 0.001,
+          max: 1.0
+        }
       },
       {
         key: 'Minimum Training Data',
         value: this.configuration.minimumTrainingData.toLocaleString(),
-        fieldConfig: { key: 'Minimum Training Data', type: 'number', min: 10, max: 1000000 },
-        formControlName: 'minimumTrainingData',
+        fieldName: 'minimumTrainingData',
+        fieldConfig: {
+          key: 'Minimum Training Data',
+          type: 'number',
+          min: 10,
+          max: 1000000
+        }
       },
       {
         key: 'Training Batch Size',
         value: this.configuration.trainingBatchSize.toLocaleString(),
-        fieldConfig: { key: 'Training Batch Size', type: 'number', min: 1000, max: 1000000 },
-        formControlName: 'trainingBatchSize',
+        fieldName: 'trainingBatchSize',
+        fieldConfig: {
+          key: 'Training Batch Size',
+          type: 'number',
+          min: 1000,
+          max: 1000000
+        }
       },
       {
         key: 'Training Interval',
         value: this.formatTrainingInterval(this.configuration.trainingInterval),
-        fieldConfig: { key: 'Training Interval', type: 'text', placeholder: '06:00:00' },
-        formControlName: 'trainingInterval',
+        fieldName: 'trainingInterval',
+        fieldConfig: {
+          key: 'Training Interval',
+          type: 'text',
+          placeholder: '06:00:00'
+        }
       },
       {
         key: 'Model File Name',
         value: this.configuration.modelFileName,
-        fieldConfig: { key: 'Model File Name', type: 'text' },
-        formControlName: 'modelFileName',
+        fieldName: 'modelFileName',
+        fieldConfig: {
+          key: 'Model File Name',
+          type: 'text'
+        }
       },
       {
         key: 'Config Folder',
         value: this.configuration.configFolderName,
-        fieldConfig: { key: 'Config Folder', type: 'text' },
-        formControlName: 'configFolderName',
+        fieldName: 'configFolderName',
+        fieldConfig: {
+          key: 'Config Folder',
+          type: 'text'
+        }
       },
       {
         key: 'ML Models Folder',
         value: this.configuration.mlModelsFolderName,
-        fieldConfig: { key: 'ML Models Folder', type: 'text' },
-        formControlName: 'mlModelsFolderName',
+        fieldName: 'mlModelsFolderName',
+        fieldConfig: {
+          key: 'ML Models Folder',
+          type: 'text'
+        }
       },
     ];
 

@@ -21,7 +21,7 @@ import type { MachineLearningConfigDto } from './machine-learning.service';
           Current ML training parameters
         }
         @if (configuration?.lastUpdated) {
-          <div i18n style="margin-top: 8px; font-size: 12px; color: #666;">
+          <div style="margin-top: 8px; font-size: 12px; color: #666;">
             Last updated: {{ configuration?.lastUpdated | date:'medium' }}
             @if (configuration?.updatedBy) {
               by {{ configuration?.updatedBy }}

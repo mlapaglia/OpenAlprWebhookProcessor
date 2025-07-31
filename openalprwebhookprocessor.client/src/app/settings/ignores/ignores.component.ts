@@ -1,6 +1,5 @@
 import { Component, inject, type OnInit, type OnDestroy } from '@angular/core';
-import type { FormGroup } from '@angular/forms';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { type FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -102,7 +101,7 @@ export class IgnoresComponent implements OnInit, OnDestroy {
     const formValue = this.quickAddForm.value;
     const newIgnore = new Ignore({
       plateNumber: formValue.plateNumber.trim().toUpperCase(),
-      description: formValue.description?.trim() || '',
+      description: formValue.description?.trim() ?? '',
       strictMatch: formValue.strictMatch,
     });
 
@@ -130,7 +129,7 @@ export class IgnoresComponent implements OnInit, OnDestroy {
     const updatedIgnore = new Ignore({
       ...this.editingIgnore,
       plateNumber: formValue.plateNumber.trim().toUpperCase(),
-      description: formValue.description?.trim() || '',
+      description: formValue.description?.trim() ?? '',
       strictMatch: formValue.strictMatch,
     });
 

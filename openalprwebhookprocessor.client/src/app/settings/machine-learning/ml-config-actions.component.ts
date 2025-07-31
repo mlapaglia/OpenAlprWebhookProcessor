@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import type { FormGroup } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import type { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-ml-config-actions',
@@ -32,17 +32,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   `,
   imports: [
     CommonModule,
-    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatCardModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MlConfigActionsComponent {
   @Input() isEditingConfiguration = false;
-  @Input() isLoadingConfiguration = false;
   @Input() isSavingConfiguration = false;
+  @Input() isLoadingConfiguration = false;
   @Input() configForm!: FormGroup;
 
   @Output() editConfiguration = new EventEmitter<void>();

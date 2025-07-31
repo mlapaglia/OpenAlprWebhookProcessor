@@ -1,6 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
+import { Component, inject, type OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
@@ -9,7 +8,6 @@ import { EditCameraService } from './edit-camera.service';
 import { ZoomFocus } from './zoomfocus';
 import { CameraMaskComponent } from './camera-mask/camera-mask.component';
 import { MatButtonModule } from '@angular/material/button';
-
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -34,7 +32,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
       ]),
     ]),
   ],
-  imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CameraMaskComponent],
+  imports: [
+    MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule,
+    FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule,
+    MatButtonModule, CameraMaskComponent,
+  ],
 })
 export class EditCameraComponent implements OnInit {
   dialogRef = inject<MatDialogRef<EditCameraComponent>>(MatDialogRef);

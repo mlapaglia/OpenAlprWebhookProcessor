@@ -1,8 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import type { OnInit } from '@angular/core';
-import { Component, inject } from '@angular/core';
-import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Component, inject, type OnInit } from '@angular/core';
+import { type MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import type { Enricher } from './enricher';
@@ -32,7 +30,10 @@ import { MatCardModule } from '@angular/material/card';
       ]),
     ]),
   ],
-  imports: [MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule, MatRadioModule, MatButtonModule],
+  imports: [
+    MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule, MatFormFieldModule,
+    MatInputModule, MatIconModule, MatTooltipModule, MatRadioModule, MatButtonModule,
+  ],
 })
 export class EnrichersComponent implements OnInit {
   private readonly enricherService = inject(EnrichersService);

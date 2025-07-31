@@ -3,16 +3,12 @@ import { StyleManager } from './style-manager.component';
 
 describe('StyleManager', () => {
   let service: StyleManager;
-  let originalHead: HTMLHeadElement;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [StyleManager],
     });
     service = TestBed.inject(StyleManager);
-
-    // Save the original head to restore later
-    originalHead = document.head;
   });
 
   afterEach(() => {

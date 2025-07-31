@@ -1,16 +1,12 @@
-import type { ElementRef, OnInit } from '@angular/core';
-import { Component, Input, ViewChild, inject } from '@angular/core';
+import { type ElementRef, type OnInit, Component, Input, ViewChild, inject } from '@angular/core';
 import { CameraMaskService } from './camera-mask.service';
 import { CameraMask } from './camera-mask';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import type { Camera } from '../../camera';
 import type { Coordinate } from './coordinate';
-import type { PageEvent } from '@angular/material/paginator';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import type { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-
+import { MatPaginatorModule, type PageEvent } from '@angular/material/paginator';
+import { type MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
@@ -60,13 +56,6 @@ export class CameraMaskComponent implements OnInit {
     this.addEventHandlers();
   }
 
-  public getSamplePlates() {
-    this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
-      this.samplePlates = plates;
-      this.loadImageIntoCanvas(this.camera.sampleImageUrl);
-    });
-  }
-
   public handlePageEvent(pageEvent: PageEvent) {
     this.loadImageIntoCanvas(this.samplePlates[pageEvent.pageIndex]);
   }
@@ -80,119 +69,7 @@ export class CameraMaskComponent implements OnInit {
     }
   }
 
-  public prepareCanvases() {
-    this.ctx = this.canvas.nativeElement.getContext('2d') ?? (() => {
-      throw new Error('ctx is null');
-    })();
-    this.sampleCtx = this.sampleCanvas.nativeElement.getContext('2d') ?? (() => {
-      throw new Error('ctx is null');
-    })();
-    this.savingCtx = this.savingCanvas.nativeElement.getContext('2d') ?? (() => {
-      throw new Error('ctx is null');
-    })();
-
-    this.savingCtx.canvas.hidden = true;
-  }
-
-  public addEventHandlers() {
-    this.canvas.nativeElement.addEventListener('mousedown', (event) => {
-      if (!this.imageInValidState) {
-        return;
-      }
-
-      const mousePos = this.getMousePosition(event);
-
-      if (this.isClosed && this.isPointInPolygon(mousePos.x, mousePos.y, this.coordinates)) {
-        this.dragStartIndex = -1;
-        this.dragOffset = { x: mousePos.x, y: mousePos.y };
-        this.isDragging = true;
-        this.canvas.nativeElement.style.cursor = 'move';
-      } else {
-        this.dragStartIndex = this.findClosestPoint(mousePos);
-
-        if (this.dragStartIndex !== -1) {
-          this.isDragging = true;
-        } else {
-          this.canvas.nativeElement.style.cursor = 'default';
-        }
-      }
-    });
-
-    document.addEventListener('mousemove', (event) => {
-      if (!this.imageInValidState) {
-        return;
-      }
-      const mousePos = this.getMousePosition(event);
-
-      if (this.coordinates.length === 0) {
-        this.currentPos = mousePos;
-        return;
-      }
-
-      if (this.isDragging && this.dragStartIndex !== -1) {
-        this.movePoint(this.dragStartIndex, mousePos.x, mousePos.y);
-      } else if (this.isDragging && this.isClosed && this.dragStartIndex === -1) {
-        this.canvas.nativeElement.style.cursor = 'move';
-        const dx = mousePos.x - this.dragOffset.x;
-        const dy = mousePos.y - this.dragOffset.y;
-
-        this.coordinates.forEach((point) => {
-          point.x += dx;
-          point.y += dy;
-        });
-
-        this.dragOffset = { x: mousePos.x, y: mousePos.y };
-        this.draw();
-      } else if (!this.isClosed) {
-        this.currentPos = mousePos;
-        this.draw();
-      } else if (this.isClosed) {
-        this.canvas.nativeElement.style.cursor = this.isPointInPolygon(mousePos.x, mousePos.y, this.coordinates) ? 'move' : 'default';
-        this.currentPos = mousePos;
-        this.draw();
-      }
-    });
-
-    this.canvas.nativeElement.addEventListener('mouseup', () => {
-      if (!this.imageInValidState) {
-        return;
-      }
-      this.isDragging = false;
-      this.dragStartIndex = -1;
-      this.dragOffset = { x: 0, y: 0 };
-
-      this.canvas.nativeElement.style.cursor = 'default';
-    });
-
-    this.canvas.nativeElement.addEventListener('click', (event) => {
-      if (!this.imageInValidState) {
-        return;
-      }
-      if (!this.isClosed && !this.isDragging) {
-        const mousePos = this.getMousePosition(event);
-
-        if (this.isNearPoint(0, mousePos)) {
-          this.closePolygon();
-        } else {
-          this.addPoint(mousePos.x, mousePos.y);
-        }
-      }
-    });
-
-    this.canvas.nativeElement.addEventListener('mouseleave', () => {
-      if (!this.imageInValidState) {
-        return;
-      }
-      this.isDragging = false;
-      this.dragStartIndex = -1;
-      this.dragOffset = { x: 0, y: 0 };
-      this.currentPos = { x: 0, y: 0 };
-      this.canvas.nativeElement.style.cursor = 'default';
-      this.draw();
-    });
-  }
-
-  public loadImageIntoCanvas(url: string) {
+  private loadImageIntoCanvas(url: string) {
     this.isLoadingSnapshot = true;
     this.cameraMaskService.getPlateCapture(url).subscribe((image: Blob) => {
       const reader = new FileReader();
@@ -239,7 +116,7 @@ export class CameraMaskComponent implements OnInit {
     });
   }
 
-  public loadMaskCoordinates() {
+  private loadMaskCoordinates() {
     this.currentPos = { x: 0, y: 0 };
 
     if (this.coordinates.length === 0) {
@@ -304,7 +181,7 @@ export class CameraMaskComponent implements OnInit {
     // do nothing
   }
 
-  public draw() {
+  private draw() {
     this.ctx.clearRect(0, 0, this.imageWidth, this.imageHeight);
     try {
       this.ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
@@ -359,7 +236,7 @@ export class CameraMaskComponent implements OnInit {
     }
   }
 
-  public getMousePosition(event: MouseEvent) {
+  private getMousePosition(event: MouseEvent) {
     const rect = this.canvas.nativeElement.getBoundingClientRect();
 
     return {
@@ -368,13 +245,13 @@ export class CameraMaskComponent implements OnInit {
     };
   }
 
-  public addPoint(x: number, y: number) {
+  private addPoint(x: number, y: number) {
     this.coordinates.push({ x, y });
 
     this.draw();
   }
 
-  public isNearPoint(point = -1, mospos: Coordinate) {
+  private isNearPoint(point = -1, mospos: Coordinate) {
     if (this.coordinates.length === 0) {
       return false;
     }
@@ -398,7 +275,7 @@ export class CameraMaskComponent implements OnInit {
     return dx * dx + dy * dy < this.forgiveness * this.forgiveness;
   }
 
-  public closePolygon() {
+  private closePolygon() {
     if (this.coordinates.length > 2) {
       this.isClosed = true;
       this.draw();
@@ -406,7 +283,7 @@ export class CameraMaskComponent implements OnInit {
     }
   }
 
-  public drawSampleMaskImage() {
+  private drawSampleMaskImage() {
     this.sampleCtx.drawImage(this.image, this.imageWidth / 4, this.imageHeight / 4);
     this.sampleCtx.fillStyle = 'white';
     this.sampleCtx.fillRect(0, 0, this.sampleCanvas.nativeElement.width, this.sampleCanvas.nativeElement.height);
@@ -468,9 +345,145 @@ export class CameraMaskComponent implements OnInit {
     return isInside;
   }
 
-  public findClosestPoint(mousePos: Coordinate) {
+  private findClosestPoint(mousePos: Coordinate) {
     return this.coordinates.findIndex(p =>
       Math.sqrt((p.x - mousePos.x) ** 2 + (p.y - mousePos.y) ** 2) < this.dotRadius * 2,
     );
+  }
+
+  private getSamplePlates() {
+    this.cameraMaskService.getPlateCaptures(this.camera.id).subscribe((plates) => {
+      this.samplePlates = plates;
+      this.loadImageIntoCanvas(this.camera.sampleImageUrl);
+    });
+  }
+
+  private prepareCanvases() {
+    this.ctx = this.canvas.nativeElement.getContext('2d') ?? (() => {
+      throw new Error('ctx is null');
+    })();
+    this.sampleCtx = this.sampleCanvas.nativeElement.getContext('2d') ?? (() => {
+      throw new Error('ctx is null');
+    })();
+    this.savingCtx = this.savingCanvas.nativeElement.getContext('2d') ?? (() => {
+      throw new Error('ctx is null');
+    })();
+
+    this.savingCtx.canvas.hidden = true;
+  }
+
+  private addEventHandlers() {
+    this.canvas.nativeElement.addEventListener('mousedown', this.handleMouseDown);
+    document.addEventListener('mousemove', this.handleMouseMove);
+    this.canvas.nativeElement.addEventListener('mouseup', this.handleMouseUp);
+    this.canvas.nativeElement.addEventListener('click', this.handleClick);
+    this.canvas.nativeElement.addEventListener('mouseleave', this.handleMouseLeave);
+  }
+
+  private readonly handleMouseDown = (event: MouseEvent): void => {
+    if (!this.imageInValidState) {
+      return;
+    }
+
+    const mousePos = this.getMousePosition(event);
+
+    if (this.isClosed && this.isPointInPolygon(mousePos.x, mousePos.y, this.coordinates)) {
+      this.dragStartIndex = -1;
+      this.dragOffset = { x: mousePos.x, y: mousePos.y };
+      this.isDragging = true;
+      this.canvas.nativeElement.style.cursor = 'move';
+    } else {
+      this.dragStartIndex = this.findClosestPoint(mousePos);
+
+      if (this.dragStartIndex !== -1) {
+        this.isDragging = true;
+      } else {
+        this.canvas.nativeElement.style.cursor = 'default';
+      }
+    }
+  };
+
+  private readonly handleMouseMove = (event: MouseEvent): void => {
+    if (!this.imageInValidState) {
+      return;
+    }
+    const mousePos = this.getMousePosition(event);
+
+    if (this.coordinates.length === 0) {
+      this.currentPos = mousePos;
+      return;
+    }
+
+    if (this.isDragging && this.dragStartIndex !== -1) {
+      this.movePoint(this.dragStartIndex, mousePos.x, mousePos.y);
+    } else if (this.isDragging && this.isClosed && this.dragStartIndex === -1) {
+      this.moveEntirePolygon(mousePos);
+    } else if (!this.isClosed) {
+      this.handlePolygonDrawing(mousePos);
+    } else {
+      this.handleClosedPolygonHover(mousePos);
+    }
+  };
+
+  private readonly handleMouseUp = (): void => {
+    if (!this.imageInValidState) {
+      return;
+    }
+    this.isDragging = false;
+    this.dragStartIndex = -1;
+    this.dragOffset = { x: 0, y: 0 };
+    this.canvas.nativeElement.style.cursor = 'default';
+  };
+
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (!this.imageInValidState) {
+      return;
+    }
+    if (!this.isClosed && !this.isDragging) {
+      const mousePos = this.getMousePosition(event);
+
+      if (this.isNearPoint(0, mousePos)) {
+        this.closePolygon();
+      } else {
+        this.addPoint(mousePos.x, mousePos.y);
+      }
+    }
+  };
+
+  private readonly handleMouseLeave = (): void => {
+    if (!this.imageInValidState) {
+      return;
+    }
+    this.isDragging = false;
+    this.dragStartIndex = -1;
+    this.dragOffset = { x: 0, y: 0 };
+    this.currentPos = { x: 0, y: 0 };
+    this.canvas.nativeElement.style.cursor = 'default';
+    this.draw();
+  };
+
+  private moveEntirePolygon(mousePos: { x: number; y: number }): void {
+    this.canvas.nativeElement.style.cursor = 'move';
+    const dx = mousePos.x - this.dragOffset.x;
+    const dy = mousePos.y - this.dragOffset.y;
+
+    this.coordinates.forEach((point) => {
+      point.x += dx;
+      point.y += dy;
+    });
+
+    this.dragOffset = { x: mousePos.x, y: mousePos.y };
+    this.draw();
+  }
+
+  private handlePolygonDrawing(mousePos: { x: number; y: number }): void {
+    this.currentPos = mousePos;
+    this.draw();
+  }
+
+  private handleClosedPolygonHover(mousePos: { x: number; y: number }): void {
+    this.canvas.nativeElement.style.cursor = this.isPointInPolygon(mousePos.x, mousePos.y, this.coordinates) ? 'move' : 'default';
+    this.currentPos = mousePos;
+    this.draw();
   }
 }

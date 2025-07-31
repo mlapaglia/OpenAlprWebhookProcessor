@@ -1,20 +1,16 @@
 import { Component, Input, Output, EventEmitter, inject, type TrackByFunction } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatOptionModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import type { IPlateSetting } from './plate-setting.interface';
 import type { PlateSettingsConfig } from './plate-settings-table.component';
+import { SettingsHeaderComponent } from './settings-header.component';
+import { SettingsEmptyStateComponent } from './settings-empty-state.component';
+import { PlateNumberCellComponent } from './plate-number-cell.component';
+import { DescriptionCellComponent } from './description-cell.component';
+import { ActionsCellComponent } from './actions-cell.component';
 
 @Component({
   selector: 'app-settings-list',
@@ -22,17 +18,13 @@ import type { PlateSettingsConfig } from './plate-settings-table.component';
   imports: [
     CommonModule,
     MatTableModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
     MatIconModule,
-    MatTooltipModule,
     MatCardModule,
-    MatChipsModule,
+    SettingsHeaderComponent,
+    SettingsEmptyStateComponent,
+    PlateNumberCellComponent,
+    DescriptionCellComponent,
+    ActionsCellComponent,
   ],
 })
 export class SettingsListComponent<T extends IPlateSetting> {
