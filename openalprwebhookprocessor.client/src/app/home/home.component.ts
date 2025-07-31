@@ -13,6 +13,7 @@ import { MostSeenPlatesComponent } from './most-seen-plates.component';
 
 @Component({
   templateUrl: 'home.component.html',
+  styleUrls: ['./home.component.css'],
   imports: [
     CommonModule,
     PredictionsSectionComponent,

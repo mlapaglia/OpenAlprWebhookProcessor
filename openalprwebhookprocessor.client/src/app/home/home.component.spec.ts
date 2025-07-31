@@ -1,8 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import type { QuickStats, GetHourlyStatsResponse } from './home.service';
-import { HomeService, HourlyStats } from './home.service';
+import { HomeService, type QuickStats, type GetHourlyStatsResponse } from './home.service';
 import type { DayCounts } from './plateCountResponse';
 import type { MostSeenCounts } from './mostSeenResponse';
 import type { PredictionResult } from './prediction-response';
