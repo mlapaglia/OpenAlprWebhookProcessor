@@ -61,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.accountService.user.subscribe((x) => {
+      this.user = x;
       this.topBarVisible = x.id !== undefined;
 
       if (x.jwtToken) {

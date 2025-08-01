@@ -23,6 +23,7 @@ export class SignalrService {
   public isConnected: boolean;
   public connectionStatusChanged: Subject<boolean> = new Subject<boolean>();
   public databaseCleanupCompleted: Subject<boolean> = new Subject<boolean>();
+  public connectionStartTime: Date | null = null;
 
   public startConnection() {
     if (this.isConnected) {
@@ -44,6 +45,7 @@ export class SignalrService {
     this.hubConnection
       .start()
       .then(() => {
+        this.connectionStartTime = new Date();
         this.snackbarService.create('Connected to server!', SnackBarType.Connected);
         this.connectionEstablished.next(true);
         this.triggerConnectionStatusChange(true);
@@ -89,6 +91,7 @@ export class SignalrService {
     });
 
     this.hubConnection.onreconnected(() => {
+      this.connectionStartTime = new Date(); // Reset connection time on reconnect
       this.snackbarService.create('Reconnected to server!', SnackBarType.Connected);
       this.triggerConnectionStatusChange(true);
     });
@@ -99,6 +102,7 @@ export class SignalrService {
     });
 
     this.hubConnection.onclose(() => {
+      this.connectionStartTime = null;
       this.snackbarService.create('Connection lost', SnackBarType.Disconnected);
       this.triggerConnectionStatusChange(false);
     });
@@ -113,6 +117,7 @@ export class SignalrService {
       return;
     }
 
+    this.connectionStartTime = null;
     this.hubConnection
       .stop()
       .then(() => {
@@ -124,8 +129,34 @@ export class SignalrService {
       });
   }
 
-  public triggerConnectionStatusChange(isConencted: boolean) {
-    this.isConnected = isConencted;
+  private triggerConnectionStatusChange(isConnected: boolean): void {
+    this.isConnected = isConnected;
     this.connectionStatusChanged.next(this.isConnected);
+  }
+
+  public getConnectionInfo() {
+    if (!this.hubConnection) {
+      return null;
+    }
+
+    const getStateString = (state: signalR.HubConnectionState): string => {
+      switch (state) {
+        case signalR.HubConnectionState.Connecting: return 'Connecting';
+        case signalR.HubConnectionState.Connected: return 'Connected';
+        case signalR.HubConnectionState.Reconnecting: return 'Reconnecting';
+        case signalR.HubConnectionState.Disconnecting: return 'Disconnecting';
+        case signalR.HubConnectionState.Disconnected: return 'Disconnected';
+        default: return 'Unknown';
+      }
+    };
+
+    return {
+      state: getStateString(this.hubConnection.state),
+      connectionId: this.hubConnection.connectionId,
+      transport: (this.hubConnection as any).transport?.name || 'Unknown',
+      startTime: this.connectionStartTime,
+      durationSeconds: this.connectionStartTime ?
+        Math.floor((new Date().getTime() - this.connectionStartTime.getTime()) / 1000) : 0,
+    };
   }
 }

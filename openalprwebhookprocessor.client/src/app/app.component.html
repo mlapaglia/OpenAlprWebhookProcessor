@@ -1,59 +1,59 @@
-﻿<mat-sidenav-container fullscreen>
-  <mat-sidenav
-    [mode]="isMobile ? 'over' : 'side'"
-    [(opened)]="sidenavOpened"
-    [fixedInViewport]="true"
-    [fixedTopGap]="0"
-    [fixedBottomGap]="0"
-    class="main-sidenav">
-    
-    <!-- App Header in Sidebar -->
-    <mat-toolbar class="sidebar-header">
-      <div class="app-logo">
-        <div class="status-indicator">
-          <div [ngClass]="isSignalrConnected ? 'pulse-circle': 'pulse-circle-offline'"></div>
-          <mat-icon [ngClass]="isSignalrConnected ? 'glow' : 'glow-offline'">anchor</mat-icon>
+﻿@if (user.jwtToken) {
+  <mat-sidenav-container fullscreen>
+    <mat-sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [(opened)]="sidenavOpened"
+      [fixedInViewport]="true"
+      [fixedTopGap]="0"
+      [fixedBottomGap]="0"
+      class="main-sidenav">
+      
+      <!-- App Header in Sidebar -->
+      <mat-toolbar class="sidebar-header">
+        <div class="app-logo">
+          <div class="status-indicator">
+            <div [ngClass]="isSignalrConnected ? 'pulse-circle': 'pulse-circle-offline'"></div>
+            <mat-icon [ngClass]="isSignalrConnected ? 'glow' : 'glow-offline'">anchor</mat-icon>
+          </div>
+          <div class="app-title">
+            <span class="app-name">OpenALPR</span>
+            <span class="app-subtitle">Webhook Processor</span>
+          </div>
         </div>
-        <div class="app-title">
-          <span class="app-name">OpenALPR</span>
-          <span class="app-subtitle">Webhook Processor</span>
-        </div>
-      </div>
-    </mat-toolbar>
+      </mat-toolbar>
 
-    <!-- Main Navigation -->
-    <mat-nav-list class="main-nav">
-      <mat-list-item routerLink="/" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
-        <mat-icon matListItemIcon>home</mat-icon>
-        <span>Home</span>
-      </mat-list-item>
-      <mat-list-item routerLink="/plates" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
-        <mat-icon matListItemIcon>crop_16_9</mat-icon>
-        <span>Plates</span>
-      </mat-list-item>
-      
-      <!-- Settings Section -->
-      <mat-divider />
-      <h3 class="nav-section-header">Settings</h3>
-      @for (item of settingsNavItems; track item) {
-        <mat-list-item [routerLink]="item.link" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
-          <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-          <span>{{item.linkTitle}}</span>
+      <!-- Main Navigation -->
+      <mat-nav-list class="main-nav">
+        <mat-list-item routerLink="/" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
+          <mat-icon matListItemIcon>home</mat-icon>
+          <span>Home</span>
         </mat-list-item>
-      }
-      
-      <!-- Bottom Actions -->
-      <mat-divider />
-      <app-theme-picker />
-      <mat-list-item (click)="logout()" class="logout-item">
-        <mat-icon matListItemIcon>exit_to_app</mat-icon>
-        <span>Logout</span>
-      </mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-  
-  <mat-sidenav-content class="main-content">
-    @if (topBarVisible) {
+        <mat-list-item routerLink="/plates" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
+          <mat-icon matListItemIcon>crop_16_9</mat-icon>
+          <span>Plates</span>
+        </mat-list-item>
+        
+        <!-- Settings Section -->
+        <mat-divider />
+        <h3 class="nav-section-header">Settings</h3>
+        @for (item of settingsNavItems; track item) {
+          <mat-list-item [routerLink]="item.link" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
+            <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+            <span>{{item.linkTitle}}</span>
+          </mat-list-item>
+        }
+        
+        <!-- Bottom Actions -->
+        <mat-divider />
+        <app-theme-picker />
+        <mat-list-item (click)="logout()" class="logout-item">
+          <mat-icon matListItemIcon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-sidenav>
+    
+    <mat-sidenav-content class="main-content">
       <!-- Mobile menu button -->
       @if (isMobile) {
         <mat-toolbar class="mobile-header">
@@ -67,6 +67,8 @@
       <mat-tab-nav-panel #tabPanel class="content-wrapper">
         <router-outlet />
       </mat-tab-nav-panel>
-    }
-  </mat-sidenav-content>
-</mat-sidenav-container>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+} @else {
+  <router-outlet />
+}

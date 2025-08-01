@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { CommonModule } from '@angular/common';
+import { SignalrConnectionMonitorComponent } from './signalr-connection-monitor/signalr-connection-monitor.component';
 
 @Component({
   selector: 'app-debug',
@@ -21,6 +23,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDividerModule,
+    CommonModule,
+    SignalrConnectionMonitorComponent,
   ],
 })
 export class DebugComponent implements OnInit {

@@ -17,6 +17,7 @@ using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using OpenAlprWebhookProcessor.Features.ImageRelay.ImageCompression;
 using OpenAlprWebhookProcessor.Features.Users;
@@ -178,6 +179,26 @@ namespace OpenAlprWebhookProcessor.Infrastructure.Extensions
                             }
                         }
 
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        // Log failed authentication attempts for SignalR
+                        if (context.HttpContext.Request.Path.StartsWithSegments("/api/processorHub", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerEvents>>();
+                            logger.LogWarning("SignalR authentication failed: {Exception}", context.Exception.Message);
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        // Additional validation for SignalR connections
+                        if (context.HttpContext.Request.Path.StartsWithSegments("/api/processorHub", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<JwtBearerEvents>>();
+                            logger.LogDebug("SignalR JWT token validated for user: {User}", context.Principal?.Identity?.Name);
+                        }
                         return Task.CompletedTask;
                     }
                 };

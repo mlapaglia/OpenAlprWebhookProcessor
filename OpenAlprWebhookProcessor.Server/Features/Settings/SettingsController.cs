@@ -19,8 +19,10 @@ using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetVersion;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
+using OpenAlprWebhookProcessor.ProcessorHub;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -173,6 +175,28 @@ namespace OpenAlprWebhookProcessor.Features.Settings
         {
             var query = new GetVersionQuery();
             return await _mediator.Send(query, cancellationToken);
+        }
+
+        [HttpGet("debug/signalr-connections")]
+        public IActionResult GetSignalRConnections()
+        {
+            var connections = ProcessorHub.ProcessorHub.GetAllConnections();
+            var connectionSummary = new
+            {
+                TotalConnections = connections.Length,
+                Connections = connections.Select(c => new
+                {
+                    c.ConnectionId,
+                    c.UserId,
+                    c.ConnectedAt,
+                    DurationSeconds = (int)(DateTime.UtcNow - c.ConnectedAt).TotalSeconds,
+                    c.Transport,
+                    c.UserAgent,
+                    c.IpAddress
+                }).ToArray()
+            };
+            
+            return Ok(connectionSummary);
         }
     }
 } 

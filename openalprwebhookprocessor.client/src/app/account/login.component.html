@@ -1,4 +1,9 @@
-<div class="login-container">
+<div class="login-container" 
+     [class.dark-theme]="isDarkTheme"
+     [class.deeppurple-amber-theme]="currentThemeName === 'deeppurple-amber'"
+     [class.indigo-pink-theme]="currentThemeName === 'indigo-pink'"
+     [class.pink-bluegrey-theme]="currentThemeName === 'pink-bluegrey'"
+     [class.purple-green-theme]="currentThemeName === 'purple-green'">
   <div class="floating-ball ball-1"></div>
   <div class="floating-ball ball-2"></div>
   <div class="floating-ball ball-3"></div>
