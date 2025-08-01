@@ -23,8 +23,8 @@ export class AccountService {
     return this.userSubject.value;
   }
 
-  login(username: string, password: string) {
-    return this.http.post<User>('/api/users/authenticate', { username, password })
+  login(username: string, password: string, rememberMe: boolean = false) {
+    return this.http.post<User>('/api/users/authenticate', { username, password, rememberMe })
       .pipe(map((user) => {
         // store user details and jwt token in local storage to keep user logged in between page refreshes
         localStorage.setItem('user', JSON.stringify(user));

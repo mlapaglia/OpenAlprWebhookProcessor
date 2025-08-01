@@ -78,7 +78,7 @@ namespace Tests.Features.Users.Services
             var cancellationToken = new CancellationToken();
 
             // Act
-            var token = await _jwtService.GenerateJwtTokenAsync(_user, cancellationToken);
+            var token = await _jwtService.GenerateJwtTokenAsync(_user, false, cancellationToken);
 
             // Assert
             token.Should().NotBeNull();
@@ -100,7 +100,7 @@ namespace Tests.Features.Users.Services
             var beforeGeneration = DateTime.UtcNow.AddMinutes(15);
 
             // Act
-            var token = await _jwtService.GenerateJwtTokenAsync(_user, cancellationToken);
+            var token = await _jwtService.GenerateJwtTokenAsync(_user, false, cancellationToken);
 
             // Assert
             var afterGeneration = DateTime.UtcNow.AddMinutes(15);
@@ -119,7 +119,7 @@ namespace Tests.Features.Users.Services
             var cancellationToken = new CancellationToken();
 
             // Act
-            await _jwtService.GenerateJwtTokenAsync(_user, cancellationToken);
+            await _jwtService.GenerateJwtTokenAsync(_user, false, cancellationToken);
 
             // Assert
             await _jwtKeyRepository.Received(1).GetFirstAsync(cancellationToken);
@@ -134,7 +134,7 @@ namespace Tests.Features.Users.Services
 
             // Act & Assert
             Assert.ThrowsAsync<ArgumentNullException>(() => 
-                _jwtService.GenerateJwtTokenAsync(nullUser, cancellationToken));
+                _jwtService.GenerateJwtTokenAsync(nullUser, false, cancellationToken));
         }
 
         [Test]
@@ -336,8 +336,8 @@ namespace Tests.Features.Users.Services
             var cancellationToken = new CancellationToken();
 
             // Act
-            var token1 = await _jwtService.GenerateJwtTokenAsync(user1, cancellationToken);
-            var token2 = await _jwtService.GenerateJwtTokenAsync(user2, cancellationToken);
+                    var token1 = await _jwtService.GenerateJwtTokenAsync(user1, false, cancellationToken);
+        var token2 = await _jwtService.GenerateJwtTokenAsync(user2, false, cancellationToken);
 
             // Assert
             token1.Should().NotBe(token2);
@@ -357,7 +357,7 @@ namespace Tests.Features.Users.Services
             var cancellationToken = new CancellationToken();
 
             // Act
-            var token = await _jwtService.GenerateJwtTokenAsync(_user, cancellationToken);
+            var token = await _jwtService.GenerateJwtTokenAsync(_user, false, cancellationToken);
 
             // Assert
             var tokenHandler = new JwtSecurityTokenHandler();

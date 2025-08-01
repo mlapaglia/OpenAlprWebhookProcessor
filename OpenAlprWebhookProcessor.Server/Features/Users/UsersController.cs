@@ -37,7 +37,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
             [FromBody] AuthenticateRequest model,
             CancellationToken cancellationToken)
         {
-            var command = new AuthenticateCommand(model.Username, model.Password, GetIpAddress());
+            var command = new AuthenticateCommand(model.Username, model.Password, GetIpAddress(), model.RememberMe);
             var response = await _mediator.Send(command, cancellationToken);
 
             if (response == null)

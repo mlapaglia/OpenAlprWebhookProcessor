@@ -56,7 +56,7 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns(newJwtToken);
 
             // Act
@@ -171,14 +171,14 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns(newJwtToken);
 
             // Act
             await _handler.Handle(command, GetCancellationToken());
 
             // Assert
-            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>());
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>());
             _mockJwtService.Received(1).GenerateRefreshToken("192.168.1.1");
         }
 
@@ -204,7 +204,7 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
 
             // Act
@@ -246,7 +246,7 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
 
             // Act
@@ -281,7 +281,7 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, cancellationToken)
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), cancellationToken)
                 .Returns("jwt-token");
 
             // Act
@@ -289,7 +289,7 @@ namespace Tests.Features.Users.Commands
 
             // Assert
             result.Should().NotBeNull();
-            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, cancellationToken);
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<bool>(), cancellationToken);
         }
 
         [Test]
@@ -311,7 +311,7 @@ namespace Tests.Features.Users.Commands
 
             _mockJwtService.GenerateRefreshToken("192.168.1.1")
                 .Returns(newRefreshToken);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
 
             // Act

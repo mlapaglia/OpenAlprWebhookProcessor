@@ -48,7 +48,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RefreshToken
 
             await _usersUnitOfWork.SaveChangesAsync(cancellationToken);
 
-            var jwtToken = await _jwtService.GenerateJwtTokenAsync(user, cancellationToken);
+            var jwtToken = await _jwtService.GenerateJwtTokenAsync(user, false, cancellationToken);
 
             return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
         }

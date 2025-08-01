@@ -81,7 +81,7 @@ export class AppComponent implements OnInit, OnDestroy {
           } else {
             this.sidenavOpened = true;
           }
-        })
+        }),
     );
 
     this.swUpdate.unrecoverable.subscribe(() => {

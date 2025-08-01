@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
   ],
 })
 export class LoginComponent implements OnInit, OnDestroy {
@@ -45,7 +47,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   public canRegister = false;
   public isDarkTheme = false;
   public currentThemeName = '';
-  
+
   private themeSubscription = new Subscription();
 
   ngOnInit() {
@@ -56,11 +58,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
+      rememberMe: [false],
     });
 
     // Set initial theme
     this.setThemeFromStorage();
-    
+
     // Subscribe to theme changes
     this.themeSubscription = this.themeStorage.onThemeUpdate.subscribe((theme: DocsSiteTheme) => {
       this.isDarkTheme = theme.isDark ?? false;
@@ -74,7 +77,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private setThemeFromStorage() {
     const storedThemeName = this.themeStorage.getStoredThemeName();
-    
+
     // Define available themes (matching theme-picker component)
     const themes: DocsSiteTheme[] = [
       { primary: '#673AB7', accent: '#FFC107', displayName: 'Deep Purple & Amber', name: 'deeppurple-amber', isDark: false },
@@ -106,7 +109,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    this.accountService.login(this.f.username.value, this.f.password.value)
+    this.accountService.login(this.f.username.value, this.f.password.value, this.f.rememberMe.value)
       .pipe(first())
       .subscribe({
         next: () => {

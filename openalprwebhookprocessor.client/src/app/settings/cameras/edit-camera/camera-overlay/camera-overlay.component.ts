@@ -1,8 +1,6 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -44,8 +42,9 @@ export class CameraOverlayComponent implements OnInit {
   @Output() testOverlay = new EventEmitter<void>();
 
   overlayForm: FormGroup;
+  private readonly fb = inject(FormBuilder);
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor() {
     this.overlayForm = this.fb.group({
       updateOverlayEnabled: [false],
       updateOverlayTextUrl: [''],
@@ -53,29 +52,27 @@ export class CameraOverlayComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.camera) {
-      this.overlayForm.patchValue({
-        updateOverlayEnabled: this.camera.updateOverlayEnabled,
-        updateOverlayTextUrl: this.camera.updateOverlayTextUrl,
-      });
+    this.overlayForm.patchValue({
+      updateOverlayEnabled: this.camera.updateOverlayEnabled,
+      updateOverlayTextUrl: this.camera.updateOverlayTextUrl,
+    });
 
-      this.overlayForm.valueChanges.subscribe(values => {
-        this.camera = { ...this.camera, ...values };
-        this.cameraChange.emit(this.camera);
-      });
+    this.overlayForm.valueChanges.subscribe(values => {
+      this.camera = { ...this.camera, ...values };
+      this.cameraChange.emit(this.camera);
+    });
 
-      this.overlayForm.get('updateOverlayEnabled')?.valueChanges.subscribe(enabled => {
-        const urlControl = this.overlayForm.get('updateOverlayTextUrl');
+    this.overlayForm.get('updateOverlayEnabled')?.valueChanges.subscribe(enabled => {
+      const urlControl = this.overlayForm.get('updateOverlayTextUrl');
 
-        if (enabled) {
-          urlControl?.setValidators([Validators.required, Validators.pattern(/^https?:\/\/.+/)]);
-        } else {
-          urlControl?.clearValidators();
-        }
+      if (enabled) {
+        urlControl?.setValidators([Validators.required, Validators.pattern(/^https?:\/\/.+/)]);
+      } else {
+        urlControl?.clearValidators();
+      }
 
-        urlControl?.updateValueAndValidity();
-      });
-    }
+      urlControl?.updateValueAndValidity();
+    });
   }
 
   onTestOverlay() {

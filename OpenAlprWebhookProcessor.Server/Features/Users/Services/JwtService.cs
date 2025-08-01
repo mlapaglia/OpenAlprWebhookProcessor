@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
             _usersUnitOfWork = usersUnitOfWork ?? throw new ArgumentNullException(nameof(usersUnitOfWork));
         }
 
-        public async Task<string> GenerateJwtTokenAsync(User user, CancellationToken cancellationToken = default)
+        public async Task<string> GenerateJwtTokenAsync(User user, bool rememberMe = false, CancellationToken cancellationToken = default)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -34,7 +34,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Services
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                Expires = rememberMe ? null : DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(jwtSecretKey),
                     SecurityAlgorithms.HmacSha256Signature)

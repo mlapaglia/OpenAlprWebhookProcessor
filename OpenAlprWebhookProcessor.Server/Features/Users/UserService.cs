@@ -267,7 +267,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
             return Convert.FromBase64String(jwtKey.Key);
         }
 
-        private async Task<string> GenerateJwtTokenAsync(User user)
+        private async Task<string> GenerateJwtTokenAsync(User user, bool rememberMe = false)
         {
             var jwtSecretKey = await GetJwtSecretKeyAsync();
 
@@ -279,7 +279,7 @@ namespace OpenAlprWebhookProcessor.Features.Users
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                Expires = rememberMe ? null : DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(jwtSecretKey),
                     SecurityAlgorithms.HmacSha256Signature)

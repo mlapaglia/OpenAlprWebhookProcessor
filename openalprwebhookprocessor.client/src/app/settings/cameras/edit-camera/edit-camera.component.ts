@@ -13,6 +13,7 @@ import { CameraDayNightComponent } from './camera-daynight/camera-daynight.compo
 
 @Component({
   selector: 'app-edit-camera',
+  standalone: true,
   templateUrl: './edit-camera.component.html',
   styleUrls: ['./edit-camera.component.less'],
   imports: [

@@ -1,8 +1,6 @@
-import type { OnInit, OnChanges } from '@angular/core';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, type OnInit, type OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -51,8 +49,9 @@ export class CameraDayNightComponent implements OnInit, OnChanges {
   @Output() triggerAutofocus = new EventEmitter<void>();
 
   dayNightForm: FormGroup;
+  private readonly fb = inject(FormBuilder);
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor() {
     this.dayNightForm = this.fb.group({
       dayNightModeEnabled: [false],
       latitude: [''],
@@ -69,44 +68,40 @@ export class CameraDayNightComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (this.camera) {
-      this.dayNightForm.patchValue({
-        dayNightModeEnabled: this.camera.dayNightModeEnabled,
-        latitude: this.camera.latitude,
-        longitude: this.camera.longitude,
-        sunsetOffset: this.camera.sunsetOffset,
-        sunriseOffset: this.camera.sunriseOffset,
-        timezoneOffset: this.camera.timezoneOffset,
-        dayNightModeUrl: this.camera.dayNightModeUrl,
-        dayZoom: this.camera.dayZoom,
-        dayFocus: this.camera.dayFocus,
-        nightZoom: this.camera.nightZoom,
-        nightFocus: this.camera.nightFocus,
-      });
+    this.dayNightForm.patchValue({
+      dayNightModeEnabled: this.camera.dayNightModeEnabled,
+      latitude: this.camera.latitude,
+      longitude: this.camera.longitude,
+      sunsetOffset: this.camera.sunsetOffset,
+      sunriseOffset: this.camera.sunriseOffset,
+      timezoneOffset: this.camera.timezoneOffset,
+      dayNightModeUrl: this.camera.dayNightModeUrl,
+      dayZoom: this.camera.dayZoom,
+      dayFocus: this.camera.dayFocus,
+      nightZoom: this.camera.nightZoom,
+      nightFocus: this.camera.nightFocus,
+    });
 
-      this.dayNightForm.valueChanges.subscribe(values => {
-        this.camera = { ...this.camera, ...values };
-        this.cameraChange.emit(this.camera);
-      });
+    this.dayNightForm.valueChanges.subscribe(values => {
+      this.camera = { ...this.camera, ...values };
+      this.cameraChange.emit(this.camera);
+    });
 
-      this.dayNightForm.get('dayNightModeEnabled')?.valueChanges.subscribe(enabled => {
-        const urlControl = this.dayNightForm.get('dayNightModeUrl');
+    this.dayNightForm.get('dayNightModeEnabled')?.valueChanges.subscribe(enabled => {
+      const urlControl = this.dayNightForm.get('dayNightModeUrl');
 
-        if (enabled) {
-          urlControl?.setValidators([Validators.required, Validators.pattern(/^https?:\/\/.+/)]);
-        } else {
-          urlControl?.clearValidators();
-        }
+      if (enabled) {
+        urlControl?.setValidators([Validators.required, Validators.pattern(/^https?:\/\/.+/)]);
+      } else {
+        urlControl?.clearValidators();
+      }
 
-        urlControl?.updateValueAndValidity();
-      });
-    }
+      urlControl?.updateValueAndValidity();
+    });
   }
 
   ngOnChanges() {
-    if (this.currentZoomFocus) {
-      this.updateCurrentZoomFocusDisplay();
-    }
+    this.updateCurrentZoomFocusDisplay();
   }
 
   private updateCurrentZoomFocusDisplay() {

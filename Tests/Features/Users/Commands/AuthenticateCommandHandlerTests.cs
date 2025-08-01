@@ -51,7 +51,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns(jwtToken);
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(refreshToken);
@@ -86,7 +86,7 @@ namespace Tests.Features.Users.Commands
             // Assert
             result.Should().BeNull();
             _mockPasswordService.DidNotReceive().VerifyPasswordHash(Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<byte[]>());
-            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace Tests.Features.Users.Commands
 
             // Assert
             result.Should().BeNull();
-            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+            await _mockJwtService.DidNotReceive().GenerateJwtTokenAsync(Arg.Any<User>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
@@ -146,7 +146,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
@@ -155,7 +155,7 @@ namespace Tests.Features.Users.Commands
             await _handler.Handle(command, GetCancellationToken());
 
             // Assert
-            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>());
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>());
             _mockJwtService.Received(1).GenerateRefreshToken(command.IpAddress);
         }
 
@@ -178,7 +178,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(refreshToken);
@@ -213,7 +213,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(refreshToken);
@@ -240,7 +240,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, cancellationToken)
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), cancellationToken)
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });
@@ -250,7 +250,7 @@ namespace Tests.Features.Users.Commands
 
             // Assert
             result.Should().NotBeNull();
-            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, cancellationToken);
+            await _mockJwtService.Received(1).GenerateJwtTokenAsync(user, Arg.Any<bool>(), cancellationToken);
         }
 
         [Test]
@@ -265,7 +265,7 @@ namespace Tests.Features.Users.Commands
 
             _mockPasswordService.VerifyPasswordHash(command.Password, user.PasswordHash, user.PasswordSalt)
                 .Returns(true);
-            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<CancellationToken>())
+            _mockJwtService.GenerateJwtTokenAsync(user, Arg.Any<bool>(), Arg.Any<CancellationToken>())
                 .Returns("jwt-token");
             _mockJwtService.GenerateRefreshToken(command.IpAddress)
                 .Returns(new RefreshToken { Token = "refresh-token", Expires = DateTime.UtcNow.AddDays(7), Created = DateTime.UtcNow, CreatedByIp = command.IpAddress });

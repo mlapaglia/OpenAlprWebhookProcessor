@@ -167,7 +167,13 @@
 }
 
 .form-fields {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
+}
+
+.remember-me-section {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
 }
 
 .full-width {

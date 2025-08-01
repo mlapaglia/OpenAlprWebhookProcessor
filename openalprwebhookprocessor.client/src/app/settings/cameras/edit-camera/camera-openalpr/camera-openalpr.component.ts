@@ -1,8 +1,6 @@
-import type { OnInit } from '@angular/core';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, type OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
@@ -47,8 +45,9 @@ export class CameraOpenAlprComponent implements OnInit {
 
   openAlprForm: FormGroup;
   isEditingMask = false;
+  private readonly fb = inject(FormBuilder);
 
-  constructor(private readonly fb: FormBuilder) {
+  constructor() {
     this.openAlprForm = this.fb.group({
       openAlprEnabled: [false],
       openAlprName: [''],
@@ -57,34 +56,32 @@ export class CameraOpenAlprComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.camera) {
-      this.openAlprForm.patchValue({
-        openAlprEnabled: this.camera.openAlprEnabled,
-        openAlprName: this.camera.openAlprName,
-        openAlprCameraId: this.camera.openAlprCameraId,
-      });
+    this.openAlprForm.patchValue({
+      openAlprEnabled: this.camera.openAlprEnabled,
+      openAlprName: this.camera.openAlprName,
+      openAlprCameraId: this.camera.openAlprCameraId,
+    });
 
-      this.openAlprForm.valueChanges.subscribe(values => {
-        this.camera = { ...this.camera, ...values };
-        this.cameraChange.emit(this.camera);
-      });
+    this.openAlprForm.valueChanges.subscribe(values => {
+      this.camera = { ...this.camera, ...values };
+      this.cameraChange.emit(this.camera);
+    });
 
-      this.openAlprForm.get('openAlprEnabled')?.valueChanges.subscribe(enabled => {
-        const nameControl = this.openAlprForm.get('openAlprName');
-        const idControl = this.openAlprForm.get('openAlprCameraId');
+    this.openAlprForm.get('openAlprEnabled')?.valueChanges.subscribe(enabled => {
+      const nameControl = this.openAlprForm.get('openAlprName');
+      const idControl = this.openAlprForm.get('openAlprCameraId');
 
-        if (enabled) {
-          nameControl?.setValidators([Validators.required]);
-          idControl?.setValidators([Validators.required, Validators.min(1)]);
-        } else {
-          nameControl?.clearValidators();
-          idControl?.clearValidators();
-        }
+      if (enabled) {
+        nameControl?.setValidators([Validators.required]);
+        idControl?.setValidators([Validators.required, Validators.min(1)]);
+      } else {
+        nameControl?.clearValidators();
+        idControl?.clearValidators();
+      }
 
-        nameControl?.updateValueAndValidity();
-        idControl?.updateValueAndValidity();
-      });
-    }
+      nameControl?.updateValueAndValidity();
+      idControl?.updateValueAndValidity();
+    });
   }
 
   onEditMask() {

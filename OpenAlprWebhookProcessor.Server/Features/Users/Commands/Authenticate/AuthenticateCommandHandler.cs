@@ -36,7 +36,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
                 return null;
             }
 
-            var jwtToken = await _jwtService.GenerateJwtTokenAsync(user, cancellationToken);
+            var jwtToken = await _jwtService.GenerateJwtTokenAsync(user, request.RememberMe, cancellationToken);
             var refreshToken = _jwtService.GenerateRefreshToken(request.IpAddress);
 
             user.RefreshTokens ??= new System.Collections.Generic.List<Users.RefreshToken>();

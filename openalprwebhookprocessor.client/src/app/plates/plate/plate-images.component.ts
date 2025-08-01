@@ -1,4 +1,5 @@
-import { Component, Input, inject, OnInit, OnDestroy, OnChanges } from '@angular/core';
+import type { OnInit, OnDestroy, OnChanges } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Lightbox } from 'ngx-lightbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -32,7 +33,7 @@ export class PlateImagesComponent implements OnInit, OnChanges, OnDestroy {
   public loadingPlateImage = false;
   public loadingPlateImageFailed = false;
   public plateImageUrl = '';
-  
+
   private isInitialized = false;
 
   ngOnInit(): void {
