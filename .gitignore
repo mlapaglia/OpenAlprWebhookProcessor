@@ -18,6 +18,7 @@ mono_crash.*
 
 # Build results
 [Dd]ebug/
+!openalprwebhookprocessor.client/src/app/settings/debug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

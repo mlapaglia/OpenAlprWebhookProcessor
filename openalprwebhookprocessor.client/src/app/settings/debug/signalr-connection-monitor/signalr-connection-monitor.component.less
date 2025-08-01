@@ -1,0 +1,64 @@
+// SignalR Connection Monitor Component Styles
+
+.connection-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  th {
+    border-bottom: 1px solid #ddd;
+    font-weight: 500;
+  }
+  
+  .user-agent-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .connection-id-cell {
+    font-family: monospace;
+    font-size: 12px;
+  }
+}
+
+.connection-status {
+  &.connected {
+    color: #4caf50;
+  }
+  
+  &.disconnected {
+    color: #f44336;
+  }
+  
+  &.not-available {
+    color: #666;
+    font-style: italic;
+  }
+}
+
+.connection-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh-button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}

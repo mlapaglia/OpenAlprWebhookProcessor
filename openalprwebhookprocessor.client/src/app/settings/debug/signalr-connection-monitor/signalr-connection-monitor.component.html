@@ -1,0 +1,94 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon style="margin-right: 8px;">wifi</mat-icon>
+      SignalR Connection Monitor
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    
+    <!-- Client Connection Info -->
+    <div style="margin-bottom: 24px;">
+      <h4>Client Connection</h4>
+      @if (clientConnectionInfo) {
+        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; align-items: center;">
+          <strong>State:</strong>
+          <span [style.color]="clientConnectionInfo.state === 'Connected' ? '#4caf50' : '#f44336'">
+            {{ clientConnectionInfo.state }}
+          </span>
+          
+                     <strong>Connection ID:</strong>
+           <span>{{ clientConnectionInfo.connectionId || 'Not available' }}</span>
+           
+           <strong>Transport:</strong>
+           <span>{{ clientConnectionInfo.transport }}</span>
+
+           <strong>Connected Duration:</strong>
+           <span>{{ formatDuration(clientConnectionInfo.durationSeconds) }}</span>
+        </div>
+      } @else {
+        <span style="color: #f44336; font-style: italic;">Not connected</span>
+      }
+    </div>
+
+    <mat-divider />
+
+    <!-- Server Connection Info -->
+    <div style="margin-top: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h4>Server Connections ({{ signalrConnections?.totalConnections || 0 }})</h4>
+        <button 
+          mat-icon-button 
+          (click)="refreshConnections()"
+          [disabled]="isLoadingConnections"
+          matTooltip="Refresh connection data">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+             @if (isLoadingConnections && isManualRefresh) {
+         <div style="display: flex; align-items: center; gap: 10px;">
+           <mat-progress-spinner 
+             color="primary" 
+             mode="indeterminate" 
+             diameter="20" />
+           <span>Loading connection information...</span>
+         </div>
+       } @else if (signalrConnections && signalrConnections.connections.length > 0) {
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <th style="text-align: left; padding: 8px;">User</th>
+                <th style="text-align: left; padding: 8px;">Transport</th>
+                <th style="text-align: left; padding: 8px;">Duration</th>
+                <th style="text-align: left; padding: 8px;">IP Address</th>
+                <th style="text-align: left; padding: 8px;">User Agent</th>
+                <th style="text-align: left; padding: 8px;">Connection ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (connection of signalrConnections.connections; track connection.connectionId) {
+                <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 8px;">{{ connection.userId }}</td>
+                  <td style="padding: 8px;">{{ connection.transport }}</td>
+                  <td style="padding: 8px;">{{ formatDuration(connection.durationSeconds) }}</td>
+                  <td style="padding: 8px;">{{ connection.ipAddress }}</td>
+                  <td style="padding: 8px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                      [title]="connection.userAgent">
+                    {{ connection.userAgent }}
+                  </td>
+                  <td style="padding: 8px; font-family: monospace; font-size: 12px;">
+                    {{ connection.connectionId.substring(0, 8) }}...
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <span style="color: #666; font-style: italic;">No active connections</span>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
