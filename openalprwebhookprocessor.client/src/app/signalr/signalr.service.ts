@@ -129,7 +129,7 @@ export class SignalrService {
       });
   }
 
-  private triggerConnectionStatusChange(isConnected: boolean): void {
+  public triggerConnectionStatusChange(isConnected: boolean): void {
     this.isConnected = isConnected;
     this.connectionStatusChanged.next(this.isConnected);
   }
