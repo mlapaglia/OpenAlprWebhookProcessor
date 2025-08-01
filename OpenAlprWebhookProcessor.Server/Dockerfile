@@ -41,16 +41,23 @@ RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURAT
     -p:GitVersion="$GIT_VERSION" \
     -p:GitAssemblyVersion="$GIT_ASSEMBLY_VERSION" \
     -p:GitFileVersion="$GIT_FILE_VERSION" && \
+    mkdir -p /app/build && \
     /root/.dotnet/tools/dotnet-ef migrations bundle \
+        --project "./OpenAlprWebhookProcessor.Server.csproj" \
+        --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context ProcessorContext \
         --output /app/build/processor-migrator \
-        --no-build \
-        --configuration $BUILD_CONFIGURATION && \
+        --configuration $BUILD_CONFIGURATION \
+        --verbose \
+        --force && \
     /root/.dotnet/tools/dotnet-ef migrations bundle \
+        --project "./OpenAlprWebhookProcessor.Server.csproj" \
+        --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context UsersContext \
         --output /app/build/users-migrator \
-        --no-build \
-        --configuration $BUILD_CONFIGURATION
+        --configuration $BUILD_CONFIGURATION \
+        --verbose \
+        --force
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION
