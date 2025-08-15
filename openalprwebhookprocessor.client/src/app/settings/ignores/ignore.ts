@@ -1,10 +1,4 @@
-export class Ignore {
-  id: string
-  plateNumber: string
-  strictMatch: boolean
-  description: string
+import { PlateSettingBase } from '../shared/plate-setting.interface';
 
-  constructor(init?: Partial<Ignore>) {
-    Object.assign(this, init)
-  }
+export class Ignore extends PlateSettingBase {
 }

@@ -1,0 +1,71 @@
+<mat-expansion-panel (opened)="onPlateOpened()" (closed)="onPlateClosed()">
+  <mat-expansion-panel-header [ngClass]="{'alertPlate': plate().isAlert === true, 'ignorePlate': plate().isIgnore === true}">
+    <mat-panel-title style="display: flex; align-content: flex-start;" [ngClass]="{'ignorePlateText': plate().isIgnore === true}">
+      <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">{{plate().openAlprCameraId}}</span>
+      <span style="flex: 2; overflow: hidden; word-wrap: break-word;">{{plate().plateNumber}}</span>
+      <span style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile vehicle-description-container">
+        @if (vehicleMakeInfo; as makeInfo) {
+          <div class="vehicle-logo-container">
+            <img 
+              [ngSrc]="makeInfo.logo" 
+              [alt]="makeInfo.displayName + ' logo'"
+              class="vehicle-logo"
+              [title]="makeInfo.displayName"
+              fill
+              (error)="onImageError($event)"
+            />
+          </div>
+        }
+        <span class="vehicle-text">{{formattedVehicleDescription}}</span>
+      </span>
+      <span style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile">
+        <mat-icon i18n [style.transform]="'rotate(' + (plate().direction - 90) + 'deg)'" aria-hidden="false" aria-label="vehicle direction" i18n-aria-label>arrow_right_alt</mat-icon>
+      </span>
+      <span style="flex: 3; overflow: hidden; word-wrap: break-word;">{{plate().receivedOn | date:"medium"}}</span>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <ng-template matExpansionPanelContent>
+    <app-plate [isVisible]="plate().isOpen" [isExpanded]="isExpanded" [plate]="plate()" (plateChanged)="onPlateChanged($event)" />
+  </ng-template>
+  <mat-action-row class="plate-actions">
+    <div class="primary-actions">
+      <button mat-raised-button
+              [disabled]="plate().canBeEnriched"
+              type="button"
+              color="accent"
+              (click)="onEnrichPlate()"
+              i18n>
+        <mat-icon>auto_fix_high</mat-icon>
+        <span>Enrich plate</span>
+      </button>
+      
+      <button mat-raised-button 
+              type="button"
+              color="primary"
+              (click)="onEditPlate()"
+              i18n>
+        <mat-icon>edit</mat-icon>
+        <span>Edit plate</span>
+      </button>
+      
+      <app-refresh-button
+        [disabled]="plate().isIgnore"
+        (refreshStarted)="onIgnorePlate()"
+        buttonText="Add to ignore list"
+        buttonRefreshingText="Adding..."
+        icon="visibility_off"
+        color="accent"
+        i18n />
+
+      
+      <app-refresh-button
+        [disabled]="plate().isAlert"
+        (refreshStarted)="onAlertPlate()"
+        buttonText="Add to alert list"
+        buttonRefreshingText="Adding..."
+        icon="notifications_active"
+        color="primary"
+        i18n />
+    </div>
+  </mat-action-row>
+</mat-expansion-panel>

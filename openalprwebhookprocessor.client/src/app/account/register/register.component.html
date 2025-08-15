@@ -1,0 +1,124 @@
+<div class="login-container">
+  <div class="floating-ball ball-1"></div>
+  <div class="floating-ball ball-2"></div>
+  <div class="floating-ball ball-3"></div>
+  <div class="floating-ball ball-4"></div>
+  <div class="floating-ball ball-5"></div>
+  <div class="floating-ball ball-6"></div>
+  <div class="floating-ball ball-7"></div>
+  <div class="floating-ball ball-8"></div>
+  <div class="floating-ball ball-9"></div>
+  <div class="floating-ball ball-10"></div>
+  <div class="floating-ball ball-11"></div>
+  <div class="floating-ball ball-12"></div>
+  <div class="login-card-wrapper">
+    <app-alert />
+    <mat-card class="login-card">
+      <mat-card-content>
+        <div class="login-header">
+          <h1 class="login-title" i18n>Create Account</h1>
+          <p class="login-subtitle" i18n>Sign up to get started</p>
+        </div>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+          <div class="form-fields">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>First Name</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                formControlName="firstName"
+                [class.mat-form-field-invalid]="submitted && f.firstName.errors"
+                autocomplete="given-name">
+              <mat-icon matSuffix>person</mat-icon>
+              @if (submitted && f.firstName.errors) {
+                <mat-error i18n>First name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Last Name</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                formControlName="lastName"
+                [class.mat-form-field-invalid]="submitted && f.lastName.errors"
+                autocomplete="family-name">
+              <mat-icon matSuffix>person</mat-icon>
+              @if (submitted && f.lastName.errors) {
+                <mat-error i18n>Last name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Username (email)</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                formControlName="username"
+                [class.mat-form-field-invalid]="submitted && f.username.errors"
+                autocomplete="username">
+              <mat-icon matSuffix>account_circle</mat-icon>
+              @if (submitted && f.username.errors) {
+                <mat-error i18n>Username is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Password</mat-label>
+              <input 
+                type="password" 
+                matInput 
+                formControlName="password"
+                [class.mat-form-field-invalid]="submitted && f.password.errors"
+                autocomplete="new-password">
+              <mat-icon matSuffix>lock</mat-icon>
+              @if (submitted && f.password.errors) {
+                <mat-error>
+                  @if (f.password.errors['required']) {
+                    <span i18n>Password is required</span>
+                  }
+                  @if (f.password.errors['minlength']) {
+                    <span i18n>Password must be at least 8 characters</span>
+                  }
+                  @if (f.password.errors['pattern']) {
+                    <span i18n>Password must contain uppercase, lowercase, and number</span>
+                  }
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="login-actions">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              class="login-button full-width"
+              [disabled]="loading"
+              i18n>
+              @if (loading) {
+                <mat-spinner diameter="20" class="button-spinner" />
+                Creating Account...
+              } @else {
+                Create Account
+              }
+            </button>
+
+            <div class="register-section">
+              <p class="register-text" i18n>Already have an account?</p>
+              <button 
+                mat-button 
+                color="accent"
+                routerLink="../login"
+                class="register-button"
+                i18n>
+                Sign In
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

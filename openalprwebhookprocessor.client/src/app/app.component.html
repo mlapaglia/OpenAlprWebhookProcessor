@@ -1,39 +1,74 @@
-﻿<mat-sidenav-container fullscreen>
-  <mat-sidenav
-    mode="over"
-    [(opened)]="navBarVisible"
-    [fixedInViewport]="false"
-    [fixedTopGap]="0"
-    [fixedBottomGap]="0">
-    <mat-nav-list>
-      @for (item of navItems; track item) {
-        <mat-list-item (click)="handleSideNavClick();" routerLink="{{item.link}}">
-          <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
-          <span class="mobile-shrink">{{item.linkTitle}}</span>
-        </mat-list-item>
-      }
-      <app-theme-picker></app-theme-picker>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content fullscreen>
-    @if (topBarVisible) {
-      <nav mat-tab-nav-bar mat-align-tabs="start"
-        [tabPanel]="tabPanel">
-        <a mat-tab-link routerLink="/" class="home-button">
-          <div class="icon-container">
+﻿@if (topBarVisible) {
+  <mat-sidenav-container fullscreen>
+    <mat-sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [(opened)]="sidenavOpened"
+      [fixedInViewport]="isMobile"
+      [fixedTopGap]="0"
+      [fixedBottomGap]="0"
+      class="main-sidenav">
+      
+      <!-- App Header in Sidebar -->
+      <mat-toolbar color="primary" class="sidebar-header">
+        <div class="app-logo">
+          <div class="status-indicator">
             <div [ngClass]="isSignalrConnected ? 'pulse-circle': 'pulse-circle-offline'"></div>
             <mat-icon [ngClass]="isSignalrConnected ? 'glow' : 'glow-offline'">anchor</mat-icon>
           </div>
-          <span style="padding-left:6px;">OpenALPR Webhook Processor</span></a>
-          <a mat-tab-link routerLink="/"><mat-icon>home</mat-icon><span>Home</span></a>
-          <a mat-tab-link routerLink="/plates"><mat-icon>crop_16_9</mat-icon><span>Plates</span></a>
-          <a mat-tab-link (click)="settingsButtonClicked();" (keydown)="settingsButtonClicked()" tabindex="0"><mat-icon>settings</mat-icon><span>Settings</span></a>
-          <a mat-tab-link (click)="logout()" (keydown)="settingsButtonClicked()" tabindex="0"><mat-icon>exit_to_app</mat-icon><span>Logout</span></a>
-        </nav>
+          <div class="app-title">
+            <span class="app-name">OpenALPR</span>
+            <span class="app-subtitle">Webhook Processor</span>
+          </div>
+        </div>
+      </mat-toolbar>
+
+      <!-- Main Navigation -->
+      <mat-nav-list class="main-nav">
+        <mat-list-item routerLink="/" routerLinkActive="active-link" (click)="closeSidenavOnMobile()" (keydown)="onNavigationKeyDown($event)">
+          <mat-icon matListItemIcon>home</mat-icon>
+          <span>Home</span>
+        </mat-list-item>
+        <mat-list-item routerLink="/plates" routerLinkActive="active-link" (click)="closeSidenavOnMobile()" (keydown)="onNavigationKeyDown($event)">
+          <mat-icon matListItemIcon>crop_16_9</mat-icon>
+          <span>Plates</span>
+        </mat-list-item>
+        
+        <!-- Settings Section -->
+        <mat-divider />
+        <h3 class="nav-section-header">Settings</h3>
+        @for (item of settingsNavItems; track item) {
+          <mat-list-item [routerLink]="item.link" routerLinkActive="active-link" (click)="closeSidenavOnMobile()" (keydown)="onNavigationKeyDown($event)">
+            <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+            <span>{{item.linkTitle}}</span>
+          </mat-list-item>
+        }
+        
+        <!-- Bottom Actions -->
+        <mat-divider />
+        <app-theme-picker />
+        <mat-list-item (click)="logout()" (keydown)="onLogoutKeyDown($event)" class="logout-item">
+          <mat-icon matListItemIcon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-sidenav>
+    
+    <mat-sidenav-content class="main-content">
+      <!-- Mobile menu button -->
+      @if (isMobile) {
+        <mat-toolbar color="primary" class="mobile-header">
+          <button mat-icon-button (click)="toggleSidenav()" class="menu-toggle">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <span class="mobile-title">OpenALPR</span>
+        </mat-toolbar>
       }
-      <app-alert></app-alert>
-      <mat-tab-nav-panel #tabPanel>
-        <router-outlet></router-outlet>
+      <app-alert />
+      <mat-tab-nav-panel #tabPanel class="content-wrapper">
+        <router-outlet />
       </mat-tab-nav-panel>
     </mat-sidenav-content>
   </mat-sidenav-container>
+} @else {
+  <router-outlet />
+}

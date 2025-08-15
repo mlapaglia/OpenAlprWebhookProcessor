@@ -1,4 +1,4 @@
 export class ZoomFocus {
-  zoom: number
-  focus: number
+  zoom: number;
+  focus: number;
 }

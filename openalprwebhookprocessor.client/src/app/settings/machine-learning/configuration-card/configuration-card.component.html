@@ -1,0 +1,30 @@
+<mat-card>
+  <app-configuration-header
+    [isLoadingConfiguration]="isLoadingConfiguration()" />
+  
+  <app-configuration-table 
+    [configuration]="configuration()"
+    [configForm]="configForm"
+    [isEditingConfiguration]="isEditingConfiguration()" />
+  
+  <app-configuration-actions 
+    [isEditingConfiguration]="isEditingConfiguration()"
+    [isLoadingConfiguration]="isLoadingConfiguration()"
+    [isSavingConfiguration]="isSavingConfiguration()"
+    [configForm]="configForm"
+    (saveConfiguration)="onSaveConfiguration()"
+    (cancelConfigurationEdit)="onCancelConfigurationEdit()"
+    (editConfiguration)="onEditConfiguration()" />
+</mat-card>
+
+
+
+
+
+
+
+
+
+
+
+

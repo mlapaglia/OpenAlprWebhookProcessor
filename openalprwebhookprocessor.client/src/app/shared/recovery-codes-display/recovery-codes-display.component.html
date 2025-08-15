@@ -1,0 +1,48 @@
+@if (recoveryCodes().length > 0) {
+  <mat-card class="recovery-codes-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>security</mat-icon>
+        Recovery Codes
+      </mat-card-title>
+      <mat-card-subtitle>
+        Save these codes in a safe place. Each code can only be used once.
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="warning-message">
+        <mat-icon>warning</mat-icon>
+        <p>These codes will allow you to access your account if you lose your authenticator device. 
+           Store them securely and don't share them with anyone.</p>
+      </div>
+      
+      <mat-list class="recovery-codes-list">
+        @for (code of recoveryCodes(); track code) {
+          <mat-list-item>
+            <code>{{ code }}</code>
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <button mat-button (click)="downloadCodes()">
+        <mat-icon>download</mat-icon>
+        Download
+      </button>
+      <button mat-button (click)="printCodes()">
+        <mat-icon>print</mat-icon>
+        Print
+      </button>
+      @if (canGenerate()) {
+        <button mat-button 
+                (click)="onGenerateNewCodes()"
+                color="warn">
+          <mat-icon>refresh</mat-icon>
+          Generate New Codes
+        </button>
+      }
+    </mat-card-actions>
+  </mat-card>
+}

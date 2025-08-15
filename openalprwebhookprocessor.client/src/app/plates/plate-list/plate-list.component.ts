@@ -1,0 +1,69 @@
+import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import type { PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { PlateItemComponent, type PlateData } from '../plate-item/plate-item.component';
+
+@Component({
+  selector: 'app-plate-list',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    MatExpansionModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule,
+    PlateItemComponent,
+  ],
+  templateUrl: './plate-list.component.html',
+  styleUrl: './plate-list.component.less',
+})
+export class PlateListComponent {
+  readonly plates = input<PlateData[]>([]);
+  readonly isLoading = input<boolean>(false);
+  readonly pageSize = input<number>(25);
+  readonly totalNumberOfPlates = input<number>(0);
+
+  readonly plateOpened = output<string>();
+  readonly plateClosed = output<string>();
+  readonly enrichPlate = output<string>();
+  readonly editPlate = output<string>();
+  readonly alertPlate = output<string>();
+  readonly ignorePlate = output<string>();
+  readonly viewPlate = output<string>();
+  readonly paginatorChange = output<PageEvent>();
+
+  onPlateOpened(plateId: string) {
+    this.plateOpened.emit(plateId);
+  }
+
+  onPlateClosed(plateId: string) {
+    this.plateClosed.emit(plateId);
+  }
+
+  onEnrichPlate(plateId: string) {
+    this.enrichPlate.emit(plateId);
+  }
+
+  onEditPlate(plateId: string) {
+    this.editPlate.emit(plateId);
+  }
+
+  onAlertPlate(plateId: string) {
+    this.alertPlate.emit(plateId);
+  }
+
+  onIgnorePlate(plateId: string) {
+    this.ignorePlate.emit(plateId);
+  }
+
+  onViewPlate(plateId: string) {
+    this.viewPlate.emit(plateId);
+  }
+
+  onPaginatorPage(event: PageEvent) {
+    this.paginatorChange.emit(event);
+  }
+}

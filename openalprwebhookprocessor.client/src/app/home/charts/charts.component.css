@@ -1,0 +1,107 @@
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chart-card {
+  height: 420px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chart-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chart-card mat-card-header {
+  padding-bottom: 1rem;
+}
+
+.chart-card mat-card-content {
+  overflow: hidden;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.chart-container canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.chart-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 850px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-row {
+    gap: 1.5rem;
+  }
+  
+  .chart-card {
+    height: 380px;
+  }
+}
+
+@media (max-width: 480px) {
+  .charts-row {
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card {
+    height: 350px;
+    min-width: 0;
+  }
+  
+  .chart-container {
+    height: 250px;
+    padding: 0.25rem;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .chart-card {
+    height: 320px;
+  }
+  
+  .chart-container {
+    height: 220px;
+    padding: 0.125rem;
+  }
+}

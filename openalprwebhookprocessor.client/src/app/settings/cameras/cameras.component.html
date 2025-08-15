@@ -1,13 +1,10 @@
-<mat-grid-list cols="2" rowHeight="2:1" style="padding:16px;">
-  <div style="display: flex; flex-wrap: wrap;" >
-    @for (camera of cameras; track camera) {
-      <app-camera
-        [camera]="camera"
-        (add)="addCamera()"
-        (edit)="editCamera($event)"
-        (delete)="deleteCamera($event)"
-        style="padding: 15px;">
-      </app-camera>
-    }
-  </div>
-</mat-grid-list>
+<div class="cameras-container">
+  @for (camera of cameras; track camera) {
+    <app-camera
+      [camera]="camera"
+      (add)="addCamera()"
+      (edit)="editCamera($event)"
+      (delete)="deleteCamera($event)"
+      class="camera-wrapper" />
+  }
+</div>

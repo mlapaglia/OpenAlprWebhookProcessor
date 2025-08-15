@@ -1,0 +1,49 @@
+<div class="qr-code-container">
+  @if (loading) {
+    <div class="loading">
+      <mat-spinner diameter="40" />
+      <p>Generating QR code...</p>
+    </div>
+  }
+  
+  @if (error) {
+    <div class="error">
+      <mat-icon>error</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+  }
+  
+  @if (qrCodeImageUrl && !loading && !error) {
+    <div class="qr-code-display">
+      <!-- eslint-disable-next-line @angular-eslint/template/prefer-ngsrc -->
+      <img [src]="qrCodeImageUrl" alt="QR Code for two-factor authentication setup" class="qr-code" />
+      
+      @if (sharedKey()) {
+        <mat-card class="shared-key-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>vpn_key</mat-icon>
+              Manual Entry Key
+            </mat-card-title>
+            <mat-card-subtitle>
+              Use this key if you can't scan the QR code
+            </mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="key-container">
+              <code class="shared-key-code">{{ sharedKey() }}</code>
+              <button 
+                mat-icon-button 
+                (click)="copyToClipboard()" 
+                matTooltip="Copy to clipboard"
+                class="copy-button">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

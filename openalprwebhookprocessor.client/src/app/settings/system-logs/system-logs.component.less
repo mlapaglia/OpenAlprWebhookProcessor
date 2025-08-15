@@ -1,0 +1,194 @@
+.system-logs-container {
+  padding: 24px;
+  max-width: 100%;
+  
+  .controls-section {
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    border: 1px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    
+    .log-level-section {
+      margin-bottom: 32px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      
+      mat-form-field {
+        width: 240px;
+        
+        .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+        
+        &:first-child {
+          min-width: 180px;
+        }
+        
+        &:last-child {
+          min-width: 260px;
+          flex: 1;
+        }
+      }
+    }
+    
+    .plate-controls-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      
+      .plate-download-group {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: center;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        flex-wrap: wrap;
+        
+        button {
+          min-width: 260px;
+          height: 40px;
+          font-weight: 500;
+          letter-spacing: 0.025em;
+          flex-shrink: 0;
+        }
+        
+        mat-checkbox {
+          margin-left: 0;
+          margin-top: 0;
+          
+          .mdc-form-field {
+            font-size: 14px;
+            color: #495057;
+          }
+        }
+      }
+      
+      > button {
+        align-self: flex-start;
+        min-width: 200px;
+        height: 40px;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+        
+        &.spinner {
+          opacity: 0.8;
+          cursor: not-allowed;
+          position: relative;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+        }
+      }
+    }
+  }
+  
+  .logs-display-section {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    
+    pre {
+      margin: 0;
+      background-color: #1e1e1e;;
+      border: none;
+      border-radius: 0;
+      max-height: 70vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+  
+  // Responsive design
+  @media (max-width: 540px) {
+    .controls-section {
+      .log-level-section {
+        flex-direction: column;
+        
+        mat-form-field {
+          width: 100%;
+          
+          &:first-child,
+          &:last-child {
+            min-width: auto;
+          }
+        }
+      }
+      
+      .plate-controls-section {
+        .plate-download-group {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+          
+          button {
+            width: 100%;
+            min-width: auto;
+          }
+        }
+      }
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .controls-section {
+      .plate-controls-section {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 32px;
+        
+        .plate-download-group {
+          flex: 1;
+          margin-right: 0;
+          max-width: none;
+        }
+        
+        > button {
+          align-self: flex-start;
+          margin-top: 20px;
+        }
+      }
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .controls-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 48px;
+      
+      .log-level-section {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      
+      .plate-controls-section {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+  }
+  
+  @keyframes spin {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
+  }
+}

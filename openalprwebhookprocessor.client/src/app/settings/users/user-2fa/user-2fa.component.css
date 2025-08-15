@@ -1,0 +1,107 @@
+mat-card {
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+mat-card-header {
+  padding: 16px 20px 8px;
+}
+
+mat-card-header h1 {
+  font-size: 1.25rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+mat-card-content {
+  padding: 0 20px 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+mat-card-actions {
+  padding: 12px 20px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--mdc-theme-outline, #e0e0e0);
+}
+
+/* Compact content sections */
+h3 {
+  font-size: 1.1rem;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+h4 {
+  font-size: 1rem;
+  margin: 12px 0 8px 0;
+  font-weight: 500;
+}
+
+p {
+  margin: 8px 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Setup loading section */
+.setup-loading {
+  text-align: center;
+  padding: 24px;
+}
+
+.setup-loading p {
+  margin-top: 12px;
+}
+
+/* 2FA Enabled section */
+.twofa-enabled-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.twofa-enabled-header mat-icon {
+  color: var(--mdc-theme-primary, green);
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.twofa-enabled-header h3 {
+  margin: 0;
+}
+
+/* Action buttons */
+.action-buttons {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  font-size: 0.875rem;
+}
+
+/* Expansion panel */
+.mat-expansion-panel {
+  margin: 12px 0;
+}
+
+.mat-list-item code {
+  font-family: 'Courier New', monospace;
+  background-color: var(--mat-menu-container-color, #f5f5f5);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.is-invalid {
+  border-color: var(--mdc-theme-error, #dc3545);
+}
+
+mat-spinner {
+  display: inline-block;
+  vertical-align: middle;
+}

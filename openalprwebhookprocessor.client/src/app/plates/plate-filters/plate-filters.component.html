@@ -1,0 +1,146 @@
+<!-- Sticky Filter Bar -->
+<div class="filter-bar">
+  <mat-card class="filter-card">
+    <mat-card-content class="filter-content">
+      <div class="primary-filters">
+        <mat-form-field class="date-range-field">
+          <mat-label i18n>Date Range</mat-label>
+          <mat-date-range-input [rangePicker]="picker" [max]="todaysDate()">
+            <input matStartDate [(ngModel)]="filterStartOn" (ngModelChange)="onStartDateChange()" (keyup.enter)="onSearch()" placeholder="Start" i18n-placeholder>
+            <input matEndDate [(ngModel)]="filterEndOn" (ngModelChange)="onEndDateChange()" (keyup.enter)="onSearch()" placeholder="End" i18n-placeholder>
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker" />
+          <mat-date-range-picker #picker />
+        </mat-form-field>
+        
+        <mat-form-field class="plate-field">
+          <mat-label i18n>Plate Number</mat-label>
+          <input matInput
+            [(ngModel)]="filterPlateNumber"
+            (keyup.enter)="onSearch()"
+            (input)="validateSearchPlateNumber(); onFilterChange()"
+            placeholder="LRN2DRV" i18n-placeholder />
+        </mat-form-field>
+        
+        <div class="filter-actions">
+          <app-refresh-button
+            [disabled]="isSearchDisabled"
+            [isLoading]="isSearching()"
+            buttonType="raised"
+            buttonText="Search"
+            buttonRefreshingText="Searching..."
+            color="primary"
+            icon="directions_run"
+            (refreshStarted)="onSearch()" />
+          <button mat-raised-button
+            color="warn"
+            (click)="onClear()">
+            <mat-icon>clear</mat-icon>
+            <span i18n>Clear</span>
+          </button>
+          <button mat-icon-button
+            (click)="onToggleAdvanced()"
+            [class.expanded]="showAdvancedFilters()"
+            class="expand-btn"
+            matTooltip="Advanced Filters" i18n-matTooltip>
+            <mat-icon>{{showAdvancedFilters() ? 'expand_less' : 'expand_more'}}</mat-icon>
+          </button>
+        </div>
+      </div>
+      
+      @if (showAdvancedFilters()) {
+        <div class="advanced-filters">
+          <mat-form-field>
+            <mat-label i18n>Camera</mat-label>
+            <mat-select [disabled]="cameras().length === 0" [(ngModel)]="filterOpenAlprCameraId" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              @for (camera of cameras(); track camera) {
+                <mat-option [value]="camera">{{camera}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label i18n>Vehicle Make</mat-label>
+            <mat-select [disabled]="vehicleFilters().vehicleMakes.length === 0" [(ngModel)]="filterVehicleMake" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              @for (make of vehicleFilters().vehicleMakes; track make) {
+                <mat-option [value]="make">{{make}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label i18n>Vehicle Model</mat-label>
+            <mat-select [disabled]="vehicleFilters().vehicleModels.length === 0" [(ngModel)]="filterVehicleModel" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              @for (model of vehicleFilters().vehicleModels; track model) {
+                <mat-option [value]="model">{{model}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label i18n>Vehicle Type</mat-label>
+            <mat-select [disabled]="vehicleFilters().vehicleTypes.length === 0" [(ngModel)]="filterVehicleType" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              @for (type of vehicleFilters().vehicleTypes; track type) {
+                <mat-option [value]="type">{{type}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label i18n>Vehicle Color</mat-label>
+            <mat-select [disabled]="vehicleFilters().vehicleColors.length === 0" [(ngModel)]="filterVehicleColor" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              @for (color of vehicleFilters().vehicleColors; track color) {
+                <mat-option [value]="color">{{color}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field>
+            <mat-label i18n>Direction</mat-label>
+            <mat-select [(ngModel)]="filterDirection" (ngModelChange)="onFilterChange()">
+              <mat-option [value]="" />
+              <mat-option [value]="0" i18n>North</mat-option>
+              <mat-option [value]="45" i18n>North East</mat-option>
+              <mat-option [value]="90" i18n>East</mat-option>
+              <mat-option [value]="135" i18n>South East</mat-option>
+              <mat-option [value]="180" i18n>South</mat-option>
+              <mat-option [value]="225" i18n>South West</mat-option>
+              <mat-option [value]="270" i18n>West</mat-option>
+              <mat-option [value]="315" i18n>North West</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        
+        <div class="checkbox-filters">
+          <mat-checkbox
+            [(ngModel)]="filterIncludeIgnoredPlatesEnabled"
+            (ngModelChange)="onFilterChange()"
+            color="primary">Include Ignored</mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="regexSearchEnabled"
+            (ngModelChange)="onFilterChange()"
+            color="primary">Regex Search</mat-checkbox>
+          <mat-checkbox
+            [(ngModel)]="filterPlatesSeenLessThan"
+            (ngModelChange)="onFilterChange()"
+            color="primary">Plates Seen Less Than 10 Times</mat-checkbox>
+        </div>
+        
+        @if (showRegexError) {
+          <mat-error i18n>Invalid regex pattern</mat-error>
+        }
+        @if (showSearchError) {
+          <mat-error i18n>Invalid search term</mat-error>
+        }
+        @if (showDateRangeError) {
+          <mat-error i18n>End date must be after start date</mat-error>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

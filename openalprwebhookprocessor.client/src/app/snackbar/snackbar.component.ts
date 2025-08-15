@@ -1,36 +1,62 @@
-import { Component, inject } from '@angular/core'
-import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar'
-import { SnackBarType } from './snackbartype'
-import { MatIconModule } from '@angular/material/icon'
-import { SnackBar } from './snackbar'
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { SnackBarType } from './snackbartype';
+import type { SnackBar } from './snackbar';
 
 @Component({
   selector: 'app-snackbar',
   templateUrl: './snackbar.component.html',
   styleUrls: ['./snackbar.component.less'],
-  imports: [MatIconModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatIconModule, MatButtonModule],
 })
 export class SnackbarComponent {
-  data = inject<SnackBar>(MAT_SNACK_BAR_DATA)
+  data = inject<SnackBar>(MAT_SNACK_BAR_DATA);
+  snackBarRef = inject(MatSnackBarRef);
 
   get getIcon() {
     switch (this.data.snackType) {
       case SnackBarType.Alert:
-        return 'taxi_alert'
+        return 'warning';
       case SnackBarType.Info:
-        return 'info'
+        return 'info';
       case SnackBarType.Connected:
-        return 'signal_wifi_4_bar'
+        return 'wifi';
       case SnackBarType.Disconnected:
-        return 'signal_cellular_off'
+        return 'wifi_off';
       case SnackBarType.Saved:
-        return 'saved'
+        return 'save';
       case SnackBarType.Deleted:
-        return 'delete'
+        return 'delete';
       case SnackBarType.Successful:
-        return 'check'
+        return 'check_circle';
       case SnackBarType.Error:
-        return 'error'
+        return 'error';
     }
+  }
+
+  get getIconColor() {
+    switch (this.data.snackType) {
+      case SnackBarType.Alert:
+        return '#ff9800'; // Orange
+      case SnackBarType.Info:
+      case SnackBarType.Connected:
+      case SnackBarType.Saved:
+        return '#2196f3'; // Blue
+      case SnackBarType.Successful:
+        return '#4caf50'; // Green
+      case SnackBarType.Error:
+      case SnackBarType.Disconnected:
+      case SnackBarType.Deleted:
+        return '#f44336'; // Red
+      default:
+        return '#2196f3'; // Default blue
+    }
+  }
+
+  dismiss() {
+    this.snackBarRef.dismiss();
   }
 }

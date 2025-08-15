@@ -1,0 +1,66 @@
+<div class="images-container">
+  <h3 class="section-title" i18n>Images</h3>
+  
+  <div class="images-content">
+    <div class="image-container">
+      <!-- Vehicle Image Section -->
+      <div class="vehicle-section">
+        @if (loadingVehicleImage) {
+          <mat-progress-spinner
+            color="primary"
+            mode="indeterminate" i18n-mode
+            diameter="60"
+          />
+        }
+        @if (!this.vehicleImageUrl || loadingVehicleImageFailed) {
+          <mat-icon i18n style="font-size: 80px; line-height: normal;"
+            [inline]="true"
+            matTooltip="Unable to retrieve vehicle image" i18n-matTooltip>
+            image_not_supported
+          </mat-icon>
+        }
+        <!-- eslint-disable-next-line @angular-eslint/template/prefer-ngsrc -->
+        <img [src]="this.vehicleImageUrl"
+          class="resize-mobile vehicle-image"
+          style="cursor: pointer;"
+          alt="Vehicle image" i18n-alt
+          tabindex="0"
+          [hidden]="loadingVehicleImage || loadingVehicleImageFailed"
+          [style.pointer-events]="loadingVehicleImageFailed ? 'none' : 'auto'"
+          (load)="vehicleImageLoaded()"
+          (error)="vehicleImageFailedToLoad()"
+          (click)="openLightbox(plate().imageUrl, plate().plateNumber)"
+          (keydown)="openLightbox(plate().imageUrl, plate().plateNumber)" />
+      </div>
+      
+      <!-- Plate Image Section -->
+      <div class="plate-section">
+        @if (loadingPlateImage) {
+          <mat-progress-spinner
+            color="primary"
+            mode="indeterminate" i18n-mode
+            diameter="40" />
+        }
+        @if (!this.plateImageUrl || loadingPlateImageFailed) {
+          <mat-icon i18n style="font-size: 60px; line-height: normal;"
+            [inline]="true"
+            matTooltip="Unable to retrieve plate image" i18n-matTooltip>
+            image_not_supported
+          </mat-icon>
+        }
+        <!-- eslint-disable-next-line @angular-eslint/template/prefer-ngsrc -->
+        <img [src]="this.plateImageUrl"
+          class="resize-mobile plate-image"
+          style="cursor: pointer;"
+          alt="License plate image" i18n-alt
+          tabindex="0"
+          [hidden]="loadingPlateImage || loadingPlateImageFailed"
+          [style.pointer-events]="loadingPlateImageFailed ? 'none' : 'auto'"
+          (load)="plateImageLoaded()"
+          (error)="plateImageFailedToLoad()"
+          (click)="openLightbox(plate().cropImageUrl, plate().plateNumber)"
+          (keydown)="openLightbox(plate().cropImageUrl, plate().plateNumber)" />
+      </div>
+    </div>
+  </div>
+</div>

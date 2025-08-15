@@ -1,0 +1,79 @@
+<div class="setup-container">
+  <mat-card class="setup-card">
+    <mat-card-header>
+      <mat-card-title>Two-Factor Authentication Setup</mat-card-title>
+      <mat-card-subtitle>
+        @if (twoFactorEnabled) {
+          Two-factor authentication is currently enabled
+        } @else {
+          Secure your account with two-factor authentication
+        }
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (twoFactorEnabled) {
+        <!-- 2FA is already enabled -->
+        <div class="status-section">
+          <p>✅ Two-factor authentication is enabled for your account.</p>
+          
+          <div class="action-buttons">
+            <button mat-raised-button color="warn" (click)="disableTwoFactor()">
+              Disable 2FA
+            </button>
+            <button mat-raised-button color="primary" (click)="onGenerateNewRecoveryCodes()">
+              Generate New Recovery Codes
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- Setup 2FA -->
+        @if (setupLoading) {
+          <div class="loading-section">
+            <mat-spinner />
+            <p>Setting up two-factor authentication...</p>
+          </div>
+        } @else {
+          <div class="setup-section">
+            <!-- Step 1: QR Code -->
+            <mat-expansion-panel expanded="true">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Step 1: Scan QR Code</mat-panel-title>
+              </mat-expansion-panel-header>
+              
+              <div class="qr-section">
+                <app-qr-code-display 
+                  [qrCodeData]="qrCodeUri"
+                  [sharedKey]="sharedKey" />
+              </div>
+            </mat-expansion-panel>
+
+            <!-- Step 2: Verify -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Step 2: Verify Setup</mat-panel-title>
+              </mat-expansion-panel-header>
+              
+              <app-two-factor-code-input
+                [loading]="loading"
+                submitText="Enable Two-Factor Authentication"
+                (codeSubmitted)="onCodeSubmitted($event)" />
+            </mat-expansion-panel>
+          </div>
+        }
+      }
+
+      <!-- Recovery Codes -->
+      <app-recovery-codes-display
+        [recoveryCodes]="recoveryCodes"
+        [canGenerate]="twoFactorEnabled"
+        (generateNewCodes)="onGenerateNewRecoveryCodes()" />
+    </mat-card-content>
+
+    <mat-card-actions>
+      <div class="navigation-links">
+        <a routerLink="/account/login">Back to Login</a>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>

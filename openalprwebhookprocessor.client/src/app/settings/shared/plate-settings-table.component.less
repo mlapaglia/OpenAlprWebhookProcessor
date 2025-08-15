@@ -1,0 +1,21 @@
+@import './plate-settings-base.less';
+
+.plate-settings-page {
+  @include plate-settings-base-styles();
+
+  // Plate settings-specific form styling
+  .add-setting-card {
+    .setting-form {
+      @extend .form-base;
+    }
+  }
+
+  // Plate settings-specific list styling  
+  .settings-list-card {
+    @extend .list-card-base;
+    
+    .table-content .table-container .settings-table {
+      @extend .table-base;
+    }
+  }
+} 

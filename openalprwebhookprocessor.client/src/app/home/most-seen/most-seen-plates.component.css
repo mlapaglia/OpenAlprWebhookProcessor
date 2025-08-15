@@ -1,0 +1,86 @@
+.most-seen-card {
+  box-shadow: var(--mat-sys-elevation-level2);
+  border-radius: var(--mat-sys-corner-medium);
+  transition: box-shadow 0.2s ease;
+  max-height: 400px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.most-seen-card:hover {
+  box-shadow: var(--mat-sys-elevation-level3);
+}
+
+.most-seen-card mat-card-header {
+  padding-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  flex-shrink: 0;
+}
+
+.most-seen-card mat-card-content {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.most-seen-card mat-list-item {
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  padding: 1rem;
+  min-height: 64px;
+}
+
+.most-seen-card mat-list-item:hover {
+  background-color: var(--mat-sys-primary-container);
+}
+
+.most-seen-card mat-list-item:last-child {
+  border-bottom: none;
+}
+
+.most-seen-card mat-list-item [matListItemMeta] {
+  display: flex;
+  align-items: center;
+}
+
+.rank {
+  font-weight: 600;
+  color: var(--mat-sys-primary);
+  margin-right: 1rem;
+  transition: color 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.most-seen-card mat-list-item:hover .rank {
+  color: var(--mat-sys-on-primary-container);
+}
+
+.count-chip {
+  background-color: var(--mat-sys-secondary-container) !important;
+  color: var(--mat-sys-on-secondary-container) !important;
+  font-size: 0.75rem;
+  align-self: center !important;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .most-seen-card {
+    max-height: 350px;
+  }
+  
+  .most-seen-card mat-card-header {
+    padding-bottom: 0.75rem;
+  }
+  
+  .most-seen-card mat-list-item {
+    padding: 0.75rem;
+    min-height: 56px;
+  }
+}

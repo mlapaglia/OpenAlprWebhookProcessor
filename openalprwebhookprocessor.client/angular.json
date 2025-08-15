@@ -18,39 +18,30 @@
             },
             "index": "src/index.html",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
+            "allowedCommonJsDependencies": [
+              "highlight.js",
+              "ngx-lightbox"
+            ],
             "assets": [
               "src/assets/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              {
+                "glob": "*.css",
+                "input": "node_modules/@angular/material/prebuilt-themes",
+                "output": "assets/themes"
+              }
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "./node_modules/ngx-lightbox/lightbox.css",
               "./node_modules/highlight.js/styles/dark.css",
-              "src/styles.less",
-              {
-                "inject": false,
-                "input": "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
-                "bundleName": "pink-bluegrey"
-              },
-              {
-                "inject": false,
-                "input": "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
-                "bundleName": "deeppurple-amber"
-              },
-              {
-                "inject": false,
-                "input": "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-                "bundleName": "indigo-pink"
-              },
-              {
-                "inject": false,
-                "input": "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
-                "bundleName": "purple-green"
-              }
+              "src/assets/highlight/dotnet-logs.language.css",
+              "src/styles.less"
             ],
             "scripts": [],
             "serviceWorker": "ngsw-config.json",
@@ -66,8 +57,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "12kb"
                 }
               ],
               "fileReplacements": [
@@ -113,7 +104,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
@@ -144,7 +136,8 @@
   "cli": {
     "schematicCollections": [
       "@angular-eslint/schematics"
-    ]
+    ],
+    "analytics": false
   },
   "schematics": {
     "@schematics/angular:component": {

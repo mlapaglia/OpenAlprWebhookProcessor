@@ -1,0 +1,66 @@
+<div style="margin: 16px; display: flex; flex-wrap: wrap; justify-content: flex-start; flex-direction: column; row-gap: 16px;">
+
+  <!-- Model Information Card -->
+  @if (modelInfo) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title i18n>Model Information</mat-card-title>
+        <mat-card-subtitle>{{ modelInfo.description }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div style="display: flex; flex-direction: row; gap: 16px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 300px;">
+            <p><strong i18n>Model Type:</strong> {{ modelInfo.modelType }}</p>
+            <p><strong i18n>Status:</strong>
+              <span [style.color]="modelInfo.modelAvailable ? '#32de84' : '#D2122E'">
+                {{ modelInfo.modelAvailable ? 'Available' : 'Not Available' }}
+              </span>
+            </p>
+            <p><strong i18n>Training Schedule:</strong> {{ modelInfo.trainingSchedule }}</p>
+            <p><strong i18n>Last Updated:</strong> {{ modelInfo.lastUpdated }}</p>
+          </div>
+          <div style="flex: 1; min-width: 300px;">
+            <p><strong i18n>Features Used ({{ featuresData.data.length }}):</strong></p>
+            <div style="max-height: 200px; overflow-y: auto;">
+              <table mat-table [dataSource]="featuresData" class="mat-elevation-z1">
+                <ng-container matColumnDef="feature" i18n-matColumnDef>
+                  <th i18n mat-header-cell *matHeaderCellDef>Feature</th>
+                  <td mat-cell *matCellDef="let element">{{ element.feature }}</td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="featuresColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: featuresColumns;"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Training Status Card -->
+  <app-training-status-card 
+    [trainingStatus]="trainingStatus"
+    [isLoadingTrainingStatus]="isLoadingTrainingStatus"
+    [isTriggering]="isTriggering"
+    (triggerTraining)="triggerTraining()"
+    (refreshData)="refreshData()" />
+
+  <!-- Model Metrics Card -->
+  <app-model-metrics-card [trainingStatus]="trainingStatus" />
+
+  <!-- Configuration Card -->
+  <app-configuration-card 
+    [configuration]="configuration"
+    [isLoadingConfiguration]="isLoadingConfiguration"
+    [isEditingConfiguration]="isEditingConfiguration"
+    [isSavingConfiguration]="isSavingConfiguration"
+    (saveConfiguration)="saveConfiguration($event)"
+    (cancelConfigurationEdit)="cancelConfigurationEdit()"
+    (editConfiguration)="editConfiguration()" />
+
+</div>
+
+
+
+
+

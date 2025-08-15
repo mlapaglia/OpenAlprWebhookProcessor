@@ -1,0 +1,24 @@
+@if (isEditing() && fieldConfig) {
+  <div [formGroup]="configForm()">
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <input 
+        matInput
+        [type]="fieldConfig.inputType"
+        [formControlName]="fieldConfig.controlName"
+        [placeholder]="fieldConfig.placeholder || ''"
+        [step]="fieldConfig.step"
+        [min]="fieldConfig.min"
+        [max]="fieldConfig.max" />
+      @if (hasError) {
+        <mat-error>{{ errorMessage }}</mat-error>
+      }
+    </mat-form-field>
+  </div>
+} @else {
+  <span>{{ fieldValue() }}</span>
+}
+
+
+
+
+

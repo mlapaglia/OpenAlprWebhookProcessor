@@ -1,0 +1,116 @@
+// Debug component styles
+
+// Main container
+.debug-container {
+  margin: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Version info grid
+.version-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+// Loading states
+.loading-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// Warning box
+.warning-box {
+  background-color: var(--mat-warn-50);
+  border: 1px solid var(--mat-warn-200);
+  border-radius: 4px;
+  padding: 12px;
+  margin: 16px 0;
+  
+  mat-icon {
+    color: var(--mat-warn-700);
+    margin-right: 8px;
+  }
+  
+  strong, span {
+    color: var(--mat-warn-700);
+  }
+}
+
+// Action buttons container
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+// Card headers
+.card-header-title {
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+// Utility classes
+.text-muted {
+  color: var(--mat-on-surface-variant);
+  font-style: italic;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .debug-container {
+    margin: 8px;
+    gap: 12px;
+  }
+  
+  .version-grid {
+    grid-template-columns: 1fr;
+    gap: 4px 8px;
+    
+    strong {
+      font-weight: 600;
+      color: var(--mat-on-surface-variant);
+    }
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .warning-box {
+    padding: 8px;
+    font-size: 14px;
+    
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .debug-container {
+    margin: 4px;
+  }
+  
+  mat-card-content {
+    padding: 12px !important;
+  }
+  
+  mat-card-header {
+    padding: 12px 12px 0 12px !important;
+  }
+} 

@@ -1,81 +1,94 @@
-@if (camera.id) {
-  <mat-card class="example-card">
+@if (camera().id) {
+  <mat-card class="camera-card">
     <mat-card-header>
-      <div mat-card-avatar class="example-header-image"></div>
-      <mat-card-title>{{camera.ipAddress}}</mat-card-title>
-      <mat-card-subtitle>{{camera.manufacturer}} {{camera.modelNumber}}</mat-card-subtitle>
+      <mat-icon mat-card-avatar class="camera-avatar">{{avatarIcon}}</mat-icon>
+      <mat-card-title>{{camera().ipAddress}}</mat-card-title>
+      <mat-card-subtitle>{{camera().manufacturer}} {{camera().modelNumber}}</mat-card-subtitle>
     </mat-card-header>
-    @if (camera.sampleImageUrl) {
-      <img
-        mat-card-image
-        class="sample-image"
-        src="{{camera.sampleImageUrl}}"
-        [hidden]="isLoadingImage || isLoadingFailed"
-        (load)="imageLoaded()"
-        (error)="imageFailedToLoad()"
-        alt="last capture from camera">
-    }
-    <mat-card-content>
-      @if (isLoadingImage) {
-        <div
-          style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; height:200px;">
-          <mat-progress-spinner
-            color="primary"
-            mode="indeterminate">
-          </mat-progress-spinner>
+    
+    <app-camera-image 
+      [imageDataUrl]="imageDataUrl"
+      [isLoadingImage]="isLoadingImage" 
+      [isLoadingFailed]="isLoadingFailed"
+      [sampleImageUrl]="camera().sampleImageUrl"
+      [hasOpenAlprIntegration]="hasOpenAlprIntegration" />
+    
+    <mat-card-content class="camera-info">
+      <!-- OpenALPR Integration Section -->
+      @if (hasOpenAlprIntegration) {
+        <div class="info-section">
+          <h4 class="section-title">
+            <mat-icon>car_tag</mat-icon>
+            <span i18n>OpenALPR Integration</span>
+          </h4>
+          <mat-list>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="primary">label</mat-icon>
+              <div matListItemTitle i18n>OpenALPR Name</div>
+              <div matListItemLine>{{camera().openAlprName}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="primary">analytics</mat-icon>
+              <div matListItemTitle i18n>Plates Detected</div>
+              <div matListItemLine>{{camera().platesSeen | number}}</div>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="primary">picture_in_picture_alt</mat-icon>
+              <div matListItemTitle i18n>Overlay Updates</div>
+              <div matListItemLine>{{camera().updateOverlayEnabled ? 'Enabled' : 'Disabled'}}</div>
+            </mat-list-item>
+          </mat-list>
         </div>
       }
-      @if (!camera.sampleImageUrl || isLoadingFailed) {
-        <div
-          style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height:200px;">
-          <mat-icon
-            style="font-size: 100px; height: 90px; width: 90px;"
-          matTooltip="Image will display after first plate capture">help_center</mat-icon>
+
+      <!-- Day/Night Mode Section -->
+      @if (hasDayNightMode) {
+        <div class="info-section">
+          <h4 class="section-title">
+            <mat-icon>wb_sunny</mat-icon>
+            <span i18n>Day/Night Mode</span>
+          </h4>
+          <mat-list>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="accent">location_on</mat-icon>
+              <div matListItemTitle i18n>Coordinates</div>
+              <div matListItemLine>{{camera().latitude}}°, {{camera().longitude}}°</div>
+            </mat-list-item>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="accent">schedule</mat-icon>
+              <div matListItemTitle i18n>Next Toggle</div>
+              <div matListItemLine>{{camera().dayNightNextScheduledCommand | date:"medium"}}</div>
+            </mat-list-item>
+          </mat-list>
         </div>
       }
-      <div>
-        <b>Camera Manufacturer: </b> {{camera.manufacturer}}
-      </div>
-      @if (camera.updateOverlayEnabled) {
-        <div>
-          <div>
-            <b>OpenALPR Name:</b> {{camera.openAlprName}}
-          </div>
-          <div>
-            <b>Plates Seen:</b> {{camera.platesSeen}}
-          </div>
-        </div>
-      }
-      @if (camera.dayNightModeEnabled) {
-        <div>
-          <div>
-            <b>Coordinates:</b> {{camera.latitude}}°, {{camera.longitude}}°
-          </div>
-          <div>
-            <b>Next Day/Night Toggle:</b> {{camera.dayNightNextScheduledCommand | date:"medium"}}
-          </div>
+
+      <!-- Feature Status Overview -->
+      @if (!hasAnyFeatures) {
+        <div class="info-section">
+          <mat-list>
+            <mat-list-item>
+              <mat-icon matListItemIcon>info</mat-icon>
+              <div matListItemTitle i18n>Status</div>
+              <div matListItemLine i18n>Basic camera monitoring</div>
+            </mat-list-item>
+          </mat-list>
         </div>
       }
     </mat-card-content>
-    <mat-card-actions align="end" style="margin: auto 0 0;">
-      <button mat-button (click)="editCamera()">Edit</button>
-      <button mat-button (click)="removeCamera()" color="warn">Remove</button>
+    
+    <mat-card-actions align="end">
+      <button mat-raised-button color="primary" (click)="editCamera()">
+        <mat-icon>edit</mat-icon>
+        <span i18n>Edit</span>
+      </button>
+      <button mat-raised-button color="warn" (click)="removeCamera()">
+        <mat-icon>delete</mat-icon>
+        <span i18n>Remove</span>
+      </button>
     </mat-card-actions>
   </mat-card>
 }
-@if (!camera.id) {
-  <mat-card class="example-card">
-    <mat-card-header>
-      <mat-card-title>Add new camera</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="sample-image"
-        style="height:200px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
-        <mat-icon
-          style="font-size: 100px; height: 90px; width: 90px;"
-          (click)="addCamera()"
-        color="primary">add_box</mat-icon>
-      </div>
-    </mat-card-content>
-  </mat-card>
+@else {
+  <app-add-camera (add)="add.emit()" />
 }

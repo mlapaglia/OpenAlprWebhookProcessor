@@ -1,0 +1,474 @@
+using AwesomeAssertions;
+using Microsoft.ML;
+using NSubstitute;
+using NUnit.Framework;
+using OpenAlprWebhookProcessor.Features.MachineLearning.Services.Filesystem;
+using System.IO.Abstractions.TestingHelpers;
+using Tests.TestHelpers;
+
+namespace Tests.Features.MachineLearning.Services.Filesystem
+{
+    [Parallelizable(ParallelScope.Self)]
+    [TestFixture]
+    public class ModelPersistenceServiceTests : TestBase
+    {
+        private ModelPersistenceService _service;
+        private MockFileSystem _mockFileSystem;
+        private MLContext _mlContext;
+        private ITransformer _mockModel;
+
+        [SetUp]
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            _mockFileSystem = new MockFileSystem();
+            _service = new ModelPersistenceService(_mockFileSystem);
+            _mlContext = new MLContext(seed: 42);
+            _mockModel = Substitute.For<ITransformer>();
+        }
+
+        #region Constructor Tests
+
+        [Test]
+        public void Constructor_WithValidFileSystem_InitializesCorrectly()
+        {
+            _service.Should().NotBeNull();
+        }
+
+        #endregion
+
+        #region ModelExists Tests
+
+        [Test]
+        public void ModelExists_WhenFileExists_ReturnsTrue()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "test-model.zip");
+            _mockFileSystem.AddFile(modelPath, new MockFileData("fake model data"));
+
+            // Act
+            var result = _service.ModelExists(modelPath);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Test]
+        public void ModelExists_WhenFileDoesNotExist_ReturnsFalse()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "non-existent-model.zip");
+
+            // Act
+            var result = _service.ModelExists(modelPath);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void ModelExists_WithNullPath_ReturnsFalse()
+        {
+            // Act
+            var result = _service.ModelExists(null);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void ModelExists_WithEmptyPath_ReturnsFalse()
+        {
+            // Act
+            var result = _service.ModelExists("");
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void ModelExists_WithDirectory_ReturnsFalse()
+        {
+            // Arrange
+            var directoryPath = Path.Combine("models", "");
+            _mockFileSystem.AddDirectory(directoryPath);
+
+            // Act
+            var result = _service.ModelExists(directoryPath);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        #endregion
+
+        #region GetModelFileInfo Tests
+
+        [Test]
+        public void GetModelFileInfo_WhenFileExists_ReturnsCorrectInfo()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "test-model.zip");
+            var fileContent = "fake model data with some content to test file size";
+            var lastWriteTime = new DateTime(2023, 10, 15, 14, 30, 0);
+            
+            var mockFileData = new MockFileData(fileContent)
+            {
+                LastWriteTime = lastWriteTime
+            };
+            _mockFileSystem.AddFile(modelPath, mockFileData);
+
+            // Act
+            var result = _service.GetModelFileInfo(modelPath);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Exists.Should().BeTrue();
+            result.LastModified.Should().Be(lastWriteTime);
+            result.FileSize.Should().Be(fileContent.Length);
+        }
+
+        [Test]
+        public void GetModelFileInfo_WhenFileDoesNotExist_ReturnsNonExistentInfo()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "non-existent-model.zip");
+
+            // Act
+            var result = _service.GetModelFileInfo(modelPath);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Exists.Should().BeFalse();
+            result.LastModified.Should().BeNull();
+            result.FileSize.Should().Be(0);
+        }
+
+        [Test]
+        public void GetModelFileInfo_WithEmptyFile_ReturnsZeroFileSize()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "empty-model.zip");
+            _mockFileSystem.AddFile(modelPath, new MockFileData(""));
+
+            // Act
+            var result = _service.GetModelFileInfo(modelPath);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Exists.Should().BeTrue();
+            result.FileSize.Should().Be(0);
+        }
+
+        [Test]
+        public void GetModelFileInfo_WithLargeFile_ReturnsCorrectFileSize()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "large-model.zip");
+            var largeContent = new string('x', 1024 * 1024); // 1MB of data
+            _mockFileSystem.AddFile(modelPath, new MockFileData(largeContent));
+
+            // Act
+            var result = _service.GetModelFileInfo(modelPath);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Exists.Should().BeTrue();
+            result.FileSize.Should().Be(1024 * 1024);
+        }
+
+        #endregion
+
+        #region LoadModelAsync Tests
+
+        [Test]
+        public void LoadModelAsync_WhenFileExists_ReturnsModel()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "test-model.zip");
+
+            // Create a simple model to serialize
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f },
+                new { Value = 2.0f }
+            });
+
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Save the model to get real model data
+            using var memoryStream = new MemoryStream();
+            _mlContext.Model.Save(model, dataView.Schema, memoryStream);
+            var modelData = memoryStream.ToArray();
+
+            _mockFileSystem.AddFile(modelPath, new MockFileData(modelData));
+
+            // Act
+            var result = _service.LoadModel(modelPath, _mlContext);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<ITransformer>();
+        }
+
+        [Test]
+        public void LoadModelAsync_WhenFileDoesNotExist_ReturnsNull()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "non-existent-model.zip");
+
+            // Act
+            var result = _service.LoadModel(modelPath, _mlContext);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public void LoadModelAsync_WithNullPath_ReturnsNull()
+        {
+            // Act
+            var result = _service.LoadModel(null, _mlContext);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public void LoadModelAsync_WithEmptyFile_ThrowsException()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "empty-model.zip");
+            _mockFileSystem.AddFile(modelPath, new MockFileData(""));
+
+            // Act & Assert
+            var act = () => _service.LoadModel(modelPath, _mlContext);
+            act.Should().Throw<Exception>();
+        }
+
+        [Test]
+        public void LoadModelAsync_WithInvalidModelData_ThrowsException()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "invalid-model.zip");
+            _mockFileSystem.AddFile(modelPath, new MockFileData("invalid model data"));
+
+            // Act & Assert
+            var act = () => _service.LoadModel(modelPath, _mlContext);
+            act.Should().Throw<Exception>();
+        }
+
+        #endregion
+
+        #region SaveModelAsync Tests
+
+        [Test]
+        public async Task SaveModelAsync_WithValidModel_CreatesFile()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "new-model.zip");
+            
+            // Create a simple model
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f },
+                new { Value = 2.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Act
+            await _service.SaveModelAsync(model, modelPath, _mlContext);
+
+            // Assert
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+            var fileData = _mockFileSystem.GetFile(modelPath);
+            fileData.Contents.Length.Should().BeGreaterThan(0);
+        }
+
+        [Test]
+        public async Task SaveModelAsync_WhenDirectoryDoesNotExist_CreatesDirectory()
+        {
+            // Arrange
+            var modelPath = Path.Combine("new-folder", "subdir", "model.zip");
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Act
+            await _service.SaveModelAsync(model, modelPath, _mlContext);
+
+            // Assert
+            _mockFileSystem.Directory.Exists(Path.Combine("new-folder", "subdir")).Should().BeTrue();
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+        }
+
+        [Test]
+        public async Task SaveModelAsync_WhenFileAlreadyExists_OverwritesFile()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "existing-model.zip");
+            _mockFileSystem.AddFile(modelPath, new MockFileData("old model data"));
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            var originalSize = _mockFileSystem.GetFile(modelPath).Contents.Length;
+
+            // Act
+            await _service.SaveModelAsync(model, modelPath, _mlContext);
+
+            // Assert
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+            var newFileData = _mockFileSystem.GetFile(modelPath);
+            newFileData.Contents.Length.Should().NotBe(originalSize);
+            newFileData.Contents.Length.Should().BeGreaterThan(0);
+        }
+
+        [Test]
+        public async Task SaveModelAsync_WithComplexPath_HandlesProperly()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "deep", "nested", "folder", "structure", "model.zip");
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Act
+            await _service.SaveModelAsync(model, modelPath, _mlContext);
+
+            // Assert
+            _mockFileSystem.Directory.Exists(Path.Combine("models", "deep", "nested", "folder", "structure")).Should().BeTrue();
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+        }
+
+        [Test]
+        public async Task SaveModelAsync_SaveAndLoad_RoundTripSucceeds()
+        {
+            // Arrange
+            var modelPath = Path.Combine("models", "roundtrip-model.zip");
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f },
+                new { Value = 2.0f },
+                new { Value = 3.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var originalModel = pipeline.Fit(dataView);
+
+            // Act
+            await _service.SaveModelAsync(originalModel, modelPath, _mlContext);
+            var loadedModel = _service.LoadModel(modelPath, _mlContext);
+
+            // Assert
+            loadedModel.Should().NotBeNull();
+            loadedModel.Should().BeAssignableTo<ITransformer>();
+            
+            // Verify the file exists and has content
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+            var fileInfo = _service.GetModelFileInfo(modelPath);
+            fileInfo.Exists.Should().BeTrue();
+            fileInfo.FileSize.Should().BeGreaterThan(0);
+        }
+
+        #endregion
+
+        #region Edge Case Tests
+
+        [Test]
+        public async Task SaveModelAsync_WithRootFile_HandlesCorrectly()
+        {
+            // Arrange
+            var modelPath = "root-model.zip"; // No directory, just filename
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Act
+            await _service.SaveModelAsync(model, modelPath, _mlContext);
+
+            // Assert
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+        }
+
+        [Test]
+        public void ModelExists_WithRootFile_WorksCorrectly()
+        {
+            // Arrange
+            var modelPath = "root-model.zip";
+            _mockFileSystem.AddFile(modelPath, new MockFileData("test data"));
+
+            // Act
+            var result = _service.ModelExists(modelPath);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Test]
+        public void GetModelFileInfo_WithRootFile_WorksCorrectly()
+        {
+            // Arrange
+            var modelPath = "root-model.zip";
+            var content = "test model data";
+            _mockFileSystem.AddFile(modelPath, new MockFileData(content));
+
+            // Act
+            var result = _service.GetModelFileInfo(modelPath);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Exists.Should().BeTrue();
+            result.FileSize.Should().Be(content.Length);
+        }
+
+        [Test]
+        public async Task SaveModelAsync_WithEmptyDirectoryPath_DoesNotThrow()
+        {
+            // Arrange - Create a scenario where GetDirectoryName returns empty
+            var modelPath = "model-no-dir.zip";
+            
+            var dataView = _mlContext.Data.LoadFromEnumerable(new[]
+            {
+                new { Value = 1.0f }
+            });
+            
+            var pipeline = _mlContext.Transforms.Concatenate("Features", "Value");
+            var model = pipeline.Fit(dataView);
+
+            // Act & Assert - Should not throw even if directory path is empty
+            var act = async () => await _service.SaveModelAsync(model, modelPath, _mlContext);
+            await act.Should().NotThrowAsync();
+            
+            // Verify file was created
+            _mockFileSystem.File.Exists(modelPath).Should().BeTrue();
+        }
+
+        #endregion
+    }
+} 

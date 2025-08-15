@@ -1,0 +1,129 @@
+table {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.url-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-table {
+  display: none;
+}
+
+.desktop-table {
+  display: table;
+}
+
+.mobile-details {
+  display: none;
+}
+
+.mobile-row {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.expanded-card {
+  margin: 8px 0;
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+    padding: 4px 0;
+    border-bottom: 1px solid #e0e0e0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    strong {
+      flex: 0 0 auto;
+      margin-right: 16px;
+      min-width: 120px;
+    }
+    
+    span {
+      flex: 1;
+      text-align: right;
+      word-break: break-all;
+    }
+    
+    .url-text {
+      font-size: 0.9em;
+      color: #666;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none;
+  }
+  
+  .mobile-table {
+    display: table;
+  }
+  
+  .mobile-details {
+    display: block;
+  }
+  
+  table {
+    font-size: 0.9em;
+  }
+  
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    padding: 8px 4px;
+  }
+  
+  .mat-column-cameraName {
+    flex: 2;
+  }
+  
+  .mat-column-isStreaming {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .mat-column-fps {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .mat-column-totalPlateReads {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .expanded-card {
+    .detail-row {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      strong {
+        margin-bottom: 4px;
+        min-width: auto;
+      }
+      
+      span {
+        text-align: left;
+        width: 100%;
+      }
+    }
+  }
+}

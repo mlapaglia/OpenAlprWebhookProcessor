@@ -1,0 +1,36 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title i18n>Model Metrics</mat-card-title>
+    <mat-card-subtitle i18n>Performance metrics from the latest training session</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    @if (trainingStatus()?.modelMetrics && metricsData.data.length > 0) {
+      <table mat-table [dataSource]="metricsData" class="mat-elevation-z1">
+        <ng-container matColumnDef="key">
+          <th i18n mat-header-cell *matHeaderCellDef>Metric</th>
+          <td mat-cell *matCellDef="let element">{{ element.key }}</td>
+        </ng-container>
+        <ng-container matColumnDef="value">
+          <th i18n mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    } @else {
+      <p i18n class="no-metrics">No model metrics available. Train a model to see performance data.</p>
+    }
+  </mat-card-content>
+</mat-card>
+
+
+
+
+
+
+
+
+
+
+
+

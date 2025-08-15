@@ -1,140 +1,183 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
+using OpenAlprWebhookProcessor.Data.Repositories;
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using OpenAlprWebhookProcessor.ProcessorHub;
-using Microsoft.AspNetCore.SignalR;
-using OpenAlprWebhookProcessor.Data;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Hangfire;
-using Hangfire.Storage;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.Hydrator
 {
-    public class HydrationService : IHostedService
+    public class HydrationService : IHydrationService, IDisposable
     {
-        private readonly BlockingCollection<string> _hydrationRequestsToProcess;
+        private readonly Channel<string> _hydrationRequestsChannel;
 
-        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly ChannelWriter<string> _writer;
+
+        private readonly ChannelReader<string> _reader;
 
         private readonly IServiceProvider _serviceProvider;
 
-        private readonly IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> _processorHub;
+        private Timer _scheduledScrapeTimer;
 
-        private readonly JobStorage _jobStorage;
+        private readonly Lock _timerLock = new Lock();
 
-        public HydrationService(
-            IServiceProvider serviceProvider,
-            IHubContext<ProcessorHub.ProcessorHub, IProcessorHub> processorHub,
-            JobStorage jobStorage)
+        private int? _currentIntervalMinutes;
+
+        private string _currentAgentUid;
+
+        private bool _disposed = false;
+
+        public HydrationService(IServiceProvider serviceProvider)
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            _serviceProvider = serviceProvider;
-            _processorHub = processorHub;
-            _hydrationRequestsToProcess = new BlockingCollection<string>();
-            _jobStorage = jobStorage;
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+            _hydrationRequestsChannel = Channel.CreateUnbounded<string>();
+            _writer = _hydrationRequestsChannel.Writer;
+            _reader = _hydrationRequestsChannel.Reader;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public void StartHydration(string name)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            if (_disposed)
+                return;
+
+            if (!_writer.TryWrite(name))
             {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-                var agent = await processorContext.Agents
-                    .FirstOrDefaultAsync(cancellationToken);
-
-                await ScheduleHydrationAsync(cancellationToken);
-            }
-            _ = Task.Run(() => StartHydrationAsync(), cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _cancellationTokenSource.Cancel();
-            return Task.CompletedTask;
-        }
-
-        public async Task ScheduleHydrationAsync(CancellationToken cancellationToken)
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var processorContext = scope.ServiceProvider.GetRequiredService<ProcessorContext>();
-
-                var agent = await processorContext.Agents.FirstOrDefaultAsync(cancellationToken);
-
-                if (string.IsNullOrWhiteSpace(agent.Uid))
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
-                    logger.LogWarning("Agent UID is not set. Cannot schedule hydration.");
-                    return;
-                }
-
-                if (agent.ScheduledScrapingIntervalMinutes == null)
-                {
-                    RecurringJob.RemoveIfExists(agent.Uid);
-                    agent.NextScrapeEpochMs = null;
-                }
-                else
-                {
-                    RecurringJob
-                        .AddOrUpdate(agent.Uid,
-                            () => StartHydration(agent.Uid),
-                        $"*/{agent.ScheduledScrapingIntervalMinutes} * * * *");
-
-                    var nextScrape = _jobStorage
-                        .GetConnection()
-                        .GetRecurringJobs()
-                        .Single(x => x.Id == agent.Uid);
-
-                    agent.NextScrapeEpochMs = new DateTimeOffset(nextScrape.NextExecution.Value).ToUnixTimeMilliseconds();
-                }
-
-                await processorContext.SaveChangesAsync(cancellationToken);
+                using var scope = _serviceProvider.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                logger.LogWarning("Failed to queue hydration request for {Name} - channel may be closed", name);
             }
         }
 
-        public void StartHydration(string request)
+        public int GetPendingHydrationCount()
         {
-            _hydrationRequestsToProcess.Add(request);
+            return _reader.Count;
         }
 
-        private async Task StartHydrationAsync()
+        public async IAsyncEnumerable<string> GetConsumingHydrationRequestsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            foreach (var _ in _hydrationRequestsToProcess.GetConsumingEnumerable(_cancellationTokenSource.Token))
+            await foreach (var request in _reader.ReadAllAsync(cancellationToken))
             {
-                try
+                yield return request;
+            }
+        }
+
+        public async Task ScheduleHydrationAsync(CancellationToken cancellationToken = default)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+
+            var agent = await unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
+
+            if (string.IsNullOrWhiteSpace(agent?.Uid))
+            {
+                logger.LogWarning("Agent UID is not set. Cannot schedule hydration.");
+                DisposeTimer();
+                return;
+            }
+
+            lock (_timerLock)
+            {
+                var configurationChanged = _currentIntervalMinutes != agent.ScheduledScrapingIntervalMinutes
+                    || _currentAgentUid != agent.Uid;
+
+                if (configurationChanged)
                 {
-                    using (var scope = _serviceProvider.CreateScope())
+                    _scheduledScrapeTimer?.Dispose();
+                    _scheduledScrapeTimer = null;
+
+                    _currentIntervalMinutes = agent.ScheduledScrapingIntervalMinutes;
+                    _currentAgentUid = agent.Uid;
+
+                    if (agent.ScheduledScrapingIntervalMinutes == null)
                     {
-                        var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
-                        logger.LogInformation("Starting OpenALPR Agent scrape.");
+                        agent.NextScrapeEpochMs = null;
+                    }
+                    else
+                    {
+                        var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
+                        agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
 
-                        try
-                        {
-                            var scraper = scope.ServiceProvider.GetRequiredService<OpenAlprAgentScraper>();
-
-                            await scraper.ScrapeAgentAsync(_cancellationTokenSource.Token);
-                            await scraper.ScrapeAgentImagesAsync(_cancellationTokenSource.Token);
-
-                            await _processorHub.Clients.All.ScrapeFinished();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Failed to scrape Agent.");
-                        }
+                        _scheduledScrapeTimer = new Timer(
+                            async _ =>
+                            {
+                                StartHydration(agent.Uid);
+                                await UpdateNextScrapeTimeAsync(agent.Uid, agent.ScheduledScrapingIntervalMinutes.Value);
+                            },
+                            null,
+                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value),
+                            TimeSpan.FromMinutes(agent.ScheduledScrapingIntervalMinutes.Value)
+                        );
                     }
                 }
-                finally
+                else if (_scheduledScrapeTimer != null && agent.ScheduledScrapingIntervalMinutes.HasValue)
                 {
-                    await ScheduleHydrationAsync(default);
+                    var nextExecution = DateTime.UtcNow.AddMinutes(agent.ScheduledScrapingIntervalMinutes.Value);
+                    agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
                 }
             }
+
+            unitOfWork.Agents.Update(agent);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        public void DisposeTimer()
+        {
+            lock (_timerLock)
+            {
+                _scheduledScrapeTimer?.Dispose();
+                _scheduledScrapeTimer = null;
+                _currentIntervalMinutes = null;
+                _currentAgentUid = null;
+            }
+        }
+
+        /// <summary>
+        /// Complete the channel to signal that no more items will be written.
+        /// Call this when shutting down the service.
+        /// </summary>
+        public void CompleteChannel()
+        {
+            _writer.TryComplete();
+        }
+
+        private async Task UpdateNextScrapeTimeAsync(string agentUid, int intervalMinutes)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                var agent = await unitOfWork.Agents.GetFirstAgentAsync();
+                if (agent != null && agent.Uid == agentUid)
+                {
+                    var nextExecution = DateTime.UtcNow.AddMinutes(intervalMinutes);
+                    agent.NextScrapeEpochMs = new DateTimeOffset(nextExecution).ToUnixTimeMilliseconds();
+
+                    unitOfWork.Agents.Update(agent);
+                    await unitOfWork.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<HydrationService>>();
+                logger.LogError(ex, "Error updating next scrape time for agent {AgentUid}", agentUid);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            DisposeTimer();
+            CompleteChannel();
+            _disposed = true;
         }
     }
 }

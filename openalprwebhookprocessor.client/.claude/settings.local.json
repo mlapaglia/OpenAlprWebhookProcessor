@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm run test:prod:*)",
+      "Bash(npx ng test:*)",
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(npm test:*)",
+      "Bash(ng test:*)"
+    ],
+    "deny": []
+  }
+}

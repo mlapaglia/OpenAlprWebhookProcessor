@@ -1,20 +1,58 @@
-<div>
-    <button
-        mat-button 
-        color="primary"
-        (click)="downloadPlates()">Download past 24 hours plates</button>
-    <mat-checkbox 
-        color="primary"
-        [(ngModel)]="onlyFailedPlateGroups">Include ONLY failed plate groups</mat-checkbox>
-        <button
-            mat-button
-            color="warn"
-            (click)="deletePlates()"
-            [class.spinner]="isPurging">Delete debug plates</button>
-    <pre>
-        <code
-            [highlight]="logMessagesDisplay"
-            language="text">
-        </code>
-    </pre>
+<div class="system-logs-container">
+    <div class="controls-section">
+        <div class="log-level-section">
+            <mat-form-field appearance="outline" i18n-appearance>
+                <mat-label i18n>Log Level</mat-label>
+                <mat-select [(value)]="selectedLogLevel" (selectionChange)="onLogLevelChange()">
+                    @for (option of logLevelOptions; track option.value) {
+                        <mat-option [value]="option.value">
+                            {{option.label}}
+                        </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" i18n-appearance>
+                <mat-label i18n>Search Logs</mat-label>
+                <input 
+                    matInput 
+                    [formControl]="searchControl"
+                    placeholder="Enter search text..." i18n-placeholder>
+            </mat-form-field>
+        </div>
+        
+        <div class="plate-controls-section">
+            <div class="plate-download-group">
+                <button i18n
+                    mat-raised-button 
+                    color="primary"
+                    (click)="downloadPlates()">
+                    Download Past 24 Hours Plates
+                </button>
+                <mat-checkbox i18n 
+                    color="primary"
+                    [(ngModel)]="onlyFailedPlateGroups">
+                    Include ONLY failed plate groups
+                </mat-checkbox>
+            </div>
+            
+            <button
+                mat-raised-button
+                color="warn"
+                (click)="deletePlates()"
+                [disabled]="isPurging"
+                [class.spinner]="isPurging">
+                {{isPurging ? 'Deleting...' : 'Delete Debug Plates'}}
+            </button>
+        </div>
+    </div>
+    
+    <div class="logs-display-section">
+        <pre>
+            <code
+                [highlight]="logMessagesDisplay"
+                language="dotnetlogs" i18n-language>
+            </code>
+        </pre>
+    </div>
 </div>

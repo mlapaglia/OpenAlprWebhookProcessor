@@ -1,13 +1,130 @@
-.example-card {
-  width: 450px;
+.camera-card {
+  width: 100%;
+  max-width: 450px;
   height: 100%;
-}
-  
-.example-header-image {
-  background-image: url('https://cdn3.volusion.com/not95.tcan2/v/vspfiles/photos/HD-Q3-1.jpg?v-cache=1627219410');
-  background-size: cover;
+  display: flex;
+  flex-direction: column;
 }
 
-.sample-image{
-  background-size: cover;
+.camera-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--mat-sys-primary);
+  background-color: var(--mat-sys-on-primary);
+}
+
+.avatar-icon {
+  font-size: 24px;
+}
+
+.camera-info {
+  flex: 1;
+  padding: 16px;
+}
+
+.info-section {
+  margin-bottom: 16px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  
+  mat-icon {
+    font-size: 20px;
+  }
+}
+
+.status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+mat-list {
+  padding: 0;
+}
+
+mat-list-item {
+  padding: 0;
+  margin-bottom: 8px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.camera-card mat-card-actions {
+  margin-top: auto;
+  padding: 8px 16px 16px;
+  
+  button {
+    margin-left: 8px;
+    
+    &:first-child {
+      margin-left: 0;
+    }
+    
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}
+
+// Mobile responsive adjustments
+@media (max-width: 768px) {
+  .camera-card {
+    max-width: none;
+  }
+  
+  .camera-info {
+    padding: 12px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+    
+    mat-icon {
+      font-size: 18px;
+    }
+  }
+  
+  .status-chips {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .camera-info {
+    padding: 8px;
+  }
+  
+  mat-card-actions {
+    padding: 8px;
+    
+    button {
+      font-size: 12px;
+      padding: 6px 12px;
+      
+      mat-icon {
+        font-size: 16px;
+        margin-right: 2px;
+      }
+    }
+  }
 }

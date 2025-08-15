@@ -1,0 +1,235 @@
+.user-form-card {
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.card-header {
+  padding: 24px 24px 16px;
+  background: linear-gradient(135deg, var(--mdc-theme-primary, #1976d2) 0%, var(--mdc-theme-primary-variant, #1565c0) 100%);
+  color: var(--mdc-theme-on-primary, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.9;
+}
+
+.card-title h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.card-content {
+  padding: 24px;
+  background: var(--mdc-theme-surface);
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field mat-icon[matPrefix] {
+  color: var(--mdc-theme-primary, #1976d2);
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+.form-field.mat-focused mat-icon[matPrefix] {
+  opacity: 1;
+}
+
+.card-actions {
+  padding: 16px 24px 24px;
+  background: var(--mdc-theme-surface);
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--mdc-theme-outline, #e0e0e0);
+}
+
+.save-button {
+  min-width: 120px;
+  height: 48px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+.save-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+}
+
+.save-button mat-icon {
+  margin-right: 8px;
+}
+
+.cancel-button {
+  min-width: 100px;
+  height: 48px;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.cancel-button:hover:not([disabled]) {
+  transform: translateY(-1px);
+  background-color: var(--mdc-theme-error-container, #ffebee);
+  border-color: var(--mdc-theme-error, #f44336);
+}
+
+.cancel-button mat-icon {
+  margin-right: 8px;
+}
+
+.button-spinner {
+  margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .user-form-card {
+    margin: 0;
+    border-radius: 12px;
+  }
+  
+  .card-header {
+    padding: 24px 24px 12px;
+  }
+  
+  .card-title h1 {
+    font-size: 24px;
+  }
+  
+  .card-content {
+    padding: 24px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .card-actions {
+    padding: 20px 24px 24px;
+    flex-direction: column-reverse;
+  }
+  
+  .save-button,
+  .cancel-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+  
+  .user-form-card {
+    border-radius: 8px;
+  }
+  
+  .card-header {
+    padding: 20px 20px 10px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .card-content {
+    padding: 20px;
+  }
+  
+  .user-form {
+    gap: 20px;
+  }
+}
+
+/* Animation for form validation errors */
+mat-error {
+  animation: slideInError 0.3s ease-out;
+}
+
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading state styles */
+.save-button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Focus styles for accessibility */
+.form-field input:focus {
+  outline: none;
+}
+
+.save-button:focus,
+.cancel-button:focus {
+  outline: 2px solid var(--mdc-theme-primary, #1976d2);
+  outline-offset: 2px;
+}
+
+/* Theme-aware styles - Material handles most theming automatically through CSS custom properties */
+/* Additional dark theme adjustments if needed */
+@media (prefers-color-scheme: dark) {
+  .user-form-card {
+    /* Material theme variables will handle the surface colors automatically */
+  }
+  
+  .header-icon {
+    /* Slightly more opacity for better visibility in dark themes */
+    opacity: 1;
+  }
+}

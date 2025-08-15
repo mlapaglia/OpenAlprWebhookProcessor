@@ -1,48 +1,24 @@
-<div style="display: flex; flex-direction: row; justify-content: space-around; padding-top: 16px;">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>Plates Seen</mat-card-title>
-            <mat-card-subtitle>Last 7 days</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-            <div>
-                <ngx-charts-bar-vertical
-                [view]="view"
-                [results]="plateCounts"
-                [xAxis]="true"
-                [yAxis]="true"
-                [showXAxisLabel]="true"
-                [showYAxisLabel]="true"
-                [xAxisLabel]="xAxisLabel"
-                [yAxisLabel]="yAxisLabel"
-                [showGridLines]="true"
-                [showDataLabel]="true"
-                [legend]="false"
-                [tooltipDisabled]="true"></ngx-charts-bar-vertical>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title>Most Seen</mat-card-title>
-            <mat-card-subtitle>Last 7 days</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-            <div>
-                <ngx-charts-bar-vertical
-                [view]="view"
-                [results]="mostSeenCounts"
-                [xAxis]="true"
-                [yAxis]="true"
-                [showXAxisLabel]="true"
-                [showYAxisLabel]="true"
-                [xAxisLabel]="xAxisLabel"
-                [yAxisLabel]="yAxisLabel"
-                [showGridLines]="true"
-                [showDataLabel]="true"
-                [legend]="false"
-                [tooltipDisabled]="true"></ngx-charts-bar-vertical>
-            </div>
-        </mat-card-content>
-    </mat-card>
+<div class="dashboard-container">
+  <!-- Quick Stats Section -->
+  <section class="stats-section">
+    <app-quick-stats 
+      [quickStats]="quickStats"
+      [isLoadingStats]="isLoadingStats"
+      [quickStatCols]="quickStatCols" />
+  </section>
+
+  <!-- Charts Section -->
+  <section class="charts-section">
+    <app-charts [isLoadingCharts]="isLoadingCharts" />
+  </section>
+
+  <!-- Predictions and Most Seen Section -->
+  <section class="predictions-and-insights-section">
+    <app-predictions-section 
+      [nextExpected]="nextExpected"
+      [upcomingPredictions]="upcomingPredictions"
+      [predictablePlates]="predictablePlates"
+      [isLoadingPredictions]="isLoadingPredictions" />
+    <app-most-seen-plates [mostSeenCounts]="mostSeenCounts" />
+  </section>
 </div>

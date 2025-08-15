@@ -1,0 +1,37 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Verification Code</mat-label>
+    <input matInput 
+           formControlName="code" 
+           placeholder="123456" 
+           maxlength="6"
+           [class.is-invalid]="submitted && f.code.errors" />
+    @if (submitted && f.code.errors?.['required']) {
+      <mat-error>
+        Verification code is required
+      </mat-error>
+    }
+    @if (submitted && f.code.errors?.['pattern']) {
+      <mat-error>
+        Please enter a valid 6-digit code
+      </mat-error>
+    }
+  </mat-form-field>
+
+  <div class="form-actions">
+    <button mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="loading() || form.invalid">
+      @if (loading()) {
+        <mat-spinner diameter="20" />
+      }
+      @if (!loading()) {
+        <span>{{ submitText() }}</span>
+      }
+      @if (loading()) {
+        <span>Verifying...</span>
+      }
+    </button>
+  </div>
+</form>

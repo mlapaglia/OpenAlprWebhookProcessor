@@ -1,49 +1,56 @@
 @if (client) {
   <mat-card style="margin:16px;">
     <mat-card-header style="justify-content: space-between;">
-      <mat-card-title>Pushover</mat-card-title>
-      <mat-card-subtitle>https://pushover.net/</mat-card-subtitle>
+      <mat-card-title i18n>Pushover</mat-card-title>
+      <mat-card-subtitle i18n>https://pushover.net/</mat-card-subtitle>
       <mat-slide-toggle
         style="padding-top: 10px;"
         [(ngModel)]="client.isEnabled"
-      (change)="onPushoverToggle($event)"></mat-slide-toggle>
+      (change)="onPushoverToggle($event)" />
     </mat-card-header>
     @if (client.isEnabled) {
       <mat-card-content [@inOutAnimation]>
         <div style="display: flex; flex-direction: column;">
           <mat-form-field>
-            <mat-label>User Key</mat-label>
+            <mat-label i18n>User Key</mat-label>
             <input matInput [(ngModel)]="client.userKey">
-            <mat-icon matTooltip="The pushover user key, found on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+            <mat-icon i18n matTooltip="The pushover user key, found on the profile page" i18n-matTooltip style="cursor:default" matSuffix>help_center</mat-icon>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>API Token</mat-label>
+            <mat-label i18n>API Token</mat-label>
             <input matInput [(ngModel)]="client.apiToken">
-            <mat-icon matTooltip="The pushover api token, found under 'Your Applications' on the profile page" style="cursor:default" matSuffix>help_center</mat-icon>
+            <mat-icon i18n matTooltip="The pushover api token, found under 'Your Applications' on the profile page" i18n-matTooltip style="cursor:default" matSuffix>help_center</mat-icon>
           </mat-form-field>
           <div>
-            <mat-checkbox [(ngModel)]="client.sendPlatePreviewEnabled">Send Plate Preview Image</mat-checkbox>
+            <mat-checkbox i18n [(ngModel)]="client.sendPlatePreviewEnabled">Send Plate Preview Image</mat-checkbox>
           </div>
           <div>
-            <mat-checkbox [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
+            <mat-checkbox i18n [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
           </div>
         </div>
       </mat-card-content>
     }
     @if (client.isEnabled) {
-      <mat-card-actions align="end" [@inOutAnimation]>
-        <button mat-raised-button (click)="testClient();" [disabled]="isTesting">
-          @if (isTesting) {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-          }
-          Test
-        </button>
-        <button mat-raised-button color="primary" (click)="saveClient();" [disabled]="isSaving" btn-primary>
-          @if (isSaving) {
-            <span class="spinner-border spinner-border-sm mr-1"></span>
-          }
-          Save
-        </button>
+      <mat-card-actions align="end" i18n-align [@inOutAnimation]>
+        <app-refresh-button
+          [isLoading]="isTesting"
+          [disabled]="isTesting || isSaving"
+          icon="science"
+          buttonType="raised"
+          buttonText="Test"
+          buttonRefreshingText="Testing..."
+          color="accent"
+          (refreshStarted)="testClient()" />
+        <app-refresh-button
+          [isLoading]="isSaving"
+          [disabled]="isTesting || isSaving"
+          icon="save"
+          buttonType="raised"
+          buttonText="Save"
+          buttonRefreshingText="Saving..."
+          color="primary"
+          (refreshStarted)="saveClient()"
+          type="submit" />
       </mat-card-actions>
     }
   </mat-card>

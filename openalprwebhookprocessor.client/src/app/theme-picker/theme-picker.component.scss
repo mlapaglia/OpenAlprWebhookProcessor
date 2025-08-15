@@ -1,3 +1,20 @@
+// Align with sidenav navigation items
+.mat-mdc-list-item {
+  margin: 0 12px 4px;
+  border-radius: 8px;
+  height: 48px;
+  transition: all 0.2s ease;
+
+  .mat-icon {
+    margin-right: 16px;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
 .docs-theme-picker-menu {
     .mat-mdc-menu-item {
       .mat-icon.theme-example-icon {

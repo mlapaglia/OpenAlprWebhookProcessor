@@ -1,8 +1,83 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Import Angular Material theme for proper default styling */
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
 a { cursor: pointer }
 
 html,body{
     height: calc(100% - 25px);
 }
 
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Remove padding from expansion panel body so cards take full width */
+.mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+/* Also remove any default padding from mat-expansion-panel-content */
+.mat-expansion-panel-content {
+  padding: 0 !important;
+}
+
+/* Material Symbols Configuration */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Material Design Form Field Fixes - Use default theme colors */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Fix expansion panel border radius when panels are wrapped in child components */
+mat-accordion {
+  app-plate-item {
+    display: block;
+    margin-bottom: 0;
+    
+    mat-expansion-panel {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+  }
+  
+  /* First app-plate-item (first data panel after header) gets top border radius */
+  app-plate-item:first-of-type mat-expansion-panel {
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+  }
+  
+  /* Last app-plate-item gets bottom border radius */
+  app-plate-item:last-of-type mat-expansion-panel {
+    border-bottom-left-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+  }
+  
+  /* Remove bottom border from all except last to prevent double borders */
+  app-plate-item:not(:last-of-type) mat-expansion-panel {
+    border-bottom: none !important;
+  }
+  
+  /* Ensure middle panels have no border radius */
+  app-plate-item:not(:first-of-type):not(:last-of-type) mat-expansion-panel {
+    border-radius: 0 !important;
+  }
+}

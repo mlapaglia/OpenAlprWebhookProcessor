@@ -2,17 +2,19 @@
 <html>
 <head>
     <base href="/"/>
-    <title>OpenALPR Webhook Processor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#1976d2">
+    <title i18n>OpenALPR Webhook Processor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" i18n-content>
+    <!-- Preload critical fonts to prevent FOUC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined&display=block" rel="stylesheet">
+    <link rel="icon" i18n-rel type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="manifest" i18n-rel href="manifest.webmanifest">
+    <meta name="theme-color" content="#1976d2" i18n-content>
 </head>
 <body>
     <app-app></app-app>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+    <noscript i18n>Please enable JavaScript to continue using this application.</noscript>
 </body>
 </html>

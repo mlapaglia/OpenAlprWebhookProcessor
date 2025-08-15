@@ -1,0 +1,114 @@
+.setup-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.setup-card {
+  width: 100%;
+  max-width: 600px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.loading-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.loading-section mat-spinner {
+  margin: 0 auto 20px;
+}
+
+.setup-section {
+  margin-bottom: 20px;
+}
+
+.qr-section {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.qr-code {
+  margin: 20px 0;
+}
+
+.qr-code img {
+  max-width: 200px;
+  height: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background: white;
+}
+
+.manual-entry {
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.manual-entry code {
+  font-size: 14px;
+  word-break: break-all;
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  display: block;
+  margin-top: 8px;
+}
+
+.status-section {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.action-buttons {
+  margin-top: 20px;
+}
+
+.action-buttons button {
+  margin: 0 8px 8px 0;
+}
+
+.recovery-codes {
+  padding: 10px 0;
+}
+
+.recovery-codes mat-list-item {
+  border-bottom: 1px solid #eee;
+}
+
+.recovery-codes code {
+  font-family: 'Courier New', monospace;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.navigation-links {
+  width: 100%;
+  text-align: center;
+}
+
+.navigation-links a {
+  color: #3f51b5;
+  text-decoration: none;
+}
+
+.navigation-links a:hover {
+  text-decoration: underline;
+}
+
+mat-spinner {
+  margin-right: 8px;
+}
+
+mat-expansion-panel {
+  margin-bottom: 16px;
+}

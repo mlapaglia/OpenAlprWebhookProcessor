@@ -1,0 +1,24 @@
+<!-- eslint-disable @angular-eslint/template/prefer-ngsrc -->
+@if (imageDataUrl() && !isLoadingImage() && !isLoadingFailed()) {
+  <img
+    mat-card-image
+    class="sample-image"
+    [src]="imageDataUrl()"
+    alt="last capture from camera" i18n-alt>
+}
+@if (isLoadingImage()) {
+  <div
+    style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; height:200px;">
+    <mat-progress-spinner
+      color="primary"
+      mode="indeterminate" i18n-mode />
+  </div>
+}
+@if (!sampleImageUrl() || (isLoadingFailed() && !isLoadingImage())) {
+  <div
+    style="display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; height:200px;">
+    <mat-icon i18n
+      style="font-size: 100px; height: 90px; width: 90px;"
+    [matTooltip]="tooltipText" i18n-matTooltip>help_center</mat-icon>
+  </div>
+}

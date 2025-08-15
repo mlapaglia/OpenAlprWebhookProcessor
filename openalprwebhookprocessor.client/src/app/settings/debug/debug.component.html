@@ -1,0 +1,106 @@
+<div class="debug-container">
+  
+  <!-- Version Information Section -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="card-header-title">
+        <mat-icon i18n>info</mat-icon>
+        Application Version
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (isLoadingVersion) {
+        <div class="loading-container">
+          <mat-progress-spinner 
+            color="primary" 
+            mode="indeterminate" 
+            diameter="20" />
+          <span i18n>Loading version information...</span>
+        </div>
+      } @else if (version) {
+        <div class="version-grid">
+          <strong>Version:</strong>
+          <span>{{ version.version }}</span>
+          
+          <strong>Assembly Version:</strong>
+          <span>{{ version.assemblyVersion }}</span>
+          
+          <strong>File Version:</strong>
+          <span>{{ version.fileVersion }}</span>
+          
+          <strong>Informational Version:</strong>
+          <span>{{ version.informationalVersion }}</span>
+        </div>
+      } @else {
+        <span class="text-muted" i18n>Version information unavailable</span>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Database Cleanup Section -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title class="card-header-title">
+        <mat-icon i18n>delete_sweep</mat-icon>
+        Database Cleanup
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p i18n>
+        This operation will clean up sensitive data from the database for privacy and storage purposes.
+        Use this when preparing the system for sharing or reducing storage usage.
+      </p>
+      
+      <div>
+        <h4 i18n>This operation will:</h4>
+        <ul>
+          <li i18n>Remove all webhook forward configurations</li>
+          <li i18n>Remove all web push subscription data</li>
+          <li i18n>Remove all pushover client configurations</li>
+          <li i18n>Clear all stored JPEG images (plates and vehicles)</li>
+          <li i18n>Obfuscate all license plate numbers in the database</li>
+        </ul>
+      </div>
+
+      <div class="warning-box">
+        <mat-icon i18n>warning</mat-icon>
+        <strong i18n>Warning:</strong>
+        <span i18n>This action cannot be undone. All cleaned data will be permanently lost.</span>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          mat-raised-button 
+          color="warn"
+          [disabled]="isCleaningDatabase"
+          (click)="cleanupDatabase()"
+          matTooltip="Clean up database - removes sensitive data permanently" i18n-matTooltip>
+          @if (isCleaningDatabase) {
+            <mat-progress-spinner 
+              style="margin-right:8px;" 
+              color="primary" 
+              mode="indeterminate" i18n-mode 
+              diameter="20" />
+          }
+          @if (!isCleaningDatabase) {
+            <mat-icon i18n style="margin-right: 8px;">delete_sweep</mat-icon>
+          }
+          {{ isCleaningDatabase ? 'Cleaning Database...' : 'Cleanup Database' }}
+        </button>
+        
+        @if (isCleaningDatabase) {
+          <span class="text-muted" i18n>
+            This may take a few moments depending on database size...
+          </span>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Scheduled Jobs Section -->
+  <app-scheduled-jobs />
+
+  <!-- SignalR Connection Monitoring Section -->
+  <app-signalr-connection-monitor />
+
+</div> 
