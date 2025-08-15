@@ -1,0 +1,107 @@
+﻿<mat-card class="user-form-card">
+  <mat-card-header class="card-header">
+    <mat-icon class="header-icon">
+      @if (isAddMode) {
+        person_add
+      } @else {
+        edit
+      }
+    </mat-icon>
+    <mat-card-title class="card-title">
+      @if (isAddMode) {
+        <h1 i18n>Add User</h1>
+      } @else {
+        <h1 i18n>Edit User</h1>
+      }
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="card-content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="user-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label i18n>First Name</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="firstName"
+            autocomplete="given-name"
+            [class.mat-form-field-invalid]="submitted && f.firstName.errors" />
+          <mat-icon matPrefix>person</mat-icon>
+          @if (showFirstNameError) {
+            <mat-error i18n>First name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label i18n>Last Name</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="lastName"
+            autocomplete="family-name"
+            [class.mat-form-field-invalid]="submitted && f.lastName.errors" />
+          <mat-icon matPrefix>person</mat-icon>
+          @if (showLastNameError) {
+            <mat-error i18n>Last name is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="form-field full-width">
+        <mat-label i18n>Username</mat-label>
+        <input 
+          matInput 
+          type="text" 
+          formControlName="username"
+          autocomplete="username"
+          [class.mat-form-field-invalid]="submitted && f.username.errors" />
+        <mat-icon matPrefix>account_circle</mat-icon>
+        @if (showUsernameError) {
+          <mat-error i18n>Username is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field full-width">
+        <mat-label i18n>Password</mat-label>
+        <input 
+          matInput 
+          type="password" 
+          formControlName="password"
+          autocomplete="new-password"
+          [class.mat-form-field-invalid]="submitted && f.password.errors" />
+        <mat-icon matPrefix>lock</mat-icon>
+        @if (showPasswordRequiredError) {
+          <mat-error i18n>Password is required</mat-error>
+        }
+        @if (showPasswordMinLengthError) {
+          <mat-error i18n>Password must be at least 6 characters</mat-error>
+        }
+        @if (!isAddMode) {
+          <mat-hint i18n>Leave blank to keep current password</mat-hint>
+        }
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions class="card-actions">
+    <app-refresh-button
+      [isLoading]="loading"
+      [disabled]="form.invalid"
+      buttonType="raised"
+      buttonText="Save"
+      buttonRefreshingText="Saving..."
+      color="primary"
+      icon="save"
+      (refreshStarted)="onSubmit()" />
+    
+    <button 
+      mat-raised-button 
+      (click)="onCancel()"
+      [disabled]="loading"
+      color="warning"
+      i18n>
+      <span>Cancel</span>
+    </button>
+  </mat-card-actions>
+</mat-card>

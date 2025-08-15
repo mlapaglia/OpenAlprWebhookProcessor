@@ -1,0 +1,79 @@
+<div class="login-container">
+  <div class="floating-ball ball-1"></div>
+  <div class="floating-ball ball-2"></div>
+  <div class="floating-ball ball-3"></div>
+  <div class="floating-ball ball-4"></div>
+  <div class="floating-ball ball-5"></div>
+  <div class="floating-ball ball-6"></div>
+  <div class="floating-ball ball-7"></div>
+  <div class="floating-ball ball-8"></div>
+  <div class="floating-ball ball-9"></div>
+  <div class="floating-ball ball-10"></div>
+  <div class="floating-ball ball-11"></div>
+  <div class="floating-ball ball-12"></div>
+  <div class="login-card-wrapper">
+    <mat-card class="login-card">
+      <mat-card-content>
+        <div class="login-header">
+          <h1 class="login-title" i18n>Two-Factor Authentication</h1>
+          <p class="login-subtitle" i18n>Enter the verification code from your authenticator app</p>
+        </div>
+        
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+          <div class="form-fields">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label i18n>Verification Code</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="code"
+                placeholder="123456"
+                maxlength="6"
+                [class.mat-form-field-invalid]="submitted && f.code.errors"
+                autocomplete="off">
+              <mat-icon matSuffix>security</mat-icon>
+              @if (submitted && f.code.errors) {
+                <mat-error>
+                  @if (f.code.errors['required']) {
+                    Verification code is required
+                  }
+                  @if (f.code.errors['pattern']) {
+                    Please enter a valid 6-digit code
+                  }
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="login-actions">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              class="login-button full-width"
+              [disabled]="loading"
+              i18n>
+              @if (loading) {
+                <mat-spinner diameter="20" class="button-spinner" />
+                Verifying...
+              } @else {
+                Verify Code
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button 
+          mat-button 
+          color="accent"
+          routerLink="/account/login" 
+          class="back-button"
+          i18n>
+          <mat-icon>arrow_back</mat-icon>
+          Back to Login
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

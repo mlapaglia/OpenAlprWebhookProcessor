@@ -1,0 +1,39 @@
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Loading Overlay for Plates List -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+    </div>
+  }
+  
+  <mat-accordion style="display: block;">
+    <mat-expansion-panel [hideToggle]="true" [disabled]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title style="display: flex; justify-content: space-between;">
+          <div i18n style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Camera Id</div>
+          <div i18n style="flex: 2; overflow: hidden; word-wrap: break-word;">Plate Number</div>
+          <div i18n style="flex: 5; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Vehicle Description</div>
+          <div i18n style="flex: 2; overflow: hidden; word-wrap: break-word;" class="hide-mobile" >Vehicle Direction</div>
+          <div i18n style="flex: 3; overflow: hidden; word-wrap: break-word;">Date</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+    </mat-expansion-panel>
+    @for (plate of plates(); track plate.id) {
+      <app-plate-item 
+        [plate]="plate"
+        (plateOpened)="onPlateOpened($event)"
+        (plateClosed)="onPlateClosed($event)"
+        (enrichPlate)="onEnrichPlate($event)"
+        (editPlate)="onEditPlate($event)"
+        (alertPlate)="onAlertPlate($event)"
+        (ignorePlate)="onIgnorePlate($event)"
+        (viewPlate)="onViewPlate($event)"
+      />
+    }
+  </mat-accordion>
+  <mat-paginator
+    [pageSizeOptions]="[10, 25, 75, 100]"
+    [pageSize]="pageSize"
+    [length]="totalNumberOfPlates"
+    (page)="onPaginatorPage($event)" />
+</div>

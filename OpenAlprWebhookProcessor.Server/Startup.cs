@@ -1,47 +1,23 @@
-using AutoMapper;
-using Hangfire;
-using Lib.Net.Http.WebPush;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Flurl.Http.Configuration;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using OpenAlprWebhookProcessor.Alerts;
-using OpenAlprWebhookProcessor.Alerts.Pushover;
-using OpenAlprWebhookProcessor.Data;
-using OpenAlprWebhookProcessor.Hydrator;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher;
-using OpenAlprWebhookProcessor.LicensePlates.Enricher.LicensePlateData;
-using OpenAlprWebhookProcessor.ProcessorHub;
-using OpenAlprWebhookProcessor.SystemLogs;
-using OpenAlprWebhookProcessor.Users;
-using OpenAlprWebhookProcessor.Users.Data;
-using OpenAlprWebhookProcessor.Users.Register;
-using OpenAlprWebhookProcessor.WebhookProcessor;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprAgentScraper;
-using OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket;
-using OpenAlprWebhookProcessor.WebPushSubscriptions;
+using Microsoft.OpenApi.Models;
+using OpenAlprWebhookProcessor.Features.Users.Services;
+using OpenAlprWebhookProcessor.Infrastructure.Extensions;
+using OpenAlprWebhookProcessor.Infrastructure.Middleware;
 using Serilog;
 using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor
 {
     public class Startup
     {
-        private const string configurationDirectory = "config";
-
-        private readonly string UsersContextConnectionString = $"Data Source={configurationDirectory}/users.db";
-
-        private readonly string ProcessorContextConnectionString = $"Data Source={configurationDirectory}/processor.db;foreign keys=true;";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -53,158 +29,144 @@ namespace OpenAlprWebhookProcessor
         {
             services.AddCors();
             services.AddControllers();
-
-            services.AddSignalR();
-
-            var processorOptionsBuilder = new DbContextOptionsBuilder<ProcessorContext>();
-            processorOptionsBuilder.UseSqlite(ProcessorContextConnectionString);
-
-            Directory.CreateDirectory(configurationDirectory);
-
-            using (var context = new ProcessorContext(processorOptionsBuilder.Options))
+            services.AddSignalR(options =>
             {
-                context.Database.Migrate();
-                var agent = context.Agents.FirstOrDefault();
-
-                if (agent == null)
-                {
-                    agent = new Data.Agent();
-
-                    context.Agents.Add(agent);
-                    context.SaveChanges();
-                }
-            }
-
-            var optionsBuilder = new DbContextOptionsBuilder<UsersContext>();
-            optionsBuilder.UseSqlite(UsersContextConnectionString);
-
-            using (var context = new UsersContext(optionsBuilder.Options))
-            {
-                if (context.Database.GetPendingMigrations().Any())
-                {
-                    context.Database.Migrate();
-                }
-
-                var userService = new UserService(context);
-                var secretKey = userService.GetJwtSecretKeyAsync().Result;
-
-                services.AddAuthentication(x =>
-                {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    };
-                    x.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            if (string.IsNullOrWhiteSpace(context.Token)
-                                && context.HttpContext.Request.Path.StartsWithSegments("/api/images", StringComparison.OrdinalIgnoreCase))
-                            {
-                                context.Token = context.Request.Cookies["jwtToken"];
-                            }
-
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
-            }
-
-            services.AddScoped<IUserService, UserService>();
-
-            services.AddDbContext<ProcessorContext>(options =>
-                options.UseSqlite(ProcessorContextConnectionString));
-
-            services.AddDbContext<UsersContext>(options =>
-                options.UseSqlite(UsersContextConnectionString));
-
-            var handlerTypes = Assembly.GetExecutingAssembly()
-             .GetTypes()
-             .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Handler"));
-
-            foreach (var handlerType in handlerTypes)
-            {
-                services.TryAddScoped(handlerType);
-            }
-
-            services.AddScoped<OpenAlprAgentScraper>();
-
-            services.AddScoped<ILicensePlateEnricherClient, LicensePlateDataClient>();
-
-            services.AddSingleton<IAlertClient, PushoverClient>();
-            services.AddSingleton<IAlertClient, WebPushNotificationProducer>();
-            services.AddSingleton<IWebPushSubscriptionsService, WebPushSubscriptionsService>();
-
-            services.AddHttpClient<PushServiceClient>();
-
-            services.AddSingleton<WebPushNotificationProducer>();
-            services.AddSingleton<IHostedService>(p => p.GetService<WebPushNotificationProducer>());
-
-            services.AddSingleton<WebsocketClientOrganizer>();
-            services.AddSingleton<IHostedService>(p => p.GetService<WebsocketClientOrganizer>());
-
-            services.AddSingleton<CameraUpdateService.CameraUpdateService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<CameraUpdateService.CameraUpdateService>());
-
-            services.AddSingleton<HydrationService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<HydrationService>());
-
-            services.AddSingleton<AlertService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<AlertService>());
-
-            services.AddSingleton<ImageRetrieverService>();
-            services.AddSingleton<IHostedService>(p => p.GetService<ImageRetrieverService>());
-
-            var mapper = new MapperConfiguration(mc =>
-            {
-                mc.CreateMap<User, UserModel>();
-                mc.CreateMap<User, UserModel>();
-                mc.CreateMap<RegisterModel, User>();
-                mc.CreateMap<UpdateModel, User>();
+                options.EnableDetailedErrors = true;
             });
 
-            services.AddSingleton(mapper.CreateMapper());
+            services.AddHttpClient();
+            services.AddSingleton<IFlurlClientCache>(sp => new FlurlClientCache());
+            services.AddApplicationServices();
 
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseInMemoryStorage());
+            services.AddDataServices(Configuration);
 
-            services.AddHangfireServer(options =>
+            services.AddIdentity<Features.Users.Data.ApplicationUser, IdentityRole<int>>(options =>
             {
-                options.SchedulePollingInterval = TimeSpan.FromSeconds(1);
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
+
+                options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+            })
+            .AddEntityFrameworkStores<Features.Users.Data.UsersContext>()
+            .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.ExpireTimeSpan = TimeSpan.FromHours(24);
+                options.SlidingExpiration = true;
+                options.LoginPath = "/account/login";
+                options.LogoutPath = "/account/logout";
+                options.AccessDeniedPath = "/account/access-denied";
+                
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
+                
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = 403;
+                        return Task.CompletedTask;
+                    }
+                    context.Response.Redirect(context.RedirectUri);
+                    return Task.CompletedTask;
+                };
             });
+
+            services.AddScoped<IPasswordService, PasswordService>();
+
+            services.AddExternalServices();
+
+            services.AddBackgroundServices(Configuration);
+
+            services.AddMachineLearningServices();
+
+            services.AddAutoMapperConfiguration();
 
             services.AddMemoryCache();
+
+            services.AddDevelopmentDataSeeding();
+
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "OpenALPR Webhook Processor API",
+                    Version = "v1",
+                    Description = "API for managing license plate recognition, cameras, alerts, and machine learning configurations"
+                });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSerilogRequestLogging();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            app.UseHangfireDashboard();
-
             app.UseCors(x => x
-                .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader()
+                .AllowCredentials());
 
-            app.UseMiddleware<JwtMiddleware>();
+            if (env.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "OpenALPR Webhook Processor API v1");
+                    c.RoutePrefix = "swagger";
+                });
+            }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             var webSocketOptions = new WebSocketOptions
             {
@@ -223,21 +185,9 @@ namespace OpenAlprWebhookProcessor
             {
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("/index.html");
-                endpoints.MapHub<ProcessorHub.ProcessorHub>("/api/processorHub");
+                endpoints.MapHub<ProcessorHub.ProcessorHub>("/api/processorHub")
+                    .RequireAuthorization();
             });
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Error)
-                .Enrich.FromLogContext()
-                .WriteTo.File(
-                    "./config/log-.txt",
-                    rollingInterval: RollingInterval.Day,
-                    shared: true,
-                    flushToDiskInterval: TimeSpan.FromSeconds(5),
-                    retainedFileCountLimit: 3)
-                .WriteTo.Console()
-                .WriteTo.Signalr(app.ApplicationServices.GetService<IHubContext<ProcessorHub.ProcessorHub, IProcessorHub>>())
-                .CreateLogger();
         }
     }
 }

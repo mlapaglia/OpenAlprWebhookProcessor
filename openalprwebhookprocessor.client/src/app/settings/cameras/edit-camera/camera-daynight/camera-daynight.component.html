@@ -1,0 +1,228 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <span i18n>Day/Night Toggle</span>
+    </mat-card-title>
+    <mat-card-subtitle i18n>Configure automatic day/night mode switching and camera focus settings</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="dayNightForm">
+      <div class="toggle-section">
+        <mat-slide-toggle 
+          class="toggle-switch" 
+          formControlName="dayNightModeEnabled"
+          color="primary">
+          <span i18n>Enable Day/Night Mode</span>
+        </mat-slide-toggle>
+      </div>
+      @if (dayNightForm.get('dayNightModeEnabled')?.value) {
+        <div [@inOutAnimation] class="daynight-settings">
+          
+          <!-- Location Settings -->
+          <div class="settings-section">
+            <h3 class="section-title" i18n>Location Settings</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Latitude</mat-label>
+                <input type="number" 
+                       matInput 
+                       formControlName="latitude" 
+                       placeholder="Defaults to agent's GPS if blank" 
+                       i18n-placeholder
+                       step="0.000001">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Longitude</mat-label>
+                <input type="number" 
+                       matInput 
+                       formControlName="longitude" 
+                       placeholder="Defaults to agent's GPS if blank" 
+                       i18n-placeholder
+                       step="0.000001">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Timezone Offset (hours +/-)</mat-label>
+                <input type="number" 
+                       matInput 
+                       formControlName="timezoneOffset"
+                       min="-12" 
+                       max="14"
+                       step="0.5">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Time Offset Settings -->
+          <div class="settings-section">
+            <h3 class="section-title" i18n>Time Adjustments</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Sunset Offset (minutes +/-)</mat-label>
+                <input type="number" 
+                       matInput 
+                       formControlName="sunsetOffset"
+                       min="-120" 
+                       max="120">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Sunrise Offset (minutes +/-)</mat-label>
+                <input type="number" 
+                       matInput 
+                       formControlName="sunriseOffset"
+                       min="-120" 
+                       max="120">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Camera Control Settings -->
+          <div class="settings-section">
+            <h3 class="section-title" i18n>Camera Control</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="url-field">
+                <mat-label i18n>Day/Night Mode URL</mat-label>
+                <input matInput 
+                       formControlName="dayNightModeUrl" 
+                       placeholder="https://camera-ip/daynight-endpoint" 
+                       i18n-placeholder>
+                @if (dayNightForm.get('dayNightModeUrl')?.hasError('required')) {
+                  <mat-error i18n>
+                    Day/Night mode URL is required
+                  </mat-error>
+                }
+                @if (dayNightForm.get('dayNightModeUrl')?.hasError('pattern')) {
+                  <mat-error i18n>
+                    Please enter a valid URL starting with http:// or https://
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Focus Settings -->
+          <div class="settings-section">
+            <h3 class="section-title" i18n>Focus & Zoom Presets</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <h4 class="group-title" i18n>Day Settings</h4>
+                <mat-form-field appearance="outline">
+                  <mat-label i18n>Day Zoom</mat-label>
+                  <input type="number" 
+                         matInput 
+                         formControlName="dayZoom"
+                         min="1" 
+                         max="100">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label i18n>Day Focus</mat-label>
+                  <input type="number" 
+                         matInput 
+                         formControlName="dayFocus"
+                         min="1" 
+                         max="100">
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <h4 class="group-title" i18n>Night Settings</h4>
+                <mat-form-field appearance="outline">
+                  <mat-label i18n>Night Zoom</mat-label>
+                  <input type="number" 
+                         matInput 
+                         formControlName="nightZoom"
+                         min="1" 
+                         max="100">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label i18n>Night Focus</mat-label>
+                  <input type="number" 
+                         matInput 
+                         formControlName="nightFocus"
+                         min="1" 
+                         max="100">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Settings & Controls -->
+          <div class="settings-section">
+            <h3 class="section-title" i18n>Current Camera Settings</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Current Zoom</mat-label>
+                <input type="number" 
+                       matInput 
+                       [value]="currentZoomFocus()?.zoom || 0"
+                       (input)="onZoomChange($event)"
+                       min="1" 
+                       max="100">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label i18n>Current Focus</mat-label>
+                <input type="number" 
+                       matInput 
+                       [value]="currentZoomFocus()?.focus || 0"
+                       (input)="onFocusChange($event)"
+                       min="1" 
+                       max="100">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <div class="button-group">
+              <h4 class="group-title" i18n>Mode Controls</h4>
+              <button mat-raised-button 
+                      color="primary" 
+                      type="button" 
+                      (click)="onTriggerDayMode()"
+                      [disabled]="!dayNightForm.get('dayNightModeUrl')?.value" 
+                      i18n>
+                Trigger Day Mode
+              </button>
+              <button mat-raised-button 
+                      color="accent" 
+                      type="button" 
+                      (click)="onTriggerNightMode()"
+                      [disabled]="!dayNightForm.get('dayNightModeUrl')?.value" 
+                      i18n>
+                Trigger Night Mode
+              </button>
+            </div>
+
+            <div class="button-group">
+              <h4 class="group-title" i18n>Focus Controls</h4>
+              <button mat-raised-button 
+                      type="button" 
+                      (click)="onGetZoomFocus()" 
+                      i18n>
+                Get Current Zoom/Focus
+              </button>
+              <button mat-raised-button 
+                      type="button" 
+                      (click)="onSetZoomFocus()" 
+                      i18n>
+                Set Zoom/Focus
+              </button>
+              <button mat-raised-button 
+                      type="button" 
+                      (click)="onTriggerAutofocus()" 
+                      i18n>
+                Trigger Auto Focus
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>

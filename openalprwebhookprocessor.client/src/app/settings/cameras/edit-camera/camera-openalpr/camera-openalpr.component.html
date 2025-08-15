@@ -1,0 +1,63 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <span i18n>OpenALPR Integration</span>
+    </mat-card-title>
+    <mat-card-subtitle i18n>Configure automatic license plate recognition settings</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="openAlprForm">
+      <div class="toggle-section">
+        <mat-slide-toggle 
+          class="toggle-switch" 
+          formControlName="openAlprEnabled"
+          color="primary">
+          <span i18n>Enable OpenALPR Integration</span>
+        </mat-slide-toggle>
+      </div>
+      @if (openAlprForm.get('openAlprEnabled')?.value) {
+        <div [@inOutAnimation] class="openalpr-settings">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label i18n>OpenALPR Name</mat-label>
+              <input matInput formControlName="openAlprName">
+              @if (openAlprForm.get('openAlprName')?.hasError('required')) {
+                <mat-error i18n>
+                  OpenALPR name is required
+                </mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label i18n>OpenALPR Camera ID</mat-label>
+              <input type="number" matInput formControlName="openAlprCameraId" min="1">
+              @if (openAlprForm.get('openAlprCameraId')?.hasError('required')) {
+                <mat-error i18n>
+                  Camera ID is required
+                </mat-error>
+              }
+              @if (openAlprForm.get('openAlprCameraId')?.hasError('min')) {
+                <mat-error i18n>
+                  Camera ID must be greater than 0
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button color="accent" type="button" (click)="onEditMask()" i18n>
+              Edit Camera Mask
+            </button>
+          </div>
+
+          @if (isEditingMask) {
+            <div class="camera-mask-container">
+              <app-camera-mask [camera]="camera()" />
+            </div>
+          }
+        </div>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>

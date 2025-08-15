@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using OpenAlprWebhookProcessor.Features.SystemLogs.Queries.GetLogs;
+using System.Threading.Tasks;
 
 namespace OpenAlprWebhookProcessor.ProcessorHub
 {
@@ -8,12 +9,20 @@ namespace OpenAlprWebhookProcessor.ProcessorHub
 
         Task LicensePlateAlerted(string plateNumber);
 
-        Task ProcessInformationLogged(string log);
+        Task ProcessInformationLogged(
+            ApiLogLevel logLevel,
+            string log);
 
-        Task OpenAlprAgentConnected(string agentId, string ipAddress);
+        Task OpenAlprAgentConnected(
+            string agentId,
+            string ipAddress);
 
-        Task OpenAlprAgentDisconnected(string agentId, string ipAddress);
+        Task OpenAlprAgentDisconnected(
+            string agentId,
+            string ipAddress);
 
         Task ScrapeFinished();
+
+        Task DatabaseCleanupCompleted();
     }
 }

@@ -1,12 +1,12 @@
-import { EnrichmentType } from './enrichmentType'
+import type { EnrichmentType } from './enrichmentType';
 
 export class Enricher {
-  id: string
-  isEnabled: boolean
-  apiKey: string
-  enrichmentType: EnrichmentType
+  id: string;
+  isEnabled: boolean;
+  apiKey: string;
+  enrichmentType: EnrichmentType;
 
   constructor(init?: Partial<Enricher>) {
-    Object.assign(this, init)
+    Object.assign(this, init);
   }
 }

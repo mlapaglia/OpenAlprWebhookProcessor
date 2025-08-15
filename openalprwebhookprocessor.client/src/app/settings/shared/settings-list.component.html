@@ -1,0 +1,77 @@
+<!-- Settings List -->
+<mat-card class="settings-list-card">
+  <app-settings-header
+    [config]="config()"
+    [itemCount]="settings().data.length"
+    [isSaving]="isSaving()"
+    (saveSettings)="onSaveSettings()" />
+
+  <mat-card-content class="table-content">
+    <!-- Empty State -->
+    @if(settings().data.length === 0) {
+      <app-settings-empty-state
+        [config]="config()"
+        (scrollToForm)="onScrollToForm()" />
+    }
+
+    <!-- Settings Table -->
+    @if(settings().data.length > 0) {
+      <div class="table-container">
+        <table 
+          mat-table 
+          [dataSource]="computedData" 
+          [trackBy]="trackByFn"
+          class="settings-table"
+          multiTemplateDataRows>
+          
+          <ng-container matColumnDef="plateNumber" i18n-matColumnDef>
+            <th mat-header-cell *matHeaderCellDef class="plate-header">
+              <mat-icon i18n class="column-icon">local_police</mat-icon>
+              Plate Number
+            </th>
+            <td mat-cell *matCellDef="let element" class="plate-cell">
+              <app-plate-number-cell
+                [setting]="element"
+                [isEditing]="element.isCurrentlyEditing"
+                [editingSetting]="editingSetting" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description" i18n-matColumnDef>
+            <th mat-header-cell *matHeaderCellDef class="description-header">
+              <mat-icon i18n class="column-icon">notes</mat-icon>
+              Description
+            </th>
+            <td mat-cell *matCellDef="let element" class="description-cell">
+              <app-description-cell
+                [setting]="element"
+                [isEditing]="element.isCurrentlyEditing"
+                [editingSetting]="editingSetting" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions" i18n-matColumnDef>
+            <th i18n mat-header-cell *matHeaderCellDef class="actions-header">
+              Actions
+            </th>
+            <td mat-cell *matCellDef="let element" class="actions-cell">
+              <app-actions-cell
+                [setting]="element"
+                [config]="config()"
+                [isEditing]="element.isCurrentlyEditing"
+                (startEdit)="onStartEdit(element)"
+                (confirmDelete)="onConfirmDelete(element)"
+                (saveEdit)="onSaveEdit(element)"
+                (cancelEdit)="onCancelEdit()" />
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" 
+              class="table-row" 
+              [class.editing-row]="element.isCurrentlyEditing"></tr>
+        </table>
+      </div>
+    }
+  </mat-card-content>
+</mat-card> 

@@ -1,45 +1,49 @@
-import { Injectable } from '@angular/core'
+import { Injectable } from '@angular/core';
 
-/**
- * Class for managing stylesheets. Stylesheets are loaded into named slots so that they can be
- * removed or changed later.
- */
 @Injectable({ providedIn: 'root' })
 export class StyleManager {
-  /**
-   * Set the stylesheet with the specified key.
-   */
-  setStyle(key: string, href: string) {
-    getLinkElementForKey(key).setAttribute('href', href)
+
+  async setStyle(key: string, href: string): Promise<void> {
+    const linkEl = await this.getLinkElementForKey(key);
+    linkEl.href = href;
+
+    return new Promise((resolve, reject) => {
+      linkEl.onload = () => resolve();
+      linkEl.onerror = () => reject(new Error(`Failed to load stylesheet: ${href}`));
+
+      if (linkEl.href === href) {
+        resolve();
+      }
+    });
   }
 
-  /**
-   * Remove the stylesheet with the specified key.
-   */
   removeStyle(key: string) {
-    const existingLinkElement = getExistingLinkElementByKey(key)
+    const existingLinkElement = this.getExistingLinkElementByKey(key);
     if (existingLinkElement) {
-      document.head.removeChild(existingLinkElement)
+      document.head.removeChild(existingLinkElement);
     }
   }
-}
 
-function getLinkElementForKey(key: string) {
-  return getExistingLinkElementByKey(key) || createLinkElementWithKey(key)
-}
+  private getLinkElementForKey(key: string): Promise<HTMLLinkElement> {
+    return new Promise((resolve) => {
+      const existingLinkElement = this.getExistingLinkElementByKey(key);
 
-function getExistingLinkElementByKey(key: string) {
-  return document.head.querySelector(`link[rel="stylesheet"].${getClassNameForKey(key)}`)
-}
+      if (existingLinkElement) {
+        resolve(existingLinkElement);
+      } else {
+        const linkEl = document.createElement('link');
+        linkEl.type = 'text/css';
+        linkEl.rel = 'stylesheet';
+        linkEl.setAttribute('data-style-key', key);
+        document.head.appendChild(linkEl);
+        resolve(linkEl);
+      }
+    });
+  }
 
-function createLinkElementWithKey(key: string) {
-  const linkEl = document.createElement('link')
-  linkEl.setAttribute('rel', 'stylesheet')
-  linkEl.classList.add(getClassNameForKey(key))
-  document.head.appendChild(linkEl)
-  return linkEl
-}
-
-function getClassNameForKey(key: string) {
-  return `style-manager-${key}`
+  private getExistingLinkElementByKey(key: string): HTMLLinkElement | null {
+    return document.head.querySelector(
+      `link[rel="stylesheet"][data-style-key="${key}"]`,
+    );
+  }
 }

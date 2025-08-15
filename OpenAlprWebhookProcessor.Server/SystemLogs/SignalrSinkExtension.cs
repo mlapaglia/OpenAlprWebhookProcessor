@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Serilog;
 using Serilog.Configuration;
-using System;
 
 namespace OpenAlprWebhookProcessor.SystemLogs
 {
@@ -9,8 +8,7 @@ namespace OpenAlprWebhookProcessor.SystemLogs
     {
         public static LoggerConfiguration Signalr(
             this LoggerSinkConfiguration loggerConfiguration,
-            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub,
-            IFormatProvider formatProvider = null)
+            IHubContext<ProcessorHub.ProcessorHub, ProcessorHub.IProcessorHub> processorHub)
         {
             return loggerConfiguration.Sink(new SignalrSink(processorHub));
         }

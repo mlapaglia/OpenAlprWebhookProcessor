@@ -1,106 +1,168 @@
-import { Injectable, inject } from '@angular/core'
-import { SnackbarService } from 'app/snackbar/snackbar.service'
-import { SnackBarType } from 'app/snackbar/snackbartype'
-import * as signalR from '@microsoft/signalr'
-import { Subject } from 'rxjs'
+import { Injectable, inject } from '@angular/core';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import * as signalR from '@microsoft/signalr';
+import { Subject } from 'rxjs';
+import { AccountService } from 'app/_services';
+import type { ApiLogLevel } from 'app/settings/system-logs/system-logs.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SignalrService {
-  private snackbarService = inject(SnackbarService)
+  private readonly snackbarService = inject(SnackbarService);
+  private readonly accountService = inject(AccountService);
 
-  private hubConnection: signalR.HubConnection
+  private hubConnection?: signalR.HubConnection;
 
-  public connectionEstablished = new Subject<boolean>()
-  public licensePlateReceived = new Subject<string>()
-  public licensePlateAlerted = new Subject<string>()
-  public processInformationLogged = new Subject<string>()
-  public openAlprAgentConnectionStatusChanged = new Subject<boolean>()
-  public isConnected: boolean
-  public connectionStatusChanged: Subject<boolean> = new Subject<boolean>()
+  public connectionEstablished = new Subject<boolean>();
+  public licensePlateReceived = new Subject<string>();
+  public licensePlateAlerted = new Subject<string>();
+  public processInformationLogged = new Subject<{ logLevel: ApiLogLevel, logMessage: string }>();
+  public openAlprAgentConnectionStatusChanged = new Subject<boolean>();
+  public isConnected: boolean;
+  public connectionStatusChanged: Subject<boolean> = new Subject<boolean>();
+  public databaseCleanupCompleted: Subject<boolean> = new Subject<boolean>();
+  public connectionStartTime: Date | null = null;
 
   public startConnection() {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('/api/processorhub')
-      .withAutomaticReconnect()
-      .build()
+    if (this.isConnected) {
+      return;
+    }
+
+    const user = this.accountService.userValue;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    const userId = user?.id as number | null | undefined;
+    if (!userId) {
+      return; // User not authenticated
+    }
+
+    // Build connection - rely on cookies for authentication
+    const connectionBuilder = new signalR.HubConnectionBuilder()
+      .withUrl('/api/processorHub')
+      .withAutomaticReconnect();
+
+    this.hubConnection = connectionBuilder.build();
 
     this.hubConnection
       .start()
       .then(() => {
-        this.snackbarService.create('Connected to server!', SnackBarType.Connected)
-        this.connectionEstablished.next(true)
-        this.triggerConnectionStatusChange(true)
+        this.connectionStartTime = new Date();
+        this.snackbarService.create('Connected to server!', SnackBarType.Connected);
+        this.connectionEstablished.next(true);
+        this.triggerConnectionStatusChange(true);
       })
-      .catch((err) => {
-        console.log('Error while starting connection: ' + err)
-        this.snackbarService.create('Connection lost', SnackBarType.Disconnected)
-      })
+      .catch(_ => {
+        this.snackbarService.create('Connection lost', SnackBarType.Disconnected);
+      });
 
-    this.hubConnection.on('ProcessInformationLogged', (logMessage) => {
-      this.processInformationLogged.next(logMessage)
-    })
+    this.setupEventHandlers();
+  }
+
+  private setupEventHandlers() {
+    if (!this.hubConnection) {
+      return;
+    }
+
+    this.hubConnection.on('ProcessInformationLogged', (logLevel: ApiLogLevel, logMessage: string) => {
+      this.processInformationLogged.next({ logLevel, logMessage });
+    });
 
     this.hubConnection.on('OpenAlprAgentConnected', (agentId, ipAddress) => {
-      this.openAlprAgentConnectionStatusChanged.next(true)
+      this.openAlprAgentConnectionStatusChanged.next(true);
       this.snackbarService.create(
         `OpenALPR Agent Connected: ${agentId}`,
         SnackBarType.Connected,
-        `IP Address: ${ipAddress}`)
-    })
+        `IP Address: ${ipAddress}`);
+    });
 
     this.hubConnection.on('OpenAlprAgentDisconnected', (agentId, ipAddress) => {
-      this.openAlprAgentConnectionStatusChanged.next(false)
+      this.openAlprAgentConnectionStatusChanged.next(false);
       this.snackbarService.create(
         `OpenALPR Agent Disconnected: ${agentId}`,
         SnackBarType.Disconnected,
-        'IP Address: ' + ipAddress)
-    })
+        `IP Address: ${ipAddress}`);
+    });
 
     this.hubConnection.on('LicensePlateRecorded', (plateNumber) => {
-      this.licensePlateReceived.next(plateNumber)
-    })
+      this.licensePlateReceived.next(plateNumber);
+    });
+
+    this.hubConnection.on('DatabaseCleanupCompleted', () => {
+      this.snackbarService.create('Database Cleanup Completed!', SnackBarType.Successful);
+    });
 
     this.hubConnection.on('LicensePlateAlerted', (plateNumber) => {
-      this.snackbarService.create(`Alert! Plate Number: ${plateNumber}`, SnackBarType.Alert)
-    })
+      this.snackbarService.create(`Alert! Plate Number: ${plateNumber}`, SnackBarType.Alert);
+    });
 
     this.hubConnection.onreconnected(() => {
-      console.log('Connection reconnected')
-      this.snackbarService.create('Reconnected to server!', SnackBarType.Connected)
-      this.triggerConnectionStatusChange(true)
-    })
+      this.connectionStartTime = new Date(); // Reset connection time on reconnect
+      this.snackbarService.create('Reconnected to server!', SnackBarType.Connected);
+      this.triggerConnectionStatusChange(true);
+    });
 
     this.hubConnection.onreconnecting(() => {
-      console.log('Connection reconnecting')
-      this.snackbarService.create('Reconnecting to server...', SnackBarType.Disconnected)
-      this.triggerConnectionStatusChange(false)
-    })
+      this.snackbarService.create('Reconnecting to server...', SnackBarType.Disconnected);
+      this.triggerConnectionStatusChange(false);
+    });
 
     this.hubConnection.onclose(() => {
-      console.log('Connection ended')
-      this.snackbarService.create('Connection lost', SnackBarType.Disconnected)
-      this.triggerConnectionStatusChange(false)
-    })
+      this.connectionStartTime = null;
+      this.snackbarService.create('Connection lost', SnackBarType.Disconnected);
+      this.triggerConnectionStatusChange(false);
+    });
 
     this.hubConnection.on('ScrapeFinished', () => {
-      console.log('Scrape finished')
-      this.snackbarService.create('Scrape finished!', SnackBarType.Info)
-    })
+      this.snackbarService.create('Scrape finished!', SnackBarType.Info);
+    });
   }
 
   public stopConnection() {
+    if (!this.hubConnection) {
+      return;
+    }
+
+    this.connectionStartTime = null;
     this.hubConnection
       .stop()
       .then(() => {
-        this.snackbarService.create('Connection closed', SnackBarType.Disconnected)
-        this.triggerConnectionStatusChange(false)
+        this.snackbarService.create('Connection closed', SnackBarType.Disconnected);
+        this.triggerConnectionStatusChange(false);
       })
+      .catch(_ => {
+        // do nothing
+      });
   }
 
-  public triggerConnectionStatusChange(isConencted: boolean) {
-    this.isConnected = isConencted
-    this.connectionStatusChanged.next(this.isConnected)
+  public triggerConnectionStatusChange(isConnected: boolean): void {
+    this.isConnected = isConnected;
+    this.connectionStatusChanged.next(this.isConnected);
+  }
+
+  public getConnectionInfo() {
+    if (!this.hubConnection) {
+      return null;
+    }
+
+    const getStateString = (state: signalR.HubConnectionState): string => {
+      switch (state) {
+        case signalR.HubConnectionState.Connecting: return 'Connecting';
+        case signalR.HubConnectionState.Connected: return 'Connected';
+        case signalR.HubConnectionState.Reconnecting: return 'Reconnecting';
+        case signalR.HubConnectionState.Disconnecting: return 'Disconnecting';
+        case signalR.HubConnectionState.Disconnected: return 'Disconnected';
+        default: return 'Unknown';
+      }
+    };
+
+    return {
+      state: getStateString(this.hubConnection.state),
+      connectionId: this.hubConnection.connectionId,
+      transport: (this.hubConnection as { transport?: { name: string } }).transport?.name ?? 'Unknown',
+      startTime: this.connectionStartTime,
+      durationSeconds: this.connectionStartTime ?
+        Math.floor((new Date().getTime() - this.connectionStartTime.getTime()) / 1000) : 0,
+    };
   }
 }

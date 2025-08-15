@@ -1,0 +1,16 @@
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.form-actions button {
+  min-width: 120px;
+}
+
+input.is-invalid {
+  border-color: #f44336;
+}

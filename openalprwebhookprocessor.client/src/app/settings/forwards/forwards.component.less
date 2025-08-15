@@ -1,0 +1,78 @@
+/* Forwards component styling */
+
+/* Responsive layout - show/hide desktop vs mobile views */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  
+  .mobile-only {
+    display: block;
+  }
+}
+
+/* Mobile card layout */
+.forward-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+.forward-info {
+  margin-bottom: 16px;
+}
+
+.destination-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-item span {
+  font-size: 14px;
+  color: var(--mdc-theme-on-surface);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.delete-button {
+  border-radius: 4px;
+  font-size: 12px;
+  height: 36px;
+  font-weight: 500;
+}
+
+.delete-button mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Desktop table optimizations */
+@media (min-width: 769px) {
+  table {
+    min-width: 800px;
+  }
+}

@@ -1,108 +1,109 @@
-<div class="mobilePlateContainer" style="display: flex; flex-wrap: wrap;">
-  <mat-card class="example-card">
-    <mat-card-header>
-      <mat-card-title>Images</mat-card-title>
-      <mat-card-subtitle>Plate and Vehicle</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      @if (loadingVehicleImage) {
-        <mat-progress-spinner
-          color="primary"
-          mode="indeterminate"
-          diameter="100"
-        ></mat-progress-spinner>
-      }
-      <img [src]="this.vehicleImageUrl"
-        class="resize-mobile"
-        style="cursor: pointer;"
-        alt="image of the vehicle"
-        tabindex="0"
-        [hidden]="loadingVehicleImage || loadingVehicleImageFailed"
-        (load)="vehicleImageLoaded()"
-        (error)="vehicleImageFailedToLoad()"
-        (click)="openLightbox(plate.imageUrl, plate.plateNumber)"
-        (keydown)="openLightbox(plate.imageUrl, plate.plateNumber)" />
-        @if (!this.vehicleImageUrl|| loadingVehicleImageFailed) {
-          <mat-icon style="font-size: 100px; line-height: normal;"
-            [inline]="true"
-          matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-        }
-        @if (loadingPlateImage) {
-          <mat-progress-spinner
-            color="primary"
-            mode="indeterminate"
-            diameter="100">
-          </mat-progress-spinner>
-        }
-        <img [src]="this.plateImageUrl"
-          class="resize-mobile"
-          style="width: 500px; padding-top:16px;"
-          alt="image of the vehicle's license plate"
-          [hidden]="loadingPlateImage || loadingPlateImageFailed"
-          (load)="plateImageLoaded()"
-          (error)="plateImageFailedToLoad()" />
-          @if (!this.plateImageUrl || loadingPlateImageFailed) {
-            <mat-icon style="font-size: 100px; line-height: normal;"
-              [inline]="true"
-            matTooltip="Unable to retrieve image from agent">help_center</mat-icon>
-          }
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title>Statistics</mat-card-title>
-          <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          @if (loadingStatistics) {
-            <mat-progress-spinner
-              color="primary"
-              mode="indeterminate"
-              diameter="100"
-              style="margin: auto;"
-            ></mat-progress-spinner>
-          }
-          @if (loadingStatisticsFailed) {
-            <mat-icon style="font-size: 100px;"
-              [inline]="true"
-            matTooltip="Unable to retrieve statistics from server">help_center</mat-icon>
-          }
-          @if (plateStatistics.length > 0) {
-            <table
-              mat-table [dataSource]="plateStatistics"
-              class="mat-elevation-z8"
-              style="width: 100%">
-              <ng-container matColumnDef="key">
-                <td style="min-width:200px;" mat-cell *matCellDef="let element"> {{element.key}} </td>
-              </ng-container>
-              <ng-container matColumnDef="value">
-                <td mat-cell *matCellDef="let element"> {{element.value}} </td>
-              </ng-container>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-            </table>
-          }
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="example-card">
-        <mat-card-header>
-          <mat-card-title>Notes</mat-card-title>
-          <mat-card-subtitle>{{plate.plateNumber}}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content >
-          <mat-form-field style="width: 100%;" appearance="fill">
-            <textarea [cdkTextareaAutosize]="true" matInput [(ngModel)]="plate.notes"></textarea>
-          </mat-form-field>
-        </mat-card-content>
-        <mat-card-actions align="end">
-          <button mat-raised-button
-            style="margin: 8px 8px 8px 0;"
-            color="primary"
-            [disabled]="isSavingNotes"
-            (click)="saveNotes()"
-          [class.spinner]="isSavingNotes">Save</button>
-          <button mat-raised-button color="warn"
-            (click)="clearNotes()"
-          style="margin: 8px 8px 8px 0;">Clear</button>
-        </mat-card-actions>
-      </mat-card>
+<div class="plate-container">
+  <!-- Compact Header -->
+  <div class="plate-header" [ngClass]="{'alert-expanded': plate().isAlert && isExpanded(), 'ignore-expanded': plate().isIgnore && isExpanded()}">
+    @if (vehicleMakeInfo; as makeInfo) {
+      <div class="background-logo">
+        <img 
+          [ngSrc]="makeInfo.logo" 
+          [alt]="makeInfo.displayName + ' background logo'"
+          fill
+          (error)="onImageError($event)"
+        />
+      </div>
+    }
+    <div class="plate-title">
+      <h2>{{plate().plateNumber}}</h2>
+      <span class="plate-meta">{{plate().receivedOn | date:"medium"}} • {{plate().openAlprCameraId}}</span>
     </div>
+    <div class="plate-actions">
+      <button mat-icon-button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">
+        <mat-icon>dashboard</mat-icon>
+      </button>
+      <button mat-icon-button class="tab-btn" [class.active]="activeTab === 'images'" (click)="setTab('images')">
+        <mat-icon>photo_library</mat-icon>
+      </button>
+      <button mat-icon-button class="tab-btn" [class.active]="activeTab === 'stats'" (click)="setTab('stats')">
+        <mat-icon>analytics</mat-icon>
+      </button>
+      <button mat-icon-button class="tab-btn" [class.active]="activeTab === 'notes'" (click)="setTab('notes')">
+        <mat-icon>note</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="plate-content">
+    <!-- Overview Tab - Compact Layout -->
+    <div class="tab-content" [class.active]="activeTab === 'overview'">
+      <div class="overview-grid">
+        <div class="quick-images">
+          <div class="image-preview vehicle-preview" (click)="setTab('images')" (keyup.enter)="setTab('images')" tabindex="0">
+            <img [ngSrc]="vehicleImageUrl" alt="Vehicle" class="preview-img" fill />
+            <div class="preview-overlay">
+              <mat-icon>zoom_in</mat-icon>
+            </div>
+          </div>
+          <div class="image-preview plate-preview" (click)="setTab('images')" (keyup.enter)="setTab('images')" tabindex="0">
+            <img [ngSrc]="plateImageUrl" alt="Plate" class="preview-img" fill />
+            <div class="preview-overlay">
+              <mat-icon>zoom_in</mat-icon>
+            </div>
+          </div>
+        </div>
+        
+        <div class="quick-stats">
+          <div class="stat-item">
+            <span class="stat-label">Direction</span>
+            <span class="stat-value">
+              <mat-icon [style.transform]="'rotate(' + (plate().direction - 90) + 'deg)'">arrow_right_alt</mat-icon>
+            </span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Vehicle</span>
+            <span class="stat-value">{{plate().vehicleDescription || 'Unknown'}}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Confidence</span>
+            <span class="stat-value">{{plate().processedPlateConfidence}}%</span>
+          </div>
+        </div>
+        
+        <div class="quick-notes">
+          <div class="notes-preview" (click)="setTab('notes')" (keyup.enter)="setTab('notes')" tabindex="0">
+            <mat-icon>note</mat-icon>
+            <span class="notes-text">{{plate().notes || 'Add notes...'}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images Tab -->
+    <div class="tab-content" [class.active]="activeTab === 'images'">
+      @if (shouldShowImages) {
+        <app-plate-images 
+          [plate]="plateAsPlate" />
+      }
+    </div>
+
+    <!-- Statistics Tab -->
+    <div class="tab-content" [class.active]="activeTab === 'stats'">
+      @if (shouldShowStatistics) {
+        <app-plate-statistics
+          [plateStatistics]="plateStatistics"
+          [loadingStatistics]="loadingStatistics"
+          [loadingStatisticsFailed]="loadingStatisticsFailed" />
+      }
+    </div>
+
+    <!-- Notes Tab -->
+    <div class="tab-content" [class.active]="activeTab === 'notes'">
+      @if (shouldShowNotes) {
+        <app-plate-notes 
+          [(plate)]="plateAsPlateSignal"
+          [isSavingNotes]="isSavingNotes"
+          [saveNotes]="saveNotes"
+          [clearNotes]="clearNotes" />
+      }
+    </div>
+  </div>
+</div>

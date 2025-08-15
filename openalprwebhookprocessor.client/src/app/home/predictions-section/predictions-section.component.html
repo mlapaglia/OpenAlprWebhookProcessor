@@ -1,0 +1,81 @@
+@if(shouldShow) {
+  <div class="predictions-section">
+    @if (nextExpectedWithFormatting) {
+      <mat-card class="featured-prediction-card">
+        <mat-card-header>
+          <mat-card-title i18n>Next Expected Arrival</mat-card-title>
+          <mat-card-subtitle i18n>ML Prediction</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="featured-content">
+            <h2 class="plate-number">{{ nextExpectedWithFormatting.licensePlate }}</h2>
+            <div class="prediction-details">
+              <div class="detail-item">
+                <mat-icon i18n>schedule</mat-icon>
+                <span>{{ nextExpectedWithFormatting.formattedTime }}</span>
+              </div>
+              <mat-chip i18n [style.background-color]="nextExpectedWithFormatting.confidenceColor">
+                {{ nextExpectedWithFormatting.confidenceText }} Confidence
+              </mat-chip>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+    
+    @if (showUpcomingPredictions) {
+      <mat-card class="predictions-card">
+        <mat-card-header>
+          <mat-card-title i18n>Upcoming Predictions</mat-card-title>
+          <mat-card-subtitle i18n>Next 24 hours</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (isLoading) {
+            <mat-progress-spinner diameter="40" mode="indeterminate" />
+          } @else {
+            <mat-list>
+              @for (prediction of upcomingPredictionsWithFormatting; track prediction.licensePlate) {
+                <mat-list-item>
+                  <div matListItemTitle>{{ prediction.licensePlate }}</div>
+                  <div matListItemLine>
+                    <span class="time-badge">{{ prediction.formattedTime }}</span>
+                    <span i18n class="location">Unknown</span>
+                  </div>
+                  <mat-chip matListItemMeta
+                            [style.background-color]="prediction.confidenceColor">
+                    {{ prediction.confidencePercentage }}%
+                  </mat-chip>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+    
+    @if (showPredictablePlates) {
+      <mat-card class="predictions-card">
+        <mat-card-header>
+          <mat-card-title i18n>Most Predictable</mat-card-title>
+          <mat-card-subtitle i18n>Highest confidence patterns</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            @for (prediction of predictablePlatesWithFormatting; track prediction.licensePlate) {
+              <mat-list-item>
+                <div matListItemTitle>{{ prediction.licensePlate }}</div>
+                <div matListItemLine>
+                  <span i18n class="pattern">{{ prediction.totalHistoricalVisits }} visits</span>
+                </div>
+                <mat-chip matListItemMeta
+                          [style.background-color]="prediction.confidenceColor">
+                  {{ prediction.confidencePercentage }}%
+                </mat-chip>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+} 

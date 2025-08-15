@@ -1,0 +1,128 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="header-title">
+      <mat-icon>wifi</mat-icon>
+      SignalR Connection Monitor
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    
+    <!-- Client Connection Info -->
+    <div class="client-info-section">
+      <h4>Client Connection</h4>
+      @if (clientConnectionInfo) {
+        <div class="connection-grid">
+          <strong>State:</strong>
+          <span [class]="'connection-status ' + (clientConnectionInfo.state === 'Connected' ? 'connected' : 'disconnected')">
+            {{ clientConnectionInfo.state }}
+          </span>
+          
+          <strong>Connection ID:</strong>
+          <span>{{ clientConnectionInfo.connectionId || 'Not available' }}</span>
+           
+          <strong>Transport:</strong>
+          <span>{{ clientConnectionInfo.transport }}</span>
+
+          <strong>Connected Duration:</strong>
+          <span>{{ formatDuration(clientConnectionInfo.durationSeconds) }}</span>
+        </div>
+      } @else {
+        <span class="connection-status not-available">Not connected</span>
+      }
+    </div>
+
+    <mat-divider />
+
+    <!-- Server Connection Info -->
+    <div class="server-connections-section">
+      <div class="refresh-button-container">
+        <h4>Server Connections ({{ signalrConnections?.totalConnections || 0 }})</h4>
+        <button 
+          mat-icon-button 
+          (click)="refreshConnections()"
+          [disabled]="isLoadingConnections"
+          matTooltip="Refresh connection data">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      @if (isLoadingConnections && isManualRefresh) {
+        <div class="loading-indicator">
+          <mat-progress-spinner 
+            color="primary" 
+            mode="indeterminate" 
+            diameter="20" />
+          <span>Loading connection information...</span>
+        </div>
+      } @else if (signalrConnections && signalrConnections.connections.length > 0) {
+        <!-- Desktop Table View -->
+        <div class="table-wrapper">
+          <table class="connection-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Transport</th>
+                <th>Duration</th>
+                <th>IP Address</th>
+                <th>User Agent</th>
+                <th>Connection ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (connection of signalrConnections.connections; track connection.connectionId) {
+                <tr>
+                  <td>{{ connection.userId }}</td>
+                  <td>{{ connection.transport }}</td>
+                  <td>{{ formatDuration(connection.durationSeconds) }}</td>
+                  <td>{{ connection.ipAddress }}</td>
+                  <td class="user-agent-cell" [title]="connection.userAgent">
+                    {{ connection.userAgent }}
+                  </td>
+                  <td class="connection-id-cell">
+                    {{ connection.connectionId.substring(0, 8) }}...
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="mobile-connections-container">
+          @for (connection of signalrConnections.connections; track connection.connectionId) {
+            <div class="mobile-connection-card">
+              <div class="connection-header">
+                <mat-icon>person</mat-icon>
+                <span>{{ connection.userId }}</span>
+              </div>
+              <div class="connection-details">
+                <div class="detail-row">
+                  <span class="label">Transport:</span>
+                  <span class="value">{{ connection.transport }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Duration:</span>
+                  <span class="value">{{ formatDuration(connection.durationSeconds) }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">IP Address:</span>
+                  <span class="value">{{ connection.ipAddress }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">User Agent:</span>
+                  <span class="value">{{ connection.userAgent }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="label">Connection ID:</span>
+                  <span class="value">{{ connection.connectionId.substring(0, 8) }}...</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <span class="connection-status not-available">No active connections</span>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

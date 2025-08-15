@@ -1,20 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { AlertsComponent } from './alerts.component'
-import { AlertsService } from './alerts.service'
-import { PushoverService } from './pushover/pushover.service'
-import { WebpushService } from './webpush/webpush.service'
-import { of } from 'rxjs'
-import { Alert } from './alert'
-import { Pushover } from './pushover/pushover'
-import { Webpush } from './webpush/webpush'
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { AlertsComponent } from './alerts.component';
+import { AlertsService } from './alerts.service';
+import { PushoverService } from './pushover/pushover.service';
+import { WebpushService } from './webpush/webpush.service';
+import { of } from 'rxjs';
+import type { Alert } from './alert';
+import { Pushover } from './pushover/pushover';
+import { Webpush } from './webpush/webpush';
 
 describe(AlertsComponent.name, () => {
-  let fixture: ComponentFixture<AlertsComponent>
-  let component: AlertsComponent
+  let fixture: ComponentFixture<AlertsComponent>;
+  let component: AlertsComponent;
 
-  const pushoverServiceSpy = jasmine.createSpyObj(PushoverService.name, ['getPushover'])
-  const webpushServiceSpy = jasmine.createSpyObj('WebpushService', ['getWebpush'])
-  const alertsServiceSpy = jasmine.createSpyObj('AlertsService', ['getAlerts'])
+  const pushoverServiceSpy = jasmine.createSpyObj(PushoverService.name, ['getPushover']);
+  const webpushServiceSpy = jasmine.createSpyObj('WebpushService', ['getWebpush']);
+  const alertsServiceSpy = jasmine.createSpyObj('AlertsService', ['getAlerts']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -24,24 +25,24 @@ describe(AlertsComponent.name, () => {
         { provide: PushoverService, useValue: pushoverServiceSpy },
         { provide: WebpushService, useValue: webpushServiceSpy },
       ],
-    }).compileComponents()
-  })
+    }).compileComponents();
+  });
 
   beforeEach(() => {
-    const alertsData: Alert[] = []
-    alertsServiceSpy.getAlerts.and.returnValue(of(alertsData))
-    pushoverServiceSpy.getPushover.and.returnValue(of(new Pushover()))
-    webpushServiceSpy.getWebpush.and.returnValue(of(new Webpush()))
+    const alertsData: Alert[] = [];
+    alertsServiceSpy.getAlerts.and.returnValue(of(alertsData));
+    pushoverServiceSpy.getPushover.and.returnValue(of(new Pushover()));
+    webpushServiceSpy.getWebpush.and.returnValue(of(new Webpush()));
 
-    fixture = TestBed.createComponent(AlertsComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+    fixture = TestBed.createComponent(AlertsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
   it('should call getAlerts method with specific return value', () => {
-    expect(component).toBeTruthy()
-    expect(alertsServiceSpy.getAlerts).toHaveBeenCalled()
-    expect(pushoverServiceSpy.getPushover).toHaveBeenCalled()
-    expect(webpushServiceSpy.getWebpush).toHaveBeenCalled()
-  })
-})
+    expect(component).toBeTruthy();
+    expect(alertsServiceSpy.getAlerts).toHaveBeenCalled();
+    expect(pushoverServiceSpy.getPushover).toHaveBeenCalled();
+    expect(webpushServiceSpy.getWebpush).toHaveBeenCalled();
+  });
+});

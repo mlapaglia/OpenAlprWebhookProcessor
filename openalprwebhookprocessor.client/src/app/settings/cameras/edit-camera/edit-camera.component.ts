@@ -1,96 +1,151 @@
-import { animate, style, transition, trigger } from '@angular/animations'
-import { Component, OnInit, inject } from '@angular/core'
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog'
-import { SnackbarService } from 'app/snackbar/snackbar.service'
-import { SnackBarType } from 'app/snackbar/snackbartype'
-import { Camera } from '../camera'
-import { EditCameraService } from './edit-camera.service'
-import { ZoomFocus } from './zoomfocus'
-import { CameraMaskComponent } from './camera-mask/camera-mask.component'
-import { MatButtonModule } from '@angular/material/button'
-
-import { MatSlideToggleModule } from '@angular/material/slide-toggle'
-import { MatIconModule } from '@angular/material/icon'
-import { MatInputModule } from '@angular/material/input'
-import { MatOptionModule } from '@angular/material/core'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { MatSelectModule } from '@angular/material/select'
-import { MatFormFieldModule } from '@angular/material/form-field'
+import { ChangeDetectionStrategy, Component, inject, type OnDestroy, type OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import type { Camera } from '../camera';
+import { EditCameraService } from './edit-camera.service';
+import { ZoomFocus } from './zoomfocus';
+import { CameraBasicInfoComponent } from './camera-basic-info/camera-basic-info.component';
+import { CameraOpenAlprComponent } from './camera-openalpr/camera-openalpr.component';
+import { CameraOverlayComponent } from './camera-overlay/camera-overlay.component';
+import { CameraDayNightComponent } from './camera-daynight/camera-daynight.component';
+import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
+import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
+import { SettingsService } from '../../settings.service';
 
 @Component({
   selector: 'app-edit-camera',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
   templateUrl: './edit-camera.component.html',
   styleUrls: ['./edit-camera.component.less'],
-  animations: [
-    trigger('inOutAnimation', [
-      transition(':enter', [
-        style({ height: 0, opacity: 0 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 })),
-      ]),
-      transition(':leave', [
-        style({ height: '*', opacity: 1 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: 0, opacity: 0 })),
-      ]),
-    ]),
+  imports: [
+    MatDialogModule,
+    MatButtonModule,
+    CameraBasicInfoComponent,
+    CameraOpenAlprComponent,
+    CameraOverlayComponent,
+    CameraDayNightComponent,
+    RefreshButtonComponent,
   ],
-  imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, FormsModule, MatOptionModule, MatInputModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CameraMaskComponent],
 })
-export class EditCameraComponent implements OnInit {
-  dialogRef = inject<MatDialogRef<EditCameraComponent>>(MatDialogRef)
-  private snackBarService = inject(SnackbarService)
-  private editCameraService = inject(EditCameraService)
-  data = inject<Camera>(MAT_DIALOG_DATA)
+export class EditCameraComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
+  dialogRef = inject<MatDialogRef<EditCameraComponent>>(MatDialogRef);
+  private readonly snackBarService = inject(SnackbarService);
+  private readonly editCameraService = inject(EditCameraService);
+  private readonly settingsService = inject(SettingsService);
+  data = inject<Camera>(MAT_DIALOG_DATA);
 
-  public camera: Camera
-  public hidePassword = true
-  public currentZoomFocus: ZoomFocus = new ZoomFocus()
-  public isEditingMask = false
+  public camera: Camera;
+  public currentZoomFocus: ZoomFocus = new ZoomFocus();
+  public isSaving = false;
 
   ngOnInit(): void {
-    this.camera = this.data
-    this.getZoomFocus()
+    this.camera = { ...this.data };
+    this.getZoomFocus();
+    this.markForCheck();
   }
 
-  public triggerDayMode() {
-    this.editCameraService.triggerDayMode(this.camera.id).subscribe(() => {
-      this.snackBarService.create('day mode test sent successfully', SnackBarType.Info)
-    })
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
   }
 
-  public triggerNightMode() {
-    this.editCameraService.triggerNightMode(this.camera.id).subscribe(() => {
-      this.snackBarService.create('night mode test sent successfully', SnackBarType.Info)
-    })
+  onCameraChange(updatedCamera: Camera) {
+    this.camera = updatedCamera;
+    this.markForCheck();
   }
 
-  public testOverlay() {
-    this.editCameraService.triggerTestOverlay(this.camera.id).subscribe(() => {
-      this.snackBarService.create('overlay test sent successfully', SnackBarType.Info)
-    })
+  onCurrentZoomFocusChange(updatedZoomFocus: ZoomFocus) {
+    this.currentZoomFocus = updatedZoomFocus;
+    this.markForCheck();
   }
 
-  public getZoomFocus() {
-    this.editCameraService.getZoomAndFocus(this.camera.id).subscribe((result) => {
-      this.currentZoomFocus = result
-    })
+  onTriggerDayMode() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.triggerDayMode(this.camera.id),
+      () => {
+        this.snackBarService.create('Day mode test sent successfully', SnackBarType.Info);
+      },
+    );
   }
 
-  public setZoomFocus() {
-    this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus).subscribe(() => {
-      this.getZoomFocus()
-    })
+  onTriggerNightMode() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.triggerNightMode(this.camera.id),
+      () => {
+        this.snackBarService.create('Night mode test sent successfully', SnackBarType.Info);
+      },
+    );
   }
 
-  public triggerAutofocus() {
-    this.editCameraService.triggerAutofocus(this.camera.id).subscribe(() => {
-      this.getZoomFocus()
-    },
-    () => {
-      this.snackBarService.create('auto focus failed', SnackBarType.Error)
-    })
+  onTestOverlay() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.triggerTestOverlay(this.camera.id),
+      () => {
+        this.snackBarService.create('Overlay test sent successfully', SnackBarType.Info);
+      },
+    );
   }
 
-  public editMask() {
-    this.isEditingMask = !this.isEditingMask
+  onGetZoomFocus() {
+    this.getZoomFocus();
+  }
+
+  onSetZoomFocus() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.setZoomAndFocus(this.camera.id, this.currentZoomFocus),
+      () => {
+        this.getZoomFocus();
+      },
+    );
+  }
+
+  onTriggerAutofocus() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.triggerAutofocus(this.camera.id),
+      () => {
+        this.getZoomFocus();
+      },
+      () => {
+        this.snackBarService.create('Auto focus failed', SnackBarType.Error);
+      },
+    );
+  }
+
+  onEditMask() {
+    // This will be handled by the OpenALPR component
+  }
+
+  private getZoomFocus() {
+    this.subscribeAndMarkForCheck(
+      this.editCameraService.getZoomAndFocus(this.camera.id),
+      (result) => {
+        this.currentZoomFocus = result;
+      },
+    );
+  }
+
+  onSave() {
+    this.isSaving = true;
+    this.markForCheck();
+
+    this.subscribeAndMarkForCheck(
+      this.settingsService.upsertCamera(this.camera),
+      () => {
+        this.isSaving = false;
+        this.snackBarService.create('Camera saved successfully', SnackBarType.Successful);
+        this.dialogRef.close(this.camera);
+      },
+      (error) => {
+        this.isSaving = false;
+        this.snackBarService.create('Failed to save camera', SnackBarType.Error, error as string);
+        this.markForCheck();
+      },
+    );
+  }
+
+  onCancel() {
+    this.dialogRef.close(false);
   }
 }

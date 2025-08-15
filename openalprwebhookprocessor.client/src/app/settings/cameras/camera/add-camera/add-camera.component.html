@@ -1,0 +1,21 @@
+<mat-card class="example-card">
+  <mat-card-header>
+    <mat-card-title i18n>Add new camera</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="sample-image"
+      style="height:200px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+      <mat-icon i18n
+        style="font-size: 100px; height: 90px; width: 90px;"
+        (click)="addCamera()"
+        (keydown)="onKeyDown($event)"
+        tabindex="0"
+        role="button"
+        aria-label="Add new camera"
+      color="primary">add_box</mat-icon>
+    </div>
+  </mat-card-content>
+  <mat-card-actions align="end" style="margin: auto 0 0;">
+    <span style="visibility: hidden;">placeholder</span>
+  </mat-card-actions>
+</mat-card>

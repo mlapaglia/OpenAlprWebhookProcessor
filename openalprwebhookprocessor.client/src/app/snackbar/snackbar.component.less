@@ -1,0 +1,45 @@
+.snackbar-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.snackbar-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.snackbar-messages {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.primary-message {
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.secondary-message {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.snackbar-action {
+  flex-shrink: 0;
+  min-width: auto;
+  padding: 0 8px;
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--mat-snack-bar-button-color);
+  }
+}

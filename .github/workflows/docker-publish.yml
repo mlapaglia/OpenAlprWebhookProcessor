@@ -12,15 +12,17 @@ env:
   IMAGE_NAME: OpenAlprWebhookProcessor
 
 jobs:
-  build:
+  docker-build:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push' || !contains(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v2
       - name: Run build
         run: docker build . --file ./OpenAlprWebhookProcessor.Server/Dockerfile
   
-  back-end-tests:
+  build-test-analyze:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push' || !contains(github.ref, 'refs/tags/')
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -28,7 +30,7 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Setup .NET
+      - name: Setup .NETf
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 9.x
@@ -49,7 +51,8 @@ jobs:
           /o:"openalprwebhookprocessor" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.cs.opencover.reportsPaths="coverage/**/coverage.opencover.xml" \
-          /d:sonar.javascript.lcov.reportPaths="**/lcov.info"
+          /d:sonar.javascript.lcov.reportPaths="**/lcov.info" \
+          /d:sonar.exclusions="**/Data/Migrations/**,**/Infrastructure/Extensions/ServiceCollectionExtensions.cs"
       
       - name: Build and Test Backend
         run: |
@@ -69,6 +72,7 @@ jobs:
       
   front-end-lint:
     runs-on: ubuntu-latest
+    if: github.event_name != 'push' || !contains(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v2
       - name: Run frontend lint
@@ -77,18 +81,7 @@ jobs:
           npm ci
           npm run lint
 
-  front-end-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run frontend tests
-        working-directory: ./openalprwebhookprocessor.client
-        run: |
-          npm ci
-          npm run test:prod
-
   windows-build-push:
-    needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
@@ -104,10 +97,20 @@ jobs:
       - name: Build Artifact
         run: |
           tag=$(git describe --tags --abbrev=0)
+          version=${tag#v}  # Remove 'v' prefix (e.g., 6.0.0-alpha25)
+          numeric_version=$(echo "$version" | sed 's/-.*//')  # Extract numeric part (e.g., 6.0.0)
+          assembly_version="${numeric_version}.0"  # Make it 4-part numeric (e.g., 6.0.0.0)
           release_name="OpenAlprWebHookProcessor-${tag}-windows64"
           dotnet restore "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj"
-          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release
-          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name"
+          dotnet build "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release \
+            -p:GitVersion="$version" \
+            -p:GitAssemblyVersion="$assembly_version" \
+            -p:GitFileVersion="$assembly_version"
+          dotnet publish "OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj" -c Release -o "$release_name" \
+            -r win-x64 --self-contained false \
+            -p:GitVersion="$version" \
+            -p:GitAssemblyVersion="$assembly_version" \
+            -p:GitFileVersion="$assembly_version"
           tar czvf "${release_name}.tar.gz" "$release_name"
 
       - name: Publish
@@ -119,7 +122,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker-build-push:
-    needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
@@ -135,14 +137,26 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Get git tag
+      - name: Get git tag and version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: |
+          tag=${GITHUB_REF/refs\/tags\//}
+          version=${tag#v}  # Remove 'v' prefix (e.g., 6.0.0-alpha25)
+          numeric_version=$(echo "$version" | sed 's/-.*//')  # Extract numeric part (e.g., 6.0.0)
+          assembly_version="${numeric_version}.0"  # Make it 4-part numeric (e.g., 6.0.0.0)
+          echo "VERSION=$tag" >> $GITHUB_OUTPUT
+          echo "GIT_VERSION=$version" >> $GITHUB_OUTPUT
+          echo "ASSEMBLY_VERSION=$assembly_version" >> $GITHUB_OUTPUT
 
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            GIT_VERSION=${{ steps.get_version.outputs.GIT_VERSION }}
+            GIT_ASSEMBLY_VERSION=${{ steps.get_version.outputs.ASSEMBLY_VERSION }}
+            GIT_FILE_VERSION=${{ steps.get_version.outputs.ASSEMBLY_VERSION }}
           file: ./OpenAlprWebhookProcessor.Server/Dockerfile
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}

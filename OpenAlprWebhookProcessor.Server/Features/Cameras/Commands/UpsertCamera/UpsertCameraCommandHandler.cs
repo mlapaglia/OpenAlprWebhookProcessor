@@ -1,0 +1,98 @@
+using Mediator;
+using OpenAlprWebhookProcessor.CameraUpdateService;
+using OpenAlprWebhookProcessor.Data.Repositories;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
+{
+    public class UpsertCameraCommandHandler : ICommandHandler<UpsertCameraCommand>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ISimpleCameraScheduler _cameraScheduler;
+
+        public UpsertCameraCommandHandler(
+            IUnitOfWork unitOfWork,
+            ISimpleCameraScheduler cameraScheduler)
+        {
+            _unitOfWork = unitOfWork;
+            _cameraScheduler = cameraScheduler;
+        }
+
+        public async ValueTask<Unit> Handle(UpsertCameraCommand command, CancellationToken cancellationToken = default)
+        {
+            var camera = command.Camera;
+
+            var existingCamera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == camera.Id, cancellationToken);
+
+            if (existingCamera == null)
+            {
+                existingCamera = new Data.Camera()
+                {
+                    Id = camera.Id,
+                    CameraPassword = camera.CameraPassword,
+                    CameraUsername = camera.CameraUsername,
+                    IpAddress = camera.IpAddress,
+                    Latitude = camera.Latitude,
+                    Longitude = camera.Longitude,
+                    Manufacturer = camera.Manufacturer,
+                    NightFocus = camera.NightFocus,
+                    DayFocus = camera.DayFocus,
+                    DayZoom = camera.DayZoom,
+                    NightZoom = camera.NightZoom,
+                    OpenAlprCameraId = camera.OpenAlprCameraId,
+                    OpenAlprName = camera.OpenAlprName,
+                    OpenAlprEnabled = camera.OpenAlprEnabled,
+                    UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl,
+                    UpdateOverlayEnabled = camera.UpdateOverlayEnabled,
+                    UpdateDayNightModeUrl = camera.DayNightModeUrl,
+                    UpdateDayNightModeEnabled = camera.DayNightModeEnabled,
+                    SunriseOffset = camera.SunriseOffset,
+                    SunsetOffset = camera.SunsetOffset,
+                    TimezoneOffset = camera.TimezoneOffset,
+                };
+
+                await _unitOfWork.Cameras.AddAsync(existingCamera, cancellationToken);
+            }
+            else
+            {
+                existingCamera.CameraPassword = camera.CameraPassword;
+                existingCamera.CameraUsername = camera.CameraUsername;
+                existingCamera.IpAddress = camera.IpAddress;
+                existingCamera.Latitude = camera.Latitude;
+                existingCamera.Longitude = camera.Longitude;
+                existingCamera.Manufacturer = camera.Manufacturer;
+                existingCamera.ModelNumber = camera.ModelNumber;
+                existingCamera.NightFocus = camera.NightFocus;
+                existingCamera.DayFocus = camera.DayFocus;
+                existingCamera.DayZoom = camera.DayZoom;
+                existingCamera.NightZoom = camera.NightZoom;
+                existingCamera.OpenAlprCameraId = camera.OpenAlprCameraId;
+                existingCamera.OpenAlprName = camera.OpenAlprName;
+                existingCamera.OpenAlprEnabled = camera.OpenAlprEnabled;
+                existingCamera.UpdateOverlayTextUrl = camera.UpdateOverlayTextUrl;
+                existingCamera.UpdateOverlayEnabled = camera.UpdateOverlayEnabled;
+                existingCamera.UpdateDayNightModeUrl = camera.DayNightModeUrl;
+                existingCamera.UpdateDayNightModeEnabled = camera.DayNightModeEnabled;
+                existingCamera.SunriseOffset = camera.SunriseOffset;
+                existingCamera.SunsetOffset = camera.SunsetOffset;
+                existingCamera.TimezoneOffset = camera.TimezoneOffset;
+                
+                _unitOfWork.Cameras.Update(existingCamera);
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (existingCamera.UpdateDayNightModeEnabled)
+            {
+                await _cameraScheduler.RescheduleAllCamerasAsync(cancellationToken);
+            }
+            else
+            {
+                await _cameraScheduler.RemoveCameraScheduleAsync(existingCamera.Id, cancellationToken);
+            }
+
+            return Unit.Value;
+        }
+    }
+}

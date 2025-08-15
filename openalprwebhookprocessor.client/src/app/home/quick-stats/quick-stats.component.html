@@ -1,0 +1,73 @@
+<mat-grid-list [cols]="quickStatCols()" rowHeight="120px" gutterSize="16px" class="quick-stats-grid">
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>today</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Today</h3>
+          @if (isLoadingStats()) {
+            <mat-spinner diameter="30" />
+          } @else if (quickStats()) {
+            <p class="stat-value">{{ quickStats()?.todayCount }}</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>date_range</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>This Week</h3>
+          @if (isLoadingStats()) {
+            <mat-spinner diameter="30" />
+          } @else if (quickStats()) {
+            <p class="stat-value">{{ quickStats()?.weekCount }}</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>directions_car</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Unique Plates</h3>
+          @if (isLoadingStats()) {
+            <mat-spinner diameter="30" />
+          } @else if (quickStats()) {
+            <p class="stat-value">{{ quickStats()?.uniquePlatesThisWeek }}</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+
+  <mat-grid-tile>
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon i18n>videocam</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3 i18n>Active Cameras</h3>
+          @if (isLoadingStats()) {
+            <mat-spinner diameter="30" />
+          } @else if (quickStats()) {
+            <p class="stat-value">{{ quickStats()?.activeCameras }}</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+</mat-grid-list>

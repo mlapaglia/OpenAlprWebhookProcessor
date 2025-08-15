@@ -1,0 +1,176 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="header-title">
+      <mat-icon>schedule</mat-icon>
+      Scheduled Jobs
+    </mat-card-title>
+    <div class="header-actions">
+      <button 
+        mat-icon-button 
+        (click)="loadScheduledJobs()"
+        [disabled]="isLoading"
+        matTooltip="Refresh scheduled jobs">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </mat-card-header>
+  
+  <mat-card-content>
+    @if (isLoading) {
+      <div class="loading-container">
+        <mat-progress-spinner 
+          color="primary" 
+          mode="indeterminate" 
+          diameter="20" />
+        <span>Loading scheduled jobs...</span>
+      </div>
+    } @else if (scheduledJobsData) {
+      <!-- Summary Statistics -->
+      <div class="summary-stats">
+        <mat-chip-set>
+          <mat-chip>
+            <mat-icon matChipAvatar>schedule</mat-icon>
+            Total: {{ totalJobs }}
+          </mat-chip>
+          @if (overdueJobs > 0) {
+            <mat-chip class="overdue-chip">
+              <mat-icon matChipAvatar>warning</mat-icon>
+              Overdue: {{ overdueJobs }}
+            </mat-chip>
+          }
+          <mat-chip class="next24-chip">
+            <mat-icon matChipAvatar>today</mat-icon>
+            Next 24h: {{ jobsInNext24Hours }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      @if (scheduledJobsData.scheduledJobs.length === 0) {
+        <div class="empty-state">
+          <mat-icon>schedule</mat-icon>
+          <p>No scheduled jobs found</p>
+          <p class="empty-description">Jobs will appear here when cameras are scheduled for overlay updates or day/night mode changes.</p>
+        </div>
+      } @else {
+        <!-- Jobs Table -->
+        <div class="table-container">
+          <!-- Desktop Table View -->
+          <table mat-table [dataSource]="scheduledJobsData.scheduledJobs" class="jobs-table">
+            
+            <!-- Job Type Column -->
+            <ng-container matColumnDef="jobType">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let job">
+                <div class="job-type-cell">
+                  <mat-icon [class]="isJobOverdue(job) ? 'job-icon-overdue' : 'job-icon-normal'">
+                    {{ getJobTypeIcon(job.jobType) }}
+                  </mat-icon>
+                  <div>
+                    <div>{{ getJobTypeDisplay(job.jobType) }}</div>
+                    @if (job.sunriseSunsetType !== undefined && job.sunriseSunsetType !== 0) {
+                      <div class="job-subtitle">
+                        {{ getSunriseSunsetDisplay(job.sunriseSunsetType) }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Camera Column -->
+            <ng-container matColumnDef="camera">
+              <th mat-header-cell *matHeaderCellDef>Camera</th>
+              <td mat-cell *matCellDef="let job">
+                <div class="camera-cell">
+                  <mat-icon>videocam</mat-icon>
+                  {{ getCameraDisplay(job) }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Scheduled Time Column -->
+            <ng-container matColumnDef="scheduledTime">
+              <th mat-header-cell *matHeaderCellDef>Scheduled Time</th>
+              <td mat-cell *matCellDef="let job">
+                {{ formatDateTime(job.scheduledExecutionTime) }}
+              </td>
+            </ng-container>
+
+            <!-- Time Until Column -->
+            <ng-container matColumnDef="timeUntil">
+              <th mat-header-cell *matHeaderCellDef>Time Until</th>
+              <td mat-cell *matCellDef="let job">
+                <span [class]="isJobOverdue(job) ? 'time-until-overdue' : 'time-until-normal'">
+                  {{ formatTimeUntil(job) }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let job">
+                <mat-chip [class]="getStatusChipClass(job)">
+                  {{ getStatusDisplay(job) }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <!-- Mobile Card View -->
+          <div class="mobile-jobs-container">
+            @for (job of scheduledJobsData.scheduledJobs; track job.jobId) {
+              <div class="mobile-job-card">
+                <div class="job-header">
+                  <mat-icon [class]="isJobOverdue(job) ? 'job-icon-overdue' : 'job-icon-normal'">
+                    {{ getJobTypeIcon(job.jobType) }}
+                  </mat-icon>
+                  <span>{{ getJobTypeDisplay(job.jobType) }}</span>
+                  @if (job.sunriseSunsetType !== undefined && job.sunriseSunsetType !== 0) {
+                    <span class="job-subtitle">
+                      ({{ getSunriseSunsetDisplay(job.sunriseSunsetType) }})
+                    </span>
+                  }
+                </div>
+                <div class="job-details">
+                  <div class="detail-row">
+                    <span class="label">Camera:</span>
+                    <span class="value">{{ getCameraDisplay(job) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Scheduled:</span>
+                    <span class="value">{{ formatDateTime(job.scheduledExecutionTime) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Time Until:</span>
+                    <span [class]="'value ' + (isJobOverdue(job) ? 'time-until-overdue' : 'time-until-normal')">
+                      {{ formatTimeUntil(job) }}
+                    </span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Status:</span>
+                    <mat-chip [class]="getStatusChipClass(job)">
+                      {{ getStatusDisplay(job) }}
+                    </mat-chip>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <p>Failed to load scheduled jobs information</p>
+        <button mat-button (click)="onRefreshClick($event)">
+          <mat-icon>refresh</mat-icon>
+          Try Again
+        </button>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

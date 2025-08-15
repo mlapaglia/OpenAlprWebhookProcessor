@@ -1,0 +1,44 @@
+<mat-card class="training-status-card" [class.loading]="isLoadingTrainingStatus()">
+  <mat-card-header>
+    <mat-card-title i18n>
+      Training Status
+    </mat-card-title>
+    <mat-card-subtitle i18n>Current training status and history</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    @if (trainingStatus() && statusData.data.length > 0) {
+      <table mat-table [dataSource]="statusData" class="mat-elevation-z1">
+        <ng-container matColumnDef="key">
+          <th i18n mat-header-cell *matHeaderCellDef>Property</th>
+          <td mat-cell *matCellDef="let element">{{ element.key }}</td>
+        </ng-container>
+        <ng-container matColumnDef="value">
+          <th i18n mat-header-cell *matHeaderCellDef>Value</th>
+          <td mat-cell *matCellDef="let element" [style.color]="element.key === 'Last Training Result' ? getResultColor(element.value) : null">
+            {{ element.value }}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    } @else {
+      <p i18n class="no-status">No training status available.</p>
+    }
+  </mat-card-content>
+  <mat-card-actions>
+    <app-refresh-button 
+      [isLoading]="isTriggering() || trainingStatus()?.isTraining || false"
+      buttonType="raised"
+      buttonText="Start Training"
+      buttonRefreshingText="Starting..."
+      color="primary"
+      icon="directions_run"
+      (refreshStarted)="onTriggerTraining()" />
+
+    <app-refresh-button 
+      [isLoading]="isLoadingTrainingStatus() ?? false"
+      buttonType="basic"
+      icon="sync"
+      (refreshStarted)="onRefreshData()" />
+  </mat-card-actions>
+</mat-card>

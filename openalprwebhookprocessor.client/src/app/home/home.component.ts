@@ -1,60 +1,118 @@
-﻿import { Component, OnInit, inject } from '@angular/core'
-import { User } from 'app/_models'
-import { AccountService } from 'app/_services'
-import { HomeService } from './home.service'
-import { BarChartModule } from '@swimlane/ngx-charts'
-import { MatCardModule } from '@angular/material/card'
+import { Component, inject, type AfterViewInit, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import type { User } from 'app/_models';
+import { AccountService } from 'app/_services';
+import { CommonModule } from '@angular/common';
+import { PredictionsSectionComponent } from './predictions-section/predictions-section.component';
+import { QuickStatsComponent } from './quick-stats/quick-stats.component';
+import { ChartsComponent } from './charts/charts.component';
+import { MostSeenPlatesComponent } from './most-seen/most-seen-plates.component';
+import { LayoutService, type LayoutState } from './layout.service';
+import { HomeDataService, type HomeData } from './home-data.service';
+import type { PredictionResult } from './prediction-response';
+import type { QuickStats } from './home.service';
+import { OnPushBaseComponent } from '../_helpers/onpush-base.component';
 
 @Component({
   templateUrl: 'home.component.html',
-  imports: [MatCardModule, BarChartModule],
+  styleUrls: ['./home.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    PredictionsSectionComponent,
+    QuickStatsComponent,
+    ChartsComponent,
+    MostSeenPlatesComponent,
+  ],
 })
-export class HomeComponent implements OnInit {
-  private accountService = inject(AccountService)
-  private homeService = inject(HomeService)
+export class HomeComponent extends OnPushBaseComponent implements AfterViewInit {
+  readonly chartsComponent = viewChild<ChartsComponent>(ChartsComponent);
 
-  user: User
-  public plateCounts: { name: Date, value: number }[]
-  public mostSeenCounts: { name: string, value: number }[]
+  private readonly accountService = inject(AccountService);
+  private readonly layoutService = inject(LayoutService);
+  private readonly homeDataService = inject(HomeDataService);
 
-  view: [number, number] = [700, 400]
+  user: User;
+
+  public mostSeenCounts: { name: string, value: number }[] = [];
+  public nextExpected: PredictionResult | null = null;
+  public upcomingPredictions: PredictionResult[] = [];
+  public predictablePlates: PredictionResult[] = [];
+  public quickStats: QuickStats | null = null;
+
+  public isLoadingPredictions = false;
+  public isLoadingStats = false;
+  public isLoadingCharts = false;
+
+  public isMobile = false;
+  public isTablet = false;
+  public quickStatCols = 4;
+
   constructor() {
-    this.user = this.accountService.userValue
+    super();
+    this.user = this.accountService.userValue;
   }
 
-  ngOnInit() {
-    this.homeService.getPlatesCount().subscribe((result) => {
-      this.plateCounts = []
+  ngAfterViewInit() {
+    // Setup responsive layout after view initialization to avoid FOUC
+    this.setupResponsiveLayout();
 
-      result.counts.forEach((x) => {
-        this.plateCounts.push(
-          {
-            name: x.date,
-            value: x.count,
-          })
-      })
-    })
-
-    this.homeService.getMostSeenPlates().subscribe((result) => {
-      this.mostSeenCounts = []
-
-      result.counts.forEach((x) => {
-        this.mostSeenCounts.push(
-          {
-            name: x.plateNumber,
-            value: x.count,
-          })
-      })
-    })
+    setTimeout(() => {
+      this.loadAllData();
+    }, 0);
   }
 
-  // options
-  showXAxis = true
-  showYAxis = true
-  gradient = false
-  showLegend = false
-  showXAxisLabel = false
-  xAxisLabel = 'Date'
-  showYAxisLabel = true
-  yAxisLabel = 'Plates Seen'
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+  }
+
+  private setupResponsiveLayout() {
+    this.subscribeAndMarkForCheck(
+      this.layoutService.getLayoutState(),
+      (layoutState: LayoutState) => {
+        this.isMobile = layoutState.isMobile;
+        this.isTablet = layoutState.isTablet;
+        this.quickStatCols = layoutState.quickStatCols;
+      },
+    );
+  }
+
+  private loadAllData() {
+    this.setLoadingStates(true);
+
+    this.subscribeAndMarkForCheck(
+      this.homeDataService.loadAllData(),
+      (data: HomeData) => {
+        this.quickStats = data.quickStats;
+        this.nextExpected = data.nextExpected;
+        this.upcomingPredictions = data.upcomingPredictions;
+        this.predictablePlates = data.predictablePlates;
+        this.mostSeenCounts = data.mostSeenCounts;
+
+        const chartComponent = this.chartsComponent();
+        if (chartComponent && data.hourlyStats.length > 0) {
+          const labels = data.hourlyStats.map(x => x.displayHour);
+          const chartData = data.hourlyStats.map(x => x.count);
+          chartComponent.updateHourlyChart(labels, chartData);
+        }
+
+        if (chartComponent && data.dailyStats.length > 0) {
+          const dailyLabels = data.dailyStats.map(x => x.date);
+          const dailyData = data.dailyStats.map(x => x.count);
+          chartComponent.updateDailyChart(dailyLabels, dailyData);
+        }
+
+        this.setLoadingStates(false);
+      },
+      () => {
+        this.setLoadingStates(false);
+      },
+    );
+  }
+
+  private setLoadingStates(loading: boolean) {
+    this.isLoadingStats = loading;
+    this.isLoadingPredictions = loading;
+    this.isLoadingCharts = loading;
+    this.markForCheck();
+  }
 }

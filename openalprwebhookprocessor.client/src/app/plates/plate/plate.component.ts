@@ -1,203 +1,213 @@
-import { DatePipe } from '@angular/common'
-import { Component, Input, OnChanges, OnDestroy, OnInit, inject } from '@angular/core'
-import { SnackbarService } from 'app/snackbar/snackbar.service'
-import { SnackBarType } from 'app/snackbar/snackbartype'
-import { Lightbox } from 'ngx-lightbox'
-import { PlateService } from '../plate.service'
-import { Plate } from './plate'
-import { PlateStatisticsData } from './plateStatistics'
-import { Subscription } from 'rxjs'
-import { MatButtonModule } from '@angular/material/button'
-import { ReactiveFormsModule, FormsModule } from '@angular/forms'
-import { TextFieldModule } from '@angular/cdk/text-field'
-import { MatInputModule } from '@angular/material/input'
-import { MatFormFieldModule } from '@angular/material/form-field'
-import { MatTableModule } from '@angular/material/table'
-import { MatIconModule } from '@angular/material/icon'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
-import { MatCardModule } from '@angular/material/card'
+import { Component, input, output, inject, ChangeDetectionStrategy, type OnInit } from '@angular/core';
+import { Plate } from './plate';
+import type { PlateData } from '../plate-item/plate-item.component';
+import { CommonModule, DatePipe, NgOptimizedImage } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { PlateStatisticsComponent } from './plate-statistics/plate-statistics.component';
+import { PlateImagesComponent } from './plate-images/plate-images.component';
+import { PlateNotesComponent } from './plate-notes/plate-notes.component';
+import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
+import { PlateFacadeService } from './services/plate-facade.service';
+import { PlateTabStateService } from './services/plate-tab-state.service';
+import { PlateStatisticsStateService } from './services/plate-statistics-state.service';
+import { PlateNotesStateService } from './services/plate-notes-state.service';
 
 @Component({
   selector: 'app-plate',
   templateUrl: './plate.component.html',
   styleUrls: ['./plate.component.less'],
-  imports: [MatCardModule, MatProgressSpinnerModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, TextFieldModule, ReactiveFormsModule, FormsModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    PlateFacadeService,
+    PlateTabStateService,
+    PlateStatisticsStateService,
+    PlateNotesStateService,
+  ],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    PlateStatisticsComponent,
+    PlateImagesComponent,
+    PlateNotesComponent,
+    DatePipe,
+    NgOptimizedImage,
+  ],
 })
-export class PlateComponent implements OnInit, OnChanges, OnDestroy {
-  private lightbox = inject(Lightbox)
-  private plateService = inject(PlateService)
-  private datePipe = inject(DatePipe)
-  private snackbarService = inject(SnackbarService)
+export class PlateComponent extends OnPushBaseComponent implements OnInit {
+  private readonly facade = inject(PlateFacadeService);
 
-  @Input() plate: Plate
-  @Input() isVisible: boolean
+  readonly plate = input.required<PlateData>();
+  readonly isVisible = input(false);
+  readonly isExpanded = input(false);
+  readonly plateChanged = output<PlateData>();
 
-  public isInitialized: boolean
+  activeTab: 'overview' | 'images' | 'stats' | 'notes' = 'overview';
 
-  public loadingVehicleImage: boolean
-  public vehicleImageUrl: string
-  public loadingVehicleImageFailed: boolean
-
-  public loadingPlateImage: boolean
-  public loadingPlateImageFailed: boolean
-  public plateImageUrl: string
-
-  public loadingStatistics: boolean
-  public loadingStatisticsFailed: boolean
-  public isSavingNotes: boolean
-
-  public plateStatistics: PlateStatisticsData[] = []
-  public displayedColumns: string[] = ['key', 'value']
-
-  private statisticsSubscription = new Subscription()
-
-  ngOnInit(): void {
-    this.loadingVehicleImage = true
-    this.loadingPlateImage = true
-    this.getPlateStatistics()
-    this.getPlateImages()
-    this.isInitialized = true
+  get plateStatistics() {
+    return this.facade.plateStatistics();
   }
 
-  ngOnChanges(): void {
-    if (this.isInitialized) {
-      if (!this.isVisible) {
-        this.loadingStatistics = false
-        this.loadingStatisticsFailed = false
-        this.statisticsSubscription.unsubscribe()
-
-        if (this.loadingVehicleImage) {
-          this.vehicleImageUrl = ''
-        }
-
-        if (this.loadingPlateImage) {
-          this.plateImageUrl = ''
-        }
-      }
-      else {
-        if (this.plateStatistics.length == 0) {
-          this.getPlateStatistics()
-        }
-
-        this.getPlateImages()
-      }
-    }
+  get loadingStatistics() {
+    return this.facade.loadingStatistics();
   }
 
-  ngOnDestroy(): void {
-    this.statisticsSubscription.unsubscribe()
-    this.vehicleImageUrl = ''
-    this.plateImageUrl = ''
+  get loadingStatisticsFailed() {
+    return this.facade.loadingStatisticsFailed();
   }
 
-  private getPlateStatistics() {
-    this.loadingStatistics = true
-    this.statisticsSubscription.closed = false
-    this.statisticsSubscription.add(this.plateService.getPlateStatistics(this.plate.plateNumber).subscribe((result) => {
-      this.loadingStatistics = false
-      this.loadingStatisticsFailed = false
-
-      this.plateStatistics.push({
-        key: 'Confidence',
-        value: this.plate.processedPlateConfidence + '%',
-      })
-
-      this.plateStatistics.push({
-        key: 'Seen past 90 days',
-        value: result.last90Days.toString(),
-      })
-
-      this.plateStatistics.push({
-        key: 'Total Seen',
-        value: result.totalSeen.toString(),
-      })
-
-      this.plateStatistics.push({
-        key: 'First seen',
-        value: this.datePipe.transform(result.firstSeen, 'medium') || '',
-      })
-
-      this.plateStatistics.push({
-        key: 'Last seen',
-        value: this.datePipe.transform(result.lastSeen, 'medium') || '',
-      })
-
-      this.plateStatistics.push({
-        key: 'Processing time',
-        value: this.plate.openAlprProcessingTimeMs.toString() + 'ms',
-      })
-
-      this.plateStatistics.push({
-        key: 'Possible plates',
-        value: this.plate.possiblePlateNumbers,
-      })
-
-      this.plateStatistics.push({
-        key: 'Region',
-        value: this.plate.region,
-      })
-    },
-    () => {
-      this.loadingStatistics = false
-      this.loadingStatisticsFailed = true
-    }))
+  get isSavingNotes() {
+    return this.facade.isSavingNotes();
   }
 
-  private getPlateImages() {
-    if (!this.vehicleImageUrl) {
-      this.loadingVehicleImage = true
-      this.loadingVehicleImageFailed = false
-      this.vehicleImageUrl = this.plate.imageUrl.toString()
-    }
+  readonly plateAsPlateSignal = this.facade.plateSignal;
 
-    if (!this.plateImageUrl) {
-      this.loadingPlateImage = true
-      this.loadingPlateImageFailed = false
-      this.plateImageUrl = this.plate.cropImageUrl.toString()
-    }
+  ngOnInit() {
+    this.facade.setPlate(this.plate());
   }
 
-  public openLightbox(url: URL, plateNumber: string) {
-    const albums = [{
-      src: url.toString(),
-      caption: plateNumber,
-      thumb: url.toString(),
-    }]
-
-    this.lightbox.open(albums, 0)
+  onPlateChange(updatedPlate: PlateData) {
+    this.plateChanged.emit(updatedPlate);
+    this.facade.setPlate(updatedPlate);
+    this.markForCheck();
   }
 
-  public vehicleImageLoaded() {
-    this.loadingVehicleImage = false
+  onPlateChangeFromChild(updatedPlate: Plate) {
+    const plateData: PlateData = {
+      id: updatedPlate.id,
+      plateNumber: updatedPlate.plateNumber,
+      openAlprCameraId: updatedPlate.openAlprCameraId,
+      vehicleDescription: updatedPlate.vehicleDescription,
+      direction: updatedPlate.direction,
+      receivedOn: updatedPlate.receivedOn,
+      isAlert: updatedPlate.isAlert,
+      isIgnore: updatedPlate.isIgnore,
+      isOpen: updatedPlate.isOpen,
+      imageUrl: updatedPlate.imageUrl,
+      cropImageUrl: updatedPlate.cropImageUrl,
+      processedPlateConfidence: updatedPlate.processedPlateConfidence,
+      notes: updatedPlate.notes,
+      canBeEnriched: updatedPlate.canBeEnriched,
+    };
+    this.plateChanged.emit(plateData);
+    this.facade.setPlate(plateData);
+    this.markForCheck();
   }
 
-  public vehicleImageFailedToLoad() {
-    this.loadingVehicleImage = false
-    this.loadingVehicleImageFailed = true
+  setTab(tab: 'overview' | 'images' | 'stats' | 'notes') {
+    this.activeTab = tab;
+    this.facade.setTab(tab, this.plate());
+    this.markForCheck();
   }
 
-  public plateImageLoaded() {
-    this.loadingPlateImage = false
+  get vehicleImageUrl(): string {
+    return this.plate().imageUrl ?? '';
   }
 
-  public plateImageFailedToLoad() {
-    this.loadingPlateImage = false
-    this.loadingPlateImageFailed = true
+  get plateImageUrl(): string {
+    return this.plate().cropImageUrl ?? '';
   }
 
-  public saveNotes() {
-    this.isSavingNotes = true
-    this.plateService.upsertPlate(this.plate).subscribe(() => {
-      this.isSavingNotes = false
-      this.snackbarService.create(`Notes saved for: ${this.plate.plateNumber}`, SnackBarType.Saved)
-    },
-    () => {
-      this.isSavingNotes = false
-      this.snackbarService.create(`Failed to save notes for: ${this.plate.plateNumber}`, SnackBarType.Error)
-    })
+  get vehicleMakeInfo() {
+    return this.facade.getVehicleMakeInfo(this.plate().vehicleDescription);
   }
 
-  public clearNotes() {
-    this.plate.notes = ''
+  get shouldShowImages() {
+    return this.facade.shouldShowImages;
+  }
+
+  get shouldShowNotes() {
+    return this.facade.shouldShowNotes;
+  }
+
+  get shouldShowStatistics() {
+    return this.facade.shouldShowStatistics;
+  }
+
+  get plateAsPlate(): Plate {
+    return this.convertPlateDataToPlate(this.plate());
+  }
+
+  private convertPlateDataToPlate(plateData: PlateData): Plate {
+    return new Plate({
+      ...this.mapBasicProperties(plateData),
+      ...this.mapImageUrls(plateData),
+      ...this.mapDefaults(),
+    });
+  }
+
+  private mapBasicProperties(plateData: PlateData) {
+    return {
+      ...this.mapIdentificationProps(plateData),
+      ...this.mapVehicleProps(plateData),
+      ...this.mapStatusProps(plateData),
+      ...this.mapMetadataProps(plateData),
+    };
+  }
+
+  private mapIdentificationProps(plateData: PlateData) {
+    return {
+      id: plateData.id,
+      plateNumber: plateData.plateNumber,
+      openAlprCameraId: plateData.openAlprCameraId,
+    };
+  }
+
+  private mapVehicleProps(plateData: PlateData) {
+    return {
+      vehicleDescription: plateData.vehicleDescription,
+      direction: plateData.direction,
+    };
+  }
+
+  private mapStatusProps(plateData: PlateData) {
+    return {
+      isAlert: plateData.isAlert,
+      isIgnore: plateData.isIgnore,
+      isOpen: plateData.isOpen,
+    };
+  }
+
+  private mapMetadataProps(plateData: PlateData) {
+    return {
+      receivedOn: plateData.receivedOn,
+      processedPlateConfidence: plateData.processedPlateConfidence ?? 0,
+      notes: plateData.notes ?? '',
+      canBeEnriched: plateData.canBeEnriched ?? false,
+    };
+  }
+
+  private mapImageUrls(plateData: PlateData) {
+    return {
+      imageUrl: plateData.imageUrl ?? '',
+      cropImageUrl: plateData.cropImageUrl ?? '',
+    };
+  }
+
+  private mapDefaults() {
+    return {
+      region: '',
+      possiblePlateNumbers: '',
+      openAlprProcessingTimeMs: 0,
+      alertDescription: '',
+    };
+  }
+
+  public saveNotes = (updatedPlate: Plate) => {
+    this.facade.saveNotes(updatedPlate, (plate) => {
+      this.onPlateChangeFromChild(plate);
+    });
+  };
+
+  public clearNotes = (updatedPlate: Plate) => {
+    this.facade.clearNotes(updatedPlate, (plate) => {
+      this.onPlateChangeFromChild(plate);
+    });
+  };
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    target.style.display = 'none';
   }
 }

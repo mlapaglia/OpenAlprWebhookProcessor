@@ -1,55 +1,107 @@
 <div style="margin: 15px;">
-    <table mat-table [dataSource]="forwards" multiTemplateDataRows class="mat-elevation-z8" style="width:50%">
-      <ng-container matColumnDef="destination">
-        <th mat-header-cell *matHeaderCellDef>Destination</th>
-        <td mat-cell *matCellDef="let element">
-          <mat-form-field>
-            <input matInput [(ngModel)]="element.destination" required>
-          </mat-form-field>
-        </td>
-      </ng-container>
+    <!-- Desktop table view -->
+    <div class="desktop-only">
+      <table mat-table [dataSource]="forwards" multiTemplateDataRows class="mat-elevation-z8" style="width: 100%;">
+        <ng-container matColumnDef="destination" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Destination</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-form-field>
+              <input matInput [(ngModel)]="element.destination" required>
+            </mat-form-field>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="forwardSinglePlates">
-        <th mat-header-cell *matHeaderCellDef>Forward Single Plate Webhooks</th>
-        <td mat-cell *matCellDef="let element">
-            <mat-checkbox [(ngModel)]="element.forwardSinglePlates"></mat-checkbox>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="forwardSinglePlates" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Forward Single Plate Webhooks</th>
+          <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.forwardSinglePlates" />
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="forwardGroupPreviews">
-        <th mat-header-cell *matHeaderCellDef>Forward Group Preview Webhooks</th>
-        <td mat-cell *matCellDef="let element">
-            <mat-checkbox [(ngModel)]="element.forwardGroupPreviews"></mat-checkbox>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="forwardGroupPreviews" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Forward Group Preview Webhooks</th>
+          <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.forwardGroupPreviews" />
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="forwardGroups">
-        <th mat-header-cell *matHeaderCellDef>Forward Group Webhooks</th>
-        <td mat-cell *matCellDef="let element">
-            <mat-checkbox [(ngModel)]="element.forwardGroups"></mat-checkbox>
-        </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="ignoreSslErrors">
-        <th mat-header-cell *matHeaderCellDef>Ignore Ssl Errors</th>
-        <td mat-cell *matCellDef="let element">
-            <mat-checkbox [(ngModel)]="element.ignoreSslErrors"></mat-checkbox>
-        </td>
-      </ng-container>
-  
-      <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef> </th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-raised-button color="warn" (click)="deleteForward(element)">Delete</button>
-        </td>
-      </ng-container>
-  
-      <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
-      <tr mat-row *matRowDef="let element; columns: rowsToDisplay;">
-      </tr>
-    </table>
+        <ng-container matColumnDef="forwardGroups" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Forward Group Webhooks</th>
+          <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.forwardGroups" />
+          </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="ignoreSslErrors" i18n-matColumnDef>
+          <th i18n mat-header-cell *matHeaderCellDef>Ignore Ssl Errors</th>
+          <td mat-cell *matCellDef="let element">
+              <mat-checkbox [(ngModel)]="element.ignoreSslErrors" />
+          </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="delete" i18n-matColumnDef>
+          <th mat-header-cell *matHeaderCellDef> </th>
+          <td mat-cell *matCellDef="let element">
+            <button i18n mat-raised-button color="warn" (click)="deleteForward(element)">Delete</button>
+          </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="rowsToDisplay"></tr>
+        <tr mat-row *matRowDef="let element; columns: rowsToDisplay;">
+        </tr>
+      </table>
+    </div>
+
+    <!-- Mobile card view -->
+    <div class="mobile-only">
+      @for (forward of forwards.data; track forward; let i = $index) {
+        <mat-card class="forward-card mat-elevation-z2">
+          <mat-card-content>
+            <div class="forward-info">
+              <mat-form-field class="destination-field">
+                <mat-label i18n>Destination URL</mat-label>
+                <input matInput [(ngModel)]="forward.destination" required>
+              </mat-form-field>
+              
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <mat-checkbox [(ngModel)]="forward.forwardSinglePlates">
+                    <span i18n>Forward Single Plate Webhooks</span>
+                  </mat-checkbox>
+                </div>
+                
+                <div class="checkbox-item">
+                  <mat-checkbox [(ngModel)]="forward.forwardGroupPreviews">
+                    <span i18n>Forward Group Preview Webhooks</span>
+                  </mat-checkbox>
+                </div>
+                
+                <div class="checkbox-item">
+                  <mat-checkbox [(ngModel)]="forward.forwardGroups">
+                    <span i18n>Forward Group Webhooks</span>
+                  </mat-checkbox>
+                </div>
+                
+                <div class="checkbox-item">
+                  <mat-checkbox [(ngModel)]="forward.ignoreSslErrors">
+                    <span i18n>Ignore SSL Errors</span>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-actions">
+              <button i18n mat-raised-button color="warn" (click)="deleteForward(forward)" class="delete-button">
+                <mat-icon>delete</mat-icon>
+                Delete
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
   </div>
   <div style="margin: 15px;">
-    <button mat-raised-button color="primary" (click)="addForward()" style="margin: 15px;">Add</button>
-    <button mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveForwards()">Save</button>
+    <button i18n mat-raised-button color="primary" (click)="addForward()" style="margin: 15px;">Add</button>
+    <button i18n mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveForwards()">Save</button>
   </div>

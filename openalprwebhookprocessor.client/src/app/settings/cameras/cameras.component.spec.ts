@@ -1,27 +1,28 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
-import { CamerasComponent } from './cameras.component'
-import { provideHttpClientTesting } from '@angular/common/http/testing'
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { CamerasComponent } from './cameras.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('CamerasComponent', () => {
-  let component: CamerasComponent
-  let fixture: ComponentFixture<CamerasComponent>
+  let component: CamerasComponent;
+  let fixture: ComponentFixture<CamerasComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CamerasComponent],
       providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
-    }).compileComponents()
-  })
+    }).compileComponents();
+  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CamerasComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+    fixture = TestBed.createComponent(CamerasComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
   it('should create', () => {
-    expect(component).toBeTruthy()
-  })
-})
+    expect(component).toBeTruthy();
+  });
+});

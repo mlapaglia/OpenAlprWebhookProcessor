@@ -1,13 +1,12 @@
-<div style="display: flex;" class="snack-container">
-  <div style="margin-right:15px; padding-top:15px;">
-    <mat-icon>{{getIcon}}</mat-icon>
+<div class="snackbar-content">
+  <mat-icon [style.color]="getIconColor" class="snackbar-icon">{{getIcon}}</mat-icon>
+  <div matSnackBarLabel class="snackbar-messages">
+    <span class="primary-message">{{data.message}}</span>
+    @if (data.message2) {
+      <span class="secondary-message">{{data.message2}}</span>
+    }
   </div>
-  <div style="display: flex; flex-direction:column;">
-    <div style="padding-top:10px;">
-      <span>{{data.message}}</span>
-    </div>
-    <div>
-      <span>{{data.message2}}</span>
-    </div>
-  </div>
+  <button mat-button matSnackBarAction class="snackbar-action" (click)="dismiss()">
+    <mat-icon>close</mat-icon>
+  </button>
 </div>

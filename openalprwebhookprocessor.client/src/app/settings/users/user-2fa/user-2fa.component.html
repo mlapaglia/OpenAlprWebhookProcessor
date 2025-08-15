@@ -1,0 +1,76 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      <h1 i18n>Manage 2FA for {{userName}}</h1>
+    </mat-card-title>
+  </mat-card-header>
+    <mat-card-content>
+      @if (!twoFactorEnabled && !setupLoading) {
+        <div>
+          <h3 i18n>Setup Two-Factor Authentication</h3>
+          <p i18n>Two-factor authentication adds an extra layer of security to this user's account.</p>
+          
+          @if (qrCodeUri) {
+            <div>
+              <h4 i18n>Step 1: Scan the QR Code</h4>
+              <p i18n>Use an authenticator app (like Google Authenticator, Authy, or Microsoft Authenticator) to scan this QR code:</p>
+              
+              <app-qr-code-display 
+                [qrCodeData]="qrCodeUri" 
+                [sharedKey]="sharedKey" />
+              
+              <h4 i18n>Step 2: Enter Verification Code</h4>
+              <p i18n>Enter the 6-digit code from your authenticator app:</p>
+              
+              <app-two-factor-code-input 
+                [loading]="loading" 
+                (codeSubmitted)="onCodeSubmitted($event)" />
+            </div>
+          }
+        </div>
+      }
+
+      @if (setupLoading) {
+        <div class="setup-loading">
+          <mat-spinner />
+          <p i18n>Setting up two-factor authentication...</p>
+        </div>
+      }
+
+      @if (twoFactorEnabled) {
+        <div>
+          <div class="twofa-enabled-header">
+            <mat-icon>check_circle</mat-icon>
+            <h3 i18n>Two-Factor Authentication is Enabled</h3>
+          </div>
+          
+          <p i18n>Two-factor authentication is currently enabled for this user's account.</p>
+
+          @if (recoveryCodes && recoveryCodes.length > 0) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title i18n>Recovery Codes</mat-panel-title>
+                <mat-panel-description i18n>
+                  Store these codes in a safe place
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              
+              <app-recovery-codes-display [recoveryCodes]="recoveryCodes" />
+            </mat-expansion-panel>
+          }
+
+          <div class="action-buttons">
+            <button mat-button color="primary" (click)="onGenerateNewRecoveryCodes()" i18n>
+              Generate New Recovery Codes
+            </button>
+            <button mat-button color="warn" (click)="disableTwoFactor()" i18n>
+              Disable 2FA
+            </button>
+          </div>
+        </div>
+      }
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="onClose()" i18n>Close</button>
+  </mat-card-actions>
+</mat-card>

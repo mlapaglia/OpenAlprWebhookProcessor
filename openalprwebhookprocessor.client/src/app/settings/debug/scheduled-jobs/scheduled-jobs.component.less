@@ -1,0 +1,297 @@
+// Header styles
+.header-title {
+  mat-icon {
+    margin-right: 8px;
+  }
+}
+
+.header-actions {
+  margin-left: auto;
+}
+
+// Loading state
+.loading-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+// Summary statistics
+.summary-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.overdue-chip {
+  background-color: var(--mat-error-50);
+  color: var(--mat-error-700);
+}
+
+.scheduled-chip {
+  background-color: var(--mat-tertiary-50);
+  color: var(--mat-tertiary-700);
+}
+
+.next24-chip {
+  background-color: var(--mat-primary-50);
+  color: var(--mat-primary-700);
+}
+
+// Empty state
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--mat-on-surface-variant);
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+  
+  .empty-description {
+    font-size: 14px;
+  }
+}
+
+// Error state
+.error-state {
+  text-align: center;
+  padding: 20px;
+  color: var(--mat-on-surface-variant);
+  font-style: italic;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: var(--mat-error);
+  }
+}
+
+// Table container
+.table-container {
+  overflow-x: auto;
+}
+
+// Jobs table
+.jobs-table {
+  width: 100%;
+  min-width: 600px;
+  
+  th {
+    font-weight: 600;
+    color: var(--mat-on-surface);
+  }
+  
+  td {
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--mat-outline-variant);
+  }
+}
+
+// Job type cell
+.job-type-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .job-subtitle {
+    font-size: 12px;
+    color: var(--mat-on-surface-variant);
+  }
+}
+
+// Camera cell
+.camera-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  mat-icon {
+    font-size: 18px;
+    color: var(--mat-on-surface-variant);
+  }
+}
+
+// Time until cell
+.time-until-overdue {
+  color: var(--mat-error);
+}
+
+.time-until-normal {
+  color: var(--mat-on-surface-variant);
+}
+
+// Job type icon colors
+.job-icon-overdue {
+  color: var(--mat-error);
+}
+
+.job-icon-normal {
+  color: var(--mat-on-surface-variant);
+}
+
+// Chip set styling
+mat-chip-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+mat-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// Mobile layout - hidden by default
+.mobile-jobs-container {
+  display: none;
+}
+
+// Material table overrides
+.mat-mdc-table {
+  box-shadow: none;
+}
+
+.mat-mdc-header-row {
+  background-color: var(--mat-surface-variant);
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--mat-surface-container-low);
+}
+
+// Mobile-first responsive design
+@media (max-width: 768px) {
+  .jobs-table {
+    font-size: 14px;
+    min-width: unset;
+    
+    // Hide less important columns on mobile
+    th:nth-child(3), td:nth-child(3), // Scheduled Time
+    th:nth-child(6), td:nth-child(6) { // Status (if we had 6 columns)
+      display: none;
+    }
+  }
+  
+  // Make table cells stack vertically on very small screens
+  .job-type-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .camera-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    
+    mat-icon {
+      font-size: 16px;
+    }
+  }
+  
+  mat-chip-set {
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .summary-stats {
+    justify-content: center;
+  }
+  
+  // Reduce card padding on mobile
+  mat-card-content {
+    padding: 12px !important;
+  }
+  
+  mat-card-header {
+    padding: 12px 12px 0 12px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  // Switch to card-based layout for very small screens
+  .table-container {
+    overflow-x: visible;
+  }
+  
+  .jobs-table {
+    display: none;
+  }
+  
+  // Mobile card layout for jobs
+  .mobile-jobs-container {
+    display: block;
+  }
+  
+  .mobile-job-card {
+    border: 1px solid var(--mat-outline-variant);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background-color: var(--mat-surface-container-lowest);
+    
+    .job-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .job-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 14px;
+      
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .label {
+          color: var(--mat-on-surface-variant);
+          font-weight: 500;
+        }
+        
+        .value {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-stats {
+    gap: 8px;
+  }
+  
+  mat-chip {
+    font-size: 12px;
+    
+    mat-icon {
+      font-size: 16px;
+    }
+  }
+  
+  .empty-state, .error-state {
+    padding: 20px;
+    
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 12px;
+    }
+  }
+}

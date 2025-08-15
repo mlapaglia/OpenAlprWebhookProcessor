@@ -1,0 +1,77 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title i18n>Camera Information</mat-card-title>
+    <mat-card-subtitle i18n>Basic camera configuration and connection details</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="basicInfoForm" class="camera-basic-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label i18n>Manufacturer</mat-label>
+          <mat-select formControlName="manufacturer">
+            <mat-option i18n value="Hikvision">Hikvision</mat-option>
+            <mat-option i18n value="Dahua">Dahua</mat-option>
+          </mat-select>
+          @if (basicInfoForm.get('manufacturer')?.hasError('required')) {
+            <mat-error i18n>
+              Manufacturer is required
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label i18n>Model Number</mat-label>
+          <input matInput formControlName="modelNumber">
+          @if (basicInfoForm.get('modelNumber')?.hasError('required')) {
+            <mat-error i18n>
+              Model number is required
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label i18n>IP Address</mat-label>
+          <input matInput formControlName="ipAddress" placeholder="192.168.1.100" i18n-placeholder>
+          @if (basicInfoForm.get('ipAddress')?.hasError('required')) {
+            <mat-error i18n>
+              IP address is required
+            </mat-error>
+          }
+          @if (basicInfoForm.get('ipAddress')?.hasError('pattern')) {
+            <mat-error i18n>
+              Please enter a valid IP address
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label i18n>Username</mat-label>
+          <input matInput formControlName="cameraUsername">
+          @if (basicInfoForm.get('cameraUsername')?.hasError('required')) {
+            <mat-error i18n>
+              Username is required
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="password-field">
+          <mat-label i18n>Password</mat-label>
+          <input matInput formControlName="cameraPassword" [type]="hidePassword ? 'password' : 'text'">
+          <mat-icon matSuffix (click)="togglePasswordVisibility()" (keydown)="onPasswordToggleKeyDown($event)" tabindex="0" role="button" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'" class="password-toggle">
+            {{hidePassword ? 'visibility_off' : 'visibility'}}
+          </mat-icon>
+          @if (basicInfoForm.get('cameraPassword')?.hasError('required')) {
+            <mat-error i18n>
+              Password is required
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

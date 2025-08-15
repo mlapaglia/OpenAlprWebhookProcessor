@@ -1,11 +1,11 @@
-import { Coordinate } from './coordinate'
+import type { Coordinate } from './coordinate';
 
 export class CameraMask {
-  coordinates: Coordinate[]
-  imageMask: string
-  cameraId: string
+  coordinates: Coordinate[];
+  imageMask: string;
+  cameraId: string;
 
   constructor(init?: Partial<Coordinate>) {
-    Object.assign(this, init)
+    Object.assign(this, init);
   }
 }

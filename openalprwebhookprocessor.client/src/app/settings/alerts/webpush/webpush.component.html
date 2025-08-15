@@ -1,27 +1,27 @@
 @if (client) {
   <mat-card style="margin:16px;">
     <mat-card-header style="justify-content: space-between;">
-      <mat-card-title>WebPush</mat-card-title>
-      <mat-card-subtitle>Native Browser & Mobile notifications</mat-card-subtitle>
+      <mat-card-title i18n>WebPush</mat-card-title>
+      <mat-card-subtitle i18n>Native Browser & Mobile notifications</mat-card-subtitle>
       <mat-slide-toggle style="padding-top: 10px;"
         [(ngModel)]="client.isEnabled"
-      (change)="onWebPushToggle($event)"></mat-slide-toggle>
+      (change)="onWebPushToggle($event)" />
     </mat-card-header>
     @if (client.isEnabled) {
       <mat-card-content [@inOutAnimation]>
         <div style="display: flex; flex-direction: column;">
           <mat-form-field>
-            <mat-label>Email Address</mat-label>
+            <mat-label i18n>Email Address</mat-label>
             <input matInput [(ngModel)]="client.emailAddress">
-            <mat-icon matTooltip="Email address associated with the given credentials" style="cursor:default" matSuffix>help_center</mat-icon>
+            <mat-icon i18n matTooltip="Email address associated with the given credentials" i18n-matTooltip style="cursor:default" matSuffix>help_center</mat-icon>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Public Key</mat-label>
+            <mat-label i18n>Public Key</mat-label>
             <input matInput readonly [(ngModel)]="client.publicKey">
-            <mat-icon matTooltip="The public key used for decrypting Web Push notifications." style="cursor:default" matSuffix>help_center</mat-icon>
+            <mat-icon i18n matTooltip="The public key used for decrypting Web Push notifications." i18n-matTooltip style="cursor:default" matSuffix>help_center</mat-icon>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Private Key</mat-label>
+            <mat-label i18n>Private Key</mat-label>
             <input matInput readonly
               [(ngModel)]="client.privateKey"
               [type]="hidePrivateKey ? 'password' : 'text'">
@@ -29,30 +29,38 @@
                 (click)="hidePrivateKey = !hidePrivateKey"
                 [attr.aria-label]="'Hide password'"
                 [attr.aria-pressed]="hidePrivateKey"
-                matTooltip="The private key used for encrypting Web Push notifications.">
+                matTooltip="The private key used for encrypting Web Push notifications." i18n-matTooltip>
                 <mat-icon>{{hidePrivateKey ? 'visibility_off' : 'visibility'}}</mat-icon>
               </button>
             </mat-form-field>
             <div>
-              <mat-checkbox [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
+              <mat-checkbox i18n [(ngModel)]="client.sendEveryPlateEnabled">Send Alerts for every plate</mat-checkbox>
             </div>
           </div>
         </mat-card-content>
       }
       @if (client.isEnabled) {
-        <mat-card-actions align="end" [@inOutAnimation]>
-          <button mat-raised-button (click)="testClient();" [disabled]="isTesting">
-            @if (isTesting) {
-              <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
-            Test
-          </button>
-          <button mat-raised-button color="primary" (click)="saveClient();" [disabled]="isSaving" btn-primary>
-            @if (isSaving) {
-              <span class="spinner-border spinner-border-sm mr-1"></span>
-            }
-            Save
-          </button>
+        <mat-card-actions align="end" i18n-align [@inOutAnimation]>
+          <app-refresh-button
+            [isLoading]="isTesting"
+            [disabled]="isTesting || isSaving"
+            icon="science"
+            buttonType="raised"
+            buttonText="Test"
+            buttonRefreshingText="Testing..."
+            color="accent"
+            (refreshStarted)="testClient()" />
+
+          <app-refresh-button
+            [isLoading]="isSaving"
+            [disabled]="isTesting || isSaving"
+            icon="save"
+            buttonType="raised"
+            buttonText="Save"
+            buttonRefreshingText="Saving..."
+            color="primary"
+            (refreshStarted)="saveClient()"
+            type="submit" />
         </mat-card-actions>
       }
     </mat-card>

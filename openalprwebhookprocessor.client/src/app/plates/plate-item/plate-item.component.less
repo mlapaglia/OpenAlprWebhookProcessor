@@ -1,0 +1,211 @@
+// Vehicle Logo Styles
+.vehicle-description-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .vehicle-logo-container {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  
+  .vehicle-logo {
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    
+    // Handle dark theme
+    @media (prefers-color-scheme: dark) {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)) brightness(1.1);
+    }
+  }
+  
+  .vehicle-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// Action Button Styles
+.plate-actions {
+  .primary-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    min-height: 36px;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    span {
+      font-size: 0.875rem;
+    }
+  }
+  
+  .enrich-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(238, 90, 36, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(45deg, #ee5a24, #d63031);
+      box-shadow: 0 4px 8px rgba(238, 90, 36, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .edit-btn {
+    border: 2px solid #0984e3;
+    color: #0984e3;
+    background: transparent;
+    
+    &:hover:not(:disabled) {
+      background: rgba(9, 132, 227, 0.1);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .search-btn {
+    border: 2px solid #00b894;
+    color: #00b894;
+    background: transparent;
+    
+    &:hover:not(:disabled) {
+      background: rgba(0, 184, 148, 0.1);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .ignore-btn {
+    background: linear-gradient(45deg, #636e72, #2d3436);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(45, 52, 54, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(45deg, #2d3436, #636e72);
+      box-shadow: 0 4px 8px rgba(45, 52, 54, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .alert-btn {
+    background: linear-gradient(45deg, #fdcb6e, #e17055);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(225, 112, 85, 0.3);
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(45deg, #e17055, #d63031);
+      box-shadow: 0 4px 8px rgba(225, 112, 85, 0.4);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .view-btn {
+    border: 2px solid #6c5ce7;
+    color: #6c5ce7;
+    background: transparent;
+    
+    &:hover:not(:disabled) {
+      background: rgba(108, 92, 231, 0.1);
+      transform: translateY(-1px);
+    }
+  }
+  
+  .delete-btn {
+    border: 2px solid #d63031;
+    color: #d63031;
+    background: transparent;
+    
+    &:hover:not(:disabled) {
+      background: rgba(214, 48, 49, 0.1);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Legacy styles for existing content
+.alertPlate {
+  background-color: var(--mat-sys-error, #FFEB3B);
+}
+
+.ignorePlate {
+  background-color: var(--mat-sys-surface, #9E9E9E);
+}
+
+.ignorePlateText {
+  color: #616161;
+}
+
+// Mobile adjustments for vehicle logos
+@media (max-width: 768px) {
+  .vehicle-description-container {
+    .vehicle-logo-container {
+      width: 32px;
+      height: 32px;
+    }
+  }
+  
+  .plate-actions {
+    .primary-actions {
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.75rem 0.5rem;
+      
+      span {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .plate-actions {
+    .primary-actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+      min-width: unset;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+// Hide elements on mobile
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}

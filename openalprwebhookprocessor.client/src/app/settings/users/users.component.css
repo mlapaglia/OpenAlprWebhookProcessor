@@ -1,0 +1,187 @@
+/* Users component styling */
+
+.actions-cell {
+  padding: 8px 16px !important;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-button {
+  border-radius: 4px;
+  font-size: 12px;
+  min-width: auto;
+  height: 32px;
+  padding: 0 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.action-button mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.action-button[disabled] {
+  opacity: 0.6;
+}
+
+/* 2FA Status styling */
+.status-enabled {
+  color: var(--mdc-theme-primary, #4caf50);
+  font-weight: 500;
+}
+
+.status-disabled {
+  color: var(--mdc-theme-error, #f44336);
+  font-weight: 500;
+}
+
+.status-icon {
+  vertical-align: middle;
+  margin-right: 4px;
+  font-size: 16px;
+}
+
+/* Add User button styling */
+.add-user-button {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+}
+
+.add-user-button mat-icon {
+  margin-right: 8px;
+}
+
+/* Responsive layout - show/hide desktop vs mobile views */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  
+  .mobile-only {
+    display: block;
+  }
+}
+
+/* Mobile card layout */
+.user-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+.user-info {
+  margin-bottom: 16px;
+}
+
+.user-name {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--mdc-theme-on-surface);
+}
+
+.user-username,
+.user-2fa {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--mdc-theme-on-surface-variant);
+}
+
+.info-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  color: var(--mdc-theme-outline);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-action-button {
+  flex: 1;
+  min-width: 100px;
+  border-radius: 4px;
+  font-size: 12px;
+  height: 36px;
+  font-weight: 500;
+}
+
+.card-action-button mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+@media (max-width: 480px) {
+  .card-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .card-action-button {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Desktop table styles */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.actions-cell {
+  padding: 8px 16px !important;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-button {
+  border-radius: 4px;
+  font-size: 12px;
+  min-width: auto;
+  height: 32px;
+  padding: 0 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.action-button mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.action-button[disabled] {
+  opacity: 0.6;
+}

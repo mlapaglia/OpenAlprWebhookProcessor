@@ -1,124 +1,96 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, type OnDestroy, type OnInit } from '@angular/core';
+import { ThemeStorage, type DocsSiteTheme } from './theme-storage/theme-storage';
+import { StyleManager } from './style-manager/style-manager.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ActivatedRoute, type ParamMap } from '@angular/router';
 
-import { DocsSiteTheme, ThemeStorage } from './theme-storage/theme-storage'
-import { MatButtonModule } from '@angular/material/button'
-import { MatIconModule, MatIconRegistry } from '@angular/material/icon'
-import { MatMenuModule } from '@angular/material/menu'
-import { MatTooltipModule } from '@angular/material/tooltip'
-
-import { ActivatedRoute, ParamMap } from '@angular/router'
-import { Subscription } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { DomSanitizer } from '@angular/platform-browser'
-import { LiveAnnouncer } from '@angular/cdk/a11y'
-import { StyleManager } from './style-manager/style-manager.component'
-import { MatRadioModule } from '@angular/material/radio'
-import { MatListModule } from '@angular/material/list'
+import { map } from 'rxjs/operators';
+import { DomSanitizer } from '@angular/platform-browser';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatListModule } from '@angular/material/list';
+import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 
 @Component({
   selector: 'app-theme-picker',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, MatRadioModule, MatListModule],
   templateUrl: './theme-picker.component.html',
   styleUrls: ['./theme-picker.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
-  imports: [MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, MatRadioModule, MatListModule],
 })
-export class ThemePickerComponent implements OnInit, OnDestroy {
-  styleManager = inject(StyleManager)
-  private _themeStorage = inject(ThemeStorage)
-  private _activatedRoute = inject(ActivatedRoute)
-  private liveAnnouncer = inject(LiveAnnouncer)
+export class ThemePickerComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
+  private readonly _themeStorage = inject(ThemeStorage);
+  private readonly _styleManager = inject(StyleManager);
+  private readonly _activatedRoute = inject(ActivatedRoute);
+  private readonly liveAnnouncer = inject(LiveAnnouncer);
 
-  private _queryParamSubscription = Subscription.EMPTY
-  currentTheme: DocsSiteTheme | undefined
+  currentTheme: DocsSiteTheme | undefined;
 
-  // The below colors need to align with the themes defined in theme-picker.scss
   themes: DocsSiteTheme[] = [
-    {
-      primary: '#673AB7',
-      accent: '#FFC107',
-      displayName: 'Deep Purple & Amber',
-      name: 'deeppurple-amber',
-      isDark: false,
-    },
     {
       primary: '#3F51B5',
       accent: '#E91E63',
-      displayName: 'Indigo & Pink',
+      displayName: 'Light',
       name: 'indigo-pink',
-      isDark: false,
-      isDefault: true,
     },
     {
       primary: '#E91E63',
       accent: '#607D8B',
-      displayName: 'Pink & Blue-grey',
+      displayName: 'Dark',
       name: 'pink-bluegrey',
-      isDark: true,
     },
-    {
-      primary: '#9C27B0',
-      accent: '#4CAF50',
-      displayName: 'Purple & Green',
-      name: 'purple-green',
-      isDark: true,
-    },
-  ]
+  ];
 
   constructor() {
-    const iconRegistry = inject(MatIconRegistry)
-    const sanitizer = inject(DomSanitizer)
-
+    super();
+    const iconRegistry = inject(MatIconRegistry);
+    const sanitizer = inject(DomSanitizer);
     iconRegistry.addSvgIcon('theme-example',
       sanitizer.bypassSecurityTrustResourceUrl(
-        'assets/img/theme-demo-icon.svg'))
-
-    const themeName = this._themeStorage.getStoredThemeName()
-    if (themeName) {
-      this.selectTheme(themeName)
-    }
-    else {
-      this.themes.find((themes) => {
-        if (themes.isDefault === true) {
-          this.selectTheme(themes.name)
-        }
-      })
-    }
+        'assets/img/theme-demo-icon.svg'));
+    this.initializeTheme();
   }
 
   ngOnInit() {
-    this._queryParamSubscription = this._activatedRoute.queryParamMap
-      .pipe(map((params: ParamMap) => params.get('theme')))
-      .subscribe((themeName: string | null) => {
+    this.subscribeAndMarkForCheck(
+      this._activatedRoute.queryParamMap.pipe(map((params: ParamMap) => params.get('theme'))),
+      (themeName: string | null) => {
         if (themeName) {
-          this.selectTheme(themeName)
+          this.selectTheme(themeName);
         }
-      })
+      },
+    );
   }
 
-  ngOnDestroy() {
-    this._queryParamSubscription.unsubscribe()
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+  }
+
+  private initializeTheme() {
+    const storedThemeName = this._themeStorage.getStoredThemeName();
+    const themeName = storedThemeName ?? 'indigo-pink'; // Default to indigo-pink if no theme is stored
+
+    this.selectTheme(themeName);
   }
 
   selectTheme(themeName: string) {
-    const theme = this.themes.find(currentTheme => currentTheme.name === themeName)
-
+    const theme = this.themes.find(currentTheme => currentTheme.name === themeName);
     if (!theme) {
-      return
+      return;
     }
 
-    this.currentTheme = theme
+    this.currentTheme = theme;
+    this.markForCheck();
 
-    if (theme.isDefault) {
-      this.styleManager.removeStyle('theme')
-    }
-    else {
-      this.styleManager.setStyle('theme', `${theme.name}.css`)
-    }
+    // Always load the theme CSS file
+    const themeUrl = `assets/themes/${theme.name}.css`;
+    void this._styleManager.setStyle('theme', themeUrl);
 
-    if (this.currentTheme) {
-      this.liveAnnouncer.announce(`${theme.displayName} theme selected.`, 'polite', 3000)
-      this._themeStorage.storeTheme(this.currentTheme)
-    }
+    void this.liveAnnouncer.announce(`${theme.displayName} theme selected.`, 'polite', 3000);
+
+    this._themeStorage.storeTheme(this.currentTheme);
   }
 }

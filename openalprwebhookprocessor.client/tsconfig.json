@@ -33,6 +33,13 @@
         ]
       }
     },
+    "exclude": [
+      "node_modules",
+      "dist",
+      "bin",
+      "obj",
+      "e2e"
+    ],
     "angularCompilerOptions": {
       "enableI18nLegacyMessageIdFormat": false,
       "strictInjectionParameters": true,

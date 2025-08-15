@@ -1,0 +1,73 @@
+<div class="plate-settings-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="mat-headline-4">{{config().title}}</h1>
+      <p class="mat-body-1 header-subtitle">{{config().subtitle}}</p>
+    </div>
+  </div>
+
+  <!-- Additional Content (for alerts: pushover/webpush components) -->
+  @if(additionalContent()) {
+    <div class="additional-content">
+      <ng-container *ngTemplateOutlet="additionalContent()" />
+    </div>
+  }
+
+  <!-- Loading Overlay -->
+  @if(isLoading) {
+    <div class="loading-overlay">
+      <mat-card class="loading-card">
+        <mat-card-content class="loading-content">
+          <mat-spinner diameter="48" />
+          <p i18n class="mat-body-1 loading-text">Loading {{config().entityName}}s...</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if(hasError && !isLoading) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon i18n class="error-icon">error_outline</mat-icon>
+            <h3 i18n class="mat-headline-6">Unable to Load {{config().title}}</h3>
+          <p i18n class="mat-body-1">There was a problem loading your {{config().entityName}}s. Please check your connection and try again.</p>
+          <button mat-raised-button color="primary" (click)="loadSettings()" class="retry-button">
+            <mat-icon i18n>refresh</mat-icon>
+            Retry
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+  <!-- Main Content -->
+   @if(!isLoading && !hasError) {
+    <div class="main-content">
+      
+      <!-- Add New Setting Form -->
+      <app-add-new-setting-form 
+        [config]="config()"
+        [existingSettings]="settings.data"
+        [isAddingSetting]="isAddingSetting"
+        (addSetting)="onAddSetting($event)"
+        (resetForm)="onResetForm()" />
+
+      <!-- Settings List -->
+      <app-settings-list
+        [config]="config()"
+        [settings]="settings"
+        [isSaving]="isSaving"
+        [editingId]="editingId"
+        [editingSetting]="editingSetting"
+        [trackByFn]="trackByFn"
+        (saveSettings)="saveSettings()"
+        (scrollToForm)="scrollToForm()"
+        (startEdit)="startEdit($event)"
+        (confirmDelete)="confirmDelete($event)"
+        (saveEdit)="saveEdit($event)"
+        (cancelEdit)="cancelEdit()" />
+    </div>
+  }
+</div> 

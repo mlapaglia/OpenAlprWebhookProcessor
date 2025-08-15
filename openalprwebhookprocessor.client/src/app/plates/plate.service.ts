@@ -1,76 +1,82 @@
-import { HttpClient } from '@angular/common/http'
-import { Injectable, inject } from '@angular/core'
-import { Observable } from 'rxjs'
-import { Stream } from 'stream'
-import { Plate } from './plate/plate'
-import { PlateResponse } from './plate/plateResponse'
-import { PlateStatistics } from './plate/plateStatistics'
-import { VehicleFilters } from './vehicleFilters'
-import { GetPlateResponse } from './plate/getPlateResponse'
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import type { Observable } from 'rxjs';
+import type { Stream } from 'stream';
+import type { Plate } from './plate/plate';
+import type { PlateResponse } from './plate/plateResponse';
+import type { PlateStatistics } from './plate/plateStatistics';
+import type { VehicleFilters } from './vehicleFilters';
+import type { GetPlateResponse } from './plate/getPlateResponse';
 
 @Injectable({ providedIn: 'root' })
 export class PlateService {
-  private http = inject(HttpClient)
+  private readonly http = inject(HttpClient);
 
-  private getRelayImageUrl = 'images'
-  private searchPlatesUrl = 'licenseplates/search'
-  private editPlateUrl = 'licenseplates/edit'
-  private singlePlateUrl = 'licenseplates'
-  private hydrateDatabaseUrl = 'hydration/start'
-  private getFiltersUrl = 'licenseplates/filters'
-  private getStatistics = 'licenseplates/statistics'
-  private enrichPlateUrl = 'licenseplates/enrich'
+  private readonly getRelayImageUrl = 'images';
+  private readonly searchPlatesUrl = 'licenseplates/search';
+  private readonly editPlateUrl = 'licenseplates/edit';
+  private readonly singlePlateUrl = 'licenseplates';
+  private readonly hydrateDatabaseUrl = 'hydration/start';
+  private readonly getFiltersUrl = 'licenseplates/filters';
+  private readonly getStatistics = 'licenseplates/statistics';
+  private readonly enrichPlateUrl = 'licenseplates/enrich';
 
   searchPlates(plateRequest: PlateRequest): Observable<PlateResponse> {
-    return this.http.post<PlateResponse>(`/api/${this.searchPlatesUrl}`, plateRequest)
+    return this.http.post<PlateResponse>(`/api/${this.searchPlatesUrl}`, plateRequest);
   }
 
   upsertPlate(plate: Plate): Observable<null> {
-    return this.http.post<null>(`/api/${this.editPlateUrl}`, plate)
+    return this.http.post<null>(`/api/${this.editPlateUrl}`, plate);
+  }
+
+  updatePlateNumber(plateId: string, newPlateNumber: string): Observable<null> {
+    return this.http.patch<null>(`/api/licenseplates/${plateId}/platenumber`, newPlateNumber, {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   deletePlate(plateId: string): Observable<null> {
-    return this.http.delete<null>(`/api/${this.singlePlateUrl}/${plateId}`)
+    return this.http.delete<null>(`/api/${this.singlePlateUrl}/${plateId}`);
   }
 
   getRelayImage(imageId: string) {
-    return this.http.get<Stream>(`/api/${this.getRelayImageUrl}/${imageId}`)
+    return this.http.get<Stream>(`/api/${this.getRelayImageUrl}/${imageId}`);
   }
 
   hydrateDatabase(): Observable<null> {
-    return this.http.post<null>(`/api/${this.hydrateDatabaseUrl}`, {})
+    return this.http.post<null>(`/api/${this.hydrateDatabaseUrl}`, {});
   }
 
   getFilters(): Observable<VehicleFilters> {
-    return this.http.get<VehicleFilters>(`/api/${this.getFiltersUrl}`)
+    return this.http.get<VehicleFilters>(`/api/${this.getFiltersUrl}`);
   }
 
   getPlate(plateId: string): Observable<GetPlateResponse> {
-    return this.http.get<GetPlateResponse>(`/api/${this.singlePlateUrl}/${plateId}`)
+    return this.http.get<GetPlateResponse>(`/api/${this.singlePlateUrl}/${plateId}`);
   }
 
   getPlateStatistics(plateNumber: string): Observable<PlateStatistics> {
-    return this.http.get<PlateStatistics>(`/api/${this.getStatistics}/${plateNumber}`)
+    return this.http.get<PlateStatistics>(`/api/${this.getStatistics}/${plateNumber}`);
   }
 
   enrichPlate(plateId: string): Observable<null> {
-    return this.http.post<null>(`/api/${this.enrichPlateUrl}/${plateId}`, null)
+    return this.http.post<null>(`/api/${this.enrichPlateUrl}/${plateId}`, null);
   }
 }
 
 export class PlateRequest {
-  plateNumber: string
-  startSearchOn: Date
-  endSearchOn: Date
-  strictMatch: boolean
-  filterIgnoredPlates: boolean
-  filterPlatesSeenLessThan: number
-  regexSearchEnabled: boolean
-  pageNumber: number
-  pageSize: number
-  vehicleMake: string
-  vehicleModel: string
-  vehicleColor: string
-  vehicleType: string
-  vehicleRegion: string
+  plateNumber: string;
+  startSearchOn: Date;
+  endSearchOn: Date;
+  strictMatch: boolean;
+  includeIgnoredPlates: boolean;
+  filterPlatesSeenLessThan: number;
+  regexSearchEnabled: boolean;
+  pageNumber: number;
+  pageSize: number;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleColor: string;
+  vehicleType: string;
+  vehicleRegion: string;
 }

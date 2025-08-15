@@ -1,0 +1,32 @@
+.cameras-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  margin: 0 auto;
+}
+
+.camera-wrapper {
+  app-camera {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Mobile responsive adjustments
+@media (max-width: 768px) {
+  .cameras-container {
+    grid-template-columns: 1fr; // Single column on mobile
+    padding: 8px;
+    gap: 12px;
+  }
+}
+
+// Small mobile screens
+@media (max-width: 480px) {
+  .cameras-container {
+    padding: 4px;
+    gap: 8px;
+  }
+}

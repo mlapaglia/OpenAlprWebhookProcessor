@@ -1,0 +1,60 @@
+mat-card {
+  margin-bottom: 24px;
+  
+  mat-card-header {
+    margin-bottom: 16px;
+    
+    mat-card-title {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    
+    mat-card-subtitle {
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+    }
+  }
+}
+
+.toggle-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  
+  .toggle-switch {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.overlay-settings {
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .url-field {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      
+      @media (min-width: 769px) {
+        min-width: 320px;
+      }
+    }
+  }
+  
+  .form-actions {
+    margin: 24px 0 16px 0;
+    
+    button {
+      margin-right: 12px;
+    }
+  }
+}
