@@ -148,7 +148,7 @@ jobs:
           echo "GIT_VERSION=$version" >> $GITHUB_OUTPUT
           echo "ASSEMBLY_VERSION=$assembly_version" >> $GITHUB_OUTPUT
 
-      - name: Push to Docker Hub and GitHub Packages
+      - name: Push to Docker Hub
         uses: docker/build-push-action@v5
         with:
           build-args: |
@@ -159,6 +159,3 @@ jobs:
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
-            ${{ contains(github.ref, 'alpha') && 'mlapaglia/openalprwebhookprocessor:alpha' || 'mlapaglia/openalprwebhookprocessor:latest' }}
-            ghcr.io/${{ github.repository_owner }}/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
-            ${{ contains(github.ref, 'alpha') && format('ghcr.io/{0}/openalprwebhookprocessor:alpha', github.repository_owner) || format('ghcr.io/{0}/openalprwebhookprocessor:latest', github.repository_owner) }}
