@@ -1,0 +1,223 @@
+name: Cleanup Alpha Releases
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  IMAGE_NAME: OpenAlprWebhookProcessor
+
+jobs:
+  cleanup-alpha-releases:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find Alpha Versions to Delete
+        id: find-versions
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fullTag = context.ref.replace('refs/tags/', '');
+            const version = fullTag.replace(/^v/, '');
+            const majorMinor = version.split('.').slice(0, 2).join('.');
+            
+            console.log(`Released stable version: ${fullTag}`);
+            console.log(`Looking for alpha releases for version ${majorMinor}...`);
+            
+            const alphaPattern = new RegExp(`^v${majorMinor}\\.[0-9]+-alpha[0-9]+$`);
+
+            const alphaReleases = [];
+            const alphaPackageVersions = [];
+            const alphaDockerTags = [];
+            
+            try {
+              console.log('🔍 Fetching GitHub releases...');
+              const { data: releases } = await github.rest.repos.listReleases({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              });
+              
+              const matchingReleases = releases.filter(release => 
+                release.prerelease && alphaPattern.test(release.tag_name)
+              );
+              
+              for (const release of matchingReleases) {
+                alphaReleases.push({
+                  id: release.id,
+                  tag: release.tag_name
+                });
+              }
+              
+              console.log(`Found ${alphaReleases.length} alpha releases to delete`);
+            } catch (error) {
+              console.log(`❌ Error fetching releases: ${error.message}`);
+            }
+
+            try {
+              console.log('📦 Fetching Docker package versions...');
+              
+              const { data: packageVersions } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
+                package_type: 'container',
+                package_name: process.env.IMAGE_NAME.toLowerCase(),
+                username: context.repo.owner
+              });
+              
+              console.log(`Found ${packageVersions.length} total package versions`);
+              
+              for (const version of packageVersions) {
+                if (version.metadata && version.metadata.container && version.metadata.container.tags) {
+                  const matchingTags = version.metadata.container.tags.filter(tag => alphaPattern.test(tag));
+                  if (matchingTags.length > 0) {
+                    alphaPackageVersions.push(version.id);
+                    alphaDockerTags.push(...matchingTags);
+                  }
+                }
+              }
+              
+              console.log(`Found ${alphaPackageVersions.length} alpha package versions to delete`);
+              console.log(`Found ${alphaDockerTags.length} alpha Docker tags: ${alphaDockerTags.join(', ')}`);
+            } catch (error) {
+              console.log(`❌ Error fetching package versions: ${error.message}`);
+            }
+
+            core.setOutput('alpha_releases', JSON.stringify(alphaReleases));
+            core.setOutput('alpha_package_versions', JSON.stringify(alphaPackageVersions));
+            core.setOutput('alpha_docker_tags', JSON.stringify(alphaDockerTags));
+            core.setOutput('major_minor', majorMinor);
+            core.setOutput('full_tag', fullTag);
+            
+            return {
+              releases: alphaReleases.length,
+              packageVersions: alphaPackageVersions.length,
+              dockerTags: alphaDockerTags.length
+            };
+
+      - name: Delete Alpha GitHub Releases
+        if: steps.find-versions.outputs.alpha_releases != '[]'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const alphaReleases = JSON.parse('${{ steps.find-versions.outputs.alpha_releases }}');
+            
+            console.log(`🗑️  Deleting ${alphaReleases.length} GitHub releases...`);
+            
+            for (const release of alphaReleases) {
+              try {
+                console.log(`Deleting GitHub release: ${release.tag}`);
+                await github.rest.repos.deleteRelease({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: release.id
+                });
+
+                try {
+                  console.log(`Deleting git tag: ${release.tag}`);
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `tags/${release.tag}`
+                  });
+                } catch (tagError) {
+                  console.log(`⚠️  Failed to delete git tag ${release.tag}: ${tagError.message}`);
+                }
+              } catch (releaseError) {
+                console.log(`⚠️  Failed to delete release ${release.tag}: ${releaseError.message}`);
+              }
+            }
+
+      - name: Delete Docker Hub Alpha Images
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        if: steps.find-versions.outputs.alpha_docker_tags != '[]'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const alphaDockerTags = JSON.parse('${{ steps.find-versions.outputs.alpha_docker_tags }}');
+            const majorMinor = '${{ steps.find-versions.outputs.major_minor }}';
+            
+            console.log(`🐳 Cleaning up ${alphaDockerTags.length} alpha images from Docker Hub...`);
+            console.log(`Tags to delete: ${alphaDockerTags.join(', ')}`);
+            
+            try {
+              const loginResponse = await fetch('https://hub.docker.com/v2/users/login/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  username: process.env.DOCKER_HUB_USERNAME,
+                  password: process.env.DOCKER_HUB_PASSWORD
+                })
+              });
+              
+              if (!loginResponse.ok) {
+                throw new Error(`Docker Hub login failed: ${loginResponse.status}`);
+              }
+              
+              const loginData = await loginResponse.json();
+              const token = loginData.token;
+              
+              if (!token) {
+                throw new Error('No token received from Docker Hub');
+              }
+              
+              console.log('✅ Successfully authenticated with Docker Hub');
+              
+              const repoName = 'mlapaglia/openalprwebhookprocessor';
+
+              for (const tagName of alphaDockerTags) {
+                try {
+                  console.log(`🗑️  Deleting Docker Hub tag: ${tagName}`);
+                  
+                  const deleteResponse = await fetch(`https://hub.docker.com/v2/repositories/${repoName}/tags/${tagName}/`, {
+                    method: 'DELETE',
+                    headers: {
+                      'Authorization': `JWT ${token}`
+                    }
+                  });
+                  
+                  if (!deleteResponse.ok) {
+                    console.log(`⚠️  Failed to delete tag ${tagName}: ${deleteResponse.status}`);
+                  } else {
+                    console.log(`✅ Successfully deleted tag ${tagName}`);
+                  }
+                } catch (tagError) {
+                  console.log(`⚠️  Error deleting tag ${tagName}: ${tagError.message}`);
+                }
+              }
+              
+            } catch (error) {
+              console.log(`❌ Error cleaning up Docker Hub: ${error.message}`);
+            }
+
+      - name: Summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fullTag = '${{ steps.find-versions.outputs.full_tag }}';
+            const majorMinor = '${{ steps.find-versions.outputs.major_minor }}';
+            const alphaReleases = JSON.parse('${{ steps.find-versions.outputs.alpha_releases }}');
+            const alphaPackageVersions = JSON.parse('${{ steps.find-versions.outputs.alpha_package_versions }}');
+            const alphaDockerTags = JSON.parse('${{ steps.find-versions.outputs.alpha_docker_tags }}');
+            
+            console.log('🎉 Cleanup Summary');
+            console.log('==================');
+            console.log(`✅ Cleanup completed for stable release ${fullTag}`);
+            console.log(`🗑️  Removed alpha releases matching pattern: v${majorMinor}.X-alphaX`);
+            console.log('');
+            console.log('📊 Items cleaned up:');
+            console.log(`   - GitHub Releases: ${alphaReleases.length}`);
+            console.log(`   - GitHub Packages: ${alphaPackageVersions.length}`);
+            console.log(`   - Docker Hub Tags: ${alphaDockerTags.length}`);
+            console.log('');
+            console.log('📦 Cleaned up from:');
+            console.log('   - GitHub Releases');
+            console.log('   - GitHub Container Registry (ghcr.io)');
+            console.log('   - Docker Hub (if configured)');
