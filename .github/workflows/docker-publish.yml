@@ -159,3 +159,4 @@ jobs:
           push: true
           tags: |
             mlapaglia/openalprwebhookprocessor:${{ steps.get_version.outputs.VERSION }}
+            ${{ contains(github.ref, 'alpha') && 'mlapaglia/openalprwebhookprocessor:alpha' || 'mlapaglia/openalprwebhookprocessor:latest' }}
