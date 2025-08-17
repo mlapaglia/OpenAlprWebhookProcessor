@@ -26,7 +26,7 @@
     "@angular/material": "^20.0.4",
     "@angular/platform-browser": "^20.0.5",
     "@angular/platform-browser-dynamic": "^20.0.5",
-    "@angular/router": "^20.0.5",
+    "@angular/router": "^20.1.7",
     "@angular/service-worker": "^20.0.5",
     "@microsoft/signalr": "^7.0.12",
     "chart.js": "^4.5.0",
