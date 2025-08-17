@@ -15,6 +15,21 @@ updates:
       - "@me"
     assignees:
       - "@me"
+    groups:
+      angular:
+        patterns:
+          - "@angular*"
+          - "@angular-devkit*"
+          - "@angular-eslint*"
+          - "ng-*"
+          - "zone.js"
+      testing:
+        patterns:
+          - "jasmine*"
+          - "karma*"
+          - "protractor*"
+          - "@types/jasmine*"
+          - "@types/node*"
 
   # Enable version updates for NuGet (.NET server projects)
   - package-ecosystem: "nuget"
