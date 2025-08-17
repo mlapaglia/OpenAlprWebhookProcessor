@@ -43,7 +43,7 @@
     "@angular/cli": "^20.0.4",
     "@angular/compiler-cli": "^20.0.5",
     "@angular/localize": "^20.1.2",
-    "@stylistic/eslint-plugin": "^5.0.0",
+    "@stylistic/eslint-plugin": "^5.2.3",
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "^2.0.13",
     "@types/node": "^20.8.9",
