@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { of, Subject, throwError } from 'rxjs';
+import { of, Subject, throwError, defer } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
@@ -452,10 +452,164 @@ describe(PlatesComponent.name, () => {
       );
     });
 
-    it('should navigate to plate view', () => {
-      component.onViewPlate('1');
+    it('should search for plate', () => {
+      spyOn(component, 'searchPlates' as any);
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/plates', '1']);
+      component.onSearchForPlate('ABC123');
+
+      expect((component as any).searchPlates).toHaveBeenCalledWith('ABC123');
+    });
+  });
+
+  describe('Search Plates Method', () => {
+    beforeEach(() => {
+      component.ngOnInit();
+      fixture.detectChanges();
+    });
+
+    it('should search plates successfully and update component state', () => {
+      const mockSearchResult = {
+        plates: [mockPlate],
+        totalCount: 5,
+      };
+      mockPlateService.searchPlates.and.returnValue(of(mockSearchResult));
+
+      component.onSearchTriggered();
+
+      expect(component.isLoading).toBe(false);
+      expect(component.plates.length).toBe(1);
+      expect(component.totalNumberOfPlates).toBe(5);
+      expect(component.plates[0].plateNumber).toBe('ABC123');
+      expect(mockPlateService.searchPlates).toHaveBeenCalled();
+    });
+
+    it('should show error notification when search fails', () => {
+      mockPlateService.searchPlates.and.returnValue(throwError('Search failed'));
+
+      component.onSearchTriggered();
+
+      expect(component.isLoading).toBe(false);
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Search failed. Please try again.',
+        SnackBarType.Error,
+      );
+    });
+
+    it('should handle concurrent search requests correctly', () => {
+      const firstSearchResult = {
+        plates: [{ ...mockPlate, plateNumber: 'FIRST' }],
+        totalCount: 1,
+      };
+      const secondSearchResult = {
+        plates: [{ ...mockPlate, plateNumber: 'SECOND' }],
+        totalCount: 1,
+      };
+
+      // First search takes longer (using defer to create observable from promise)
+      let firstSearchResolve: any;
+      const firstSearchObservable = defer(() => new Promise<any>(resolve => {
+        firstSearchResolve = resolve;
+      }));
+
+      // Second search resolves immediately
+      mockPlateService.searchPlates.and.returnValues(
+        firstSearchObservable,
+        of(secondSearchResult),
+      );
+
+      // Trigger first search
+      component.onSearchTriggered();
+      expect(component.isLoading).toBe(true);
+
+      // Trigger second search
+      component.onSearchTriggered();
+
+      // Resolve first search after second one completes
+      firstSearchResolve(firstSearchResult);
+
+      // Only second search result should be displayed
+      expect(component.plates[0].plateNumber).toBe('SECOND');
+      expect(component.totalNumberOfPlates).toBe(1);
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should handle concurrent search requests with error correctly', () => {
+      // First search will error (using defer to create observable from promise)
+      let firstSearchReject: any;
+      const firstSearchObservable = defer(() => new Promise<any>((resolve, reject) => {
+        firstSearchReject = reject;
+      }));
+
+      // Second search succeeds
+      const secondSearchResult = {
+        plates: [mockPlate],
+        totalCount: 1,
+      };
+
+      mockPlateService.searchPlates.and.returnValues(
+        firstSearchObservable,
+        of(secondSearchResult),
+      );
+
+      // Trigger first search
+      component.onSearchTriggered();
+      expect(component.isLoading).toBe(true);
+
+      // Trigger second search
+      component.onSearchTriggered();
+
+      // Reject first search after second one completes
+      firstSearchReject('First search failed');
+
+      // Should not show error notification for outdated request
+      expect(mockSnackbarService.create).not.toHaveBeenCalledWith(
+        'Search failed. Please try again.',
+        SnackBarType.Error,
+      );
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should search with plate number parameter', () => {
+      const plateNumber = 'TEST123';
+      mockPlateService.searchPlates.and.returnValue(of({ plates: [], totalCount: 0 }));
+
+      // Access private method for testing
+      (component as any).searchPlates(plateNumber);
+
+      expect(mockPlateService.searchPlates).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          plateNumber,
+        }),
+      );
+    });
+
+    it('should reset page number when searching', () => {
+      // Set page number to something other than 0
+      (component as any).pageNumber = 5;
+      mockPlateService.searchPlates.and.returnValue(of({ plates: [], totalCount: 0 }));
+
+      component.onSearchTriggered();
+
+      expect((component as any).pageNumber).toBe(0);
+    });
+
+    it('should set loading state during search', () => {
+      let searchResolve: any;
+      const searchObservable = defer(() => new Promise<any>(resolve => {
+        searchResolve = resolve;
+      }));
+      mockPlateService.searchPlates.and.returnValue(searchObservable);
+
+      component.onSearchTriggered();
+
+      expect(component.isLoading).toBe(true);
+
+      searchResolve({ plates: [], totalCount: 0 });
+
+      // Need to wait for promise resolution
+      setTimeout(() => {
+        expect(component.isLoading).toBe(false);
+      });
     });
   });
 

@@ -52,7 +52,7 @@ export class PlateItemComponent {
   readonly editPlate = output<string>();
   readonly alertPlate = output<string>();
   readonly ignorePlate = output<string>();
-  readonly viewPlate = output<string>();
+  readonly searchForPlate = output<string>();
 
   isExpanded = false;
 
@@ -82,8 +82,8 @@ export class PlateItemComponent {
     this.ignorePlate.emit(this.plate().id);
   }
 
-  onViewPlate() {
-    this.viewPlate.emit(this.plate().id);
+  onSearchForPlate() {
+    this.searchForPlate.emit(this.plate().plateNumber);
   }
 
   onPlateChanged(_: PlateData) {

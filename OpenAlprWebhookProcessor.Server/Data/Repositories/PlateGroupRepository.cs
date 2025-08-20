@@ -138,21 +138,10 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             long last90DaysEpoch,
             CancellationToken cancellationToken = default)
         {
-            var bestNumberQuery = _dbSet
+            var allEpochsQuery = _dbSet
                 .AsNoTracking()
-                .Where(pg => pg.BestNumber == plateNumber)
+                .Where(pg => pg.BestNumber == plateNumber || pg.PossibleNumbers.Any(pn => pn.Number == plateNumber))
                 .Select(pg => pg.ReceivedOnEpoch);
-
-            var possibleNumberQuery = _dbSet
-                .AsNoTracking()
-                .Join(_context.PlateGroupPossibleNumbers,
-                    pg => pg.Id,
-                    pn => pn.PlateGroupId,
-                    (pg, pn) => new { pg, pn })
-                .Where(x => x.pn.Number == plateNumber)
-                .Select(x => x.pg.ReceivedOnEpoch);
-
-            var allEpochsQuery = bestNumberQuery.Concat(possibleNumberQuery);
 
             var result = await allEpochsQuery
                 .GroupBy(e => 1)

@@ -188,6 +188,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       error: (_error) => {
         if (requestId === this.currentRequestId) {
           this.isLoading = false;
+          this.snackbarService.create('Search failed. Please try again.', SnackBarType.Error);
           this.markForCheck();
         }
       },
@@ -350,8 +351,8 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     }
   }
 
-  onViewPlate(plateId: string) {
-    void this.router.navigate(['/plates', plateId]);
+  onSearchForPlate(plateNumber: string) {
+    this.searchPlates(plateNumber);
   }
 
   private addToAlertList(plateId: string, plateNumber: string) {
