@@ -1,4 +1,9 @@
 # OpenALPR Webhook Processor
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mlapaglia_OpenAlprWebhookProcessor&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mlapaglia_OpenAlprWebhookProcessor)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=mlapaglia_OpenAlprWebhookProcessor&metric=bugs)](https://sonarcloud.io/summary/new_code?id=mlapaglia_OpenAlprWebhookProcessor)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=mlapaglia_OpenAlprWebhookProcessor&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=mlapaglia_OpenAlprWebhookProcessor)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mlapaglia_OpenAlprWebhookProcessor&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mlapaglia_OpenAlprWebhookProcessor)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=mlapaglia_OpenAlprWebhookProcessor&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=mlapaglia_OpenAlprWebhookProcessor)
 
 A comprehensive license plate recognition management system that processes webhooks from OpenALPR web servers, manages IP cameras, and provides intelligent alerting capabilities.
 <img width="1672" height="1061" alt="Untitled" src="https://github.com/user-attachments/assets/073f4ac9-d63d-452d-a80c-b9dcbd12bb29" />
