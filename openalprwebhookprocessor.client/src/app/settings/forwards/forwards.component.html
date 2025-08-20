@@ -103,5 +103,13 @@
   </div>
   <div style="margin: 15px;">
     <button i18n mat-raised-button color="primary" (click)="addForward()" style="margin: 15px;">Add</button>
-    <button i18n mat-raised-button color="primary" [class.spinner]="isSaving" [disabled]="isSaving" (click)="saveForwards()">Save</button>
+    <app-refresh-button
+      [isLoading]="isSaving"
+      buttonType="raised"
+      color="primary"
+      buttonText="Save"
+      buttonRefreshingText="Saving..."
+      icon="save"
+      (refreshStarted)="saveForwards()" />
+    
   </div>

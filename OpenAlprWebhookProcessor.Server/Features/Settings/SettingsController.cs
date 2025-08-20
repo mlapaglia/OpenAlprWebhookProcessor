@@ -1,7 +1,6 @@
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates;
@@ -10,22 +9,22 @@ using OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwards;
+
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Commands.UpsertWebhookForwards;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentVideoStreams;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
+
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetVersion;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetScheduledJobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Queries.GetWebhookForwards;
 
 namespace OpenAlprWebhookProcessor.Features.Settings
 {
@@ -103,27 +102,6 @@ namespace OpenAlprWebhookProcessor.Features.Settings
             var command = new AgentScrapeCommand();
             await _mediator.Send(command, cancellationToken);
             return StatusCode(202);
-        }
-
-        [HttpPost("ignores/add")]
-        public async Task AddIgnore([FromBody] IgnoreDto ignore, CancellationToken cancellationToken)
-        {
-            var command = new AddIgnoreCommand(ignore);
-            await _mediator.Send(command, cancellationToken);
-        }
-
-        [HttpPost("ignores")]
-        public async Task UpsertIgnore([FromBody] List<IgnoreDto> ignores, CancellationToken cancellationToken)
-        {
-            var command = new UpsertIgnoresCommand(ignores);
-            await _mediator.Send(command, cancellationToken);
-        }
-
-        [HttpGet("ignores")]
-        public async Task<List<IgnoreDto>> GetIgnores(CancellationToken cancellationToken)
-        {
-            var query = new GetIgnoresQuery();
-            return await _mediator.Send(query, cancellationToken);
         }
 
         [HttpGet("forwards")]

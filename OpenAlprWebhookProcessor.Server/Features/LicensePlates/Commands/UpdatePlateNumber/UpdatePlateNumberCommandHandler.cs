@@ -33,20 +33,3 @@ public class UpdatePlateNumberCommandHandler : ICommandHandler<UpdatePlateNumber
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

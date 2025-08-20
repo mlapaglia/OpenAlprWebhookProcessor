@@ -6,6 +6,7 @@ import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { type Ignore } from 'app/settings/ignores/ignore';
 import { SettingsService } from 'app/settings/settings.service';
+import { IgnoresService } from 'app/settings/ignores/ignores.service';
 import { type Alert } from 'app/settings/alerts/alert';
 import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -37,6 +38,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   private readonly snackbarService = inject(SnackbarService);
   private readonly alertsService = inject(AlertsService);
   private readonly settingsService = inject(SettingsService);
+  private readonly ignoresService = inject(IgnoresService);
   private readonly localStorageService = inject(LocalStorageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -388,7 +390,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       strictMatch: false,
     };
 
-    this.settingsService.upsertIgnores([ignore]).subscribe({
+    this.ignoresService.addIgnore(ignore).subscribe({
       next: () => {
         this.isAddingToIgnoreList = false;
         this.snackbarService.create('Added to ignore list', SnackBarType.Successful);

@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
+import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-forwards',
@@ -20,6 +21,7 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatTableModule, MatFormFieldModule, MatInputModule,
     ReactiveFormsModule, FormsModule, MatCheckboxModule, MatButtonModule,
     MatCardModule, MatIconModule,
+    RefreshButtonComponent,
   ],
 })
 export class ForwardsComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
