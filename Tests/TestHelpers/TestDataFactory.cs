@@ -1,7 +1,9 @@
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
+using OpenAlprWebhookProcessor.Features.Ignores.Queries.GetIgnores;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers;
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Queries.GetWebhookForwards;
 
 namespace Tests.TestHelpers
 {
@@ -290,9 +292,9 @@ namespace Tests.TestHelpers
             };
         }
 
-        public static OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores.IgnoreDto CreateTestIgnoreDto(string? plateNumber = null)
+        public static IgnoreDto CreateTestIgnoreDto(string? plateNumber = null)
         {
-            return new OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores.IgnoreDto
+            return new OpenAlprWebhookProcessor.Features.Ignores.Queries.GetIgnores.IgnoreDto
             {
                 Id = Guid.NewGuid(),
                 PlateNumber = plateNumber ?? "IGNORE123",
@@ -301,9 +303,9 @@ namespace Tests.TestHelpers
             };
         }
 
-        public static OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards.WebhookForwardDto CreateTestWebhookForwardDto()
+        public static WebhookForwardDto CreateTestWebhookForwardDto()
         {
-            return new OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards.WebhookForwardDto
+            return new OpenAlprWebhookProcessor.Features.WebhookForwards.Queries.GetWebhookForwards.WebhookForwardDto
             {
                 Id = Guid.NewGuid(),
                 Destination = new Uri("http://test-forward.local/webhook"),

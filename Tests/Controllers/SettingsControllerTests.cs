@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
+
 using OpenAlprWebhookProcessor.Features.Settings.Commands.AgentScrape;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.DisableAgent;
@@ -11,14 +11,12 @@ using OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertIgnores;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertWebhookForwards;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetEnrichers;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Commands.UpsertWebhookForwards;
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Queries.GetWebhookForwards;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers
@@ -220,81 +218,6 @@ namespace Tests.Controllers
             // Assert
             await Mediator.Received(1).Send(
                 Arg.Any<AgentScrapeCommand>(),
-                cancellationToken);
-        }
-
-        [Test]
-        public async Task AddIgnore_ValidIgnore_CallsCorrectCommand()
-        {
-            // Arrange
-            var ignore = TestDataFactory.CreateTestIgnoreDto("IGNORE123");
-            var cancellationToken = GetCancellationToken();
-
-            // Act
-            await _controller.AddIgnore(ignore, cancellationToken);
-
-            // Assert
-            await Mediator.Received(1).Send(
-                Arg.Is<AddIgnoreCommand>(cmd => cmd.Ignore == ignore),
-                cancellationToken);
-        }
-
-        [Test]
-        public async Task UpsertIgnore_ValidIgnores_CallsCorrectCommand()
-        {
-            // Arrange
-            var ignores = new List<IgnoreDto>
-            {
-                TestDataFactory.CreateTestIgnoreDto("IGNORE1"),
-                TestDataFactory.CreateTestIgnoreDto("IGNORE2")
-            };
-            var cancellationToken = GetCancellationToken();
-
-            // Act
-            await _controller.UpsertIgnore(ignores, cancellationToken);
-
-            // Assert
-            await Mediator.Received(1).Send(
-                Arg.Is<UpsertIgnoresCommand>(cmd => cmd.Ignores == ignores),
-                cancellationToken);
-        }
-
-        [Test]
-        public async Task GetIgnores_ReturnsCorrectResult()
-        {
-            // Arrange
-            var expectedIgnores = new List<IgnoreDto>
-            {
-                TestDataFactory.CreateTestIgnoreDto("IGNORE1"),
-                TestDataFactory.CreateTestIgnoreDto("IGNORE2")
-            };
-            var cancellationToken = GetCancellationToken();
-
-            Mediator.Send(Arg.Any<GetIgnoresQuery>(), cancellationToken)
-                .Returns(expectedIgnores);
-
-            // Act
-            var result = await _controller.GetIgnores(cancellationToken);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().HaveCount(2);
-            result[0].PlateNumber.Should().Be("IGNORE1");
-            result[1].PlateNumber.Should().Be("IGNORE2");
-        }
-
-        [Test]
-        public async Task GetIgnores_CallsCorrectQuery()
-        {
-            // Arrange
-            var cancellationToken = GetCancellationToken();
-
-            // Act
-            await _controller.GetIgnores(cancellationToken);
-
-            // Assert
-            await Mediator.Received(1).Send(
-                Arg.Any<GetIgnoresQuery>(),
                 cancellationToken);
         }
 

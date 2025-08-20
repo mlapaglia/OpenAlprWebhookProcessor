@@ -1,11 +1,11 @@
 using AwesomeAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Features.Settings;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.AddIgnore;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.DeleteIgnore;
-using OpenAlprWebhookProcessor.Features.Settings.Commands.UpdateIgnore;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetIgnores;
+using OpenAlprWebhookProcessor.Features.Ignores;
+using OpenAlprWebhookProcessor.Features.Ignores.Commands.AddIgnore;
+using OpenAlprWebhookProcessor.Features.Ignores.Commands.DeleteIgnore;
+using OpenAlprWebhookProcessor.Features.Ignores.Commands.UpdateIgnore;
+using OpenAlprWebhookProcessor.Features.Ignores.Queries.GetIgnores;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers

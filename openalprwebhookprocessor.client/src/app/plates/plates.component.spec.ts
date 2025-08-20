@@ -16,6 +16,7 @@ import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { SettingsService } from 'app/settings/settings.service';
+import { IgnoresService } from 'app/settings/ignores/ignores.service';
 import { LocalStorageService } from 'app/_services/local-storage.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { type PageEvent } from '@angular/material/paginator';
@@ -28,6 +29,7 @@ describe(PlatesComponent.name, () => {
   let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
   let mockAlertsService: jasmine.SpyObj<AlertsService>;
   let mockSettingsService: jasmine.SpyObj<SettingsService>;
+  let mockIgnoresService: jasmine.SpyObj<IgnoresService>;
   let mockLocalStorageService: jasmine.SpyObj<LocalStorageService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
@@ -133,7 +135,8 @@ describe(PlatesComponent.name, () => {
     });
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
     mockAlertsService = jasmine.createSpyObj('AlertsService', ['addAlert']);
-    mockSettingsService = jasmine.createSpyObj('SettingsService', ['getCameras', 'upsertIgnores']);
+    mockSettingsService = jasmine.createSpyObj('SettingsService', ['getCameras']);
+    mockIgnoresService = jasmine.createSpyObj('IgnoresService', ['addIgnore']);
     mockLocalStorageService = jasmine.createSpyObj('LocalStorageService', ['getData', 'setData']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
@@ -157,6 +160,7 @@ describe(PlatesComponent.name, () => {
         { provide: SnackbarService, useValue: mockSnackbarService },
         { provide: AlertsService, useValue: mockAlertsService },
         { provide: SettingsService, useValue: mockSettingsService },
+        { provide: IgnoresService, useValue: mockIgnoresService },
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: Router, useValue: mockRouter },
         { provide: MatDialog, useValue: mockDialog },
@@ -435,12 +439,12 @@ describe(PlatesComponent.name, () => {
 
     it('should add plate to ignore list', () => {
       spyOn(component, 'searchPlates' as any);
-      mockSettingsService.upsertIgnores.and.returnValue(of({}));
+      mockIgnoresService.addIgnore.and.returnValue(of({}));
 
       component.onIgnorePlate('1');
 
-      expect(mockSettingsService.upsertIgnores).toHaveBeenCalledWith(
-        [jasmine.objectContaining({ plateNumber: 'ABC123' })]);
+      expect(mockIgnoresService.addIgnore).toHaveBeenCalledWith(
+        jasmine.objectContaining({ plateNumber: 'ABC123' }));
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Added to ignore list',
