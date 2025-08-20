@@ -351,8 +351,8 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     }
   }
 
-  onViewPlate(plateId: string) {
-    void this.router.navigate(['/plates', plateId]);
+  onSearchForPlate(plateNumber: string) {
+    this.searchPlates(plateNumber);
   }
 
   private addToAlertList(plateId: string, plateNumber: string) {

@@ -452,10 +452,12 @@ describe(PlatesComponent.name, () => {
       );
     });
 
-    it('should navigate to plate view', () => {
-      component.onViewPlate('1');
+    it('should search for plate', () => {
+      spyOn(component, 'searchPlates' as any);
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/plates', '1']);
+      component.onSearchForPlate('ABC123');
+
+      expect((component as any).searchPlates).toHaveBeenCalledWith('ABC123');
     });
   });
 

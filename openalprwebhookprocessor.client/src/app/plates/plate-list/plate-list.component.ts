@@ -32,7 +32,7 @@ export class PlateListComponent {
   readonly editPlate = output<string>();
   readonly alertPlate = output<string>();
   readonly ignorePlate = output<string>();
-  readonly viewPlate = output<string>();
+  readonly searchForPlate = output<string>();
   readonly paginatorChange = output<PageEvent>();
 
   onPlateOpened(plateId: string) {
@@ -59,8 +59,8 @@ export class PlateListComponent {
     this.ignorePlate.emit(plateId);
   }
 
-  onViewPlate(plateId: string) {
-    this.viewPlate.emit(plateId);
+  onSearchForPlate(plateId: string) {
+    this.searchForPlate.emit(plateId);
   }
 
   onPaginatorPage(event: PageEvent) {
