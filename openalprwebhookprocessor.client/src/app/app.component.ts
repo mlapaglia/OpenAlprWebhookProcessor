@@ -15,7 +15,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { ThemePickerComponent } from './theme-picker/theme-picker.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -103,7 +103,7 @@ export class AppComponent extends OnPushBaseComponent implements OnInit, OnDestr
       (result) => {
         const wasMobile = this.isMobile;
         this.isMobile = result.matches;
-        
+
         // Only change sidenav state when crossing the breakpoint, not on every resize
         if (wasMobile !== this.isMobile) {
           this.sidenavOpened = !this.isMobile; // Open sidenav on desktop, close on mobile

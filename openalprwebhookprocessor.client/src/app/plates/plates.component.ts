@@ -56,7 +56,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     includeIgnoredPlates: false,
     platesSeenLessThan: false,
   });
-  
+
   // Core data
   public plates: PlateData[] = [];
   public totalNumberOfPlates = 0;
@@ -138,10 +138,10 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   }
 
   get hasVehicleFiltersData(): boolean {
-    return this.vehicleFilters.makes.length > 0 || 
-           this.vehicleFilters.models.length > 0 || 
-           this.vehicleFilters.types.length > 0 || 
-           this.vehicleFilters.colors.length > 0 || 
+    return this.vehicleFilters.makes.length > 0 ||
+           this.vehicleFilters.models.length > 0 ||
+           this.vehicleFilters.types.length > 0 ||
+           this.vehicleFilters.colors.length > 0 ||
            this.vehicleFilters.regions.length > 0;
   }
 
@@ -195,11 +195,13 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     });
   }
 
-  private searchPlates(plateNumber: string | null = null) {
+  private searchPlates(plateNumber: string | null = null, resetPage: boolean = true) {
     this.currentRequestId++;
     const requestId = this.currentRequestId;
 
-    this.pageNumber = 0;
+    if (resetPage) {
+      this.pageNumber = 0;
+    }
     this.isLoading = true;
     this.markForCheck();
 
@@ -243,7 +245,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       startSearchOn: this.setToStartOfDay(filters?.startDate ?? new Date()),
       endSearchOn: this.setToEndOfDay(filters?.endDate ?? new Date()),
     };
-  } 
+  }
 
   private buildVehicleFilters(filters: PlateFilters | null) {
     const getStringValue = (value: string | undefined) => value ?? '';
@@ -310,7 +312,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       this.pageSize = event.pageSize;
     }
     this.pageNumber = event.pageIndex;
-    this.searchPlates();
+    this.searchPlates(null, false);
   }
 
   onEnrichPlate(plateId: string) {

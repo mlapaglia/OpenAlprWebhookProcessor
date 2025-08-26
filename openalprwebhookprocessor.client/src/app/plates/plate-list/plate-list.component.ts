@@ -21,10 +21,10 @@ import { PlateItemComponent, type PlateData } from '../plate-item/plate-item.com
   styleUrl: './plate-list.component.less',
 })
 export class PlateListComponent {
-  readonly plates = input<PlateData[]>([]);
-  readonly isLoading = input<boolean>(false);
-  readonly pageSize = input<number>(25);
-  readonly totalNumberOfPlates = input<number>(0);
+  readonly plates = input.required<PlateData[]>();
+  readonly isLoading = input.required<boolean>();
+  readonly pageSize = input.required<number>();
+  readonly totalNumberOfPlates = input.required<number>();
 
   readonly plateOpened = output<string>();
   readonly plateClosed = output<string>();

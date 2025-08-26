@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
@@ -12,9 +13,11 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatNativeDateModule } from '@angular/material/core';
-import { signal, WritableSignal } from '@angular/core';
+import type { WritableSignal } from '@angular/core';
+import { signal } from '@angular/core';
 
-import { PlateFiltersComponent, PlateFilters, VehicleFilters } from './plate-filters.component';
+import type { PlateFilters, VehicleFilters } from './plate-filters.component';
+import { PlateFiltersComponent } from './plate-filters.component';
 import { LocalStorageService } from '../../_services/local-storage.service';
 import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
@@ -31,11 +34,11 @@ describe('PlateFiltersComponent', () => {
     vehicleMakeModelMap: {
       'Toyota': ['Camry', 'Corolla', 'Prius'],
       'Honda': ['Civic', 'Accord', 'CR-V'],
-      'Ford': ['F-150', 'Mustang', 'Explorer']
+      'Ford': ['F-150', 'Mustang', 'Explorer'],
     },
     types: ['Sedan', 'SUV', 'Truck'],
     colors: ['Red', 'Blue', 'White', 'Black'],
-    regions: ['US', 'CA', 'EU']
+    regions: ['US', 'CA', 'EU'],
   };
 
   const mockPlateFilters: PlateFilters = {
@@ -50,7 +53,7 @@ describe('PlateFiltersComponent', () => {
     vehicleRegion: '',
     regexSearchEnabled: false,
     includeIgnoredPlates: false,
-    platesSeenLessThan: false
+    platesSeenLessThan: false,
   };
 
   beforeEach(async () => {
@@ -72,11 +75,9 @@ describe('PlateFiltersComponent', () => {
         MatCheckboxModule,
         MatTooltipModule,
         MatAutocompleteModule,
-        RefreshButtonComponent
+        RefreshButtonComponent,
       ],
-      providers: [
-        { provide: LocalStorageService, useValue: localStorageSpy }
-      ]
+      providers: [{ provide: LocalStorageService, useValue: localStorageSpy }],
     }).compileComponents();
 
     localStorageService = TestBed.inject(LocalStorageService) as jasmine.SpyObj<LocalStorageService>;
@@ -101,7 +102,7 @@ describe('PlateFiltersComponent', () => {
     it('should initialize with default values', () => {
       localStorageService.getData.and.returnValue(null as any);
       fixture.detectChanges();
-      
+
       expect(component.filterPlateNumberIsValid).toBe(true);
       expect(component.filterDateRangeIsValid).toBe(true);
       expect((component as any).showAdvancedFilters).toBe(false);
@@ -113,7 +114,7 @@ describe('PlateFiltersComponent', () => {
         vehicleMake: 'Toyota',
         vehicleModel: 'Camry',
         startDate: '2023-01-01',
-        endDate: '2023-01-07'
+        endDate: '2023-01-07',
       });
       localStorageService.getData.and.returnValue(savedFilters);
 
@@ -210,9 +211,9 @@ describe('PlateFiltersComponent', () => {
         spyOn(component.searchTriggered, 'emit');
         component.filterPlateNumberIsValid = true;
         component.filterDateRangeIsValid = true;
-        
+
         (component as any).onSearch();
-        
+
         expect(component.searchTriggered.emit).toHaveBeenCalled();
         expect(localStorageService.setData).toHaveBeenCalled();
       });
@@ -221,9 +222,9 @@ describe('PlateFiltersComponent', () => {
         spyOn(component.searchTriggered, 'emit');
         component.filterPlateNumberIsValid = false;
         component.filterDateRangeIsValid = true;
-        
+
         (component as any).onSearch();
-        
+
         expect(component.searchTriggered.emit).not.toHaveBeenCalled();
       });
     });
@@ -231,13 +232,13 @@ describe('PlateFiltersComponent', () => {
     describe('Clear', () => {
       it('should clear filters and trigger search', () => {
         spyOn(component.searchTriggered, 'emit');
-        
+
         (component as any).onClear();
-        
+
         // Check validation states are reset
         expect(component.filterPlateNumberIsValid).toBe(true);
         expect(component.filterDateRangeIsValid).toBe(true);
-        
+
         // Check storage is cleared and search is triggered
         expect(localStorageService.removeData).toHaveBeenCalledWith('plateFilters');
         expect(component.searchTriggered.emit).toHaveBeenCalled();
@@ -245,7 +246,7 @@ describe('PlateFiltersComponent', () => {
 
       it('should set default date range when clearing', () => {
         (component as any).onClear();
-        
+
         expect(component.plateFilters().startDate).toBeDefined();
         expect(component.plateFilters().endDate).toBeDefined();
         expect(component.plateFilters().startDate <= component.plateFilters().endDate).toBe(true);
@@ -255,10 +256,10 @@ describe('PlateFiltersComponent', () => {
     describe('Toggle Advanced', () => {
       it('should toggle advanced filters visibility', () => {
         expect((component as any).showAdvancedFilters).toBe(false);
-        
+
         (component as any).onToggleAdvanced();
         expect((component as any).showAdvancedFilters).toBe(true);
-        
+
         (component as any).onToggleAdvanced();
         expect((component as any).showAdvancedFilters).toBe(false);
       });
@@ -274,15 +275,15 @@ describe('PlateFiltersComponent', () => {
     it('should save filters to storage on search', () => {
       component.filterPlateNumberIsValid = true;
       component.filterDateRangeIsValid = true;
-      
+
       (component as any).onSearch();
-      
+
       expect(localStorageService.setData).toHaveBeenCalledWith('plateFilters', jasmine.any(String));
     });
 
     it('should handle invalid JSON in storage gracefully', () => {
       localStorageService.getData.and.returnValue('invalid json');
-      
+
       expect(() => {
         (component as any).loadFiltersFromStorage();
       }).not.toThrow();
@@ -299,13 +300,13 @@ describe('PlateFiltersComponent', () => {
       // Simulate mobile width
       const mobileEvent = { target: { innerWidth: 400 } } as any;
       component.onResize(mobileEvent);
-      
+
       expect((component as any).isMobile).toBe(true);
-      
+
       // Simulate desktop width
       const desktopEvent = { target: { innerWidth: 1200 } } as any;
       component.onResize(desktopEvent);
-      
+
       expect((component as any).isMobile).toBe(false);
     });
   });
@@ -323,9 +324,9 @@ describe('PlateFiltersComponent', () => {
 
     it('should emit search on initialization', () => {
       spyOn(component.searchTriggered, 'emit');
-      
+
       fixture.detectChanges();
-      
+
       expect(component.searchTriggered.emit).toHaveBeenCalled();
     });
   });

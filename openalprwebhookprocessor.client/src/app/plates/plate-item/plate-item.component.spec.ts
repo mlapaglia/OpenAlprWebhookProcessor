@@ -258,7 +258,7 @@ describe('PlateItemComponent', () => {
       });
       mockVehicleLogoService.formatVehicleDescription.and.returnValue('2018 Toyota Camry');
       fixture.detectChanges();
-      
+
       // Open the expansion panel to make the content visible
       const expansionPanel = fixture.nativeElement.querySelector('mat-expansion-panel');
       expansionPanel.click();
@@ -295,7 +295,7 @@ describe('PlateItemComponent', () => {
     it('should have ignore state when plate is already ignored', () => {
       fixture.componentRef.setInput('plate', { ...mockPlateData, isIgnore: true });
       fixture.detectChanges();
-      
+
       // Test the component state directly
       expect(component.plate().isIgnore).toBe(true);
     });
@@ -303,7 +303,7 @@ describe('PlateItemComponent', () => {
     it('should have alert state when plate is already alerted', () => {
       fixture.componentRef.setInput('plate', { ...mockPlateData, isAlert: true });
       fixture.detectChanges();
-      
+
       // Test the component state directly
       expect(component.plate().isAlert).toBe(true);
     });

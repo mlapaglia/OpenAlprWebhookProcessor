@@ -1,4 +1,5 @@
-import { Component, input, output, inject, ChangeDetectionStrategy, HostListener, OnInit, ChangeDetectorRef } from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { Component, input, output, inject, ChangeDetectionStrategy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -71,7 +72,7 @@ export class PlateItemComponent implements OnInit {
   private updateMobileState(width: number) {
     const wasMobile = this.isMobile;
     this.isMobile = width <= 480;
-    
+
     if (wasMobile !== this.isMobile) {
       this.cdr.markForCheck();
     }

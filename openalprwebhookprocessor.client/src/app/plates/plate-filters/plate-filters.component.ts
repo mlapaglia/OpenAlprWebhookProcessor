@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output, inject, type OnDestroy, type OnInit, model, HostListener } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
-import { Observable, map, startWith, combineLatest } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { map, startWith, combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,7 +36,7 @@ export interface VehicleFilters {
   cameras: string[],
   makes: string[];
   models: string[];
-  vehicleMakeModelMap?: { [make: string]: string[] };
+  vehicleMakeModelMap?: Record<string, string[]>;
   types: string[];
   colors: string[];
   regions: string[];
@@ -66,7 +67,7 @@ export interface VehicleFilters {
 })
 export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly localStorageService = inject(LocalStorageService);
-  
+
   readonly todaysDate = input(new Date());
   readonly isSearching = input(false);
   readonly vehicleFilters = input.required<VehicleFilters>();
@@ -81,7 +82,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
   protected showAdvancedFilters = false;
   protected isMobile = false;
-  
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     const target = event.target as Window;
@@ -122,7 +123,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
   private updateMobileState(width: number) {
     const wasMobile = this.isMobile;
     this.isMobile = width <= 768;
-    
+
     if (wasMobile !== this.isMobile) {
       this.markForCheck();
     }
@@ -149,13 +150,14 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
   }
 
   protected validateDateRange() {
-    if (!this.plateFilters().startDate || !this.plateFilters().endDate) {
+    const filters = this.plateFilters();
+    if (!filters.startDate || !filters.endDate) {
       this.filterDateRangeIsValid = true;
       this.markForCheck();
       return;
     }
 
-    this.filterDateRangeIsValid = this.plateFilters().startDate <= this.plateFilters().endDate;
+    this.filterDateRangeIsValid = filters.startDate <= filters.endDate;
     this.markForCheck();
   }
 
@@ -203,7 +205,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     this.showAdvancedFilters = !this.showAdvancedFilters;
     this.markForCheck();
   }
-  
+
   protected onStartDateChange() {
     this.validateDateRange();
     this.onFilterChange();
@@ -230,7 +232,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     }
     this.markForCheck();
   }
-  
+
   private applyFiltersFromStorage(filters: Partial<PlateFilters>) {
     this.setDateRangeFromStorage(filters);
     this.setStringFiltersFromStorage(filters);
@@ -317,77 +319,78 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     return !this.plateFilters().vehicleMake;
   }
 
-  private _filterOptions(value: string, options: string[]): string[] {
+  private filterOptions(value: string, options: string[]): string[] {
     const filterValue = value.toLowerCase();
     return options.filter(option => option.toLowerCase().includes(filterValue));
   }
 
   private syncFormControlsWithModel(): void {
-    this.cameraControl.setValue(this.plateFilters().cameraId || '');
-    this.vehicleMakeControl.setValue(this.plateFilters().vehicleMake || '');
-    this.vehicleModelControl.setValue(this.plateFilters().vehicleModel || '');
-    this.vehicleTypeControl.setValue(this.plateFilters().vehicleType || '');
-    this.vehicleColorControl.setValue(this.plateFilters().vehicleColor || '');
-    this.vehicleRegionControl.setValue(this.plateFilters().vehicleRegion || '');
+    const filters = this.plateFilters();
+    this.cameraControl.setValue(filters.cameraId ?? '');
+    this.vehicleMakeControl.setValue(filters.vehicleMake ?? '');
+    this.vehicleModelControl.setValue(filters.vehicleModel ?? '');
+    this.vehicleTypeControl.setValue(filters.vehicleType ?? '');
+    this.vehicleColorControl.setValue(filters.vehicleColor ?? '');
+    this.vehicleRegionControl.setValue(filters.vehicleRegion ?? '');
   }
 
   private setupFilteredOptions(): void {
     this.filteredCameras$ = this.cameraControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterOptions(value || '', this.vehicleFilters().cameras || []))
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().cameras ?? [])),
     );
 
     this.filteredMakes$ = this.vehicleMakeControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterOptions(value || '', this.vehicleFilters().makes || []))
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().makes ?? [])),
     );
 
     this.filteredModels$ = combineLatest([
-      this.vehicleMakeControl.valueChanges.pipe(startWith(this.vehicleMakeControl.value || '')),
-      this.vehicleModelControl.valueChanges.pipe(startWith(this.vehicleModelControl.value || ''))
+      this.vehicleMakeControl.valueChanges.pipe(startWith(this.vehicleMakeControl.value ?? '')),
+      this.vehicleModelControl.valueChanges.pipe(startWith(this.vehicleModelControl.value ?? '')),
     ]).pipe(
       map(([makeValue, modelValue]) => {
-        const selectedMake = makeValue || this.plateFilters().vehicleMake;
+        const selectedMake = makeValue ?? this.plateFilters().vehicleMake;
         const makeModelMap = this.vehicleFilters().vehicleMakeModelMap;
         if (!selectedMake || !makeModelMap) {
           return [];
         }
         // Find the make in the map (case-insensitive)
-        const makeKey = Object.keys(makeModelMap).find(key => 
-          key.toLowerCase() === selectedMake.toLowerCase()
+        const makeKey = Object.keys(makeModelMap).find(key =>
+          key.toLowerCase() === selectedMake.toLowerCase(),
         );
         if (!makeKey) {
           return [];
         }
-        const availableModels = makeModelMap[makeKey] || [];
-        return this._filterOptions(modelValue || '', availableModels);
-      })
+        const availableModels = makeModelMap[makeKey] ?? [];
+        return this.filterOptions(modelValue ?? '', availableModels);
+      }),
     );
 
     this.filteredTypes$ = this.vehicleTypeControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterOptions(value || '', this.vehicleFilters().types || []))
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().types ?? [])),
     );
 
     this.filteredColors$ = this.vehicleColorControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterOptions(value || '', this.vehicleFilters().colors || []))
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().colors ?? [])),
     );
 
     this.filteredRegions$ = this.vehicleRegionControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filterOptions(value || '', this.vehicleFilters().regions || []))
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().regions ?? [])),
     );
   }
 
   private setupFormControlSubscriptions(): void {
     this.cameraControl.valueChanges.subscribe(value => {
-      this.plateFilters().cameraId = value || '';
+      this.plateFilters().cameraId = value ?? '';
       this.onFilterChange();
     });
 
     this.vehicleMakeControl.valueChanges.subscribe(value => {
-      this.plateFilters().vehicleMake = value || '';
+      this.plateFilters().vehicleMake = value ?? '';
       // Clear model when make changes
       if (this.plateFilters().vehicleModel) {
         this.plateFilters().vehicleModel = '';
@@ -397,22 +400,22 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     });
 
     this.vehicleModelControl.valueChanges.subscribe(value => {
-      this.plateFilters().vehicleModel = value || '';
+      this.plateFilters().vehicleModel = value ?? '';
       this.onFilterChange();
     });
 
     this.vehicleTypeControl.valueChanges.subscribe(value => {
-      this.plateFilters().vehicleType = value || '';
+      this.plateFilters().vehicleType = value ?? '';
       this.onFilterChange();
     });
 
     this.vehicleColorControl.valueChanges.subscribe(value => {
-      this.plateFilters().vehicleColor = value || '';
+      this.plateFilters().vehicleColor = value ?? '';
       this.onFilterChange();
     });
 
     this.vehicleRegionControl.valueChanges.subscribe(value => {
-      this.plateFilters().vehicleRegion = value || '';
+      this.plateFilters().vehicleRegion = value ?? '';
       this.onFilterChange();
     });
   }
