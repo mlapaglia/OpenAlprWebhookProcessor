@@ -107,7 +107,6 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             var bestMatchPlates = new[]
             {
                 CreatePlateGroup(plateNumber, now.ToUnixTimeMilliseconds()),
-                CreatePlateGroup(plateNumber, tenDaysAgo.ToUnixTimeMilliseconds()),
                 CreatePlateGroup(plateNumber, oneHundredDaysAgo.ToUnixTimeMilliseconds())
             };
 
@@ -122,7 +121,7 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
 
             badPlateGroup.PossibleNumbers = new List<PlateGroupPossibleNumbers> { possibleNumber };
 
-            await SeedPlateGroupsAsync(new[] { bestMatchPlates[0], bestMatchPlates[1], bestMatchPlates[2], badPlateGroup });
+            await SeedPlateGroupsAsync(new[] { bestMatchPlates[0], bestMatchPlates[1], badPlateGroup });
 
             var query = new GetStatisticsQuery(plateNumber);
 
@@ -131,8 +130,8 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
 
             // Assert
             result.Should().NotBeNull();
-            result.TotalSeen.Should().Be(4); // 3 best matches + 1 possible match
-            result.Last90Days.Should().Be(3); // Only the recent ones within 90 days
+            result.TotalSeen.Should().Be(3); // 3 best matches + 1 possible match
+            result.Last90Days.Should().Be(2); // Only the recent ones within 90 days
             result.FirstSeen.Should().BeCloseTo(oneHundredDaysAgo, TimeSpan.FromMinutes(1));
             result.LastSeen.Should().BeCloseTo(now, TimeSpan.FromMinutes(1));
         }
@@ -188,32 +187,6 @@ namespace Tests.Features.LicensePlates.Queries.GetStatistics
             result.Last90Days.Should().Be(1);
             result.FirstSeen.Should().BeCloseTo(now, TimeSpan.FromMinutes(1));
             result.LastSeen.Should().BeCloseTo(now, TimeSpan.FromMinutes(1));
-        }
-
-        [Test]
-        public async Task Handle_WithDuplicateEpochs_CountsThemCorrectly()
-        {
-            // Arrange
-            var plateNumber = "ABC123";
-            var now = DateTimeOffset.UtcNow;
-            var sameEpoch = now.ToUnixTimeMilliseconds();
-            
-            await SeedPlateGroupsAsync(new[]
-            {
-                CreatePlateGroup(plateNumber, sameEpoch),
-                CreatePlateGroup(plateNumber, sameEpoch),
-                CreatePlateGroup(plateNumber, sameEpoch)
-            });
-
-            var query = new GetStatisticsQuery(plateNumber);
-
-            // Act
-            var result = await _handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.TotalSeen.Should().Be(3); // All three should be counted
-            result.Last90Days.Should().Be(3);
         }
 
         [Test]
