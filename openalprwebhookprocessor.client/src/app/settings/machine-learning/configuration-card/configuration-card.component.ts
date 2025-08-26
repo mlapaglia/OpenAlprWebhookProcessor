@@ -11,7 +11,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 @Component({
   selector: 'app-configuration-card',
   templateUrl: './configuration-card.component.html',
-  styleUrls: ['./configuration-card.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
@@ -100,15 +99,3 @@ export class ConfigurationCardComponent extends OnPushBaseComponent implements O
     this.editConfiguration.emit();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -9,23 +9,3 @@ public class UpdatePlateNumberCommand : ICommand
 
     public string PlateNumber { get; set; }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
