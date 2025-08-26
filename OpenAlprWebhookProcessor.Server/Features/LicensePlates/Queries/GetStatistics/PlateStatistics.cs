@@ -16,8 +16,11 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetStatistics
     public class PlateStatisticsAggregation
     {
         public int TotalCount { get; set; }
+
         public int Last90DaysCount { get; set; }
+
         public long MinEpoch { get; set; }
+
         public long MaxEpoch { get; set; }
     }
 }
