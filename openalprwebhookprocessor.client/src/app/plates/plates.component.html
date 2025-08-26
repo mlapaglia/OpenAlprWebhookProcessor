@@ -1,15 +1,12 @@
 <div class="plates-container">
-  <app-plate-filters
-    [todaysDate]="todaysDate"
-    [cameras]="cameras"
-    [vehicleFilters]="vehicleFilters"
-    [showAdvancedFilters]="showAdvancedFilters"
-    [isSearching]="isLoading"
-    (filtersChanged)="onFiltersChanged($event)"
-    (searchTriggered)="onSearchTriggered()"
-    (filtersCleared)="onFiltersCleared()"
-    (advancedFiltersToggled)="onAdvancedFiltersToggled()"
-  />
+  @if (hasVehicleFiltersData) {
+    <app-plate-filters
+      [todaysDate]="todaysDate"
+      [(plateFilters)]="plateFilters"
+      [vehicleFilters]="vehicleFilters"
+      [isSearching]="isLoading"
+      (searchTriggered)="onSearchTriggered()" />
+  }
 
   <app-plate-list
     [plates]="plates"
@@ -23,6 +20,5 @@
     (alertPlate)="onAlertPlate($event)"
     (ignorePlate)="onIgnorePlate($event)"
     (searchForPlate)="onSearchForPlate($event)"
-    (paginatorChange)="onPaginatorChange($event)"
-  />
+    (paginatorChange)="onPaginatorChange($event)" />
 </div>

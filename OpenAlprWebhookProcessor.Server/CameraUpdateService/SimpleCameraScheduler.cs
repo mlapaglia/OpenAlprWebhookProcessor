@@ -216,7 +216,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             var delay = toggleTime - DateTimeOffset.Now;
             if (delay <= TimeSpan.Zero)
             {
-                _logger.LogWarning("Next toggle time for camera {CameraId} is in the past, skipping", cameraId);
+                _logger.LogWarning("Next toggle time for camera {CameraId} is in the past (calculated: {ToggleTime}, current: {CurrentTime}, delay: {Delay}), skipping", 
+                    cameraId, toggleTime, DateTimeOffset.Now, delay);
                 return;
             }
 
@@ -320,11 +321,14 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             int sunsetOffset)
         {
             var currentTimeInTimezone = DateTimeOffset.UtcNow.AddHours(timeZoneOffset).DateTime;
+            
+            // Add a small buffer to avoid race conditions at transition times
+            var lookAheadTime = currentTimeInTimezone.AddMinutes(1);
 
             var celestialTimes = Celestial.CalculateCelestialTimes(
                 latitude,
                 longitude,
-                currentTimeInTimezone,
+                lookAheadTime,
                 timeZoneOffset);
 
             DateTime nextToggleTime;
@@ -333,7 +337,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 var nextSunset = Celestial.Get_Next_SunSet(
                     latitude,
                     longitude,
-                    currentTimeInTimezone,
+                    lookAheadTime,
                     timeZoneOffset);
                 nextToggleTime = nextSunset.AddMinutes(sunsetOffset);
             }
@@ -342,12 +346,48 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
                 var nextSunrise = Celestial.Get_Next_SunRise(
                     latitude,
                     longitude,
-                    currentTimeInTimezone,
+                    lookAheadTime,
                     timeZoneOffset);
                 nextToggleTime = nextSunrise.AddMinutes(sunriseOffset);
             }
 
-            return new DateTimeOffset(nextToggleTime, TimeSpan.FromHours(timeZoneOffset));
+            var calculatedTime = new DateTimeOffset(nextToggleTime, TimeSpan.FromHours(timeZoneOffset));
+            
+            // Ensure the calculated time is at least 30 seconds in the future to avoid immediate past times
+            var minimumFutureTime = DateTimeOffset.Now.AddSeconds(30);
+            if (calculatedTime <= minimumFutureTime)
+            {
+                // If calculated time is too close or in the past, try calculating for tomorrow
+                var tomorrowTime = lookAheadTime.AddDays(1);
+                var tomorrowCelestialTimes = Celestial.CalculateCelestialTimes(
+                    latitude,
+                    longitude,
+                    tomorrowTime,
+                    timeZoneOffset);
+
+                if (tomorrowCelestialTimes.IsSunUp)
+                {
+                    var nextSunset = Celestial.Get_Next_SunSet(
+                        latitude,
+                        longitude,
+                        tomorrowTime,
+                        timeZoneOffset);
+                    nextToggleTime = nextSunset.AddMinutes(sunsetOffset);
+                }
+                else
+                {
+                    var nextSunrise = Celestial.Get_Next_SunRise(
+                        latitude,
+                        longitude,
+                        tomorrowTime,
+                        timeZoneOffset);
+                    nextToggleTime = nextSunrise.AddMinutes(sunriseOffset);
+                }
+                
+                calculatedTime = new DateTimeOffset(nextToggleTime, TimeSpan.FromHours(timeZoneOffset));
+            }
+
+            return calculatedTime;
         }
 
         public DateTimeOffset? GetNextScheduledExecutionTime(Guid cameraId)

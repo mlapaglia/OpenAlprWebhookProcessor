@@ -8,6 +8,8 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlateFilter
 
         public List<string> VehicleModels { get; set; }
 
+        public Dictionary<string, List<string>> VehicleMakeModelMap { get; set; }
+
         public List<string> VehicleTypes { get; set; }
 
         public List<string> VehicleYears { get; set; }

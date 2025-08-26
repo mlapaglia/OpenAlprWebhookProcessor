@@ -132,12 +132,28 @@ namespace OpenAlprWebhookProcessor.Infrastructure
             var baseTime = DateTimeOffset.UtcNow.AddDays(-7);
             var plateGroups = new List<PlateGroup>();
 
-            var plateNumbers = new[] { "ABC123", "XYZ789", "DEF456", "GHI012", "JKL345" };
-            var vehicleColors = new[] { "White", "Black", "Silver", "Red", "Blue" };
-            var vehicleMakes = new[] { "Toyota", "Honda", "Ford", "BMW", "Mercedes" };
+            var plateNumbers = new[] { "ABC123", "XYZ789", "DEF456", "GHI012", "JKL345", "MNO678", "PQR901", "STU234", "VWX567", "YZA890" };
+            var vehicleColors = new[] { "White", "Black", "Silver", "Red", "Blue", "Gray", "Green", "Yellow", "Orange", "Purple" };
+            var vehicleMakeModels = new[] 
+            { 
+                "acura_ilx", "acura_mdx", "acura_rdx", "acura_tlx",
+                "honda_accord", "honda_civic", "honda_pilot", "honda_crv",
+                "toyota_camry", "toyota_corolla", "toyota_prius", "toyota_rav4",
+                "ford_f150", "ford_mustang", "ford_explorer", "ford_escape",
+                "bmw_320i", "bmw_x3", "bmw_x5", "bmw_530i",
+                "mercedes_c300", "mercedes_e350", "mercedes_glc300", "mercedes_s550",
+                "chevrolet_malibu", "chevrolet_equinox", "chevrolet_silverado", "chevrolet_tahoe",
+                "nissan_altima", "nissan_sentra", "nissan_rogue", "nissan_pathfinder",
+                "hyundai_elantra", "hyundai_sonata", "hyundai_tucson", "hyundai_santa_fe",
+                "kia_optima", "kia_sorento", "kia_sportage", "kia_forte"
+            };
+            var vehicleTypes = new[] { "Sedan", "SUV", "Truck", "Coupe", "Hatchback", "Wagon", "Convertible", "Minivan" };
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 100; i++)
             {
+                var makeModel = vehicleMakeModels[i % vehicleMakeModels.Length];
+                var make = makeModel.Split('_')[0];
+                
                 var plateGroup = new PlateGroup
                 {
                     Id = Guid.NewGuid(),
@@ -148,7 +164,9 @@ namespace OpenAlprWebhookProcessor.Infrastructure
                     Confidence = 85.0 + (i % 15),
                     IsAlert = i % 10 == 0,
                     VehicleColor = vehicleColors[i % vehicleColors.Length],
-                    VehicleMake = vehicleMakes[i % vehicleMakes.Length],
+                    VehicleMake = make,
+                    VehicleMakeModel = makeModel,
+                    VehicleType = vehicleTypes[i % vehicleTypes.Length],
                     VehicleRegion = "us-ca",
                     PossibleNumbers = new List<PlateGroupPossibleNumbers>()
                 };

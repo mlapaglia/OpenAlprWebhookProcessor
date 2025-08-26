@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output, inject, type OnDestroy, type OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, input, output, inject, type OnDestroy, type OnInit, model, HostListener } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { Observable, map, startWith, combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,30 +11,34 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { LocalStorageService } from '../../_services/local-storage.service';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 export interface PlateFilters {
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: Date;
+  endDate: Date;
   plateNumber: string;
   cameraId: string;
   vehicleMake: string;
   vehicleModel: string;
   vehicleType: string;
   vehicleColor: string;
-  direction: string;
+  vehicleRegion: string;
   regexSearchEnabled: boolean;
   includeIgnoredPlates: boolean;
   platesSeenLessThan: boolean;
 }
 
 export interface VehicleFilters {
-  vehicleMakes: string[];
-  vehicleModels: string[];
-  vehicleTypes: string[];
-  vehicleColors: string[];
+  cameras: string[],
+  makes: string[];
+  models: string[];
+  vehicleMakeModelMap?: { [make: string]: string[] };
+  types: string[];
+  colors: string[];
+  regions: string[];
 }
 
 @Component({
@@ -43,6 +48,7 @@ export interface VehicleFilters {
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -52,6 +58,7 @@ export interface VehicleFilters {
     MatIconModule,
     MatCheckboxModule,
     MatTooltipModule,
+    MatAutocompleteModule,
     RefreshButtonComponent,
   ],
   templateUrl: './plate-filters.component.html',
@@ -59,45 +66,51 @@ export interface VehicleFilters {
 })
 export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly localStorageService = inject(LocalStorageService);
-
+  
   readonly todaysDate = input(new Date());
-  readonly cameras = input<string[]>([]);
-  readonly vehicleFilters = input<VehicleFilters>({
-    vehicleMakes: [],
-    vehicleModels: [],
-    vehicleTypes: [],
-    vehicleColors: [],
-  });
-  readonly showAdvancedFilters = input(false);
   readonly isSearching = input(false);
+  readonly vehicleFilters = input.required<VehicleFilters>();
 
-  readonly filtersChanged = output<PlateFilters>();
   readonly searchTriggered = output<void>();
-  readonly filtersCleared = output<void>();
-  readonly advancedFiltersToggled = output<void>();
 
-  // Filter properties
-  filterStartOn: Date | null = null;
-  filterEndOn: Date | null = null;
-  filterPlateNumber = '';
-  filterOpenAlprCameraId = '';
-  filterVehicleMake = '';
-  filterVehicleModel = '';
-  filterVehicleType = '';
-  filterVehicleColor = '';
-  filterDirection = '';
-  filterIncludeIgnoredPlatesEnabled = false;
-  regexSearchEnabled = false;
-  filterPlatesSeenLessThan = false;
+  readonly plateFilters = model.required<PlateFilters>();
 
   // Validation
   filterPlateNumberIsValid = true;
   filterDateRangeIsValid = true;
 
+  protected showAdvancedFilters = false;
+  protected isMobile = false;
+  
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    const target = event.target as Window;
+    this.updateMobileState(target.innerWidth);
+  }
+
+  // Form controls for autocomplete
+  cameraControl = new FormControl('');
+  vehicleMakeControl = new FormControl('');
+  vehicleModelControl = new FormControl('');
+  vehicleTypeControl = new FormControl('');
+  vehicleColorControl = new FormControl('');
+  vehicleRegionControl = new FormControl('');
+
+  // Filtered options for autocomplete
+  filteredCameras$: Observable<string[]>;
+  filteredMakes$: Observable<string[]>;
+  filteredModels$: Observable<string[]>;
+  filteredTypes$: Observable<string[]>;
+  filteredColors$: Observable<string[]>;
+  filteredRegions$: Observable<string[]>;
+
   ngOnInit() {
+    this.updateMobileState(window.innerWidth);
     this.loadFiltersFromStorage();
     this.validateDateRange();
-    this.emitFilters();
+    this.setupFilteredOptions();
+    this.syncFormControlsWithModel();
+    this.setupFormControlSubscriptions();
     this.searchTriggered.emit();
     this.markForCheck();
   }
@@ -106,110 +119,101 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     super.ngOnDestroy();
   }
 
-  validateSearchPlateNumber() {
-    if (!this.filterPlateNumber) {
+  private updateMobileState(width: number) {
+    const wasMobile = this.isMobile;
+    this.isMobile = width <= 768;
+    
+    if (wasMobile !== this.isMobile) {
+      this.markForCheck();
+    }
+  }
+
+  protected validateSearchPlateNumber() {
+    if (!this.plateFilters().plateNumber) {
       this.filterPlateNumberIsValid = true;
       this.markForCheck();
       return;
     }
 
-    if (this.regexSearchEnabled) {
+    if (this.plateFilters().regexSearchEnabled) {
       try {
-        new RegExp(this.filterPlateNumber);
+        new RegExp(this.plateFilters().plateNumber);
         this.filterPlateNumberIsValid = true;
       } catch {
         this.filterPlateNumberIsValid = false;
       }
     } else {
-      this.filterPlateNumberIsValid = this.filterPlateNumber.length >= 2;
+      this.filterPlateNumberIsValid = this.plateFilters().plateNumber.length >= 2;
     }
     this.markForCheck();
   }
 
-  validateDateRange() {
-    if (!this.filterStartOn || !this.filterEndOn) {
+  protected validateDateRange() {
+    if (!this.plateFilters().startDate || !this.plateFilters().endDate) {
       this.filterDateRangeIsValid = true;
       this.markForCheck();
       return;
     }
 
-    this.filterDateRangeIsValid = this.filterStartOn <= this.filterEndOn;
+    this.filterDateRangeIsValid = this.plateFilters().startDate <= this.plateFilters().endDate;
     this.markForCheck();
   }
 
-  onSearch() {
+  protected onSearch() {
     if (this.filterPlateNumberIsValid && this.filterDateRangeIsValid) {
       this.saveFiltersToStorage();
       this.searchTriggered.emit();
     }
   }
 
-  onClear() {
+  protected onClear() {
     this.setDefaultDateRange();
-    this.filterPlateNumber = '';
-    this.filterOpenAlprCameraId = '';
-    this.filterVehicleMake = '';
-    this.filterVehicleModel = '';
-    this.filterVehicleType = '';
-    this.filterVehicleColor = '';
-    this.filterDirection = '';
-    this.regexSearchEnabled = false;
-    this.filterIncludeIgnoredPlatesEnabled = false;
-    this.filterPlatesSeenLessThan = false;
+    this.plateFilters().plateNumber = '';
+    this.plateFilters().cameraId = '';
+    this.plateFilters().vehicleMake = '';
+    this.plateFilters().vehicleModel = '';
+    this.plateFilters().vehicleType = '';
+    this.plateFilters().vehicleColor = '';
+    this.plateFilters().vehicleRegion = '';
+    this.plateFilters().regexSearchEnabled = false;
+    this.plateFilters().includeIgnoredPlates = false;
+    this.plateFilters().platesSeenLessThan = false;
     this.filterPlateNumberIsValid = true;
     this.filterDateRangeIsValid = true;
 
+    // Clear form controls for autocomplete inputs
+    this.cameraControl.setValue('');
+    this.vehicleMakeControl.setValue('');
+    this.vehicleModelControl.setValue('');
+    this.vehicleTypeControl.setValue('');
+    this.vehicleColorControl.setValue('');
+    this.vehicleRegionControl.setValue('');
+
     this.clearFiltersFromStorage();
+    this.searchTriggered.emit();
     this.markForCheck();
-
-    this.emitFilters();
-    this.filtersCleared.emit();
   }
 
-  onToggleAdvanced() {
-    this.advancedFiltersToggled.emit();
-  }
-
-  onFilterChange() {
+  protected onFilterChange() {
     this.validateSearchPlateNumber();
     this.validateDateRange();
-    this.emitFilters();
   }
 
-  onStartDateChange() {
-    if (this.filterStartOn) {
-      this.filterStartOn = this.setToStartOfDay(this.filterStartOn);
-    }
+  protected onToggleAdvanced() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
+    this.markForCheck();
+  }
+  
+  protected onStartDateChange() {
     this.validateDateRange();
     this.onFilterChange();
     this.markForCheck();
   }
 
-  onEndDateChange() {
-    if (this.filterEndOn) {
-      this.filterEndOn = this.setToEndOfDay(this.filterEndOn);
-    }
+  protected onEndDateChange() {
     this.validateDateRange();
     this.onFilterChange();
     this.markForCheck();
-  }
-
-  private emitFilters() {
-    const filters: PlateFilters = {
-      startDate: this.filterStartOn,
-      endDate: this.filterEndOn,
-      plateNumber: this.filterPlateNumber,
-      cameraId: this.filterOpenAlprCameraId,
-      vehicleMake: this.filterVehicleMake,
-      vehicleModel: this.filterVehicleModel,
-      vehicleType: this.filterVehicleType,
-      vehicleColor: this.filterVehicleColor,
-      direction: this.filterDirection,
-      regexSearchEnabled: this.regexSearchEnabled,
-      includeIgnoredPlates: this.filterIncludeIgnoredPlatesEnabled,
-      platesSeenLessThan: this.filterPlatesSeenLessThan,
-    };
-    this.filtersChanged.emit(filters);
   }
 
   private loadFiltersFromStorage() {
@@ -226,7 +230,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     }
     this.markForCheck();
   }
-
+  
   private applyFiltersFromStorage(filters: Partial<PlateFilters>) {
     this.setDateRangeFromStorage(filters);
     this.setStringFiltersFromStorage(filters);
@@ -235,30 +239,30 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
   private setDateRangeFromStorage(filters: Partial<PlateFilters>) {
     const { startDate, endDate } = this.getDefaultDateRange();
-    this.filterStartOn = filters.startDate ? this.setToStartOfDay(new Date(filters.startDate)) : startDate;
-    this.filterEndOn = filters.endDate ? this.setToEndOfDay(new Date(filters.endDate)) : endDate;
+    this.plateFilters().startDate = filters.startDate ? new Date(filters.startDate) : startDate;
+    this.plateFilters().endDate = filters.endDate ? new Date(filters.endDate) : endDate;
   }
 
   private setStringFiltersFromStorage(filters: Partial<PlateFilters>) {
-    this.filterPlateNumber = filters.plateNumber ?? '';
-    this.filterOpenAlprCameraId = filters.cameraId ?? '';
-    this.filterVehicleMake = filters.vehicleMake ?? '';
-    this.filterVehicleModel = filters.vehicleModel ?? '';
-    this.filterVehicleType = filters.vehicleType ?? '';
-    this.filterVehicleColor = filters.vehicleColor ?? '';
-    this.filterDirection = filters.direction ?? '';
+    this.plateFilters().plateNumber = filters.plateNumber ?? '';
+    this.plateFilters().cameraId = filters.cameraId ?? '';
+    this.plateFilters().vehicleMake = filters.vehicleMake ?? '';
+    this.plateFilters().vehicleModel = filters.vehicleModel ?? '';
+    this.plateFilters().vehicleType = filters.vehicleType ?? '';
+    this.plateFilters().vehicleColor = filters.vehicleColor ?? '';
+    this.plateFilters().vehicleRegion = filters.vehicleRegion ?? '';
   }
 
   private setBooleanFiltersFromStorage(filters: Partial<PlateFilters>) {
-    this.regexSearchEnabled = filters.regexSearchEnabled ?? false;
-    this.filterIncludeIgnoredPlatesEnabled = filters.includeIgnoredPlates ?? false;
-    this.filterPlatesSeenLessThan = filters.platesSeenLessThan ?? false;
+    this.plateFilters().regexSearchEnabled = filters.regexSearchEnabled ?? false;
+    this.plateFilters().includeIgnoredPlates = filters.includeIgnoredPlates ?? false;
+    this.plateFilters().platesSeenLessThan = filters.platesSeenLessThan ?? false;
   }
 
   private setDefaultDateRange() {
     const { startDate, endDate } = this.getDefaultDateRange();
-    this.filterStartOn = startDate;
-    this.filterEndOn = endDate;
+    this.plateFilters().startDate = startDate;
+    this.plateFilters().endDate = endDate;
   }
 
   private getDefaultDateRange() {
@@ -266,37 +270,25 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     const sevenDaysAgo = new Date(today);
     sevenDaysAgo.setDate(today.getDate() - 7);
     return {
-      startDate: this.setToStartOfDay(sevenDaysAgo),
-      endDate: this.setToEndOfDay(new Date(today)),
+      startDate: sevenDaysAgo,
+      endDate: new Date(today),
     };
-  }
-
-  private setToStartOfDay(date: Date): Date {
-    const newDate = new Date(date);
-    newDate.setHours(0, 0, 0, 0);
-    return newDate;
-  }
-
-  private setToEndOfDay(date: Date): Date {
-    const newDate = new Date(date);
-    newDate.setHours(23, 59, 59, 999);
-    return newDate;
   }
 
   private saveFiltersToStorage() {
     const filters: PlateFilters = {
-      startDate: this.filterStartOn,
-      endDate: this.filterEndOn,
-      plateNumber: this.filterPlateNumber,
-      cameraId: this.filterOpenAlprCameraId,
-      vehicleMake: this.filterVehicleMake,
-      vehicleModel: this.filterVehicleModel,
-      vehicleType: this.filterVehicleType,
-      vehicleColor: this.filterVehicleColor,
-      direction: this.filterDirection,
-      regexSearchEnabled: this.regexSearchEnabled,
-      includeIgnoredPlates: this.filterIncludeIgnoredPlatesEnabled,
-      platesSeenLessThan: this.filterPlatesSeenLessThan,
+      startDate: this.plateFilters().startDate,
+      endDate: this.plateFilters().endDate,
+      plateNumber: this.plateFilters().plateNumber,
+      cameraId: this.plateFilters().cameraId,
+      vehicleMake: this.plateFilters().vehicleMake,
+      vehicleModel: this.plateFilters().vehicleModel,
+      vehicleType: this.plateFilters().vehicleType,
+      vehicleColor: this.plateFilters().vehicleColor,
+      vehicleRegion: this.plateFilters().vehicleRegion,
+      regexSearchEnabled: this.plateFilters().regexSearchEnabled,
+      includeIgnoredPlates: this.plateFilters().includeIgnoredPlates,
+      platesSeenLessThan: this.plateFilters().platesSeenLessThan,
     };
     this.localStorageService.setData('plateFilters', JSON.stringify(filters));
   }
@@ -306,11 +298,11 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
   }
 
   get showRegexError(): boolean {
-    return !this.filterPlateNumberIsValid && this.regexSearchEnabled;
+    return !this.filterPlateNumberIsValid && this.plateFilters().regexSearchEnabled;
   }
 
   get showSearchError(): boolean {
-    return !this.filterPlateNumberIsValid && !this.regexSearchEnabled;
+    return !this.filterPlateNumberIsValid && !this.plateFilters().regexSearchEnabled;
   }
 
   get showDateRangeError(): boolean {
@@ -319,5 +311,109 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
   get isSearchDisabled(): boolean {
     return !this.filterPlateNumberIsValid || !this.filterDateRangeIsValid;
+  }
+
+  get isModelDisabled(): boolean {
+    return !this.plateFilters().vehicleMake;
+  }
+
+  private _filterOptions(value: string, options: string[]): string[] {
+    const filterValue = value.toLowerCase();
+    return options.filter(option => option.toLowerCase().includes(filterValue));
+  }
+
+  private syncFormControlsWithModel(): void {
+    this.cameraControl.setValue(this.plateFilters().cameraId || '');
+    this.vehicleMakeControl.setValue(this.plateFilters().vehicleMake || '');
+    this.vehicleModelControl.setValue(this.plateFilters().vehicleModel || '');
+    this.vehicleTypeControl.setValue(this.plateFilters().vehicleType || '');
+    this.vehicleColorControl.setValue(this.plateFilters().vehicleColor || '');
+    this.vehicleRegionControl.setValue(this.plateFilters().vehicleRegion || '');
+  }
+
+  private setupFilteredOptions(): void {
+    this.filteredCameras$ = this.cameraControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterOptions(value || '', this.vehicleFilters().cameras || []))
+    );
+
+    this.filteredMakes$ = this.vehicleMakeControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterOptions(value || '', this.vehicleFilters().makes || []))
+    );
+
+    this.filteredModels$ = combineLatest([
+      this.vehicleMakeControl.valueChanges.pipe(startWith(this.vehicleMakeControl.value || '')),
+      this.vehicleModelControl.valueChanges.pipe(startWith(this.vehicleModelControl.value || ''))
+    ]).pipe(
+      map(([makeValue, modelValue]) => {
+        const selectedMake = makeValue || this.plateFilters().vehicleMake;
+        const makeModelMap = this.vehicleFilters().vehicleMakeModelMap;
+        if (!selectedMake || !makeModelMap) {
+          return [];
+        }
+        // Find the make in the map (case-insensitive)
+        const makeKey = Object.keys(makeModelMap).find(key => 
+          key.toLowerCase() === selectedMake.toLowerCase()
+        );
+        if (!makeKey) {
+          return [];
+        }
+        const availableModels = makeModelMap[makeKey] || [];
+        return this._filterOptions(modelValue || '', availableModels);
+      })
+    );
+
+    this.filteredTypes$ = this.vehicleTypeControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterOptions(value || '', this.vehicleFilters().types || []))
+    );
+
+    this.filteredColors$ = this.vehicleColorControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterOptions(value || '', this.vehicleFilters().colors || []))
+    );
+
+    this.filteredRegions$ = this.vehicleRegionControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterOptions(value || '', this.vehicleFilters().regions || []))
+    );
+  }
+
+  private setupFormControlSubscriptions(): void {
+    this.cameraControl.valueChanges.subscribe(value => {
+      this.plateFilters().cameraId = value || '';
+      this.onFilterChange();
+    });
+
+    this.vehicleMakeControl.valueChanges.subscribe(value => {
+      this.plateFilters().vehicleMake = value || '';
+      // Clear model when make changes
+      if (this.plateFilters().vehicleModel) {
+        this.plateFilters().vehicleModel = '';
+        this.vehicleModelControl.setValue('');
+      }
+      this.onFilterChange();
+    });
+
+    this.vehicleModelControl.valueChanges.subscribe(value => {
+      this.plateFilters().vehicleModel = value || '';
+      this.onFilterChange();
+    });
+
+    this.vehicleTypeControl.valueChanges.subscribe(value => {
+      this.plateFilters().vehicleType = value || '';
+      this.onFilterChange();
+    });
+
+    this.vehicleColorControl.valueChanges.subscribe(value => {
+      this.plateFilters().vehicleColor = value || '';
+      this.onFilterChange();
+    });
+
+    this.vehicleRegionControl.valueChanges.subscribe(value => {
+      this.plateFilters().vehicleRegion = value || '';
+      this.onFilterChange();
+    });
   }
 }

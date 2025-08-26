@@ -99,10 +99,15 @@ export class AppComponent extends OnPushBaseComponent implements OnInit, OnDestr
     void this.pushSubscriberService.subscribe();
 
     this.subscribeAndMarkForCheck(
-      this.breakpointObserver.observe([Breakpoints.Handset]),
+      this.breakpointObserver.observe(['(max-width: 768px)']),
       (result) => {
+        const wasMobile = this.isMobile;
         this.isMobile = result.matches;
-        this.sidenavOpened = !result.matches; // Open sidenav on desktop, close on mobile
+        
+        // Only change sidenav state when crossing the breakpoint, not on every resize
+        if (wasMobile !== this.isMobile) {
+          this.sidenavOpened = !this.isMobile; // Open sidenav on desktop, close on mobile
+        }
       },
     );
 
