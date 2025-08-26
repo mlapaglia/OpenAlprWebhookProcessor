@@ -200,6 +200,8 @@ describe('PlateService', () => {
         lastSeen: new Date('2023-12-31'),
         last90Days: 5,
         totalSeen: 10,
+        possiblePlates: ['ABC123', 'ABC124'],
+        region: 'US-CA',
       };
 
       service.getPlateStatistics(plateNumber).subscribe(response => {

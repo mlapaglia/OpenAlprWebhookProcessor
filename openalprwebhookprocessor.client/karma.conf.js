@@ -3,7 +3,7 @@
 const puppeteer = require('puppeteer');
 
 module.exports = function (config) {
-  const chromiumPath = puppeteer.executablePath();
+  process.env.CHROME_BIN = puppeteer.executablePath();
  
   config.set({
     basePath: '',
@@ -70,6 +70,4 @@ module.exports = function (config) {
     browsers: ['Chrome'],
     restartOnFileChange: true
   });
- 
-  process.env.CHROME_BIN = chromiumPath;
 };

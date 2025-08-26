@@ -24,6 +24,9 @@ export interface PlateData {
   processedPlateConfidence?: number;
   notes?: string;
   canBeEnriched?: boolean;
+  region?: string;
+  possiblePlateNumbers?: string;
+  openAlprProcessingTimeMs?: number;
 }
 
 @Component({
