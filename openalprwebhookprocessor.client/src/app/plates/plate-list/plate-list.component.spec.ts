@@ -20,7 +20,7 @@ class MockPlateItemComponent {
   readonly editPlate = output<number>();
   readonly alertPlate = output<number>();
   readonly ignorePlate = output<number>();
-  readonly viewPlate = output<number>();
+  readonly searchForPlate = output<number>();
 }
 
 describe('PlateListComponent', () => {
@@ -74,6 +74,13 @@ describe('PlateListComponent', () => {
 
     fixture = TestBed.createComponent(PlateListComponent);
     component = fixture.componentInstance;
+
+    // Set required inputs with default values
+    fixture.componentRef.setInput('plates', []);
+    fixture.componentRef.setInput('isLoading', false);
+    fixture.componentRef.setInput('pageSize', 25);
+    fixture.componentRef.setInput('totalNumberOfPlates', 0);
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -159,12 +166,12 @@ describe('PlateListComponent', () => {
       expect(component.ignorePlate.emit).toHaveBeenCalledWith('303');
     });
 
-    it('should emit viewPlate when onViewPlate is called', () => {
-      spyOn(component.viewPlate, 'emit');
+    it('should emit searchForPlate when onSearchForPlate is called', () => {
+      spyOn(component.searchForPlate, 'emit');
 
-      component.onViewPlate('404');
+      component.onSearchForPlate('404');
 
-      expect(component.viewPlate.emit).toHaveBeenCalledWith('404');
+      expect(component.searchForPlate.emit).toHaveBeenCalledWith('404');
     });
 
     it('should emit paginatorChange when onPaginatorPage is called', () => {

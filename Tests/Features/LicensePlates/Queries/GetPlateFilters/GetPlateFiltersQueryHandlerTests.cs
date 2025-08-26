@@ -49,7 +49,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
             // Assert
             result.Should().NotBeNull();
             result.VehicleColors.Should().Contain(new[] { "red", "blue" });
-            result.VehicleMakes.Should().Contain(new[] { "Toyota Camry", "Honda Civic" });
+            result.VehicleMakes.Should().Contain(new[] { "Toyota", "Honda" });
             result.VehicleTypes.Should().Contain(new[] { "sedan", "suv" });
             result.VehicleRegions.Should().Contain(new[] { "us-ca", "us-tx" });
         }
@@ -69,7 +69,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
             result.VehicleColors.Should().HaveCount(2);
             result.VehicleColors.Should().Contain(new[] { "red", "blue" });
             result.VehicleMakes.Should().HaveCount(1);
-            result.VehicleMakes.Should().Contain("Toyota Camry");
+            result.VehicleMakes.Should().Contain("Toyota");
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
             result.VehicleColors.Should().HaveCount(1);
             result.VehicleColors.Should().Contain("red");
             result.VehicleMakes.Should().HaveCount(1);
-            result.VehicleMakes.Should().Contain("Toyota Camry");
+            result.VehicleMakes.Should().Contain("Toyota");
             result.VehicleTypes.Should().HaveCount(1);
             result.VehicleTypes.Should().Contain("sedan");
             result.VehicleRegions.Should().HaveCount(1);
@@ -127,6 +127,29 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
             result.Should().NotBeNull();
         }
 
+        [Test]
+        public async Task Handle_WithMakeModelData_SplitsMakeAndModel()
+        {
+            // Arrange
+            await SeedPlateGroupsWithMakeModelAsync();
+            var query = new GetPlateFiltersQuery();
+
+            // Act
+            var result = await _handler.Handle(query, cancellationToken: default);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.VehicleMakes.Should().Contain(new[] { "Acura", "Honda", "Toyota" });
+            result.VehicleModels.Should().Contain(new[] { "Ilx", "Civic", "Camry" });
+            result.VehicleMakeModelMap.Should().NotBeNull();
+            result.VehicleMakeModelMap.Should().ContainKey("Acura");
+            result.VehicleMakeModelMap["Acura"].Should().Contain("Ilx");
+            result.VehicleMakeModelMap.Should().ContainKey("Honda");
+            result.VehicleMakeModelMap["Honda"].Should().Contain("Civic");
+            result.VehicleMakeModelMap.Should().ContainKey("Toyota");
+            result.VehicleMakeModelMap["Toyota"].Should().Contain("Camry");
+        }
+
         private async Task SeedPlateGroupsAsync()
         {
             var plateGroups = new[]
@@ -135,7 +158,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "ABC123",
                     VehicleColor = "red",
-                    VehicleMakeModel = "Toyota Camry",
+                    VehicleMakeModel = "toyota_camry",
                     VehicleType = "sedan",
                     VehicleRegion = "us-ca",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -147,7 +170,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "XYZ789",
                     VehicleColor = "blue",
-                    VehicleMakeModel = "Honda Civic",
+                    VehicleMakeModel = "honda_civic",
                     VehicleType = "suv",
                     VehicleRegion = "us-tx",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -169,7 +192,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "ABC123",
                     VehicleColor = "red",
-                    VehicleMakeModel = "Toyota Camry",
+                    VehicleMakeModel = "toyota_camry",
                     VehicleType = "sedan",
                     VehicleRegion = "us-ca",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -181,7 +204,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "DEF456",
                     VehicleColor = "red",  // Duplicate color
-                    VehicleMakeModel = "Toyota Camry",  // Duplicate make/model
+                    VehicleMakeModel = "toyota_camry",  // Duplicate make/model
                     VehicleType = "sedan",
                     VehicleRegion = "us-ca",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -193,7 +216,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "GHI789",
                     VehicleColor = "blue",
-                    VehicleMakeModel = "Toyota Camry",  // Duplicate make/model
+                    VehicleMakeModel = "toyota_camry",  // Duplicate make/model
                     VehicleType = "sedan",
                     VehicleRegion = "us-ca",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -215,7 +238,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                 {
                     BestNumber = "ABC123",
                     VehicleColor = "red",
-                    VehicleMakeModel = "Toyota Camry",
+                    VehicleMakeModel = "toyota_camry",
                     VehicleType = "sedan",
                     VehicleRegion = "us-ca",
                     ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -280,6 +303,52 @@ namespace Tests.Features.LicensePlates.Queries.GetPlateFilters
                     OpenAlprUuid = Guid.NewGuid().ToString(),
                     OpenAlprCameraId = 3,
                     Confidence = 87.0
+                }
+            };
+
+            Context.PlateGroups.AddRange(plateGroups);
+            await Context.SaveChangesAsync();
+        }
+
+        private async Task SeedPlateGroupsWithMakeModelAsync()
+        {
+            var plateGroups = new[]
+            {
+                new PlateGroup
+                {
+                    BestNumber = "ABC123",
+                    VehicleColor = "red",
+                    VehicleMakeModel = "acura_ilx",
+                    VehicleType = "sedan",
+                    VehicleRegion = "us-ca",
+                    ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    OpenAlprUuid = Guid.NewGuid().ToString(),
+                    OpenAlprCameraId = 1,
+                    Confidence = 95.5
+                },
+                new PlateGroup
+                {
+                    BestNumber = "XYZ789",
+                    VehicleColor = "blue",
+                    VehicleMakeModel = "honda_civic",
+                    VehicleType = "sedan",
+                    VehicleRegion = "us-tx",
+                    ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    OpenAlprUuid = Guid.NewGuid().ToString(),
+                    OpenAlprCameraId = 2,
+                    Confidence = 90.0
+                },
+                new PlateGroup
+                {
+                    BestNumber = "DEF456",
+                    VehicleColor = "white",
+                    VehicleMakeModel = "toyota_camry",
+                    VehicleType = "sedan",
+                    VehicleRegion = "us-fl",
+                    ReceivedOnEpoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    OpenAlprUuid = Guid.NewGuid().ToString(),
+                    OpenAlprCameraId = 3,
+                    Confidence = 88.0
                 }
             };
 

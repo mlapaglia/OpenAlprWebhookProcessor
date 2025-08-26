@@ -1,4 +1,5 @@
-import { Component, input, output, inject, ChangeDetectionStrategy } from '@angular/core';
+import type { OnInit } from '@angular/core';
+import { Component, input, output, inject, ChangeDetectionStrategy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +24,9 @@ export interface PlateData {
   processedPlateConfidence?: number;
   notes?: string;
   canBeEnriched?: boolean;
+  region?: string;
+  possiblePlateNumbers?: string;
+  openAlprProcessingTimeMs?: number;
 }
 
 @Component({
@@ -42,8 +46,9 @@ export interface PlateData {
   templateUrl: './plate-item.component.html',
   styleUrl: './plate-item.component.less',
 })
-export class PlateItemComponent {
+export class PlateItemComponent implements OnInit {
   private readonly vehicleLogoService = inject(VehicleLogoService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly plate = input.required<PlateData>();
   readonly plateOpened = output<string>();
@@ -52,9 +57,29 @@ export class PlateItemComponent {
   readonly editPlate = output<string>();
   readonly alertPlate = output<string>();
   readonly ignorePlate = output<string>();
-  readonly viewPlate = output<string>();
+  readonly searchForPlate = output<string>();
 
   isExpanded = false;
+  protected isMobile = false;
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    const target = event.target as Window;
+    this.updateMobileState(target.innerWidth);
+  }
+
+  ngOnInit() {
+    this.updateMobileState(window.innerWidth);
+  }
+
+  private updateMobileState(width: number) {
+    const wasMobile = this.isMobile;
+    this.isMobile = width <= 480;
+
+    if (wasMobile !== this.isMobile) {
+      this.cdr.markForCheck();
+    }
+  }
 
   onPlateOpened() {
     this.isExpanded = true;
@@ -82,8 +107,8 @@ export class PlateItemComponent {
     this.ignorePlate.emit(this.plate().id);
   }
 
-  onViewPlate() {
-    this.viewPlate.emit(this.plate().id);
+  onSearchForPlate() {
+    this.searchForPlate.emit(this.plate().plateNumber);
   }
 
   onPlateChanged(_: PlateData) {

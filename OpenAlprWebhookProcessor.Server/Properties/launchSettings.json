@@ -2,7 +2,6 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "launchBrowser": false,
       "launchUrl": "plates",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
@@ -28,6 +27,16 @@
         "ASPNETCORE_HTTP_PORTS": "8080"
       },
       "publishAllPorts": true
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchUrl": "https://localhost:5001/plates",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy",
+        "ASPNETCORE_URLS": "https://localhost:5001"
+      },
+      "distributionName": "Ubuntu"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

@@ -3,6 +3,8 @@ export interface PlateStatistics {
   lastSeen: Date
   last90Days: number
   totalSeen: number
+  possiblePlates: string[]
+  region: string
 }
 
 export interface PlateStatisticsData {

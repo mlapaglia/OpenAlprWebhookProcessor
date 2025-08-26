@@ -4,6 +4,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Ensure consistent sidenav behavior across screen sizes */
+@media (min-width: 769px) {
+  .mat-drawer-side {
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-sidenav {
+    width: 280px; /* Maintain consistent width even in mobile mode */
+  }
+}
+
 .content-wrapper {
   max-width: 100%;
   min-height: calc(100vh - 48px);

@@ -27,13 +27,13 @@
         (editPlate)="onEditPlate($event)"
         (alertPlate)="onAlertPlate($event)"
         (ignorePlate)="onIgnorePlate($event)"
-        (viewPlate)="onViewPlate($event)"
+        (searchForPlate)="onSearchForPlate($event)"
       />
     }
   </mat-accordion>
   <mat-paginator
     [pageSizeOptions]="[10, 25, 75, 100]"
-    [pageSize]="pageSize"
-    [length]="totalNumberOfPlates"
+    [pageSize]="pageSize()"
+    [length]="totalNumberOfPlates()"
     (page)="onPaginatorPage($event)" />
 </div>

@@ -1,6 +1,6 @@
 using AwesomeAssertions;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Features.Settings.Queries.GetWebhookForwards;
+using OpenAlprWebhookProcessor.Features.WebhookForwards.Queries.GetWebhookForwards;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetWebhookForwards

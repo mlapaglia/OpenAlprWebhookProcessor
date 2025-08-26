@@ -78,9 +78,9 @@ export class PlateFacadeService {
       processedPlateConfidence: plateData.processedPlateConfidence ?? 0,
       notes: plateData.notes ?? '',
       canBeEnriched: plateData.canBeEnriched ?? false,
-      region: '',
-      possiblePlateNumbers: '',
-      openAlprProcessingTimeMs: 0,
+      region: plateData.region ?? '',
+      possiblePlateNumbers: plateData.possiblePlateNumbers ?? '',
+      openAlprProcessingTimeMs: plateData.openAlprProcessingTimeMs ?? 0,
       alertDescription: '',
     });
   }

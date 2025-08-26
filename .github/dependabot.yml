@@ -1,0 +1,54 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Enable version updates for npm (Angular client)
+  - package-ecosystem: "npm"
+    directory: "/openalprwebhookprocessor.client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "@me"
+    assignees:
+      - "@me"
+    groups:
+      angular:
+        patterns:
+          - "@angular*"
+          - "@angular-devkit*"
+          - "@angular-eslint*"
+          - "ng-*"
+          - "zone.js"
+      testing:
+        patterns:
+          - "jasmine*"
+          - "karma*"
+          - "protractor*"
+          - "@types/jasmine*"
+          - "@types/node*"
+
+  # Enable version updates for NuGet (.NET server projects)
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "@me"
+    assignees:
+      - "@me"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/OpenAlprWebhookProcessor.Server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "@me"
+    assignees:
+      - "@me"

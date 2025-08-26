@@ -26,46 +26,59 @@
   </mat-expansion-panel-header>
   <ng-template matExpansionPanelContent>
     <app-plate [isVisible]="plate().isOpen" [isExpanded]="isExpanded" [plate]="plate()" (plateChanged)="onPlateChanged($event)" />
-  </ng-template>
-  <mat-action-row class="plate-actions">
-    <div class="primary-actions">
-      <button mat-raised-button
-              [disabled]="plate().canBeEnriched"
-              type="button"
-              color="accent"
-              (click)="onEnrichPlate()"
-              i18n>
-        <mat-icon>auto_fix_high</mat-icon>
-        <span>Enrich plate</span>
-      </button>
-      
-      <button mat-raised-button 
-              type="button"
-              color="primary"
-              (click)="onEditPlate()"
-              i18n>
-        <mat-icon>edit</mat-icon>
-        <span>Edit plate</span>
-      </button>
-      
-      <app-refresh-button
-        [disabled]="plate().isIgnore"
-        (refreshStarted)="onIgnorePlate()"
-        buttonText="Add to ignore list"
-        buttonRefreshingText="Adding..."
-        icon="visibility_off"
-        color="accent"
-        i18n />
+    
+    <div class="plate-actions">
+      <div class="primary-actions">
+        @if (plate().canBeEnriched) {
+          <button mat-raised-button
+                  type="button"
+                  color="accent"
+                  (click)="onEnrichPlate()"
+                  i18n>
+            <mat-icon>auto_fix_high</mat-icon>
+            <span>Enrich plate</span>
+          </button>
+        } 
+        <button mat-raised-button 
+                type="button"
+                color="primary"
+                (click)="onEditPlate()"
+                i18n>
+          <mat-icon>edit</mat-icon>
+          <span>Edit plate</span>
+        </button>
+        
+        <app-refresh-button
+          [disabled]="plate().isIgnore"
+          (refreshStarted)="onIgnorePlate()"
+          buttonText="Add to ignore list"
+          buttonRefreshingText="Adding..."
+          buttonType="raised"
+          icon="visibility_off"
+          color="accent"
+          [fullWidth]="isMobile"
+          i18n />
 
-      
-      <app-refresh-button
-        [disabled]="plate().isAlert"
-        (refreshStarted)="onAlertPlate()"
-        buttonText="Add to alert list"
-        buttonRefreshingText="Adding..."
-        icon="notifications_active"
-        color="primary"
-        i18n />
+        <app-refresh-button
+          [disabled]="plate().isAlert"
+          (refreshStarted)="onAlertPlate()"
+          buttonText="Add to alert list"
+          buttonRefreshingText="Adding..."
+          buttonType="raised"
+          icon="notifications_active"
+          color="primary"
+          [fullWidth]="isMobile"
+          i18n />
+
+        <button mat-raised-button 
+          type="button"
+          color="primary"
+          (click)="onSearchForPlate()"
+          i18n>
+          <mat-icon>search</mat-icon>
+          <span>Search for plate</span>
+        </button>
+      </div>
     </div>
-  </mat-action-row>
+  </ng-template>
 </mat-expansion-panel>
