@@ -48,7 +48,7 @@
     "@types/jasminewd2": "^2.0.13",
     "@types/node": "^24.3.0",
     "@types/qrcode": "^1.5.5",
-    "angular-eslint": "^20.1.1",
+    "angular-eslint": "^20.2.0",
     "eslint": "^9.34.0",
     "globals": "^16.2.0",
     "jasmine-core": "~5.9.0",
