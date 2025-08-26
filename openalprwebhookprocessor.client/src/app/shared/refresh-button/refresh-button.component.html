@@ -1,6 +1,6 @@
 @switch (buttonType()) {
   @case ('raised') {
-    <button mat-raised-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()">
+    <button mat-raised-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()" [class.full-width]="fullWidth()">
       <mat-icon [class.spinning]="isSpinning && !isStopping" [class.stopping]="isStopping">
         {{ (isSpinning || isStopping) ? 'refresh' : icon() }}
       </mat-icon>
@@ -8,7 +8,7 @@
     </button>
   }
   @case ('stroked') {
-    <button mat-stroked-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()">
+    <button mat-stroked-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()" [class.full-width]="fullWidth()">
       <mat-icon [class.spinning]="isSpinning && !isStopping" [class.stopping]="isStopping">
         {{ (isSpinning || isStopping) ? 'refresh' : icon() }}
       </mat-icon>
@@ -16,7 +16,7 @@
     </button>
   }
   @case ('flat') {
-    <button mat-flat-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()">
+    <button mat-flat-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()" [class.full-width]="fullWidth()">
       <mat-icon [class.spinning]="isSpinning && !isStopping" [class.stopping]="isStopping">
         {{ (isSpinning || isStopping) ? 'refresh' : icon() }}
       </mat-icon>
@@ -45,7 +45,7 @@
     </button>
   }
   @default {
-      <button mat-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()">
+      <button mat-button [color]="color()" (click)="onRefresh()" [disabled]="isDisabled()" [class.full-width]="fullWidth()">
       <mat-icon [class.spinning]="isSpinning && !isStopping" [class.stopping]="isStopping">
         {{ (isSpinning || isStopping) ? 'refresh' : icon() }}
       </mat-icon>

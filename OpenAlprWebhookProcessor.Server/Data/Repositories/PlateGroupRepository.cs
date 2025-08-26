@@ -138,28 +138,40 @@ namespace OpenAlprWebhookProcessor.Data.Repositories
             long last90DaysEpoch,
             CancellationToken cancellationToken = default)
         {
-            var allEpochsQuery = _dbSet
+            var bestNumberEpochs = await _dbSet
                 .AsNoTracking()
-                .Where(pg => pg.BestNumber == plateNumber || pg.PossibleNumbers.Any(pn => pn.Number == plateNumber))
-                .Select(pg => pg.ReceivedOnEpoch);
+                .Where(pg => pg.BestNumber == plateNumber)
+                .Select(pg => pg.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
 
-            var result = await allEpochsQuery
-                .GroupBy(e => 1)
-                .Select(g => new PlateStatisticsAggregation
-                {
-                    TotalCount = g.Count(),
-                    Last90DaysCount = g.Count(e => e > last90DaysEpoch),
-                    MinEpoch = g.Min(),
-                    MaxEpoch = g.Max()
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+            var possibleNumberEpochs = await _context.PlateGroupPossibleNumbers
+                .AsNoTracking()
+                .Where(pn => pn.Number == plateNumber)
+                .Select(pn => pn.PlateGroup.ReceivedOnEpoch)
+                .ToListAsync(cancellationToken);
 
-            return result ?? new PlateStatisticsAggregation
+            var allEpochs = bestNumberEpochs
+                .Concat(possibleNumberEpochs)
+                .Distinct()
+                .ToList();
+
+            if (!allEpochs.Any())
             {
-                TotalCount = 0,
-                Last90DaysCount = 0,
-                MinEpoch = 0,
-                MaxEpoch = 0
+                return new PlateStatisticsAggregation
+                {
+                    TotalCount = 0,
+                    Last90DaysCount = 0,
+                    MinEpoch = 0,
+                    MaxEpoch = 0
+                };
+            }
+
+            return new PlateStatisticsAggregation
+            {
+                TotalCount = allEpochs.Count,
+                Last90DaysCount = allEpochs.Count(e => e > last90DaysEpoch),
+                MinEpoch = allEpochs.Min(),
+                MaxEpoch = allEpochs.Max()
             };
         }
 

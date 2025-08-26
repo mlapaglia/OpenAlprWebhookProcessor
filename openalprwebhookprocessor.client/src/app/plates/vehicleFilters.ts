@@ -1,7 +1,11 @@
 export interface VehicleFilters {
+  cameras?: string[]
+
   vehicleMakes?: string[]
 
   vehicleModels?: string[]
+
+  vehicleMakeModelMap?: Record<string, string[]>
 
   vehicleTypes?: string[]
 

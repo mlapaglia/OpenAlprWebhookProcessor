@@ -175,6 +175,9 @@ export class PlateComponent extends OnPushBaseComponent implements OnInit {
       processedPlateConfidence: plateData.processedPlateConfidence ?? 0,
       notes: plateData.notes ?? '',
       canBeEnriched: plateData.canBeEnriched ?? false,
+      region: plateData.region ?? '',
+      possiblePlateNumbers: plateData.possiblePlateNumbers ?? '',
+      openAlprProcessingTimeMs: plateData.openAlprProcessingTimeMs ?? 0,
     };
   }
 

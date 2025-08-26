@@ -1,11 +1,10 @@
-import { Component, inject, type OnDestroy, type OnInit, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, inject, type OnDestroy, type OnInit, ChangeDetectionStrategy, input, model } from '@angular/core';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { type Plate } from './plate/plate';
 import { type PlateRequest, PlateService } from './plate.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
 import { type Ignore } from 'app/settings/ignores/ignore';
-import { SettingsService } from 'app/settings/settings.service';
 import { IgnoresService } from 'app/settings/ignores/ignores.service';
 import { type Alert } from 'app/settings/alerts/alert';
 import { AlertsService } from 'app/settings/alerts/alerts.service';
@@ -13,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from 'app/_services/local-storage.service';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { type PageEvent } from '@angular/material/paginator';
 import { PlateFiltersComponent, type PlateFilters, type VehicleFilters as FilterVehicleFilters } from './plate-filters/plate-filters.component';
 import { PlateListComponent } from './plate-list/plate-list.component';
@@ -37,14 +36,26 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   private readonly signalRHub = inject(SignalrService);
   private readonly snackbarService = inject(SnackbarService);
   private readonly alertsService = inject(AlertsService);
-  private readonly settingsService = inject(SettingsService);
   private readonly ignoresService = inject(IgnoresService);
   private readonly localStorageService = inject(LocalStorageService);
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
   readonly id = input.required<string>();
+  readonly plateFilters = model<PlateFilters>({
+    startDate: this.getSevenDaysAgo(),
+    endDate: this.setToEndOfDay(new Date()),
+    plateNumber: '',
+    cameraId: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleType: '',
+    vehicleColor: '',
+    vehicleRegion: '',
+    regexSearchEnabled: false,
+    includeIgnoredPlates: false,
+    platesSeenLessThan: false,
+  });
 
   // Core data
   public plates: PlateData[] = [];
@@ -52,20 +63,19 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   public isLoading = false;
 
   // Filter and pagination state
-  public showAdvancedFilters = false;
-  public currentFilters: PlateFilters | null = null;
   public pageSize = 25;
   private pageNumber = 0;
   private currentRequestId = 0;
 
   // Data for filters
   public todaysDate = new Date();
-  public cameras: string[] = [];
   public vehicleFilters: FilterVehicleFilters = {
-    vehicleMakes: [],
-    vehicleModels: [],
-    vehicleTypes: [],
-    vehicleColors: [],
+    cameras: [],
+    makes: [],
+    models: [],
+    types: [],
+    colors: [],
+    regions: [],
   };
 
   // Loading states
@@ -94,6 +104,24 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     super.ngOnDestroy();
   }
 
+  private getSevenDaysAgo(): Date {
+    const date = new Date();
+    date.setDate(date.getDate() - 7);
+    return this.setToStartOfDay(date);
+  }
+
+  private setToStartOfDay(date: Date): Date {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    return newDate;
+  }
+
+  private setToEndOfDay(date: Date): Date {
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    return newDate;
+  }
+
   private initializePageSize(): void {
     const savedPageSize = this.localStorageService.getData(this.pageSizeCacheKey);
     if (savedPageSize) {
@@ -109,23 +137,24 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     }
   }
 
+  get hasVehicleFiltersData(): boolean {
+    return this.vehicleFilters.makes.length > 0 ||
+           this.vehicleFilters.models.length > 0 ||
+           this.vehicleFilters.types.length > 0 ||
+           this.vehicleFilters.colors.length > 0 ||
+           this.vehicleFilters.regions.length > 0;
+  }
+
   private populateFilters() {
     this.subscribeAndMarkForCheck(
       this.plateService.getFilters(),
       (vehicleFilters) => {
-        this.vehicleFilters = {
-          vehicleMakes: vehicleFilters.vehicleMakes ?? [],
-          vehicleModels: vehicleFilters.vehicleModels ?? [],
-          vehicleTypes: vehicleFilters.vehicleTypes ?? [],
-          vehicleColors: vehicleFilters.vehicleColors ?? [],
-        };
-      },
-    );
-
-    this.subscribeAndMarkForCheck(
-      this.settingsService.getCameras(),
-      (cameras) => {
-        this.cameras = cameras.map(camera => camera.openAlprName);
+        this.vehicleFilters.makes = vehicleFilters.vehicleMakes ?? [];
+        this.vehicleFilters.models = vehicleFilters.vehicleModels ?? [];
+        this.vehicleFilters.vehicleMakeModelMap = vehicleFilters.vehicleMakeModelMap ?? {};
+        this.vehicleFilters.types = vehicleFilters.vehicleTypes ?? [];
+        this.vehicleFilters.colors = vehicleFilters.vehicleColors ?? [];
+        this.vehicleFilters.regions = vehicleFilters.vehicleRegions ?? [];
       },
     );
   }
@@ -166,11 +195,13 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
     });
   }
 
-  private searchPlates(plateNumber: string | null = null) {
+  private searchPlates(plateNumber: string | null = null, resetPage: boolean = true) {
     this.currentRequestId++;
     const requestId = this.currentRequestId;
 
-    this.pageNumber = 0;
+    if (resetPage) {
+      this.pageNumber = 0;
+    }
     this.isLoading = true;
     this.markForCheck();
 
@@ -196,7 +227,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   }
 
   private buildPlateRequest(plateNumber: string | null = null): PlateRequest {
-    const filters = this.currentFilters;
+    const filters = this.plateFilters();
 
     return {
       pageSize: this.pageSize,
@@ -211,8 +242,8 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
 
   private buildDateFilters(filters: PlateFilters | null) {
     return {
-      startSearchOn: filters?.startDate ?? new Date(),
-      endSearchOn: filters?.endDate ?? new Date(),
+      startSearchOn: this.setToStartOfDay(filters?.startDate ?? new Date()),
+      endSearchOn: this.setToEndOfDay(filters?.endDate ?? new Date()),
     };
   }
 
@@ -224,7 +255,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       vehicleModel: getStringValue(filters?.vehicleModel),
       vehicleType: getStringValue(filters?.vehicleType),
       vehicleColor: getStringValue(filters?.vehicleColor),
-      vehicleRegion: getStringValue(filters?.direction),
+      vehicleRegion: getStringValue(filters?.vehicleRegion),
     };
   }
 
@@ -252,28 +283,14 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       processedPlateConfidence: plate.processedPlateConfidence,
       notes: plate.notes,
       canBeEnriched: plate.canBeEnriched,
+      region: plate.region,
+      possiblePlateNumbers: plate.possiblePlateNumbers,
+      openAlprProcessingTimeMs: plate.openAlprProcessingTimeMs,
     };
-  }
-
-  // Event handlers for child components
-  onFiltersChanged(filters: PlateFilters) {
-    this.currentFilters = filters;
-    this.markForCheck();
   }
 
   onSearchTriggered() {
     this.searchPlates();
-  }
-
-  onFiltersCleared() {
-    // The plate-filters component will emit the updated filters via onFiltersChanged first,
-    // then this event will trigger the search with the new filter values
-    this.searchPlates();
-  }
-
-  onAdvancedFiltersToggled() {
-    this.showAdvancedFilters = !this.showAdvancedFilters;
-    this.markForCheck();
   }
 
   onPlateOpened(plateId: string) {
@@ -298,7 +315,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       this.pageSize = event.pageSize;
     }
     this.pageNumber = event.pageIndex;
-    this.searchPlates();
+    this.searchPlates(null, false);
   }
 
   onEnrichPlate(plateId: string) {
@@ -352,6 +369,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
   }
 
   onSearchForPlate(plateNumber: string) {
+    this.plateFilters().plateNumber = plateNumber;
     this.searchPlates(plateNumber);
   }
 

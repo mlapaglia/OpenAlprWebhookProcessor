@@ -1,4 +1,4 @@
-import { Component, input, output, ChangeDetectionStrategy, type OnChanges } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy, type OnChanges, HostBinding } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -41,8 +41,16 @@ export class RefreshButtonComponent extends OnPushBaseComponent implements OnCha
   /** The icon to display when not refreshing. */
   readonly icon = input<string>('refresh');
 
+  /** Whether the button should take full width. */
+  readonly fullWidth = input<boolean>(false);
+
   /** Emits when the button is clicked. */
   readonly refreshStarted = output<void>();
+
+  @HostBinding('class.full-width-host')
+  get isFullWidth(): boolean {
+    return this.fullWidth();
+  }
 
   public isSpinning = false;
   public isStopping = false;

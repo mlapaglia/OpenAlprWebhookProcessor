@@ -74,6 +74,13 @@ describe('PlateListComponent', () => {
 
     fixture = TestBed.createComponent(PlateListComponent);
     component = fixture.componentInstance;
+
+    // Set required inputs with default values
+    fixture.componentRef.setInput('plates', []);
+    fixture.componentRef.setInput('isLoading', false);
+    fixture.componentRef.setInput('pageSize', 25);
+    fixture.componentRef.setInput('totalNumberOfPlates', 0);
+    fixture.detectChanges();
   });
 
   it('should create', () => {

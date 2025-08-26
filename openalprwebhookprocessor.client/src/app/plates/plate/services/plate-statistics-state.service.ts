@@ -3,7 +3,6 @@ import { DatePipe } from '@angular/common';
 import { PlateService } from '../../plate.service';
 import type { PlateData } from '../../plate-item/plate-item.component';
 import type { PlateStatistics, PlateStatisticsData } from '../plateStatistics';
-import { Plate } from '../plate';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -48,40 +47,16 @@ export class PlateStatisticsStateService {
   }
 
   private buildStatisticsArray(plateData: PlateData, result: PlateStatistics): PlateStatisticsData[] {
-    const plate = this.convertPlateDataToPlate(plateData);
     return [
       { key: 'Confidence', value: `${plateData.processedPlateConfidence}%` },
       { key: 'Seen past 90 days', value: result.last90Days.toString() },
       { key: 'Total Seen', value: result.totalSeen.toString() },
       { key: 'First seen', value: this.datePipe.transform(result.firstSeen, 'medium') ?? '' },
       { key: 'Last seen', value: this.datePipe.transform(result.lastSeen, 'medium') ?? '' },
-      { key: 'Processing time', value: `${plate.openAlprProcessingTimeMs.toString()}ms` },
-      { key: 'Possible plates', value: plate.possiblePlateNumbers },
-      { key: 'Region', value: plate.region },
+      { key: 'Processing time', value: `${plateData.openAlprProcessingTimeMs?.toString() ?? '0'}ms` },
+      { key: 'Possible plates', value: plateData.possiblePlateNumbers ?? '' },
+      { key: 'Region', value: plateData.region ?? '' },
     ];
-  }
-
-  private convertPlateDataToPlate(plateData: PlateData): Plate {
-    return new Plate({
-      id: plateData.id,
-      plateNumber: plateData.plateNumber,
-      openAlprCameraId: Number(plateData.openAlprCameraId),
-      vehicleDescription: plateData.vehicleDescription,
-      direction: plateData.direction,
-      receivedOn: plateData.receivedOn,
-      isAlert: plateData.isAlert,
-      isIgnore: plateData.isIgnore,
-      isOpen: plateData.isOpen,
-      imageUrl: plateData.imageUrl ?? '',
-      cropImageUrl: plateData.cropImageUrl ?? '',
-      processedPlateConfidence: plateData.processedPlateConfidence ?? 0,
-      notes: plateData.notes ?? '',
-      canBeEnriched: plateData.canBeEnriched ?? false,
-      region: '',
-      possiblePlateNumbers: '',
-      openAlprProcessingTimeMs: 0,
-      alertDescription: '',
-    });
   }
 
   reset() {

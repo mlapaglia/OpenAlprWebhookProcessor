@@ -1,200 +1,145 @@
 import type { ComponentFixture } from '@angular/core/testing';
-import { TestBed } from '@angular/core/testing';
-import { PlatesComponent } from './plates.component';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { of, Subject, throwError, defer } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { of, throwError, Subject } from 'rxjs';
+import { ChangeDetectorRef } from '@angular/core';
 
-import { PlateService } from './plate.service';
+import { PlatesComponent } from './plates.component';
+import { PlateService, type PlateRequest } from './plate.service';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
-import { AlertsService } from 'app/settings/alerts/alerts.service';
-import { SettingsService } from 'app/settings/settings.service';
-import { IgnoresService } from 'app/settings/ignores/ignores.service';
-import { LocalStorageService } from 'app/_services/local-storage.service';
 import { SnackBarType } from 'app/snackbar/snackbartype';
+import { IgnoresService } from 'app/settings/ignores/ignores.service';
+import { AlertsService } from 'app/settings/alerts/alerts.service';
+import { LocalStorageService } from 'app/_services/local-storage.service';
+import { type Plate } from './plate/plate';
+import { type PlateResponse } from './plate/plateResponse';
+import { type VehicleFilters } from './vehicleFilters';
+import { type GetPlateResponse } from './plate/getPlateResponse';
 import { type PageEvent } from '@angular/material/paginator';
+import { type PlateData } from './plate-item/plate-item.component';
+import { type PlateFilters } from './plate-filters/plate-filters.component';
 
-describe(PlatesComponent.name, () => {
+describe('PlatesComponent', () => {
   let component: PlatesComponent;
   let fixture: ComponentFixture<PlatesComponent>;
   let mockPlateService: jasmine.SpyObj<PlateService>;
   let mockSignalrService: jasmine.SpyObj<SignalrService>;
   let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
-  let mockAlertsService: jasmine.SpyObj<AlertsService>;
-  let mockSettingsService: jasmine.SpyObj<SettingsService>;
   let mockIgnoresService: jasmine.SpyObj<IgnoresService>;
+  let mockAlertsService: jasmine.SpyObj<AlertsService>;
   let mockLocalStorageService: jasmine.SpyObj<LocalStorageService>;
-  let mockRouter: jasmine.SpyObj<Router>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockActivatedRoute: any;
-  let licensePlateReceivedSubject: Subject<any>;
 
-  const mockPlate = {
-    id: '1',
+  const mockPlate: Plate = {
+    id: '123',
     plateNumber: 'ABC123',
+    vehicleDescription: 'Toyota Camry Blue',
     openAlprCameraId: 1,
-    vehicleDescription: 'White Toyota',
-    direction: 1,
-    receivedOn: new Date('2023-01-01T12:00:00Z'),
+    direction: 90,
+    receivedOn: new Date('2023-01-01T10:00:00Z'),
     isAlert: false,
     isIgnore: false,
     isOpen: false,
-    imageUrl: 'image.jpg',
-    cropImageUrl: 'crop.jpg',
-    processedPlateConfidence: 0.95,
-    notes: 'Test note',
+    cropImageUrl: 'http://example.com/crop.jpg',
+    imageUrl: 'http://example.com/image.jpg',
+    processedPlateConfidence: 95,
     canBeEnriched: true,
-    region: 'us',
-    possiblePlateNumbers: 'ABC123',
-    openAlprProcessingTimeMs: 100,
+    region: 'US-CA',
+    possiblePlateNumbers: 'ABC123,ABC124',
+    openAlprProcessingTimeMs: 150,
     alertDescription: '',
+    notes: 'Test notes',
   };
 
-  const mockVehicleFilters = {
+  const mockVehicleFilters: VehicleFilters = {
     vehicleMakes: ['Toyota', 'Honda'],
     vehicleModels: ['Camry', 'Civic'],
+    vehicleColors: ['Blue', 'Red'],
     vehicleTypes: ['Sedan', 'SUV'],
-    vehicleColors: ['White', 'Black'],
+    vehicleRegions: ['US-CA', 'US-TX'],
+    vehicleMakeModelMap: {
+      Toyota: ['Camry', 'Corolla'],
+      Honda: ['Civic', 'Accord'],
+    },
   };
 
-  const mockCameras = [
-    {
-      id: '1',
-      latitude: 0,
-      longitude: 0,
-      ipAddress: '192.168.1.1',
-      manufacturer: 'Hikvision' as any,
-      modelNumber: 'DS-2CD2T42WD-I5',
-      openAlprName: 'Camera1',
-      openAlprCameraId: 1,
-      cameraPassword: 'password',
-      cameraUsername: 'admin',
-      updateOverlayEnabled: false,
-      updateOverlayTextUrl: '',
-      nightZoom: '1.0',
-      nightFocus: '1.0',
-      dayZoom: '1.0',
-      dayFocus: '1.0',
-      dayNightModeEnabled: false,
-      dayNightModeUrl: '',
-      dayNightNextScheduledCommand: new Date(),
-      openAlprEnabled: true,
-      sunriseOffset: 0,
-      sunsetOffset: 0,
-      platesSeen: 0,
-      sampleImageUrl: '',
-      timezoneOffset: 0,
-    },
-    {
-      id: '2',
-      latitude: 0,
-      longitude: 0,
-      ipAddress: '192.168.1.2',
-      manufacturer: 'Hikvision' as any,
-      modelNumber: 'DS-2CD2T42WD-I5',
-      openAlprName: 'Camera2',
-      openAlprCameraId: 2,
-      cameraPassword: 'password',
-      cameraUsername: 'admin',
-      updateOverlayEnabled: false,
-      updateOverlayTextUrl: '',
-      nightZoom: '1.0',
-      nightFocus: '1.0',
-      dayZoom: '1.0',
-      dayFocus: '1.0',
-      dayNightModeEnabled: false,
-      dayNightModeUrl: '',
-      dayNightNextScheduledCommand: new Date(),
-      openAlprEnabled: true,
-      sunriseOffset: 0,
-      sunsetOffset: 0,
-      platesSeen: 0,
-      sampleImageUrl: '',
-      timezoneOffset: 0,
-    },
-  ];
+  const mockPlateResponse: PlateResponse = {
+    plates: [mockPlate],
+    totalCount: 1,
+  };
 
   beforeEach(async () => {
-    licensePlateReceivedSubject = new Subject();
-
-    mockPlateService = jasmine.createSpyObj('PlateService', [
-      'getFilters',
+    const plateServiceSpy = jasmine.createSpyObj('PlateService', [
       'searchPlates',
       'getPlate',
+      'getFilters',
       'enrichPlate',
+      'upsertPlate',
+      'deletePlate',
     ]);
-    mockSignalrService = jasmine.createSpyObj('SignalrService', [], {
-      licensePlateReceived: licensePlateReceivedSubject.asObservable(),
+    const signalrServiceSpy = jasmine.createSpyObj('SignalrService', [], {
+      licensePlateReceived: new Subject<string>(),
     });
-    mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
-    mockAlertsService = jasmine.createSpyObj('AlertsService', ['addAlert']);
-    mockSettingsService = jasmine.createSpyObj('SettingsService', ['getCameras']);
-    mockIgnoresService = jasmine.createSpyObj('IgnoresService', ['addIgnore']);
-    mockLocalStorageService = jasmine.createSpyObj('LocalStorageService', ['getData', 'setData']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
+    const snackbarServiceSpy = jasmine.createSpyObj('SnackbarService', ['create']);
+    const ignoresServiceSpy = jasmine.createSpyObj('IgnoresService', ['addIgnore']);
+    const alertsServiceSpy = jasmine.createSpyObj('AlertsService', ['addAlert']);
+    const localStorageServiceSpy = jasmine.createSpyObj('LocalStorageService', ['getData', 'setData']);
+    const dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    const changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['markForCheck', 'detectChanges']);
 
     mockActivatedRoute = {
-      params: of({ id: undefined }),
+      params: of({ id: '123' }),
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        PlatesComponent,
-        RouterTestingModule,
-        BrowserAnimationsModule,
-      ],
+      imports: [PlatesComponent, NoopAnimationsModule],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        provideNativeDateAdapter(),
-        { provide: PlateService, useValue: mockPlateService },
-        { provide: SignalrService, useValue: mockSignalrService },
-        { provide: SnackbarService, useValue: mockSnackbarService },
-        { provide: AlertsService, useValue: mockAlertsService },
-        { provide: SettingsService, useValue: mockSettingsService },
-        { provide: IgnoresService, useValue: mockIgnoresService },
-        { provide: LocalStorageService, useValue: mockLocalStorageService },
-        { provide: Router, useValue: mockRouter },
-        { provide: MatDialog, useValue: mockDialog },
+        { provide: PlateService, useValue: plateServiceSpy },
+        { provide: SignalrService, useValue: signalrServiceSpy },
+        { provide: SnackbarService, useValue: snackbarServiceSpy },
+        { provide: IgnoresService, useValue: ignoresServiceSpy },
+        { provide: AlertsService, useValue: alertsServiceSpy },
+        { provide: LocalStorageService, useValue: localStorageServiceSpy },
+        { provide: MatDialog, useValue: dialogSpy },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
-      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-
-    mockPlateService.getFilters.and.returnValue(of(mockVehicleFilters));
-    mockSettingsService.getCameras.and.returnValue(of(mockCameras));
-    mockPlateService.searchPlates.and.returnValue(
-      of({ plates: [mockPlate], totalCount: 1 }),
-    );
-    mockLocalStorageService.getData.and.returnValue('');
 
     fixture = TestBed.createComponent(PlatesComponent);
     component = fixture.componentInstance;
-  });
 
-  it('should be defined', () => {
-    expect(PlatesComponent).toBeDefined();
-  });
+    mockPlateService = TestBed.inject(PlateService) as jasmine.SpyObj<PlateService>;
+    mockSignalrService = TestBed.inject(SignalrService) as jasmine.SpyObj<SignalrService>;
+    mockSnackbarService = TestBed.inject(SnackbarService) as jasmine.SpyObj<SnackbarService>;
+    mockIgnoresService = TestBed.inject(IgnoresService) as jasmine.SpyObj<IgnoresService>;
+    mockAlertsService = TestBed.inject(AlertsService) as jasmine.SpyObj<AlertsService>;
+    mockLocalStorageService = TestBed.inject(LocalStorageService) as jasmine.SpyObj<LocalStorageService>;
+    mockDialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
-  it('should create component successfully', () => {
-    expect(component).toBeTruthy();
+    // Set up default mock returns
+    mockPlateService.getFilters.and.returnValue(of(mockVehicleFilters));
+    mockPlateService.searchPlates.and.returnValue(of(mockPlateResponse));
+    mockPlateService.getPlate.and.returnValue(of({ plate: mockPlate }));
+    mockLocalStorageService.getData.and.returnValue('');
+
+    // Set required input
+    fixture.componentRef.setInput('id', '123');
   });
 
   describe('Component Initialization', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
+
     it('should initialize with default values', () => {
       expect(component.plates).toEqual([]);
       expect(component.totalNumberOfPlates).toBe(0);
       expect(component.isLoading).toBe(false);
-      expect(component.showAdvancedFilters).toBe(false);
-      expect(component.currentFilters).toBeNull();
       expect(component.pageSize).toBe(25);
       expect(component.isDeletingPlate).toBe(false);
       expect(component.isEnrichingPlate).toBe(false);
@@ -202,420 +147,707 @@ describe(PlatesComponent.name, () => {
       expect(component.isAddingToAlertList).toBe(false);
     });
 
-    it('should initialize page size from local storage', () => {
-      mockLocalStorageService.getData.and.returnValue('75');
-
-      const newComponent = TestBed.createComponent(PlatesComponent).componentInstance;
-      newComponent.ngOnInit();
-
-      expect(newComponent.pageSize).toBe(75);
+    it('should initialize plateFilters with correct default values', () => {
+      const filters = component.plateFilters();
+      expect(filters.startDate).toBeDefined();
+      expect(filters.endDate).toBeDefined();
+      expect(filters.plateNumber).toBe('');
+      expect(filters.cameraId).toBe('');
+      expect(filters.vehicleMake).toBe('');
+      expect(filters.vehicleModel).toBe('');
+      expect(filters.vehicleType).toBe('');
+      expect(filters.vehicleColor).toBe('');
+      expect(filters.vehicleRegion).toBe('');
+      expect(filters.regexSearchEnabled).toBe(false);
+      expect(filters.includeIgnoredPlates).toBe(false);
+      expect(filters.platesSeenLessThan).toBe(false);
     });
 
-    it('should use default page size when local storage has invalid value', () => {
-      mockLocalStorageService.getData.and.returnValue('invalid');
+    it('should set startDate to 7 days ago', () => {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+
+      const filters = component.plateFilters();
+      const startDate = new Date(filters.startDate);
+      startDate.setHours(0, 0, 0, 0);
+
+      expect(startDate.getTime()).toBeCloseTo(sevenDaysAgo.getTime(), -1);
+    });
+
+    it('should set endDate to end of today', () => {
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
+
+      const filters = component.plateFilters();
+      const endDate = new Date(filters.endDate);
+
+      expect(endDate.getHours()).toBe(23);
+      expect(endDate.getMinutes()).toBe(59);
+      expect(endDate.getSeconds()).toBe(59);
+    });
+  });
+
+  describe('Page Size Initialization', () => {
+    it('should use default page size when no cached value exists', () => {
+      mockLocalStorageService.getData.and.returnValue('');
 
       component.ngOnInit();
 
       expect(component.pageSize).toBe(25);
     });
 
-    it('should populate filters on init', () => {
+    it('should use cached page size when valid value exists', () => {
+      mockLocalStorageService.getData.and.returnValue('75');
+
       component.ngOnInit();
 
-      expect(mockPlateService.getFilters).toHaveBeenCalled();
-      expect(mockSettingsService.getCameras).toHaveBeenCalled();
-      expect(component.vehicleFilters).toEqual(mockVehicleFilters);
-      expect(component.cameras).toEqual(['Camera1', 'Camera2']);
+      expect(component.pageSize).toBe(75);
+    });
+
+    it('should use default page size when cached value is invalid', () => {
+      mockLocalStorageService.getData.and.returnValue('999');
+
+      component.ngOnInit();
+
+      expect(component.pageSize).toBe(25);
+    });
+
+    it('should handle JSON parsed cached page size', () => {
+      mockLocalStorageService.getData.and.returnValue(JSON.stringify(100));
+
+      component.ngOnInit();
+
+      expect(component.pageSize).toBe(100);
+    });
+
+    it('should handle malformed cached page size gracefully', () => {
+      mockLocalStorageService.getData.and.returnValue('invalid-json');
+
+      component.ngOnInit();
+
+      expect(component.pageSize).toBe(25);
     });
   });
 
-  describe('Route Parameter Handling', () => {
-    it('should get single plate when id is provided in route params', () => {
-      mockActivatedRoute.params = of({ id: '123' });
-      mockPlateService.getPlate.and.returnValue(
-        of({ plate: mockPlate }),
-      );
+  describe('Filter Population', () => {
+    it('should populate vehicle filters on init', () => {
+      component.ngOnInit();
+
+      expect(mockPlateService.getFilters).toHaveBeenCalled();
+      expect(component.vehicleFilters.makes).toEqual(['Toyota', 'Honda']);
+      expect(component.vehicleFilters.models).toEqual(['Camry', 'Civic']);
+      expect(component.vehicleFilters.colors).toEqual(['Blue', 'Red']);
+      expect(component.vehicleFilters.types).toEqual(['Sedan', 'SUV']);
+      expect(component.vehicleFilters.regions).toEqual(['US-CA', 'US-TX']);
+    });
+
+    it('should handle missing vehicle filter data gracefully', () => {
+      const incompleteFilters: Partial<VehicleFilters> = {
+        vehicleMakes: ['Toyota'],
+      };
+      mockPlateService.getFilters.and.returnValue(of(incompleteFilters as VehicleFilters));
 
       component.ngOnInit();
+
+      expect(component.vehicleFilters.makes).toEqual(['Toyota']);
+      expect(component.vehicleFilters.models).toEqual([]);
+      expect(component.vehicleFilters.colors).toEqual([]);
+      expect(component.vehicleFilters.types).toEqual([]);
+      expect(component.vehicleFilters.regions).toEqual([]);
+    });
+
+    it('should correctly identify when vehicle filters have data', () => {
+      component.vehicleFilters = {
+        cameras: [],
+        makes: ['Toyota'],
+        models: [],
+        types: [],
+        colors: [],
+        regions: [],
+      };
+
+      expect(component.hasVehicleFiltersData).toBe(true);
+    });
+
+    it('should correctly identify when vehicle filters have no data', () => {
+      component.vehicleFilters = {
+        cameras: [],
+        makes: [],
+        models: [],
+        types: [],
+        colors: [],
+        regions: [],
+      };
+
+      expect(component.hasVehicleFiltersData).toBe(false);
+    });
+  });
+
+  describe('Plate Loading', () => {
+    it('should load single plate when id is provided in route params', fakeAsync(() => {
+      const getPlateResponse: GetPlateResponse = { plate: mockPlate };
+      mockPlateService.getPlate.and.returnValue(of(getPlateResponse));
+
+      component.ngOnInit();
+      tick();
 
       expect(mockPlateService.getPlate).toHaveBeenCalledWith('123');
       expect(component.plates.length).toBe(1);
+      expect(component.plates[0].id).toBe('123');
       expect(component.totalNumberOfPlates).toBe(1);
-    });
+      expect(component.isLoading).toBe(false);
+    }));
 
-    it('should handle error when getting single plate', () => {
-      mockActivatedRoute.params = of({ id: '123' });
-      mockPlateService.getPlate.and.returnValue(throwError('Error'));
+    it('should handle error when loading single plate', fakeAsync(() => {
+      mockPlateService.getPlate.and.returnValue(throwError(() => new Error('Load error')));
 
       component.ngOnInit();
+      tick();
 
       expect(component.isLoading).toBe(false);
+      expect(component.plates.length).toBe(0);
+    }));
+
+    it('should ignore stale requests when loading single plate', fakeAsync(() => {
+      const firstResponse: GetPlateResponse = {
+        plate: { ...mockPlate, id: 'first' },
+      };
+      const secondResponse: GetPlateResponse = {
+        plate: { ...mockPlate, id: 'second' },
+      };
+
+      // Create a Subject to control when the observables emit
+      const firstSubject = new Subject<GetPlateResponse>();
+      const secondSubject = new Subject<GetPlateResponse>();
+
+      mockPlateService.getPlate.and.returnValues(
+        firstSubject.asObservable(),
+        secondSubject.asObservable(),
+      );
+
+      // Start first request
+      component.ngOnInit();
+      tick();
+
+      // Start second request (simulating route change)
+      mockActivatedRoute.params = of({ id: '456' });
+      component.ngOnInit();
+      tick();
+
+      // Resolve second request first (newer)
+      secondSubject.next(secondResponse);
+      secondSubject.complete();
+      tick();
+
+      // Resolve first request (older, should be ignored)
+      firstSubject.next(firstResponse);
+      firstSubject.complete();
+      tick();
+
+      expect(component.plates[0].id).toBe('second');
+    }));
+  });
+
+  describe('Plate Search', () => {
+    it('should search plates with correct request parameters', () => {
+      const filters: PlateFilters = {
+        startDate: new Date('2023-01-01'),
+        endDate: new Date('2023-12-31'),
+        plateNumber: 'ABC123',
+        cameraId: 'cam1',
+        vehicleMake: 'Toyota',
+        vehicleModel: 'Camry',
+        vehicleType: 'Sedan',
+        vehicleColor: 'Blue',
+        vehicleRegion: 'US-CA',
+        regexSearchEnabled: true,
+        includeIgnoredPlates: true,
+        platesSeenLessThan: true,
+      };
+
+      component.plateFilters.set(filters);
+      component.onSearchTriggered();
+
+      const expectedRequest = jasmine.objectContaining({
+        pageSize: 25,
+        pageNumber: 0,
+        plateNumber: 'ABC123',
+        strictMatch: false,
+        vehicleMake: 'Toyota',
+        vehicleModel: 'Camry',
+        vehicleType: 'Sedan',
+        vehicleColor: 'Blue',
+        vehicleRegion: 'US-CA',
+        includeIgnoredPlates: true,
+        filterPlatesSeenLessThan: 10,
+        regexSearchEnabled: true,
+      });
+
+      expect(mockPlateService.searchPlates).toHaveBeenCalledWith(expectedRequest);
+    });
+
+    it('should handle search error gracefully', () => {
+      mockPlateService.searchPlates.and.returnValue(throwError(() => new Error('Search failed')));
+
+      component.onSearchTriggered();
+
+      expect(component.isLoading).toBe(false);
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Search failed. Please try again.',
+        SnackBarType.Error,
+      );
+    });
+
+    it('should reset page number when search is triggered', () => {
+      component['pageNumber'] = 5;
+
+      component.onSearchTriggered();
+
+      expect(mockPlateService.searchPlates).toHaveBeenCalledWith(
+        jasmine.objectContaining({ pageNumber: 0 }),
+      );
+    });
+
+    it('should not reset page number when resetPage is false', () => {
+      component['pageNumber'] = 5;
+
+      component.onPaginatorChange({ pageIndex: 5, pageSize: 25, length: 100 });
+
+      expect(mockPlateService.searchPlates).toHaveBeenCalledWith(
+        jasmine.objectContaining({ pageNumber: 5 }),
+      );
     });
   });
 
   describe('SignalR Integration', () => {
-    it('should subscribe to license plate updates', () => {
-      spyOn(component, 'searchPlates' as any);
+    it('should search plates when SignalR receives new plate and not loading', fakeAsync(() => {
+      component.isLoading = false;
+
+      // Create a spy for the private searchPlates method instead
+      spyOn<any>(component, 'searchPlates');
+
       component.ngOnInit();
+      tick();
 
-      licensePlateReceivedSubject.next({});
+      mockSignalrService.licensePlateReceived.next('new-plate');
+      tick();
 
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
+      expect(component['searchPlates']).toHaveBeenCalled();
+    }));
 
-    it('should not search plates when loading', () => {
-      spyOn(component, 'searchPlates' as any);
+    it('should not search plates when SignalR receives new plate but component is loading', fakeAsync(() => {
+      spyOn<any>(component, 'searchPlates');
+
+      component.ngOnInit();
+      tick();
+
+      // Set loading to true after initialization
       component.isLoading = true;
-      component.ngOnInit();
 
-      licensePlateReceivedSubject.next({});
+      mockSignalrService.licensePlateReceived.next('new-plate');
+      tick();
 
-      expect((component as any).searchPlates).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Filter Event Handlers', () => {
-    it('should handle filters changed event', () => {
-      const filters = { plateNumber: 'ABC123' } as any;
-
-      component.onFiltersChanged(filters);
-
-      expect(component.currentFilters).toBe(filters);
-    });
-
-    it('should handle search triggered event', () => {
-      spyOn(component, 'searchPlates' as any);
-
-      component.onSearchTriggered();
-
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-
-    it('should handle filters cleared event', () => {
-      spyOn(component, 'searchPlates' as any);
-      component.currentFilters = { plateNumber: 'ABC123' } as any;
-
-      component.onFiltersCleared();
-
-      // The component doesn't clear currentFilters - the plate-filters component
-      // emits updated filters via onFiltersChanged first, then this triggers search
-      expect(component.currentFilters).toEqual({ plateNumber: 'ABC123' } as any);
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-
-    it('should toggle advanced filters', () => {
-      expect(component.showAdvancedFilters).toBe(false);
-
-      component.onAdvancedFiltersToggled();
-
-      expect(component.showAdvancedFilters).toBe(true);
-    });
-  });
-
-  describe('Plate State Management', () => {
-    beforeEach(() => {
-      component.plates = [
-        { id: '1', isOpen: false } as any,
-        { id: '2', isOpen: false } as any,
-      ];
-    });
-
-    it('should open plate', () => {
-      component.onPlateOpened('1');
-
-      expect(component.plates[0].isOpen).toBe(true);
-      expect(component.plates[1].isOpen).toBe(false);
-    });
-
-    it('should close plate', () => {
-      component.plates[0].isOpen = true;
-
-      component.onPlateClosed('1');
-
-      expect(component.plates[0].isOpen).toBe(false);
-    });
+      expect(component['searchPlates']).not.toHaveBeenCalled();
+    }));
   });
 
   describe('Pagination', () => {
     it('should handle paginator change event', () => {
-      spyOn(component, 'searchPlates' as any);
-      const pageEvent: PageEvent = {
-        pageIndex: 1,
-        pageSize: 75,
-        length: 100,
-      };
-
-      component.onPaginatorChange(pageEvent);
-
-      expect(mockLocalStorageService.setData).toHaveBeenCalledWith('platePageSize', '75');
-      expect(component.pageSize).toBe(75);
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-
-    it('should handle paginator change event with valid page size only', () => {
-      spyOn(component, 'searchPlates' as any);
       const pageEvent: PageEvent = {
         pageIndex: 2,
-        pageSize: 100,
+        pageSize: 50,
         length: 200,
       };
 
       component.onPaginatorChange(pageEvent);
 
-      expect(mockLocalStorageService.setData).toHaveBeenCalledWith('platePageSize', '100');
-      expect(component.pageSize).toBe(100);
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-  });
-
-  describe('Plate Operations', () => {
-    beforeEach(() => {
-      component.plates =
-      [{ id: '1', plateNumber: 'ABC123' } as any];
-    });
-
-    it('should enrich plate successfully', () => {
-      spyOn(component, 'searchPlates' as any);
-      mockPlateService.enrichPlate.and.returnValue(of(null));
-
-      component.onEnrichPlate('1');
-
-      expect(component.isEnrichingPlate).toBe(false);
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Plate enriched successfully',
-        SnackBarType.Successful,
+      expect(component.pageSize).toBe(50);
+      expect(mockLocalStorageService.setData).toHaveBeenCalledWith(
+        'platePageSize',
+        JSON.stringify(50),
       );
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-
-    it('should handle enrich plate error', () => {
-      mockPlateService.enrichPlate.and.returnValue(throwError('Error'));
-
-      component.onEnrichPlate('1');
-
-      expect(component.isEnrichingPlate).toBe(false);
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to enrich plate',
-        SnackBarType.Error,
-      );
-    });
-
-    it('should open edit plate dialog', () => {
-      const mockDialogRef = { afterClosed: () => of(true) };
-      mockDialog.open.and.returnValue(mockDialogRef as any);
-      spyOn(component, 'searchPlates' as any);
-
-      component.onEditPlate('1');
-
-      expect(mockDialog.open).toHaveBeenCalled();
-      expect((component as any).searchPlates).toHaveBeenCalled();
-    });
-
-    it('should add plate to alert list', () => {
-      spyOn(component, 'searchPlates' as any);
-      mockAlertsService.addAlert.and.returnValue(of({}));
-
-      component.onAlertPlate('1');
-
-      expect(mockAlertsService.addAlert).toHaveBeenCalledWith(
-        jasmine.objectContaining({ plateNumber: 'ABC123' }));
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Added to alert list',
-        SnackBarType.Successful,
-      );
-    });
-
-    it('should handle add to alert list error', () => {
-      mockAlertsService.addAlert.and.returnValue(throwError('Error'));
-
-      component.onAlertPlate('1');
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to add to alert list',
-        SnackBarType.Error,
-      );
-    });
-
-    it('should add plate to ignore list', () => {
-      spyOn(component, 'searchPlates' as any);
-      mockIgnoresService.addIgnore.and.returnValue(of({}));
-
-      component.onIgnorePlate('1');
-
-      expect(mockIgnoresService.addIgnore).toHaveBeenCalledWith(
-        jasmine.objectContaining({ plateNumber: 'ABC123' }));
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Added to ignore list',
-        SnackBarType.Successful,
-      );
-    });
-
-    it('should search for plate', () => {
-      spyOn(component, 'searchPlates' as any);
-
-      component.onSearchForPlate('ABC123');
-
-      expect((component as any).searchPlates).toHaveBeenCalledWith('ABC123');
-    });
-  });
-
-  describe('Search Plates Method', () => {
-    beforeEach(() => {
-      component.ngOnInit();
-      fixture.detectChanges();
-    });
-
-    it('should search plates successfully and update component state', () => {
-      const mockSearchResult = {
-        plates: [mockPlate],
-        totalCount: 5,
-      };
-      mockPlateService.searchPlates.and.returnValue(of(mockSearchResult));
-
-      component.onSearchTriggered();
-
-      expect(component.isLoading).toBe(false);
-      expect(component.plates.length).toBe(1);
-      expect(component.totalNumberOfPlates).toBe(5);
-      expect(component.plates[0].plateNumber).toBe('ABC123');
-      expect(mockPlateService.searchPlates).toHaveBeenCalled();
-    });
-
-    it('should show error notification when search fails', () => {
-      mockPlateService.searchPlates.and.returnValue(throwError('Search failed'));
-
-      component.onSearchTriggered();
-
-      expect(component.isLoading).toBe(false);
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Search failed. Please try again.',
-        SnackBarType.Error,
-      );
-    });
-
-    it('should handle concurrent search requests correctly', () => {
-      const firstSearchResult = {
-        plates: [{ ...mockPlate, plateNumber: 'FIRST' }],
-        totalCount: 1,
-      };
-      const secondSearchResult = {
-        plates: [{ ...mockPlate, plateNumber: 'SECOND' }],
-        totalCount: 1,
-      };
-
-      // First search takes longer (using defer to create observable from promise)
-      let firstSearchResolve: any;
-      const firstSearchObservable = defer(() => new Promise<any>(resolve => {
-        firstSearchResolve = resolve;
-      }));
-
-      // Second search resolves immediately
-      mockPlateService.searchPlates.and.returnValues(
-        firstSearchObservable,
-        of(secondSearchResult),
-      );
-
-      // Trigger first search
-      component.onSearchTriggered();
-      expect(component.isLoading).toBe(true);
-
-      // Trigger second search
-      component.onSearchTriggered();
-
-      // Resolve first search after second one completes
-      firstSearchResolve(firstSearchResult);
-
-      // Only second search result should be displayed
-      expect(component.plates[0].plateNumber).toBe('SECOND');
-      expect(component.totalNumberOfPlates).toBe(1);
-      expect(component.isLoading).toBe(false);
-    });
-
-    it('should handle concurrent search requests with error correctly', () => {
-      // First search will error (using defer to create observable from promise)
-      let firstSearchReject: any;
-      const firstSearchObservable = defer(() => new Promise<any>((resolve, reject) => {
-        firstSearchReject = reject;
-      }));
-
-      // Second search succeeds
-      const secondSearchResult = {
-        plates: [mockPlate],
-        totalCount: 1,
-      };
-
-      mockPlateService.searchPlates.and.returnValues(
-        firstSearchObservable,
-        of(secondSearchResult),
-      );
-
-      // Trigger first search
-      component.onSearchTriggered();
-      expect(component.isLoading).toBe(true);
-
-      // Trigger second search
-      component.onSearchTriggered();
-
-      // Reject first search after second one completes
-      firstSearchReject('First search failed');
-
-      // Should not show error notification for outdated request
-      expect(mockSnackbarService.create).not.toHaveBeenCalledWith(
-        'Search failed. Please try again.',
-        SnackBarType.Error,
-      );
-      expect(component.isLoading).toBe(false);
-    });
-
-    it('should search with plate number parameter', () => {
-      const plateNumber = 'TEST123';
-      mockPlateService.searchPlates.and.returnValue(of({ plates: [], totalCount: 0 }));
-
-      // Access private method for testing
-      (component as any).searchPlates(plateNumber);
-
       expect(mockPlateService.searchPlates).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          plateNumber,
+          pageNumber: 2,
+          pageSize: 50,
         }),
       );
     });
 
-    it('should reset page number when searching', () => {
-      // Set page number to something other than 0
-      (component as any).pageNumber = 5;
-      mockPlateService.searchPlates.and.returnValue(of({ plates: [], totalCount: 0 }));
+    it('should not update page size if pageSize is invalid', () => {
+      const pageEvent: PageEvent = {
+        pageIndex: 1,
+        pageSize: 0,
+        length: 100,
+      };
 
-      component.onSearchTriggered();
+      const originalPageSize = component.pageSize;
+      component.onPaginatorChange(pageEvent);
 
-      expect((component as any).pageNumber).toBe(0);
+      expect(component.pageSize).toBe(originalPageSize);
+      expect(mockLocalStorageService.setData).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Plate Actions', () => {
+    beforeEach(() => {
+      component.plates = [
+        {
+          id: '123',
+          plateNumber: 'ABC123',
+          vehicleDescription: 'Toyota Camry',
+          openAlprCameraId: 1,
+          direction: 90,
+          receivedOn: new Date(),
+          isAlert: false,
+          isIgnore: false,
+          isOpen: false,
+          imageUrl: 'http://example.com/image.jpg',
+          cropImageUrl: 'http://example.com/crop.jpg',
+          processedPlateConfidence: 95,
+          notes: 'Test notes',
+          canBeEnriched: true,
+          region: 'US-CA',
+          possiblePlateNumbers: 'ABC123',
+          openAlprProcessingTimeMs: 150,
+        },
+      ];
+
+      // Reset loading states
+      component.isEnrichingPlate = false;
+      component.isAddingToAlertList = false;
+      component.isAddingToIgnoreList = false;
     });
 
-    it('should set loading state during search', () => {
-      let searchResolve: any;
-      const searchObservable = defer(() => new Promise<any>(resolve => {
-        searchResolve = resolve;
+    describe('Plate Opening/Closing', () => {
+      it('should open plate when onPlateOpened is called', () => {
+        component.onPlateOpened('123');
+
+        expect(component.plates[0].isOpen).toBe(true);
+      });
+
+      it('should close plate when onPlateClosed is called', () => {
+        component.plates[0].isOpen = true;
+
+        component.onPlateClosed('123');
+
+        expect(component.plates[0].isOpen).toBe(false);
+      });
+
+      it('should handle opening non-existent plate gracefully', () => {
+        expect(() => component.onPlateOpened('non-existent')).not.toThrow();
+      });
+    });
+
+    describe('Component State', () => {
+      it('should allow setting and getting loading states', () => {
+        expect(component.isEnrichingPlate).toBe(false);
+        component.isEnrichingPlate = true;
+        expect(component.isEnrichingPlate).toBe(true);
+        component.isEnrichingPlate = false;
+        expect(component.isEnrichingPlate).toBe(false);
+      });
+    });
+
+    describe('Plate Enrichment', () => {
+      it('should enrich plate successfully', fakeAsync(() => {
+        mockPlateService.enrichPlate.and.returnValue(of(null));
+        spyOn<any>(component, 'searchPlates');
+
+        // Verify initial state
+        expect(component.isEnrichingPlate).toBe(false);
+
+        // Manually set the loading state to verify it can be set
+        component.isEnrichingPlate = true;
+        expect(component.isEnrichingPlate).toBe(true);
+
+        // Reset to false
+        component.isEnrichingPlate = false;
+        expect(component.isEnrichingPlate).toBe(false);
+
+        // Call the method
+        component.onEnrichPlate('123');
+
+        // Process async operations first
+        tick();
+
+        // Verify service call and final state
+        expect(mockPlateService.enrichPlate).toHaveBeenCalledWith('123');
+        expect(component.isEnrichingPlate).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Plate enriched successfully',
+          SnackBarType.Successful,
+        );
+        expect(component['searchPlates']).toHaveBeenCalled();
       }));
-      mockPlateService.searchPlates.and.returnValue(searchObservable);
 
-      component.onSearchTriggered();
+      it('should handle enrich plate error', fakeAsync(() => {
+        mockPlateService.enrichPlate.and.returnValue(throwError(() => new Error('Enrich failed')));
 
-      expect(component.isLoading).toBe(true);
+        component.onEnrichPlate('123');
+        tick();
 
-      searchResolve({ plates: [], totalCount: 0 });
+        expect(component.isEnrichingPlate).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Failed to enrich plate',
+          SnackBarType.Error,
+        );
+      }));
+    });
 
-      // Need to wait for promise resolution
-      setTimeout(() => {
-        expect(component.isLoading).toBe(false);
+    describe('Plate Editing', () => {
+      it('should open edit dialog for existing plate', () => {
+        const mockDialogRef = {
+          afterClosed: () => of(true),
+        };
+        mockDialog.open.and.returnValue(mockDialogRef as any);
+        spyOn<any>(component, 'searchPlates');
+
+        component.onEditPlate('123');
+
+        expect(mockDialog.open).toHaveBeenCalled();
+        expect(component['searchPlates']).toHaveBeenCalled();
+      });
+
+      it('should not refresh if dialog is cancelled', () => {
+        const mockDialogRef = {
+          afterClosed: () => of(false),
+        };
+        mockDialog.open.and.returnValue(mockDialogRef as any);
+        spyOn<any>(component, 'searchPlates');
+
+        component.onEditPlate('123');
+
+        expect(component['searchPlates']).not.toHaveBeenCalled();
+      });
+
+      it('should handle editing non-existent plate gracefully', () => {
+        expect(() => component.onEditPlate('non-existent')).not.toThrow();
+        expect(mockDialog.open).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Alert List Management', () => {
+      it('should add plate to alert list successfully', fakeAsync(() => {
+        mockAlertsService.addAlert.and.returnValue(of({}));
+        spyOn<any>(component, 'searchPlates');
+
+        expect(component.isAddingToAlertList).toBe(false);
+
+        component.onAlertPlate('123');
+
+        tick();
+
+        expect(mockAlertsService.addAlert).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            id: '123',
+            plateNumber: 'ABC123',
+            description: '',
+            strictMatch: false,
+          }),
+        );
+        expect(component.isAddingToAlertList).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Added to alert list',
+          SnackBarType.Successful,
+        );
+        expect(component['searchPlates']).toHaveBeenCalled();
+      }));
+
+      it('should handle add to alert list error', fakeAsync(() => {
+        mockAlertsService.addAlert.and.returnValue(throwError(() => new Error('Add failed')));
+
+        component.onAlertPlate('123');
+        tick();
+
+        expect(component.isAddingToAlertList).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Failed to add to alert list',
+          SnackBarType.Error,
+        );
+      }));
+
+      it('should handle alerting non-existent plate gracefully', () => {
+        expect(() => component.onAlertPlate('non-existent')).not.toThrow();
+        expect(mockAlertsService.addAlert).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Ignore List Management', () => {
+      it('should add plate to ignore list successfully', fakeAsync(() => {
+        mockIgnoresService.addIgnore.and.returnValue(of({}));
+        spyOn<any>(component, 'searchPlates');
+
+        expect(component.isAddingToIgnoreList).toBe(false);
+
+        component.onIgnorePlate('123');
+
+        tick();
+
+        expect(mockIgnoresService.addIgnore).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            id: '123',
+            plateNumber: 'ABC123',
+            description: '',
+            strictMatch: false,
+          }),
+        );
+        expect(component.isAddingToIgnoreList).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Added to ignore list',
+          SnackBarType.Successful,
+        );
+        expect(component['searchPlates']).toHaveBeenCalled();
+      }));
+
+      it('should handle add to ignore list error', fakeAsync(() => {
+        mockIgnoresService.addIgnore.and.returnValue(throwError(() => new Error('Add failed')));
+
+        component.onIgnorePlate('123');
+        tick();
+
+        expect(component.isAddingToIgnoreList).toBe(false);
+        expect(mockSnackbarService.create).toHaveBeenCalledWith(
+          'Failed to add to ignore list',
+          SnackBarType.Error,
+        );
+      }));
+
+      it('should handle ignoring non-existent plate gracefully', () => {
+        expect(() => component.onIgnorePlate('non-existent')).not.toThrow();
+        expect(mockIgnoresService.addIgnore).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Plate Search', () => {
+      it('should search for specific plate number', () => {
+        spyOn<any>(component, 'searchPlates');
+
+        component.onSearchForPlate('XYZ789');
+
+        expect(component.plateFilters().plateNumber).toBe('XYZ789');
+        expect(component['searchPlates']).toHaveBeenCalled();
       });
     });
   });
 
+  describe('Data Mapping', () => {
+    it('should correctly map Plate to PlateData', () => {
+      const plateData: PlateData[] = [
+        {
+          id: '123',
+          plateNumber: 'ABC123',
+          vehicleDescription: 'Toyota Camry Blue',
+          openAlprCameraId: 1,
+          direction: 90,
+          receivedOn: new Date('2023-01-01T10:00:00Z'),
+          isAlert: false,
+          isIgnore: false,
+          isOpen: false,
+          imageUrl: 'http://example.com/image.jpg',
+          cropImageUrl: 'http://example.com/crop.jpg',
+          processedPlateConfidence: 95,
+          notes: 'Test notes',
+          canBeEnriched: true,
+          region: 'US-CA',
+          possiblePlateNumbers: 'ABC123,ABC124',
+          openAlprProcessingTimeMs: 150,
+        },
+      ];
+
+      mockPlateService.searchPlates.and.returnValue(of(mockPlateResponse));
+
+      component.onSearchTriggered();
+
+      expect(component.plates).toEqual(plateData);
+    });
+  });
+
+  describe('Request Building', () => {
+    it('should build correct date filters', () => {
+      const startDate = new Date('2023-01-01T15:30:00Z');
+      const endDate = new Date('2023-12-31T10:30:00Z');
+
+      component.plateFilters.set({
+        ...component.plateFilters(),
+        startDate,
+        endDate,
+      });
+
+      component.onSearchTriggered();
+
+      const call = mockPlateService.searchPlates.calls.mostRecent();
+      const request = call.args[0] as PlateRequest;
+
+      expect(request.startSearchOn.getHours()).toBe(0);
+      expect(request.startSearchOn.getMinutes()).toBe(0);
+      expect(request.startSearchOn.getSeconds()).toBe(0);
+      expect(request.startSearchOn.getMilliseconds()).toBe(0);
+
+      expect(request.endSearchOn.getHours()).toBe(23);
+      expect(request.endSearchOn.getMinutes()).toBe(59);
+      expect(request.endSearchOn.getSeconds()).toBe(59);
+      expect(request.endSearchOn.getMilliseconds()).toBe(999);
+    });
+
+    it('should build correct vehicle filters with empty strings for undefined values', () => {
+      component.plateFilters.set({
+        ...component.plateFilters(),
+        vehicleMake: undefined as any,
+        vehicleModel: 'Camry',
+        vehicleType: '',
+        vehicleColor: undefined as any,
+        vehicleRegion: 'US-CA',
+      });
+
+      component.onSearchTriggered();
+
+      const call = mockPlateService.searchPlates.calls.mostRecent();
+      const request = call.args[0] as PlateRequest;
+
+      expect(request.vehicleMake).toBe('');
+      expect(request.vehicleModel).toBe('Camry');
+      expect(request.vehicleType).toBe('');
+      expect(request.vehicleColor).toBe('');
+      expect(request.vehicleRegion).toBe('US-CA');
+    });
+
+    it('should build correct boolean filters', () => {
+      component.plateFilters.set({
+        ...component.plateFilters(),
+        includeIgnoredPlates: true,
+        platesSeenLessThan: true,
+        regexSearchEnabled: false,
+      });
+
+      component.onSearchTriggered();
+
+      const call = mockPlateService.searchPlates.calls.mostRecent();
+      const request = call.args[0] as PlateRequest;
+
+      expect(request.includeIgnoredPlates).toBe(true);
+      expect(request.filterPlatesSeenLessThan).toBe(10);
+      expect(request.regexSearchEnabled).toBe(false);
+    });
+
+    it('should set filterPlatesSeenLessThan to 0 when platesSeenLessThan is false', () => {
+      component.plateFilters.set({
+        ...component.plateFilters(),
+        platesSeenLessThan: false,
+      });
+
+      component.onSearchTriggered();
+
+      const call = mockPlateService.searchPlates.calls.mostRecent();
+      const request = call.args[0] as PlateRequest;
+
+      expect(request.filterPlatesSeenLessThan).toBe(0);
+    });
+  });
+
   describe('Component Cleanup', () => {
-    it('should call super.ngOnDestroy for cleanup', () => {
-      component.ngOnInit();
+    it('should call parent ngOnDestroy', () => {
       spyOn(Object.getPrototypeOf(Object.getPrototypeOf(component)), 'ngOnDestroy');
 
       component.ngOnDestroy();

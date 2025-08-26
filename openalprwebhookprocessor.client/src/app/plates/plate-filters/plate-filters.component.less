@@ -11,23 +11,49 @@
 .filter-card {
   margin: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
   border-radius: 12px;
+  overflow: hidden; // Prevent content from breaking out
 }
 
-.primary-filters {
+.filter-content {
+  overflow: hidden; // Ensure content stays within bounds
+}
+
+.primary-filter-row {
   display: flex;
   gap: 1.5rem;
-  align-items: flex-start;
+  align-items: flex-start; // Start alignment for proper form field positioning
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+  width: 100%;
+  min-width: 0; // Allow shrinking
+  
+  .primary-inputs {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start; // Keep form fields at their natural alignment
+    flex: 1 1 auto;
+    min-width: 0; // Allow shrinking to prevent overflow
+    flex-wrap: wrap;
+  }
+  
+  .primary-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex: 0 0 auto; // Don't grow, don't shrink, auto size
+    flex-wrap: wrap;
+    min-width: 0; // Allow shrinking
+    margin-top: 12px; // Adjust to center with form field input area
+  }
 }
 
 .date-range-field {
-  min-width: 280px;
-  flex: 1.5;
+  min-width: 250px;
+  max-width: 100%;
+  flex: 1 1 300px; // grow, shrink, basis
   
   .mat-mdc-form-field {
+    width: 100%;
     .mat-mdc-text-field-wrapper {
       background-color: #f5f5f5;
       border-radius: 8px;
@@ -41,10 +67,12 @@
 }
 
 .plate-field {
-  min-width: 220px;
-  flex: 1;
+  min-width: 180px;
+  max-width: 100%;
+  flex: 1 1 200px; // grow, shrink, basis
   
   .mat-mdc-form-field {
+    width: 100%;
     .mat-mdc-text-field-wrapper {
       background-color: #f5f5f5;
       border-radius: 8px;
@@ -64,50 +92,30 @@
   }
 }
 
-.filter-actions {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  padding-top: 0.75rem;
-}
-
-.apply-btn {
-  min-width: 130px;
-  height: 44px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  
-  &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
-    transform: translateY(-1px);
+// Action Button Styles
+.primary-actions {
+  app-refresh-button,
+  button[mat-raised-button] {
+    transition: all 0.3s ease;
+    flex: 0 0 auto; // Don't grow or shrink
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+    
+    mat-icon {
+      margin-right: 8px;
+    }
   }
   
-  &:disabled {
-    opacity: 0.6;
-    box-shadow: none;
+  button[mat-raised-button] {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+    }
   }
   
-  mat-icon {
-    margin-right: 8px;
-  }
-}
-
-.clear-btn {
-  min-width: 110px;
-  height: 44px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-1px);
-  }
-  
-  mat-icon {
-    margin-right: 8px;
+  .expand-btn {
+    flex: 0 0 44px; // Fixed size, no grow/shrink
   }
 }
 
@@ -140,7 +148,25 @@
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out;
+  
+  &.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    margin-bottom: 0;
+  }
+  
+  &.expanded {
+    max-height: 1000px; // Large enough to accommodate content
+    opacity: 1;
+  }
+  
+  mat-error {
+    grid-column: 1 / -1; // Span all grid columns
+    margin-top: 0.5rem;
+  }
   
   .mat-mdc-form-field {
     .mat-mdc-text-field-wrapper {
@@ -160,8 +186,7 @@
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-top: 1.5rem;
-  padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  grid-column: 1 / -1; // Span all grid columns
   border-radius: 8px;
   
   .mat-mdc-checkbox {
@@ -172,6 +197,37 @@
     .mdc-form-field {
       font-weight: 500;
     }
+  }
+}
+
+// Tablet/Small Desktop - Adjust flex basis for better wrapping
+@media (max-width: 1024px) and (min-width: 769px) {
+  .primary-filter-row {
+    gap: 1rem;
+    
+    .primary-inputs {
+      gap: 1rem;
+    }
+    
+    .primary-actions {
+      gap: 0.75rem;
+      
+      app-refresh-button,
+      button[mat-raised-button] {
+        min-width: 100px;
+        max-width: 130px;
+      }
+    }
+  }
+  
+  .date-range-field {
+    min-width: 220px;
+    flex-basis: 260px;
+  }
+  
+  .plate-field {
+    min-width: 160px;
+    flex-basis: 180px;
   }
 }
 
@@ -187,10 +243,37 @@
     padding: 1rem !important;
   }
   
-  .primary-filters {
+  .primary-filter-row {
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 1rem;
+    
+    .primary-inputs {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .primary-actions {
+      flex-direction: column;
+      width: 100%;
+      gap: 0.75rem;
+      
+      app-refresh-button,
+      button[mat-raised-button] {
+        min-width: unset;
+        height: 48px;
+        
+        &.full-width {
+          width: 100%;
+        }
+      }
+      
+      .expand-btn {
+        width: 48px !important;
+        height: 48px;
+        align-self: center;
+        margin-top: 0.5rem;
+      }
+    }
   }
   
   .date-range-field,
@@ -198,24 +281,6 @@
     min-width: unset;
     width: 100%;
     flex: unset;
-  }
-  
-  .filter-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.75rem;
-    
-    .apply-btn,
-    .clear-btn {
-      flex: 1;
-      min-width: unset;
-      height: 48px;
-    }
-    
-    .expand-btn {
-      width: 48px;
-      height: 48px;
-    }
   }
   
   .advanced-filters {
@@ -232,6 +297,7 @@
   }
 }
 
+// Very Small Screens
 @media (max-width: 480px) {
   .filter-bar {
     padding: 0.75rem;
@@ -241,20 +307,34 @@
     padding: 0.75rem !important;
   }
   
-  .primary-filters {
-    gap: 0.75rem;
-  }
-  
-  .filter-actions {
-    flex-direction: column;
+  .primary-filter-row {
     gap: 0.75rem;
     
-    .apply-btn,
-    .clear-btn,
-    .expand-btn {
-      width: 100%;
-      height: 44px;
+    .primary-inputs {
+      gap: 0.75rem;
     }
+    
+    .primary-actions {
+      gap: 0.5rem;
+      
+      app-refresh-button,
+      button[mat-raised-button] {
+        height: 44px;
+        min-width: unset;
+      }
+      
+      .expand-btn {
+        width: 44px !important;
+        height: 44px;
+        flex: 0 0 44px;
+      }
+    }
+  }
+  
+  .date-range-field,
+  .plate-field {
+    min-width: unset;
+    flex-basis: 100%;
   }
   
   .checkbox-filters {

@@ -225,7 +225,8 @@ export default tseslint.config(
       '@angular-eslint/template/valid-aria': 'error',
 
       // ===== Template Code Quality Rules =====
-      '@angular-eslint/template/conditional-complexity': ['error', { maxComplexity: 3 }],
+      // Disabled due to bug with new Angular control flow syntax (@if/@else/@for)
+      // '@angular-eslint/template/conditional-complexity': ['error', { maxComplexity: 3 }],
       '@angular-eslint/template/cyclomatic-complexity': ['error', { maxComplexity: 10 }],
       '@angular-eslint/template/no-any': 'error',
       '@angular-eslint/template/no-duplicate-attributes': 'error',

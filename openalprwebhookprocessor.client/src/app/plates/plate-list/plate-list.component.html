@@ -33,7 +33,7 @@
   </mat-accordion>
   <mat-paginator
     [pageSizeOptions]="[10, 25, 75, 100]"
-    [pageSize]="pageSize"
-    [length]="totalNumberOfPlates"
+    [pageSize]="pageSize()"
+    [length]="totalNumberOfPlates()"
     (page)="onPaginatorPage($event)" />
 </div>
