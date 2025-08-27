@@ -43,8 +43,7 @@ run_sqlite_migrations() {
     local connection_string="$1"
     local script_file="$2"
     local context_name="$3"
-    
-    # Extract the database path from connection string
+
     local db_path=$(echo "$connection_string" | sed -n 's/.*[Dd]ata[[:space:]]*[Ss]ource=\([^;]*\).*/\1/p')
     db_path=$(echo "$db_path" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
     
@@ -54,14 +53,7 @@ run_sqlite_migrations() {
     fi
     
     echo "Running $context_name migrations from $script_file..."
-    
-    # Check if sqlite3 is available
-    if ! command -v sqlite3 >/dev/null 2>&1; then
-        echo "ERROR: sqlite3 command not found. Please ensure it's installed in the Docker image."
-        return 1
-    fi
-    
-    # Run the migration
+
     sqlite3 -bail "$db_path" < "$script_file" 2>&1
     local exit_code=$?
     
@@ -74,11 +66,9 @@ run_sqlite_migrations() {
     fi
 }
 
-# Ensure database directories exist
 ensure_db_directory "$PROCESSOR_CONNECTION"
 ensure_db_directory "$USERS_CONNECTION"
 
-# Run migrations
 if [ -f "./processor-migrations.sql" ]; then
     run_sqlite_migrations "$PROCESSOR_CONNECTION" "./processor-migrations.sql" "ProcessorContext"
     MIGRATION_EXIT_CODE=$?
