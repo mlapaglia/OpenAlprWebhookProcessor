@@ -7,15 +7,20 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWe
     {
         public ImageDownloadRequest() { }
 
-
         [JsonPropertyName("type")]
         public string RequestType { get; set; }
+
+        [JsonPropertyName("uuid")]
+        public string Uuid { get; set; }
 
         [JsonPropertyName("direction")]
         public string Direction { get; set; }
 
         [JsonPropertyName("camera_id")]
         public long CameraId { get; set; }
+
+        [JsonPropertyName("size")]
+        public ImageDownloadRequestSize Size { get; set; }
 
         [JsonPropertyName("transaction_id")]
         public Guid TransactionId { get; set; }

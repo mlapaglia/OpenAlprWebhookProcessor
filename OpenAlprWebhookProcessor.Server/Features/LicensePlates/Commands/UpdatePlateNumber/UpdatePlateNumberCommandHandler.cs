@@ -32,3 +32,4 @@ public class UpdatePlateNumberCommandHandler : ICommandHandler<UpdatePlateNumber
         return Unit.Value;
     }
 }
+

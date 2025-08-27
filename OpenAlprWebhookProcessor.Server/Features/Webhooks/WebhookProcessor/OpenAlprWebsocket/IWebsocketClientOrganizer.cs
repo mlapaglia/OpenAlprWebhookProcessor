@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,6 +28,11 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWe
             string agentId,
             string maskImage,
             string openAlprName,
+            CancellationToken cancellationToken = default);
+
+        Task<ImageDownloadResponse> GetCameraSnapshotAsync(
+            string agentId,
+            long cameraId,
             CancellationToken cancellationToken = default);
 
         Task DisconnectAllClientsAsync(CancellationToken cancellationToken = default);

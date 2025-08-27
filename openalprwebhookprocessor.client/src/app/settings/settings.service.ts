@@ -71,4 +71,10 @@ export class SettingsService {
   getScheduledJobs(): Observable<ScheduledJobsResponse> {
     return this.http.get<ScheduledJobsResponse>('/api/settings/scheduled-jobs');
   }
+
+  getCameraSnapshot(agentId: string, cameraId: number): Observable<Blob> {
+    return this.http.get(`/api/images/websocket/${agentId}/${cameraId}/snapshot`, {
+      responseType: 'blob'
+    });
+  }
 }

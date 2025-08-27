@@ -24,6 +24,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWe
         Task SendGetImageRequestAsync(
             Guid transactionId,
             long cameraId,
+            string imageUuid,
             CancellationToken cancellationToken = default);
 
         Task SendSaveMaskRequestAsync(

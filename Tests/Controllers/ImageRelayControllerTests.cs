@@ -7,6 +7,7 @@ using OpenAlprWebhookProcessor.Features.ImageRelay;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetCropImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
+using OpenAlprWebhookProcessor.Features.ImageRelay.WebsocketSnapshotRelay;
 using Tests.TestHelpers;
 
 namespace Tests.Controllers
@@ -345,6 +346,65 @@ namespace Tests.Controllers
             result.Should().BeOfType<FileStreamResult>();
             var fileResult = result as FileStreamResult;
             fileResult.ContentType.Should().Be("image/jpeg");
+        }
+
+        [Test]
+        public async Task GetWebsocketSnapshot_ValidParameters_ReturnsFileResult()
+        {
+            // Arrange
+            var agentId = "test-agent-123";
+            var cameraId = 123;
+            var imageBytes = new byte[] { 1, 2, 3, 4, 5 };
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetWebsocketSnapshotQuery>(), cancellationToken)
+                .Returns(new MemoryStream(imageBytes));
+
+            // Act
+            var result = await _controller.GetWebsocketSnapshot(agentId, cameraId, cancellationToken);
+
+            // Assert
+            result.Should().BeOfType<FileStreamResult>();
+            var fileResult = result as FileStreamResult;
+            fileResult.ContentType.Should().Be("image/jpeg");
+        }
+
+        [Test]
+        public async Task GetWebsocketSnapshot_Exception_ReturnsNotFound()
+        {
+            // Arrange
+            var agentId = "test-agent-123";
+            var cameraId = 123;
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetWebsocketSnapshotQuery>(), cancellationToken)
+                .Throws(new Exception("Agent not found"));
+
+            // Act
+            var result = await _controller.GetWebsocketSnapshot(agentId, cameraId, cancellationToken);
+
+            // Assert
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetWebsocketSnapshot_CallsCorrectQuery()
+        {
+            // Arrange
+            var agentId = "test-agent-123";
+            var cameraId = 123;
+            var cancellationToken = GetCancellationToken();
+
+            Mediator.Send(Arg.Any<GetWebsocketSnapshotQuery>(), cancellationToken)
+                .Returns(new MemoryStream(new byte[] { 1, 2, 3 }));
+
+            // Act
+            await _controller.GetWebsocketSnapshot(agentId, cameraId, cancellationToken);
+
+            // Assert
+            await Mediator.Received(1).Send(
+                Arg.Is<GetWebsocketSnapshotQuery>(q => q.AgentId == agentId && q.CameraId == cameraId), 
+                cancellationToken);
         }
     }
 } 

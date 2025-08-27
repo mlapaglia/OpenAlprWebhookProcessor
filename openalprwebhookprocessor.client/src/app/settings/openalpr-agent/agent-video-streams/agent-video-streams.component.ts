@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, type OnDestroy, type OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, type OnDestroy, type OnInit } from '@angular/core';
 import { SettingsService } from '../../settings.service';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { AgentVideoStreams, type VideoStream } from '../videoStream';
@@ -6,8 +6,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { NgStyle } from '@angular/common';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
+import { ImageModalComponent } from './image-modal/image-modal.component';
+import type { Agent } from '../agent';
 
 @Component({
   selector: 'app-agent-video-streams',
@@ -17,15 +22,18 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   imports:
   [
     MatCardModule, MatIconModule, NgStyle,
-    MatProgressSpinnerModule, MatTableModule,
+    MatProgressSpinnerModule, MatTableModule, MatButtonModule, MatTooltipModule,
   ],
 })
 export class AgentVideoStreamsComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly settingsService = inject(SettingsService);
   private readonly signalRHub = inject(SignalrService);
+  private readonly dialog = inject(MatDialog);
+
+  public readonly agent = input<Agent>();
 
   public agentVideoStreams?: AgentVideoStreams;
-  public displayedColumns: string[] = ['cameraName', 'url', 'isStreaming', 'fps', 'totalPlateReads', 'lastPlateRead', 'lastUpdate'];
+  public displayedColumns: string[] = ['cameraName', 'url', 'isStreaming', 'fps', 'totalPlateReads', 'lastPlateRead', 'lastUpdate', 'actions'];
   public mobileDisplayedColumns: string[] = ['cameraName', 'isStreaming', 'fps', 'totalPlateReads'];
 
   public isLoading = false;
@@ -115,5 +123,24 @@ export class AgentVideoStreamsComponent extends OnPushBaseComponent implements O
               this.agentVideoStreams.isConnected &&
               this.agentVideoStreams.videoStreams.length === 0 &&
               !this.isLoading);
+  }
+
+  public openSnapshotModal(stream: VideoStream): void {
+    const currentAgent = this.agent();
+    if (!currentAgent || !currentAgent.id) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ImageModalComponent, {
+      width: '90vw',
+      maxWidth: '800px',
+      height: 'auto',
+      maxHeight: '90vh',
+      data: {
+        agentId: currentAgent.uid,
+        cameraId: stream.cameraId,
+        cameraName: stream.cameraName || 'Unknown Camera'
+      }
+    });
   }
 }

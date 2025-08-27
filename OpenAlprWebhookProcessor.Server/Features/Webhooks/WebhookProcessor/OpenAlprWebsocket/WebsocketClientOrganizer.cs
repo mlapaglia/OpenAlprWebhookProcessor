@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -226,6 +227,47 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWe
         public IReadOnlyDictionary<string, IOpenAlprWebsocketClient> GetConnectedClients()
         {
             return _connectedClients;
+        }
+
+        public async Task<ImageDownloadResponse> GetCameraSnapshotAsync(
+            string agentId,
+            long cameraId,
+            CancellationToken cancellationToken = default)
+        {
+            if (!_connectedClients.TryGetValue(agentId, out var webSocketClient))
+            {
+                _logger.LogError("Agent is not connected: {AgentId}", agentId);
+                return null;
+            }
+
+            var transactionId = Guid.NewGuid();
+
+            try
+            {
+                await webSocketClient.SendGetImageRequestAsync(
+                    transactionId,
+                    cameraId,
+                    null,
+                    cancellationToken);
+
+                var response = await WaitForResponseAsync<ImageDownloadResponse>(
+                    webSocketClient,
+                    transactionId,
+                    cancellationToken);
+
+                if (response == null)
+                {
+                    _logger.LogError("Agent did not respond to download image request: {AgentId}", agentId);
+                    return null;
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting snapshot from camera: {AgentId}, camera: {OpenAlprName}", agentId, cameraId);
+                throw;
+            }
         }
 
         public async Task DisconnectAllClientsAsync(CancellationToken cancellationToken = default)
