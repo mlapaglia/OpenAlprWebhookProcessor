@@ -36,7 +36,7 @@ describe('QrCodeDisplayComponent', () => {
     it('should call generateQrCode on init when qrCodeData is provided', () => {
       spyOn(component, 'generateQrCode');
       fixture.componentRef.setInput('qrCodeData', 'otpauth://totp/test:user@example.com?secret=TESTSECRET');
-      
+
       component.ngOnInit();
 
       expect(component.generateQrCode).toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('QrCodeDisplayComponent', () => {
     it('should not call generateQrCode on init when qrCodeData is empty', () => {
       spyOn(component, 'generateQrCode');
       fixture.componentRef.setInput('qrCodeData', '');
-      
+
       component.ngOnInit();
 
       expect(component.generateQrCode).not.toHaveBeenCalled();
@@ -75,7 +75,7 @@ describe('QrCodeDisplayComponent', () => {
     it('should clear previous error on new generation attempt', async () => {
       // First, set an error
       component.error = 'Previous error';
-      
+
       fixture.componentRef.setInput('qrCodeData', 'otpauth://totp/test:user@example.com?secret=TESTSECRET');
 
       await component.generateQrCode();
@@ -107,7 +107,7 @@ describe('QrCodeDisplayComponent', () => {
 
       const loadingElement = fixture.debugElement.query(By.css('.loading'));
       const spinner = fixture.debugElement.query(By.css('mat-spinner'));
-      
+
       expect(loadingElement).toBeTruthy();
       expect(spinner).toBeTruthy();
     });
@@ -118,7 +118,7 @@ describe('QrCodeDisplayComponent', () => {
 
       const errorElement = fixture.debugElement.query(By.css('.error'));
       const errorText = errorElement.query(By.css('p'));
-      
+
       expect(errorElement).toBeTruthy();
       expect(errorText.nativeElement.textContent.trim()).toBe('Test error message');
     });
@@ -130,7 +130,7 @@ describe('QrCodeDisplayComponent', () => {
       fixture.detectChanges();
 
       const qrImage = fixture.debugElement.query(By.css('.qr-code'));
-      
+
       expect(qrImage).toBeTruthy();
       expect(qrImage.nativeElement.src).toBe('data:image/png;base64,testimage');
       expect(qrImage.nativeElement.alt).toBe('QR Code for two-factor authentication setup');
@@ -145,7 +145,7 @@ describe('QrCodeDisplayComponent', () => {
 
       const sharedKeyCard = fixture.debugElement.query(By.css('.shared-key-card'));
       const sharedKeyCode = fixture.debugElement.query(By.css('.shared-key-code'));
-      
+
       expect(sharedKeyCard).toBeTruthy();
       expect(sharedKeyCode.nativeElement.textContent.trim()).toBe('TESTSHAREDKEY123');
     });
@@ -158,13 +158,13 @@ describe('QrCodeDisplayComponent', () => {
       fixture.detectChanges();
 
       const sharedKeyCard = fixture.debugElement.query(By.css('.shared-key-card'));
-      
+
       expect(sharedKeyCard).toBeFalsy();
     });
 
     it('should trigger copyToClipboard when copy button is clicked', () => {
       const copyToClipboardSpy = spyOn(component, 'copyToClipboard').and.stub();
-      
+
       fixture.componentRef.setInput('sharedKey', 'TESTKEY');
       component.qrCodeImageUrl = 'data:image/png;base64,test';
       component.loading = false;
@@ -185,7 +185,7 @@ describe('QrCodeDisplayComponent', () => {
       fixture.detectChanges();
 
       const qrDisplay = fixture.debugElement.query(By.css('.qr-code-display'));
-      
+
       expect(qrDisplay).toBeFalsy();
     });
 
@@ -197,7 +197,7 @@ describe('QrCodeDisplayComponent', () => {
       fixture.detectChanges();
 
       const qrDisplay = fixture.debugElement.query(By.css('.qr-code-display'));
-      
+
       expect(qrDisplay).toBeFalsy();
     });
   });
