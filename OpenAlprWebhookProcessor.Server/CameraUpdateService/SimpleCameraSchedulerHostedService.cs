@@ -28,9 +28,9 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 await Task.Delay(Timeout.Infinite, stoppingToken);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                _logger.LogInformation("SimpleCameraScheduler hosted service stopping");
+                _logger.LogInformation(ex, "SimpleCameraScheduler hosted service stopping");
             }
             catch (Exception ex)
             {

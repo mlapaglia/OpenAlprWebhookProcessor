@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.VerifyTwoFactor
             _signInManager = signInManager;
         }
 
-        public async ValueTask<AuthenticateResponse> Handle(VerifyTwoFactorCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<AuthenticateResponse> Handle(VerifyTwoFactorCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.UserId))
                 throw new AppException("Invalid user");

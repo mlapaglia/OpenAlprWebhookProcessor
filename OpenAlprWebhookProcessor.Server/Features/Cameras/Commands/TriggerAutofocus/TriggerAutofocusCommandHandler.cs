@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TriggerAutofocus
             _simpleCameraScheduler = simpleCameraScheduler;
         }
 
-        public async ValueTask<bool> Handle(TriggerAutofocusCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(TriggerAutofocusCommand request, CancellationToken cancellationToken)
         {
             return await _simpleCameraScheduler.TriggerAutofocusAsync(
                 request.CameraId,

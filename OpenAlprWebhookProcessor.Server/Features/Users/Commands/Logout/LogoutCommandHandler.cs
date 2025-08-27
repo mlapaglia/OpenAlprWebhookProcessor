@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Logout
             _signInManager = signInManager;
         }
 
-        public async ValueTask<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken)
         {
             await _signInManager.SignOutAsync();
             return Unit.Value;

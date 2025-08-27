@@ -17,12 +17,12 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetQuickStats
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<GetQuickStatsResponse> Handle(GetQuickStatsQuery request, CancellationToken cancellationToken)
         {
             var now = DateTimeOffset.UtcNow;
             var todayUtc = DateTime.UtcNow.Date;
-            var todayStartEpoch = (long)new DateTimeOffset(todayUtc, TimeSpan.Zero).ToUnixTimeMilliseconds();
-            var tomorrowStartEpoch = (long)new DateTimeOffset(todayUtc.AddDays(1), TimeSpan.Zero).ToUnixTimeMilliseconds();
+            var todayStartEpoch = new DateTimeOffset(todayUtc, TimeSpan.Zero).ToUnixTimeMilliseconds();
+            var tomorrowStartEpoch = new DateTimeOffset(todayUtc.AddDays(1), TimeSpan.Zero).ToUnixTimeMilliseconds();
             var weekAgoEpoch = now.AddDays(-7).ToUnixTimeMilliseconds();
             var monthAgoEpoch = now.AddDays(-30).ToUnixTimeMilliseconds();
 

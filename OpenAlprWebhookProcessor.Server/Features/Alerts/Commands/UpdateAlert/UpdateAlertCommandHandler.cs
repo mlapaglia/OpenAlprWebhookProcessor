@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.UpdateAlert
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<Unit> Handle(UpdateAlertCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpdateAlertCommand command, CancellationToken cancellationToken)
         {
             var alert = command.Alert;
             var dbAlert = await _unitOfWork.Alerts.GetByIdAsync(alert.Id, cancellationToken);

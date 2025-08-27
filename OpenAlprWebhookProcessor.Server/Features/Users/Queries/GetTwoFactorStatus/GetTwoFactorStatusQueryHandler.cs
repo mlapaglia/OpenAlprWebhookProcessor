@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetTwoFactorStatus
             _userManager = userManager;
         }
 
-        public async ValueTask<TwoFactorStatusResponse> Handle(GetTwoFactorStatusQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<TwoFactorStatusResponse> Handle(GetTwoFactorStatusQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(request.User);
             if (user == null)

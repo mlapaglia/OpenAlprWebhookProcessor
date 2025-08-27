@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.DeleteCamera
             _simpleCameraScheduler = simpleCameraScheduler;
         }
 
-        public async ValueTask<Unit> Handle(DeleteCameraCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteCameraCommand command, CancellationToken cancellationToken)
         {
             var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(x => x.Id == command.CameraId, cancellationToken);
 

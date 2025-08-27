@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.TestEnrichers
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 
-        public async ValueTask<bool> Handle(TestEnrichersCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(TestEnrichersCommand request, CancellationToken cancellationToken)
         {
             return await _licensePlateEnricherClient.TestAsync(cancellationToken);
         }

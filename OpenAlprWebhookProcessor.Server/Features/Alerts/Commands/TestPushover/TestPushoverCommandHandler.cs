@@ -21,7 +21,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestPushover
             _alertClient = alertClients.First(x => x is PushoverClient);
         }
 
-        public async ValueTask<Unit> Handle(TestPushoverCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestPushoverCommand command, CancellationToken cancellationToken)
         {
             var testPlateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .Include(x => x.PlateImage)

@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetCurrentUser
             _userManager = userManager;
         }
 
-        public async ValueTask<UserDto?> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<UserDto?> Handle(GetCurrentUserQuery request, CancellationToken cancellationToken)
         {
             if (request.User == null || !request.User.Identity.IsAuthenticated)
             {

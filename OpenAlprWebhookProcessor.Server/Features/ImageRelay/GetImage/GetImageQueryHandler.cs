@@ -47,7 +47,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.GetImage
 
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 
-            if (fullPlateGroup?.VehicleImage == null)
+            if (fullPlateGroup.VehicleImage == null)
             {
                 var imageBytes = await _imageCompressionService.GetImageFromAgentAsync(
                     agent,

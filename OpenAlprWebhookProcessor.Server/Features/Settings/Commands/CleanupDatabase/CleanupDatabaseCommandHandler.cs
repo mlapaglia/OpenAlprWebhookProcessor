@@ -29,7 +29,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.CleanupDatabase
             _logger = logger;
         }
 
-        public async ValueTask<Unit> Handle(CleanupDatabaseCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(CleanupDatabaseCommand command, CancellationToken cancellationToken)
         {
             _logger.LogInformation("Starting database cleanup operation");
 

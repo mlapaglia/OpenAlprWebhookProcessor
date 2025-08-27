@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister
             _userManager = userManager;
         }
 
-        public async ValueTask<bool> Handle(CanRegisterQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(CanRegisterQuery request, CancellationToken cancellationToken)
         {
             return !await _userManager.Users.AnyAsync(cancellationToken);
         }

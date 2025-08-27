@@ -8,15 +8,15 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
 {
     public class AlertService : IAlertService, IDisposable
     {
-        private readonly Channel<AlertUpdateRequest> _alertsChannel;
         private readonly ChannelWriter<AlertUpdateRequest> _writer;
+
         private readonly ChannelReader<AlertUpdateRequest> _reader;
 
         private bool _disposed = false;
 
         public AlertService()
         {
-            _alertsChannel = Channel.CreateUnbounded<AlertUpdateRequest>();
+            var _alertsChannel = Channel.CreateUnbounded<AlertUpdateRequest>();
             _writer = _alertsChannel.Writer;
             _reader = _alertsChannel.Reader;
         }
@@ -54,6 +54,8 @@ namespace OpenAlprWebhookProcessor.Features.Alerts
 
             CompleteChannel();
             _disposed = true;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

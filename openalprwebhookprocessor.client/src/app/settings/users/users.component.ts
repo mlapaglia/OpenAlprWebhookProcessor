@@ -1,4 +1,4 @@
-﻿import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { AccountService } from 'app/_services';
 import type { User } from 'app/_models';

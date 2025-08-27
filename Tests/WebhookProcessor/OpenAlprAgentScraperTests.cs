@@ -344,7 +344,7 @@ namespace Tests.WebhookProcessor
                 _responses.Enqueue(response);
             }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 LastRequestUri = request.RequestUri.ToString();
                 

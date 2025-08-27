@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.WebhookForwards.Commands.UpsertWebho
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<Unit> Handle(UpsertWebhookForwardsCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertWebhookForwardsCommand command, CancellationToken cancellationToken)
         {
             var webhookForwards = command.WebhookForwards.Where(x => x.Destination != null).ToList();
 

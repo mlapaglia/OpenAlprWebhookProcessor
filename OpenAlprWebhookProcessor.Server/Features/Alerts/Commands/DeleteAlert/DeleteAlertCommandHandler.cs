@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.DeleteAlert
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<Unit> Handle(DeleteAlertCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteAlertCommand command, CancellationToken cancellationToken)
         {
             var alert = await _unitOfWork.Alerts.GetByIdAsync(command.Id, cancellationToken);
             

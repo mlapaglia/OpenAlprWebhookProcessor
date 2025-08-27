@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.EnableAgent
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async ValueTask<bool> Handle(EnableAgentCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(EnableAgentCommand request, CancellationToken cancellationToken)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Commands.EnrichPlate
             _licensePlateEnricherClient = licensePlateEnricherClient;
         }
 
-        public async ValueTask<Unit> Handle(EnrichPlateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(EnrichPlateCommand request, CancellationToken cancellationToken)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(
                 request.PlateId,

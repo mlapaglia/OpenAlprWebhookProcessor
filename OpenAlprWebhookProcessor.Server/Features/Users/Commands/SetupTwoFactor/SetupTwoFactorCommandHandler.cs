@@ -18,7 +18,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.SetupTwoFactor
             _urlEncoder = urlEncoder;
         }
 
-        public async ValueTask<SetupTwoFactorResponse> Handle(SetupTwoFactorCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<SetupTwoFactorResponse> Handle(SetupTwoFactorCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(request.User);
             if (user == null)

@@ -12,11 +12,6 @@ namespace OpenAlprWebhookProcessor.Data
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             await EnsureWalModeAsync(cancellationToken);

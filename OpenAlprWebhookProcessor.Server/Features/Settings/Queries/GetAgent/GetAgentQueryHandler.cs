@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgent
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<AgentDto> Handle(GetAgentQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AgentDto> Handle(GetAgentQuery request, CancellationToken cancellationToken)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

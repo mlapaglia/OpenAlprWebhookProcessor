@@ -13,7 +13,7 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Commands.AddWeb
             _pushSubscriptionsService = pushSubscriptionsService;
         }
 
-        public async ValueTask<Unit> Handle(AddWebPushSubscriptionCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(AddWebPushSubscriptionCommand request, CancellationToken cancellationToken)
         {
             await _pushSubscriptionsService.InsertAsync(request.Subscription, cancellationToken);
             return Unit.Value;

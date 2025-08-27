@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CreateUser
             _userManager = userManager;
         }
 
-        public async ValueTask<ApplicationUser> Handle(CreateUserCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<ApplicationUser> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var existingUser = await _userManager.FindByNameAsync(request.Username);
             if (existingUser != null)

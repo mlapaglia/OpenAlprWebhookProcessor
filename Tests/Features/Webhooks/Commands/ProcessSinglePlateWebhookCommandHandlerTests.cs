@@ -122,7 +122,8 @@ namespace Tests.Features.Webhooks.Commands
                 Arg.Is<CameraUpdateRequest>(r => 
                     r.Id == camera.Id &&
                     r.LicensePlate == "SINGLE123" &&
-                    r.IsSinglePlate == true));
+                    r.IsSinglePlate == true),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -143,7 +144,9 @@ namespace Tests.Features.Webhooks.Commands
 
             // Assert
             result.Should().NotBeNull();
-            await _cameraUpdateService.DidNotReceive().ScheduleOverlayAsync(Arg.Any<CameraUpdateRequest>());
+            await _cameraUpdateService.DidNotReceive().ScheduleOverlayAsync(
+                Arg.Any<CameraUpdateRequest>(),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -165,7 +168,8 @@ namespace Tests.Features.Webhooks.Commands
             // Assert
             result.Should().NotBeNull();
             await _cameraUpdateService.Received(1).ScheduleOverlayAsync(
-                Arg.Is<CameraUpdateRequest>(r => r.IsAlert == true));
+                Arg.Is<CameraUpdateRequest>(r => r.IsAlert == true),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -187,7 +191,8 @@ namespace Tests.Features.Webhooks.Commands
             // Assert
             result.Should().NotBeNull();
             await _cameraUpdateService.Received(1).ScheduleOverlayAsync(
-                Arg.Is<CameraUpdateRequest>(r => r.IsAlert == false));
+                Arg.Is<CameraUpdateRequest>(r => r.IsAlert == false),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]

@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetAccountInfo
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<AccountInfoResponse> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AccountInfoResponse> Handle(GetAccountInfoQuery request, CancellationToken cancellationToken)
         {
             var agent = await _unitOfWork.Agents.GetAllAsync(cancellationToken);
             var firstAgent = agent.FirstOrDefault();

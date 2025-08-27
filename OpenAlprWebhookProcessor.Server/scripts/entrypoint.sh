@@ -1,6 +1,5 @@
-#!/bin/sh
+﻿#!/bin/sh
 set -e
-
 echo "OpenAlprWebhookProcessor starting..."
 
 APPSETTINGS_FILE="appsettings.json"
@@ -9,7 +8,6 @@ if [ -f "appsettings.Production.json" ]; then
 fi
 
 echo "Reading connection strings from $APPSETTINGS_FILE..."
-
 PROCESSOR_CONNECTION=$(jq -r '.ConnectionStrings.ProcessorConnection // empty' "$APPSETTINGS_FILE")
 USERS_CONNECTION=$(jq -r '.ConnectionStrings.UsersConnection // empty' "$APPSETTINGS_FILE")
 
@@ -28,37 +26,58 @@ echo "Users connection: $USERS_CONNECTION"
 
 ensure_db_directory() {
     local connection_string="$1"
-    local db_path=$(echo "$connection_string" | sed -n 's/.*Data Source=\([^;]*\).*/\1/p')
-    local db_dir=$(dirname "$db_path")
+    local db_path=$(echo "$connection_string" | sed -n 's/.*[Dd]ata[[:space:]]*[Ss]ource=\([^;]*\).*/\1/p')
+    db_path=$(echo "$db_path" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
     
-    if [ ! -d "$db_dir" ]; then
-        echo "Creating database directory: $db_dir"
-        mkdir -p "$db_dir"
+    if [ -n "$db_path" ] && [ "$db_path" != ":memory:" ]; then
+        local db_dir=$(dirname "$db_path")
+        
+        if [ ! -d "$db_dir" ] && [ "$db_dir" != "." ]; then
+            echo "Creating database directory: $db_dir"
+            mkdir -p "$db_dir"
+        fi
+    fi
+}
+
+run_sqlite_migrations() {
+    local connection_string="$1"
+    local script_file="$2"
+    local context_name="$3"
+
+    local db_path=$(echo "$connection_string" | sed -n 's/.*[Dd]ata[[:space:]]*[Ss]ource=\([^;]*\).*/\1/p')
+    db_path=$(echo "$db_path" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
+    
+    if [ ! -f "$script_file" ]; then
+        echo "ERROR: Migration script $script_file not found"
+        return 1
+    fi
+    
+    echo "Running $context_name migrations from $script_file..."
+
+    sqlite3 -bail "$db_path" < "$script_file" 2>&1
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ]; then
+        echo "✓ $context_name migrations completed successfully"
+        return 0
+    else
+        echo "✗ ERROR: $context_name migration failed with exit code $exit_code"
+        return $exit_code
     fi
 }
 
 ensure_db_directory "$PROCESSOR_CONNECTION"
 ensure_db_directory "$USERS_CONNECTION"
 
-echo "Running migrations for ProcessorConnection..."
-./processor-migrator --connection "$PROCESSOR_CONNECTION" 2>&1
-
+run_sqlite_migrations "$PROCESSOR_CONNECTION" "./processor-migrations.sql" "ProcessorContext"
 MIGRATION_EXIT_CODE=$?
-if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
-    echo "ProcessorConnection migrations completed successfully"
-else
-    echo "ERROR: ProcessorConnection migration failed with exit code $MIGRATION_EXIT_CODE"
+if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
     exit $MIGRATION_EXIT_CODE
 fi
 
-echo "Running migrations for UsersConnection..."
-./users-migrator --connection "$USERS_CONNECTION" 2>&1
-
+run_sqlite_migrations "$USERS_CONNECTION" "./users-migrations.sql" "UsersContext"
 MIGRATION_EXIT_CODE=$?
-if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
-    echo "UsersConnection migrations completed successfully"
-else
-    echo "ERROR: UsersConnection migration failed with exit code $MIGRATION_EXIT_CODE"
+if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
     exit $MIGRATION_EXIT_CODE
 fi
 

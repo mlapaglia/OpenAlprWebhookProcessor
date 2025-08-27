@@ -289,8 +289,8 @@ namespace Tests.Controllers
             var logContent = @"2025-01-24 08:36:29.632 -04:00 [ERR] Unhandled exception occurred during webhook processing
 System.InvalidOperationException: Unable to process license plate data
    at OpenAlprWebhookProcessor.WebhookProcessor.GroupWebhookHandler.ProcessGroupAsync(Group group, CancellationToken cancellationToken = default) in /app/src/WebhookProcessor/GroupWebhookHandler.cs:line 45
-   at OpenAlprWebhookProcessor.WebhookProcessor.GroupWebhookHandler.HandleAsync(WebhookRequest request, CancellationToken cancellationToken = default) in /app/src/WebhookProcessor/GroupWebhookHandler.cs:line 28
-   at OpenAlprWebhookProcessor.Features.Webhooks.WebhookController.ProcessWebhook(WebhookRequest request, CancellationToken cancellationToken = default) in /app/src/Features/Webhooks/WebhookController.cs:line 67
+   at OpenAlprWebhookProcessor.WebhookProcessor.GroupWebhookHandler.HandleAsync(WebhookRequest request, CancellationToken cancellationToken) in /app/src/WebhookProcessor/GroupWebhookHandler.cs:line 28
+   at OpenAlprWebhookProcessor.Features.Webhooks.WebhookController.ProcessWebhook(WebhookRequest request, CancellationToken cancellationToken) in /app/src/Features/Webhooks/WebhookController.cs:line 67
    --- End of inner exception stack trace ---
    at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
    at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken = default)

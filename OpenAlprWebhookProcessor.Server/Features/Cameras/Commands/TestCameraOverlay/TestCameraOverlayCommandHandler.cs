@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraOverlay
             _simpleCameraScheduler = simpleCameraScheduler;
         }
 
-        public async ValueTask<Unit> Handle(TestCameraOverlayCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestCameraOverlayCommand request, CancellationToken cancellationToken)
         {
             await _simpleCameraScheduler.ScheduleOverlayAsync(new CameraUpdateRequest()
             {

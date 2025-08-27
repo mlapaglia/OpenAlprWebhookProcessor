@@ -34,7 +34,7 @@ namespace OpenAlprWebhookProcessor.Features.WebSockets.Queries.GetWebSocket
             _processorHub = processorHub;
         }
 
-        public async ValueTask<Unit> Handle(GetWebSocketQuery command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(GetWebSocketQuery command, CancellationToken cancellationToken)
         {
             if (command.HttpContext.WebSockets.IsWebSocketRequest)
             {

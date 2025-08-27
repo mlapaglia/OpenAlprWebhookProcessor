@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
             _signInManager = signInManager;
         }
 
-        public async ValueTask<UserDto> Handle(AuthenticateCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<UserDto> Handle(AuthenticateCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByNameAsync(request.Username);
             if (user == null)

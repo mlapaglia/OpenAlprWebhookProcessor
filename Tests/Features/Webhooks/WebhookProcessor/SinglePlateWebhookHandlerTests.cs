@@ -125,7 +125,8 @@ namespace Tests.Features.Webhooks.WebhookProcessor
                     req.OpenAlprProcessingTimeMs == Math.Round(webhook.ProcessingTimeMs, 2) &&
                     req.ProcessedPlateConfidence == Math.Round(webhook.Results[0].Confidence, 2) &&
                     req.IsAlert == (webhook.DataType == "alpr_alert") &&
-                    req.IsSinglePlate == true));
+                    req.IsSinglePlate == true),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -153,7 +154,9 @@ namespace Tests.Features.Webhooks.WebhookProcessor
             await _handler.HandleWebhookAsync(webhook, CancellationToken.None);
 
             // Assert
-            await _cameraUpdateService.DidNotReceive().ScheduleOverlayAsync(Arg.Any<CameraUpdateRequest>());
+            await _cameraUpdateService.DidNotReceive().ScheduleOverlayAsync(
+                Arg.Any<CameraUpdateRequest>(),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -314,7 +317,8 @@ namespace Tests.Features.Webhooks.WebhookProcessor
 
             // Assert
             await _cameraUpdateService.Received(1).ScheduleOverlayAsync(
-                Arg.Is<CameraUpdateRequest>(req => req.IsAlert == true));
+                Arg.Is<CameraUpdateRequest>(req => req.IsAlert == true),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
@@ -345,7 +349,8 @@ namespace Tests.Features.Webhooks.WebhookProcessor
 
             // Assert
             await _cameraUpdateService.Received(1).ScheduleOverlayAsync(
-                Arg.Is<CameraUpdateRequest>(req => req.IsAlert == false));
+                Arg.Is<CameraUpdateRequest>(req => req.IsAlert == false),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]
