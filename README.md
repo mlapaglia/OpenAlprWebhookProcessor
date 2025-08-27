@@ -103,3 +103,69 @@ The application requires persistent storage for:
 - Camera snapshots and images
 
 Mount a volume to `/app/config/` to persist data between container restarts.
+
+## 🛠️ Development
+
+### Prerequisites
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [Node.js 24+](https://nodejs.org/) and npm
+- [Angular CLI](https://angular.io/cli): `npm install -g @angular/cli`
+
+### Getting Started
+
+#### Backend (ASP.NET Core)
+1. Navigate to the server project directory:
+   ```cmd
+   cd OpenAlprWebhookProcessor.Server
+   ```
+
+2. Restore dependencies:
+   ```cmd
+   dotnet restore
+   ```
+
+3. Start the backend server:
+   ```cmd
+   dotnet run
+   ```
+   
+   The backend will start at `https://localhost:5001`
+
+#### Frontend (Angular)
+1. Navigate to the client project directory:
+   ```cmd
+   cd openalprwebhookprocessor.client
+   ```
+
+2. Install dependencies:
+   ```cmd
+   npm install
+   ```
+
+3. Start the development server:
+   ```cmd
+   npm start
+   ```
+   
+   The frontend will start at `https://localhost:4200` and automatically proxy API requests to the backend.
+
+### Running Both Together
+For the best development experience, run both the backend and frontend simultaneously:
+
+1. **Terminal 1** - Start the backend:
+   ```cmd
+   cd OpenAlprWebhookProcessor.Server
+   dotnet run
+   ```
+
+2. **Terminal 2** - Start the frontend:
+   ```cmd
+   cd openalprwebhookprocessor.client
+   npm start
+   ```
+
+3. Open your browser to `https://localhost:4200`
+
+### Running Tests
+- **Backend Tests**: `dotnet test` (from the solution root)
+- **Frontend Tests**: `npm test` (from the client directory)
