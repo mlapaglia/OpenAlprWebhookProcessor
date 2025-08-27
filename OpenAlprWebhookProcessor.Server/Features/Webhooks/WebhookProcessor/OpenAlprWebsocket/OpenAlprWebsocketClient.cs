@@ -82,6 +82,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
         public async Task SendGetImageRequestAsync(
             Guid transactionId,
             long cameraId,
+            string imageUuid = null,
             CancellationToken cancellationToken = default)
         {
             var imageRequest = new ImageDownloadRequest()
@@ -90,6 +91,7 @@ namespace OpenAlprWebhookProcessor.WebhookProcessor.OpenAlprWebsocket
                 Direction = "request",
                 RequestType = RequestType.GetRequestType(OpenAlprRequestType.ImageDownload),
                 TransactionId = transactionId,
+                Uuid = imageUuid,
             };
 
             var message = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(imageRequest));

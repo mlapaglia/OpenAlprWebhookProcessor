@@ -508,6 +508,165 @@ namespace Tests.WebhookProcessor
             connectedClients.Should().BeEmpty();
         }
 
+        [Test]
+        public async Task GetCameraSnapshotAsync_NonExistentAgent_ReturnsNull()
+        {
+            const string agentId = "nonexistent";
+            const long cameraId = 123;
+            
+            var result = await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_ExistingAgentResponds_ReturnsImageDownloadResponse()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 456;
+            var expectedResponse = new ImageDownloadResponse 
+            { 
+                Image = "base64imagedata",
+                ResponseCode = "success",
+                TransactionId = Guid.NewGuid()
+            };
+
+            client.TryGetAgentResponse<ImageDownloadResponse>(Arg.Any<Guid>(), out Arg.Any<ImageDownloadResponse>())
+                .Returns(x =>
+                {
+                    x[1] = expectedResponse;
+                    return true;
+                });
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var result = await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            result.Should().Be(expectedResponse);
+            result.Image.Should().Be("base64imagedata");
+            result.ResponseCode.Should().Be("success");
+            await client.Received(1).SendGetImageRequestAsync(
+                Arg.Any<Guid>(), 
+                cameraId, 
+                null, 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_AgentDoesNotRespond_ReturnsNull()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 789;
+
+            client.TryGetAgentResponse<ImageDownloadResponse>(Arg.Any<Guid>(), out Arg.Any<ImageDownloadResponse>())
+                .Returns(false);
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var result = await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            result.Should().BeNull();
+            await client.Received(1).SendGetImageRequestAsync(
+                Arg.Any<Guid>(), 
+                cameraId, 
+                null, 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_SendImageRequestThrows_PropagatesException()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 101;
+            var expectedException = new Exception("Send request failed");
+
+            client.SendGetImageRequestAsync(Arg.Any<Guid>(), Arg.Any<long>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromException(expectedException));
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var act = async () => await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            await act.Should().ThrowExactlyAsync<Exception>()
+                .WithMessage("Send request failed");
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_ValidParameters_CallsCorrectMethods()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 555;
+            var transactionId = Guid.NewGuid();
+            var expectedResponse = new ImageDownloadResponse 
+            { 
+                Image = "testimage",
+                ResponseCode = "ok",
+                TransactionId = transactionId
+            };
+
+            client.TryGetAgentResponse<ImageDownloadResponse>(Arg.Any<Guid>(), out Arg.Any<ImageDownloadResponse>())
+                .Returns(x =>
+                {
+                    x[1] = expectedResponse;
+                    return true;
+                });
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var result = await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            result.Should().NotBeNull();
+            await client.Received(1).SendGetImageRequestAsync(
+                Arg.Any<Guid>(), 
+                cameraId, 
+                null, 
+                Arg.Any<CancellationToken>());
+            
+            client.Received().TryGetAgentResponse<ImageDownloadResponse>(
+                Arg.Any<Guid>(), 
+                out Arg.Any<ImageDownloadResponse>());
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_ResponseTimeout_ReturnsNull()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 999;
+
+            // Configure client to never return a response (simulating timeout)
+            client.TryGetAgentResponse<ImageDownloadResponse>(Arg.Any<Guid>(), out Arg.Any<ImageDownloadResponse>())
+                .Returns(false);
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var result = await _organizer.GetCameraSnapshotAsync(agentId, cameraId, CancellationToken.None);
+            
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public async Task GetCameraSnapshotAsync_CancellationRequested_ThrowsOperationCanceledException()
+        {
+            var client = CreateMockClient();
+            const string agentId = "agent1";
+            const long cameraId = 777;
+            var cts = new CancellationTokenSource();
+
+            // Cancel the token immediately
+            cts.Cancel();
+
+            await _organizer.AddAgentAsync(agentId, client, CancellationToken.None);
+            
+            var act = async () => await _organizer.GetCameraSnapshotAsync(agentId, cameraId, cts.Token);
+            
+            await act.Should().ThrowAsync<OperationCanceledException>();
+        }
+
         private static IOpenAlprWebsocketClient CreateMockClient()
         {
             var client = Substitute.For<IOpenAlprWebsocketClient>();

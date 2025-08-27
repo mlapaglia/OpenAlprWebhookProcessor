@@ -1,0 +1,47 @@
+<div class="image-modal-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>Camera Snapshot - {{data.cameraName}}</h2>
+    <button mat-icon-button (click)="onClose()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="modal-content">
+    @if (isLoading) {
+      <div class="loading-container">
+        <mat-progress-spinner
+          color="primary"
+          mode="indeterminate"
+          diameter="50" />
+        <p>Loading camera snapshot...</p>
+      </div>
+    }
+
+    @if (errorMessage && !isLoading) {
+      <div class="error-container">
+        <mat-icon class="error-icon">error</mat-icon>
+        <p>{{errorMessage}}</p>
+        <button mat-raised-button color="primary" (click)="onRetry()">
+          <mat-icon>refresh</mat-icon>
+          Retry
+        </button>
+      </div>
+    }
+
+    @if (imageUrl && !isLoading && !errorMessage) {
+      <div class="image-container">
+        <img [src]="imageUrl" [alt]="'Snapshot from ' + data.cameraName" class="snapshot-image">
+      </div>
+    }
+  </div>
+
+  <div class="modal-actions">
+    <button mat-button (click)="onClose()">Close</button>
+    @if (imageUrl && !isLoading && !errorMessage) {
+      <button mat-raised-button color="primary" (click)="onRetry()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    }
+  </div>
+</div>

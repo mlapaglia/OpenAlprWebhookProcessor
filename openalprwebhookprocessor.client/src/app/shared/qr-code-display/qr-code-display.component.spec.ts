@@ -92,12 +92,7 @@ describe('QrCodeDisplayComponent', () => {
       await expectAsync(component.copyToClipboard()).toBeResolved();
     });
 
-    it('should handle clipboard operations gracefully', async () => {
-      fixture.componentRef.setInput('sharedKey', 'TESTSECRETKEY123');
 
-      // This should complete without throwing an error regardless of clipboard availability
-      await expectAsync(component.copyToClipboard()).toBeResolved();
-    });
   });
 
   describe('template rendering', () => {

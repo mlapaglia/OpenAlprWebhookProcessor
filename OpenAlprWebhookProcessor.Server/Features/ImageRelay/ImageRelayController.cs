@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetCropImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.GetImage;
 using OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay;
+using OpenAlprWebhookProcessor.Features.ImageRelay.WebsocketSnapshotRelay;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,6 +67,25 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay
             try
             {
                 var query = new GetSnapshotQuery(cameraId);
+                var snapshot = await _mediator.Send(query, cancellationToken);
+
+                return File(snapshot, "image/jpeg");
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("websocket/{agentId}/{cameraId}/snapshot")]
+        public async Task<IActionResult> GetWebsocketSnapshot(
+            string agentId,
+            long cameraId,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = new GetWebsocketSnapshotQuery(agentId, cameraId);
                 var snapshot = await _mediator.Send(query, cancellationToken);
 
                 return File(snapshot, "image/jpeg");
