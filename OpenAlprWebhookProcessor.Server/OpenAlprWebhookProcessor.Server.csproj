@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <SpaRoot>..\openalprwebhookprocessor.client</SpaRoot>
@@ -19,7 +20,7 @@
     <NoWarn>CS8618</NoWarn>
     <UserSecretsId>4cca298b-24cc-40bb-bbdd-92b2fb978368</UserSecretsId>
 	</PropertyGroup>
-
+  
 	<ItemGroup>
 	  <None Remove="config\processor.db-shm" />
 	  <None Remove="config\processor.db-wal" />
@@ -39,7 +40,7 @@
     <PackageReference Include="Flurl.Http" Version="4.0.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.2" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.7.0" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.8.0" />
     <PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
     <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*-*">
       <PrivateAssets>all</PrivateAssets>
@@ -70,11 +71,6 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="config\" />
-		<Folder Include="Features\Users\Data\Repositories\" />
 	</ItemGroup>
 
 	<ItemGroup>

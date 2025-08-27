@@ -4,8 +4,7 @@
       "commandName": "Project",
       "launchUrl": "plates",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:5001"
@@ -15,8 +14,7 @@
       "launchBrowser": true,
       "launchUrl": "plates",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "Docker": {
@@ -33,7 +31,6 @@
       "launchUrl": "https://localhost:5001/plates",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy",
         "ASPNETCORE_URLS": "https://localhost:5001"
       },
       "distributionName": "Ubuntu"

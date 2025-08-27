@@ -28,7 +28,6 @@ ARG GIT_ASSEMBLY_VERSION
 ARG GIT_FILE_VERSION
 WORKDIR /src
 
-# Copy configuration files
 COPY ["openalprwebhookprocessor.client/angular.json", \
       "openalprwebhookprocessor.client/tsconfig*.json", \
       "openalprwebhookprocessor.client/karma.conf.js", \
@@ -36,7 +35,6 @@ COPY ["openalprwebhookprocessor.client/angular.json", \
       "openalprwebhookprocessor.client/ngsw-config.json", \
       "openalprwebhookprocessor.client/"]
 
-# Copy source code (changes most frequently)
 COPY ["OpenAlprWebhookProcessor.Server/", "OpenAlprWebhookProcessor.Server/"]
 COPY ["openalprwebhookprocessor.client/src/", "openalprwebhookprocessor.client/src/"]
 
@@ -47,22 +45,18 @@ RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURAT
     -p:GitAssemblyVersion="$GIT_ASSEMBLY_VERSION" \
     -p:GitFileVersion="$GIT_FILE_VERSION" && \
     mkdir -p /app/build && \
-    /root/.dotnet/tools/dotnet-ef migrations bundle \
+    /root/.dotnet/tools/dotnet-ef migrations script \
         --project "./OpenAlprWebhookProcessor.Server.csproj" \
         --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context ProcessorContext \
-        --output /app/build/processor-migrator \
-        --configuration $BUILD_CONFIGURATION \
-        --verbose \
-        --force && \
-    /root/.dotnet/tools/dotnet-ef migrations bundle \
+        --output /app/build/processor-migrations.sql \
+        --configuration $BUILD_CONFIGURATION && \
+    /root/.dotnet/tools/dotnet-ef migrations script \
         --project "./OpenAlprWebhookProcessor.Server.csproj" \
         --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context UsersContext \
-        --output /app/build/users-migrator \
-        --configuration $BUILD_CONFIGURATION \
-        --verbose \
-        --force
+        --output /app/build/users-migrations.sql \
+        --configuration $BUILD_CONFIGURATION
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION
@@ -72,6 +66,7 @@ ARG GIT_FILE_VERSION
 RUN dotnet publish "./OpenAlprWebhookProcessor.Server.csproj" \
     -c $BUILD_CONFIGURATION \
     -o /app/publish \
+    -r linux-musl-x64 \
     /p:UseAppHost=false \
     /p:PublishSingleFile=false \
     -p:GitVersion="$GIT_VERSION" \
@@ -81,9 +76,12 @@ RUN dotnet publish "./OpenAlprWebhookProcessor.Server.csproj" \
 FROM base AS final
 WORKDIR /app
 
+USER root
+RUN apk add --no-cache sqlite
+
 COPY --from=publish /app/publish .
-COPY --from=build /app/build/processor-migrator ./processor-migrator
-COPY --from=build /app/build/users-migrator ./users-migrator
+COPY --from=build /app/build/processor-migrations.sql ./processor-migrations.sql
+COPY --from=build /app/build/users-migrations.sql ./users-migrations.sql
 COPY --from=build /src/OpenAlprWebhookProcessor.Server/scripts/entrypoint.sh ./
 
 USER root

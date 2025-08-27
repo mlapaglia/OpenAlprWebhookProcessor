@@ -1,10 +1,10 @@
-﻿import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { first } from 'rxjs/operators';
 import { AccountService } from 'app/_services';
 import type { User } from 'app/_models';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 
-import { RouterLink, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,7 @@ import { User2FAComponent } from './user-2fa/user-2fa.component';
   templateUrl: 'users.component.html',
   styleUrl: 'users.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, RouterModule, MatButtonModule, MatTableModule, MatIconModule, MatProgressSpinnerModule, MatCardModule],
+  imports: [RouterModule, MatButtonModule, MatTableModule, MatIconModule, MatProgressSpinnerModule, MatCardModule],
 })
 export class UsersComponent extends OnPushBaseComponent implements OnInit {
   private readonly accountService = inject(AccountService);
