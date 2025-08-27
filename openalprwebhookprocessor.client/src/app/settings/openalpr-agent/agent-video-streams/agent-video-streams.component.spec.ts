@@ -7,12 +7,15 @@ import { of, Subject, throwError } from 'rxjs';
 import { AgentVideoStreams, VideoStream } from '../videoStream';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { Agent } from '../agent';
 
 describe('AgentVideoStreamsComponent', () => {
   let component: AgentVideoStreamsComponent;
   let fixture: ComponentFixture<AgentVideoStreamsComponent>;
   let mockSettingsService: jasmine.SpyObj<SettingsService>;
   let mockSignalrService: jasmine.SpyObj<SignalrService>;
+  let mockDialog: jasmine.SpyObj<MatDialog>;
   let connectionStatusSubject: Subject<any>;
 
   beforeEach(async () => {
@@ -22,12 +25,14 @@ describe('AgentVideoStreamsComponent', () => {
     mockSignalrService = jasmine.createSpyObj('SignalrService', [], {
       openAlprAgentConnectionStatusChanged: connectionStatusSubject.asObservable(),
     });
+    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [AgentVideoStreamsComponent, BrowserAnimationsModule],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SignalrService, useValue: mockSignalrService },
+        { provide: MatDialog, useValue: mockDialog },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -100,7 +105,7 @@ describe('AgentVideoStreamsComponent', () => {
   });
 
   it('should display correct columns', () => {
-    expect(component.displayedColumns).toEqual(['cameraName', 'url', 'isStreaming', 'fps', 'totalPlateReads', 'lastPlateRead', 'lastUpdate']);
+    expect(component.displayedColumns).toEqual(['cameraName', 'url', 'isStreaming', 'fps', 'totalPlateReads', 'lastPlateRead', 'lastUpdate', 'actions']);
   });
 
   it('should cleanup subscriptions on destroy', () => {
@@ -112,5 +117,58 @@ describe('AgentVideoStreamsComponent', () => {
     component.ngOnDestroy();
     expect(component['destroy$'].next).toHaveBeenCalled();
     expect(component['destroy$'].complete).toHaveBeenCalled();
+  });
+
+  it('should open snapshot modal when openSnapshotModal is called with valid agent', () => {
+    const mockAgent = new Agent({ id: 'test-agent-123' });
+    const mockStream = new VideoStream({
+      cameraId: 456,
+      cameraName: 'Test Camera',
+      fps: 15.0,
+      isStreaming: true,
+      lastPlateRead: 1640995200000,
+      lastUpdate: 1640995260000,
+      totalPlateReads: 50,
+      url: 'rtsp://test/stream',
+    });
+
+    // Set the agent input
+    fixture.componentRef.setInput('agent', mockAgent);
+    mockSettingsService.getAgentVideoStreams.and.returnValue(of(new AgentVideoStreams()));
+    fixture.detectChanges();
+
+    component.openSnapshotModal(mockStream);
+
+    expect(mockDialog.open).toHaveBeenCalledWith(jasmine.any(Function), {
+      width: '90vw',
+      maxWidth: '800px',
+      height: 'auto',
+      maxHeight: '90vh',
+      data: {
+        agentId: 'test-agent-123',
+        cameraId: 456,
+        cameraName: 'Test Camera'
+      }
+    });
+  });
+
+  it('should not open snapshot modal when agent is not available', () => {
+    const mockStream = new VideoStream({
+      cameraId: 456,
+      cameraName: 'Test Camera',
+      fps: 15.0,
+      isStreaming: true,
+      lastPlateRead: 1640995200000,
+      lastUpdate: 1640995260000,
+      totalPlateReads: 50,
+      url: 'rtsp://test/stream',
+    });
+
+    mockSettingsService.getAgentVideoStreams.and.returnValue(of(new AgentVideoStreams()));
+    fixture.detectChanges();
+
+    component.openSnapshotModal(mockStream);
+
+    expect(mockDialog.open).not.toHaveBeenCalled();
   });
 });
