@@ -35,11 +35,4 @@ coverage/
 **/[Bb]in/
 **/[Oo]bj/
 **/[Rr]elease/
-**/x64/
-**/x86/
-**/[Aa][Rr][Mm]/
-**/[Aa][Rr][Mm]64/
-**/bld/
-**/[Tt]est[Rr]esult*/
-**/[Bb]uild[Ll]og.*
 **/OpenAlprWebhookProcessor.Server/config
