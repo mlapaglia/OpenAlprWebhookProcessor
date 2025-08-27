@@ -147,8 +147,8 @@ describe('AgentVideoStreamsComponent', () => {
       data: {
         agentId: 'test-agent-123',
         cameraId: 456,
-        cameraName: 'Test Camera'
-      }
+        cameraName: 'Test Camera',
+      },
     });
   });
 
