@@ -74,7 +74,7 @@ export class SettingsService {
 
   getCameraSnapshot(agentId: string, cameraId: number): Observable<Blob> {
     return this.http.get(`/api/images/websocket/${agentId}/${cameraId}/snapshot`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 }

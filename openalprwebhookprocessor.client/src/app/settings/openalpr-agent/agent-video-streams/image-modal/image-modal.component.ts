@@ -49,10 +49,10 @@ export class ImageModalComponent extends OnPushBaseComponent implements OnInit {
         this.imageUrl = URL.createObjectURL(blob);
         this.isLoading = false;
       },
-      (error) => {
+      _ => {
         this.errorMessage = 'Failed to load camera snapshot';
         this.isLoading = false;
-      }
+      },
     );
   }
 

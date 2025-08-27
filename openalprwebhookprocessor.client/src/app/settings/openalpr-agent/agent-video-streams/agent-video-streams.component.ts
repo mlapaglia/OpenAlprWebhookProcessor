@@ -124,23 +124,4 @@ export class AgentVideoStreamsComponent extends OnPushBaseComponent implements O
               this.agentVideoStreams.videoStreams.length === 0 &&
               !this.isLoading);
   }
-
-  public openSnapshotModal(stream: VideoStream): void {
-    const currentAgent = this.agent();
-    if (!currentAgent || !currentAgent.id) {
-      return;
-    }
-
-    const dialogRef = this.dialog.open(ImageModalComponent, {
-      width: '90vw',
-      maxWidth: '800px',
-      height: 'auto',
-      maxHeight: '90vh',
-      data: {
-        agentId: currentAgent.uid,
-        cameraId: stream.cameraId,
-        cameraName: stream.cameraName || 'Unknown Camera'
-      }
-    });
-  }
 }
