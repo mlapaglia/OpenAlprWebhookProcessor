@@ -30,6 +30,7 @@
     "@angular/service-worker": "^20.2.1",
     "@microsoft/signalr": "^9.0.6",
     "chart.js": "^4.5.0",
+    "lean-qr": "^2.5.0",
     "ngx-highlightjs": "^14.0.1",
     "ngx-lightbox": "^3.0.0",
     "qrcode": "^1.5.4",

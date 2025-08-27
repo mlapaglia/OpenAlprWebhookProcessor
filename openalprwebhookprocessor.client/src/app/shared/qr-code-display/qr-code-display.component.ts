@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
-import * as QRCode from 'qrcode';
+import { generate } from 'lean-qr';
 
 @Component({
   selector: 'app-qr-code-display',
@@ -38,7 +38,8 @@ export class QrCodeDisplayComponent extends OnPushBaseComponent implements OnIni
     this.markForCheck();
 
     try {
-      this.qrCodeImageUrl = await QRCode.toDataURL(this.qrCodeData());
+      const qrCode = generate(this.qrCodeData());
+      this.qrCodeImageUrl = qrCode.toDataURL();
     } catch {
       this.error = 'Failed to generate QR code';
     } finally {
