@@ -370,7 +370,7 @@ namespace Tests.Features.ImageRelay
                 _responseContent = content ?? Array.Empty<byte>();
             }
 
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 LastRequestUri = request.RequestUri.ToString();
                 

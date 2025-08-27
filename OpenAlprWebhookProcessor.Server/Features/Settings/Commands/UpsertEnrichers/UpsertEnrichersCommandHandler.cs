@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertEnrichers
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<Unit> Handle(UpsertEnrichersCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertEnrichersCommand command, CancellationToken cancellationToken)
         {
             var enricher = command.Enricher;
             var dbEnricher = await _unitOfWork.Enrichers.FirstOrDefaultAsync(x => x.Id == enricher.Id, cancellationToken);

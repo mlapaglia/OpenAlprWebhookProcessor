@@ -20,7 +20,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentVideoStream
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async ValueTask<AgentVideoStreamsDto> Handle(GetAgentVideoStreamsQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AgentVideoStreamsDto> Handle(GetAgentVideoStreamsQuery request, CancellationToken cancellationToken)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

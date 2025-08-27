@@ -54,22 +54,28 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
             foreach (var kvp in _cancellationTokens)
             {
-                kvp.Value.Cancel();
+                await kvp.Value.CancelAsync();
             }
 
             foreach (var kvp in _overlayCancellationTokens)
             {
-                kvp.Value.Cancel();
+                await kvp.Value.CancelAsync();
             }
 
             foreach (var kvp in _cameraTimers)
             {
-                kvp.Value?.Dispose();
+                if (kvp.Value != null)
+                {
+                    await kvp.Value.DisposeAsync();
+                }
             }
 
             foreach (var kvp in _overlayTimers)
             {
-                kvp.Value?.Dispose();
+                if (kvp.Value != null)
+                {
+                    await kvp.Value.DisposeAsync();
+                }
             }
 
             _cameraTimers.Clear();
@@ -234,7 +240,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
                 try
                 {
-                    _nextExecutionTimes.TryRemove(cameraId, out var whatever);
+                    _nextExecutionTimes.TryRemove(cameraId, out var _);
                     await ExecuteCameraToggleAsync(cameraId, cancellationTokenSource.Token);
                     await RescheduleCameraAsync(cameraId, cancellationTokenSource.Token);
                 }
@@ -773,6 +779,8 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
             _overlayExecutionTimes.Clear();
 
             _disposed = true;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

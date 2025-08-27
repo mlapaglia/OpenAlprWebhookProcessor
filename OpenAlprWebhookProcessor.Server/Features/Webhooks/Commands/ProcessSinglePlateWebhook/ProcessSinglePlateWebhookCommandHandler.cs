@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessSinglePlate
             _singlePlateWebhookHandler = singlePlateWebhookHandler;
         }
 
-        public async ValueTask<Unit> Handle(ProcessSinglePlateWebhookCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(ProcessSinglePlateWebhookCommand request, CancellationToken cancellationToken)
         {
             await _singlePlateWebhookHandler.HandleWebhookAsync(
                 request.SinglePlate,

@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCamera
             _cameraScheduler = cameraScheduler;
         }
 
-        public async ValueTask<Unit> Handle(UpsertCameraCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertCameraCommand command, CancellationToken cancellationToken)
         {
             var camera = command.Camera;
 

@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Commands.UpsertAgent
             _cameraScheduler = cameraScheduler;
         }
 
-        public async ValueTask<Unit> Handle(UpsertAgentCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(UpsertAgentCommand request, CancellationToken cancellationToken)
         {
             var agent = request.Agent;
             var dbAgent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);

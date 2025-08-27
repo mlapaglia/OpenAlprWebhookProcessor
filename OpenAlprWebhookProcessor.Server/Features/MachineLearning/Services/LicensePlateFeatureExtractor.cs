@@ -55,7 +55,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
 
                     if (hoursUntilNext > 0 && hoursUntilNext < 96) // Less than 4 days - filter out irregular visitors
                     {
-                        var features = await ExtractFeaturesAsync(current, sightings.Take(i + 1).ToList(), cancellationToken);
+                        var features = ExtractFeatures(current, sightings.Take(i + 1).ToList());
                         features.HoursUntilNextSeen = hoursUntilNext;
                         trainingData.Add(features);
                     }
@@ -80,13 +80,12 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             }
 
             var mostRecent = historicalData.Last();
-            return await ExtractFeaturesAsync(mostRecent, historicalData, cancellationToken);
+            return ExtractFeatures(mostRecent, historicalData);
         }
 
-        private Task<LicensePlateTrainingData> ExtractFeaturesAsync(
+        private static LicensePlateTrainingData ExtractFeatures(
             PlateGroup plateGroup,
-            List<PlateGroup> historicalSightings,
-            CancellationToken cancellationToken = default)
+            List<PlateGroup> historicalSightings)
         {
             var currentTime = DateTimeOffset.FromUnixTimeMilliseconds(plateGroup.ReceivedOnEpoch).DateTime;
             
@@ -111,7 +110,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
             var vehicleTypeCode = EncodeVehicleType(plateGroup.VehicleType);
             var vehicleColorCode = EncodeVehicleColor(plateGroup.VehicleColor);
 
-            return Task.FromResult(new LicensePlateTrainingData
+            return new LicensePlateTrainingData
             {
                 LicensePlate = plateGroup.BestNumber,
                 HourOfDay = hourOfDay,
@@ -128,10 +127,10 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                 SeasonalFactor = seasonalFactor,
                 VehicleTypeCode = vehicleTypeCode,
                 VehicleColorCode = vehicleColorCode
-            });
+            };
         }
 
-        private LicensePlateTrainingData CreateDefaultFeatures(LicensePlateInput input)
+        private static LicensePlateTrainingData CreateDefaultFeatures(LicensePlateInput input)
         {
             var currentTime = DateTime.UtcNow;
             var isWeekend = currentTime.DayOfWeek == DayOfWeek.Saturday || currentTime.DayOfWeek == DayOfWeek.Sunday;

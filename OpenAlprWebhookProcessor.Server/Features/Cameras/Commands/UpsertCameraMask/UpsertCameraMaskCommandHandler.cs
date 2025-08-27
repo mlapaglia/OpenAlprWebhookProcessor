@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.UpsertCameraMask
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async ValueTask<bool> Handle(UpsertCameraMaskCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<bool> Handle(UpsertCameraMaskCommand request, CancellationToken cancellationToken)
         {
             var cameraMask = request.CameraMask;
 

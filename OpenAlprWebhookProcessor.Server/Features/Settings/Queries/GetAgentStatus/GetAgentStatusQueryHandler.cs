@@ -19,7 +19,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetAgentStatus
             _websocketClientOrganizer = websocketClientOrganizer;
         }
 
-        public async ValueTask<AgentStatusDto> Handle(GetAgentStatusQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<AgentStatusDto> Handle(GetAgentStatusQuery request, CancellationToken cancellationToken)
         {
             var agent = await _unitOfWork.Agents.GetFirstAgentAsync(cancellationToken);
 

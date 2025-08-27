@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Ignores.Commands.DeleteIgnore
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<Unit> Handle(DeleteIgnoreCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(DeleteIgnoreCommand command, CancellationToken cancellationToken)
         {
             var ignore = await _unitOfWork.Ignores.GetByIdAsync(command.Id, cancellationToken);
             

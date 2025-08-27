@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetUserById
             _userManager = userManager;
         }
 
-        public async ValueTask<ApplicationUser> Handle(GetUserByIdQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<ApplicationUser> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
             return await _userManager.FindByIdAsync(request.Id.ToString());
         }

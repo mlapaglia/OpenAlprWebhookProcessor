@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.WebPushSubscriptions.Queries.GetWebP
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<string> Handle(GetWebPushPublicKeyQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<string> Handle(GetWebPushPublicKeyQuery request, CancellationToken cancellationToken)
         {
             var keys = await VapidKeyHelper.GetVapidKeysAsync(_unitOfWork, cancellationToken);
             return keys.PublicKey;

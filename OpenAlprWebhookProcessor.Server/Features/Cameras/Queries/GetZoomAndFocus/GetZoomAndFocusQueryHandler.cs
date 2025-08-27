@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Queries.GetZoomAndFocus
             _simpleCameraScheduler = simpleCameraScheduler;
         }
 
-        public async ValueTask<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<ZoomFocus> Handle(GetZoomAndFocusQuery request, CancellationToken cancellationToken)
         {
             return await _simpleCameraScheduler.GetZoomAndFocusAsync(
                 request.CameraId,

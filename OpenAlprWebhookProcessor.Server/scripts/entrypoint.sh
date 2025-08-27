@@ -69,24 +69,16 @@ run_sqlite_migrations() {
 ensure_db_directory "$PROCESSOR_CONNECTION"
 ensure_db_directory "$USERS_CONNECTION"
 
-if [ -f "./processor-migrations.sql" ]; then
-    run_sqlite_migrations "$PROCESSOR_CONNECTION" "./processor-migrations.sql" "ProcessorContext"
-    MIGRATION_EXIT_CODE=$?
-    if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
-        exit $MIGRATION_EXIT_CODE
-    fi
-else
-    echo "WARNING: processor-migrations.sql not found, skipping ProcessorContext migrations"
+run_sqlite_migrations "$PROCESSOR_CONNECTION" "./processor-migrations.sql" "ProcessorContext"
+MIGRATION_EXIT_CODE=$?
+if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
+    exit $MIGRATION_EXIT_CODE
 fi
 
-if [ -f "./users-migrations.sql" ]; then
-    run_sqlite_migrations "$USERS_CONNECTION" "./users-migrations.sql" "UsersContext"
-    MIGRATION_EXIT_CODE=$?
-    if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
-        exit $MIGRATION_EXIT_CODE
-    fi
-else
-    echo "WARNING: users-migrations.sql not found, skipping UsersContext migrations"
+run_sqlite_migrations "$USERS_CONNECTION" "./users-migrations.sql" "UsersContext"
+MIGRATION_EXIT_CODE=$?
+if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
+    exit $MIGRATION_EXIT_CODE
 fi
 
 echo "All migrations completed successfully"

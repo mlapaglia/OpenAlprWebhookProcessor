@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.EnableTwoFactor
             _userManager = userManager;
         }
 
-        public async ValueTask<EnableTwoFactorResponse> Handle(EnableTwoFactorCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<EnableTwoFactorResponse> Handle(EnableTwoFactorCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(request.User);
             if (user == null)

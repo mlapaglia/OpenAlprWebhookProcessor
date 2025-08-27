@@ -23,7 +23,7 @@ namespace OpenAlprWebhookProcessor.CameraUpdateService
 
         List<ScheduledJobInfo> GetAllScheduledJobs();
 
-        Task ScheduleOverlayAsync(CameraUpdateRequest cameraUpdateRequest, CancellationToken cancellationToken = default);
+        Task ScheduleOverlayAsync(CameraUpdateRequest cameraUpdaterequest, CancellationToken cancellationToken);
 
         Task ClearOverlayAsync(Guid cameraId, CancellationToken cancellationToken = default);
 

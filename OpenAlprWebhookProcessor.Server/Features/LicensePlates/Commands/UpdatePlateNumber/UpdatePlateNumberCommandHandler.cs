@@ -16,7 +16,7 @@ public class UpdatePlateNumberCommandHandler : ICommandHandler<UpdatePlateNumber
         _context = context;
     }
 
-    public async ValueTask<Unit> Handle(UpdatePlateNumberCommand request, CancellationToken cancellationToken = default)
+    public async ValueTask<Unit> Handle(UpdatePlateNumberCommand request, CancellationToken cancellationToken)
     {
         var plateGroup = await _context.PlateGroups
             .FirstOrDefaultAsync(x => x.Id == request.PlateId, cancellationToken);

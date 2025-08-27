@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Commands.ProcessPlateGroupW
             _groupWebhookHandler = groupWebhookHandler;
         }
 
-        public async ValueTask<Unit> Handle(ProcessPlateGroupWebhookCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(ProcessPlateGroupWebhookCommand request, CancellationToken cancellationToken)
         {
             await _groupWebhookHandler.HandleWebhookAsync(
                 request.Webhook,

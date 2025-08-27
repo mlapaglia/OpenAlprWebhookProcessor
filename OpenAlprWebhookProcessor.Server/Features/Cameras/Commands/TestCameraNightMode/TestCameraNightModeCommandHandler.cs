@@ -14,7 +14,7 @@ namespace OpenAlprWebhookProcessor.Features.Cameras.Commands.TestCameraNightMode
             _simpleCameraScheduler = simpleCameraScheduler;
         }
 
-        public async ValueTask<Unit> Handle(TestCameraNightModeCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestCameraNightModeCommand request, CancellationToken cancellationToken)
         {
             await _simpleCameraScheduler.ExecuteDayNightModeAsync(
                 request.CameraId,

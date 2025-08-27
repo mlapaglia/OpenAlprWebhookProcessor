@@ -16,7 +16,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RegisterUser
             _userManager = userManager;
         }
 
-        public async ValueTask<Unit> Handle(RegisterUserCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             var user = new ApplicationUser
             {

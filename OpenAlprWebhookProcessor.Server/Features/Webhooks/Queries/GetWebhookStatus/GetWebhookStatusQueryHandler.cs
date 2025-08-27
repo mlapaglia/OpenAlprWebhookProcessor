@@ -10,7 +10,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.Queries.GetWebhookStatus
         {
         }
 
-        public async ValueTask<string> Handle(GetWebhookStatusQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<string> Handle(GetWebhookStatusQuery request, CancellationToken cancellationToken)
         {
             return await Task.FromResult("Webhook Processor");
         }

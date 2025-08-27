@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.GetRecoveryCodes
             _userManager = userManager;
         }
 
-        public async ValueTask<GetRecoveryCodesResponse> Handle(GetRecoveryCodesCommand request, CancellationToken cancellationToken = default)
+        public async ValueTask<GetRecoveryCodesResponse> Handle(GetRecoveryCodesCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.GetUserAsync(request.User);
             if (user == null)

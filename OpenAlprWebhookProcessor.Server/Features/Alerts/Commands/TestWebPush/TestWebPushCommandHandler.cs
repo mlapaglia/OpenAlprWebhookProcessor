@@ -22,7 +22,7 @@ namespace OpenAlprWebhookProcessor.Features.Alerts.Commands.TestWebPush
             _alertClient = alertClients.First(x => x is WebPushNotificationProducer);
         }
 
-        public async ValueTask<Unit> Handle(TestWebPushCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask<Unit> Handle(TestWebPushCommand command, CancellationToken cancellationToken)
         {
             var testPlateGroup = await _unitOfWork.PlateGroups.GetQueryable()
                 .Include(x => x.PlateImage)

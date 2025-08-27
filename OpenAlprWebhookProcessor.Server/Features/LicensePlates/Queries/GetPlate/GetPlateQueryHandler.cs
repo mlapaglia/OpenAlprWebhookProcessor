@@ -15,7 +15,7 @@ namespace OpenAlprWebhookProcessor.Features.LicensePlates.Queries.GetPlate
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<LicensePlate?> Handle(GetPlateQuery request, CancellationToken cancellationToken)
         {
             var plateGroup = await _unitOfWork.PlateGroups.GetByIdWithDetailsAsync(request.Id, cancellationToken);
             

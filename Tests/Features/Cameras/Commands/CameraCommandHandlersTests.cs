@@ -353,7 +353,8 @@ namespace Tests.Features.Cameras.Commands
                     r.Id == cameraId &&
                     r.IsTest == true &&
                     r.LicensePlate == "test" &&
-                    r.AlertDescription == "test"));
+                    r.AlertDescription == "test"),
+                Arg.Any<CancellationToken>());
         }
 
         [Test]

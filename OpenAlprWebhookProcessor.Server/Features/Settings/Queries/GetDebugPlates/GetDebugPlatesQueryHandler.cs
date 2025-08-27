@@ -17,7 +17,7 @@ namespace OpenAlprWebhookProcessor.Features.Settings.Queries.GetDebugPlates
             _unitOfWork = unitOfWork;
         }
 
-        public async ValueTask<string> Handle(GetDebugPlatesQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<string> Handle(GetDebugPlatesQuery request, CancellationToken cancellationToken)
         {
             var query = _unitOfWork.RawPlateGroups.GetQueryable()
                 .AsNoTracking();

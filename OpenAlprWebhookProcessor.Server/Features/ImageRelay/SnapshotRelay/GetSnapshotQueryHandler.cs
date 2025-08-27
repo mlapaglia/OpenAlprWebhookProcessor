@@ -27,7 +27,7 @@ namespace OpenAlprWebhookProcessor.Features.ImageRelay.SnapshotRelay
             _timeout = TimeSpan.FromMilliseconds(configuration.Value.TimeoutMilliseconds);
         }
 
-        public async ValueTask<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken = default)
+        public async ValueTask<Stream> Handle(GetSnapshotQuery request, CancellationToken cancellationToken)
         {
             var dbCamera = await _unitOfWork.Cameras.GetByIdAsync(
                 request.CameraId,
