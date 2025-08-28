@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Infrastructure.Extensions;
@@ -43,29 +44,29 @@ namespace OpenAlprWebhookProcessor
                     var services = scope.ServiceProvider;
                     var environment = services.GetRequiredService<IWebHostEnvironment>();
 
+                    try
+                    {
+                        Log.Information("Running development migrations...");
+
+                        var processorContext = services.GetRequiredService<ProcessorContext>();
+                        await processorContext.Database.MigrateAsync();
+                        Log.Information("ProcessorConnection migrations completed.");
+
+                        var usersContext = services.GetRequiredService<UsersContext>();
+                        await usersContext.Database.MigrateAsync();
+                        Log.Information("UsersConnection migrations completed.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Migration failed during development startup");
+                        throw;
+                    }
+
                     if (environment.IsDevelopment())
                     {
-                        try
-                        {
-                            Log.Information("Running development migrations...");
-
-                            var processorContext = services.GetRequiredService<ProcessorContext>();
-                            await processorContext.Database.MigrateAsync();
-                            Log.Information("ProcessorConnection migrations completed.");
-
-                            var usersContext = services.GetRequiredService<UsersContext>();
-                            await usersContext.Database.MigrateAsync();
-                            Log.Information("UsersConnection migrations completed.");
-
-                            Log.Information("Seeding development data...");
-                            await services.SeedDevelopmentDataAsync();
-                            Log.Information("Development data seeding completed.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex, "Migration failed during development startup");
-                            throw;
-                        }
+                        Log.Information("Seeding development data...");
+                        await services.SeedDevelopmentDataAsync();
+                        Log.Information("Development data seeding completed.");
                     }
                 }
 
