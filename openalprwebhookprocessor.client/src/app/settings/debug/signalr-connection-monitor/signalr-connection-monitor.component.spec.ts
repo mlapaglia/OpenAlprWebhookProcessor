@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
 import { SignalrConnectionMonitorComponent } from './signalr-connection-monitor.component';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -65,7 +64,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       });
 
       expect(component).toBeTruthy();
@@ -89,9 +88,9 @@ describe('SignalrConnectionMonitorComponent', () => {
             durationSeconds: 300,
             transport: 'WebSockets',
             userAgent: 'Mozilla/5.0',
-            ipAddress: '192.168.1.1'
-          }
-        ]
+            ipAddress: '192.168.1.1',
+          },
+        ],
       };
 
       mockSignalrService.getConnectionInfo.and.returnValue({
@@ -99,7 +98,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       });
 
       component.ngOnInit();
@@ -123,7 +122,7 @@ describe('SignalrConnectionMonitorComponent', () => {
     it('should load connections successfully', () => {
       const mockConnectionSummary: SignalRConnectionSummary = {
         totalConnections: 1,
-        connections: []
+        connections: [],
       };
 
       mockSignalrService.getConnectionInfo.and.returnValue(null);
@@ -139,7 +138,7 @@ describe('SignalrConnectionMonitorComponent', () => {
     it('should handle loading error with manual refresh', () => {
       spyOn(console, 'error');
       mockSignalrService.getConnectionInfo.and.returnValue(null);
-      
+
       component.refreshConnections();
 
       const req = httpMock.expectOne('/api/settings/debug/signalr-connections');
@@ -148,7 +147,7 @@ describe('SignalrConnectionMonitorComponent', () => {
       expect(console.error).toHaveBeenCalledWith('Failed to load SignalR connections:', jasmine.any(Object));
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to load SignalR connection information',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.isLoadingConnections).toBe(false);
     });
@@ -166,7 +165,7 @@ describe('SignalrConnectionMonitorComponent', () => {
     it('should only update data when it has changed', () => {
       const mockConnectionSummary: SignalRConnectionSummary = {
         totalConnections: 1,
-        connections: []
+        connections: [],
       };
 
       mockSignalrService.getConnectionInfo.and.returnValue(null);
@@ -190,7 +189,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       });
 
       component.refreshConnections();
@@ -213,7 +212,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       mockSignalrService.getConnectionInfo.and.returnValue(connectionInfo);
@@ -230,7 +229,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       component.clientConnectionInfo = connectionInfo;
@@ -251,7 +250,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const result = (component as any).hasConnectionInfoChanged(newInfo);
@@ -264,7 +263,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const result = (component as any).hasConnectionInfoChanged(null);
@@ -277,7 +276,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const newInfo: ClientConnectionInfo = {
@@ -285,7 +284,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const result = (component as any).hasConnectionInfoChanged(newInfo);
@@ -298,7 +297,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const newInfo: ClientConnectionInfo = {
@@ -306,7 +305,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'new-test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const result = (component as any).hasConnectionInfoChanged(newInfo);
@@ -319,7 +318,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const newInfo: ClientConnectionInfo = {
@@ -327,7 +326,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 35
+        durationSeconds: 35,
       };
 
       const result = (component as any).hasConnectionInfoChanged(newInfo);
@@ -340,7 +339,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const newInfo: ClientConnectionInfo = {
@@ -348,7 +347,7 @@ describe('SignalrConnectionMonitorComponent', () => {
         connectionId: 'test-id',
         transport: 'WebSockets',
         startTime: new Date(),
-        durationSeconds: 30
+        durationSeconds: 30,
       };
 
       const result = (component as any).hasConnectionInfoChanged(newInfo);
@@ -375,9 +374,9 @@ describe('SignalrConnectionMonitorComponent', () => {
   describe('ngOnDestroy', () => {
     it('should clear refresh interval', fakeAsync(() => {
       mockSignalrService.getConnectionInfo.and.returnValue(null);
-      
+
       component.ngOnInit();
-      
+
       const req = httpMock.expectOne('/api/settings/debug/signalr-connections');
       req.flush({ totalConnections: 0, connections: [] });
 
@@ -385,7 +384,7 @@ describe('SignalrConnectionMonitorComponent', () => {
 
       // Advance time to see if interval still runs
       tick(5000);
-      
+
       // No additional HTTP request should be made
       httpMock.expectNone('/api/settings/debug/signalr-connections');
     }));

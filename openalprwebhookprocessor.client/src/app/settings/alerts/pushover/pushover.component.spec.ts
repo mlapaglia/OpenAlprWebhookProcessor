@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { of, throwError } from 'rxjs';
 import { PushoverComponent } from './pushover.component';
 import { PushoverService } from './pushover.service';
@@ -47,11 +47,11 @@ describe('PushoverComponent', () => {
         userKey: 'user-key',
         isEnabled: true,
         sendPlatePreviewEnabled: true,
-        sendEveryPlateEnabled: false
+        sendEveryPlateEnabled: false,
       };
 
       mockPushoverService.getPushover.and.returnValue(of(mockPushover));
-      
+
       component.ngOnInit();
 
       expect(mockPushoverService.getPushover).toHaveBeenCalled();
@@ -75,7 +75,7 @@ describe('PushoverComponent', () => {
         userKey: 'user-key',
         isEnabled: true,
         sendPlatePreviewEnabled: true,
-        sendEveryPlateEnabled: false
+        sendEveryPlateEnabled: false,
       };
     });
 
@@ -83,9 +83,9 @@ describe('PushoverComponent', () => {
       mockPushoverService.upsertPushover.and.returnValue(of(null));
 
       component.saveClient();
-      
+
       tick();
-      
+
       expect(mockPushoverService.upsertPushover).toHaveBeenCalledWith(component.client);
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Pushover client saved.', SnackBarType.Saved);
     }));
@@ -95,9 +95,9 @@ describe('PushoverComponent', () => {
       mockPushoverService.upsertPushover.and.returnValue(throwError(() => errorMessage));
 
       component.saveClient();
-      
+
       tick();
-      
+
       expect(mockPushoverService.upsertPushover).toHaveBeenCalledWith(component.client);
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Pushover client save failed.', SnackBarType.Error, errorMessage);
     }));
@@ -108,9 +108,9 @@ describe('PushoverComponent', () => {
       mockPushoverService.testPushover.and.returnValue(of(null));
 
       component.testClient();
-      
+
       tick();
-      
+
       expect(mockPushoverService.testPushover).toHaveBeenCalled();
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Pushover client test successful.', SnackBarType.Successful);
     }));
@@ -119,9 +119,9 @@ describe('PushoverComponent', () => {
       mockPushoverService.testPushover.and.returnValue(throwError(() => new Error('Test failed')));
 
       component.testClient();
-      
+
       tick();
-      
+
       expect(mockPushoverService.testPushover).toHaveBeenCalled();
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Pushover client test failed.', SnackBarType.Error);
     }));
@@ -134,14 +134,14 @@ describe('PushoverComponent', () => {
         userKey: 'user-key',
         isEnabled: true,
         sendPlatePreviewEnabled: true,
-        sendEveryPlateEnabled: false
+        sendEveryPlateEnabled: false,
       };
     });
 
     it('should handle toggle off', fakeAsync(() => {
       const mockToggleEvent = {
         checked: false,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       mockPushoverService.upsertPushover.and.returnValue(of(null));
@@ -149,16 +149,16 @@ describe('PushoverComponent', () => {
       component.onPushoverToggle(mockToggleEvent);
 
       expect(component.client.isEnabled).toBe(false);
-      
+
       tick();
-      
+
       expect(mockPushoverService.upsertPushover).toHaveBeenCalledWith(component.client);
     }));
 
     it('should not save when toggle is on', () => {
       const mockToggleEvent = {
         checked: true,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       component.onPushoverToggle(mockToggleEvent);
@@ -169,7 +169,7 @@ describe('PushoverComponent', () => {
     it('should handle toggle off with error', fakeAsync(() => {
       const mockToggleEvent = {
         checked: false,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       mockPushoverService.upsertPushover.and.returnValue(throwError(() => new Error('Toggle failed')));
@@ -177,9 +177,9 @@ describe('PushoverComponent', () => {
       component.onPushoverToggle(mockToggleEvent);
 
       expect(component.client.isEnabled).toBe(false);
-      
+
       tick();
-      
+
       expect(mockPushoverService.upsertPushover).toHaveBeenCalledWith(component.client);
     }));
   });
@@ -187,7 +187,7 @@ describe('PushoverComponent', () => {
   describe('ngOnDestroy', () => {
     it('should call parent ngOnDestroy', () => {
       spyOn(component, 'ngOnDestroy').and.callThrough();
-      
+
       component.ngOnDestroy();
 
       expect(component.ngOnDestroy).toHaveBeenCalled();

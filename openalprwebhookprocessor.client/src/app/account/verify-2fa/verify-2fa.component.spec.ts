@@ -22,7 +22,7 @@ describe('Verify2FAComponent', () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
     mockThemeStorage = jasmine.createSpyObj('ThemeStorage', ['getStoredThemeName'], {
-      onThemeUpdate: of({ name: 'indigo-pink' })
+      onThemeUpdate: of({ name: 'indigo-pink' }),
     });
 
     mockActivatedRoute = {
@@ -30,9 +30,9 @@ describe('Verify2FAComponent', () => {
         queryParams: {
           userId: 'test-user-123',
           rememberMe: 'true',
-          returnUrl: '/dashboard'
-        }
-      }
+          returnUrl: '/dashboard',
+        },
+      },
     } as any;
 
     await TestBed.configureTestingModule({
@@ -80,7 +80,7 @@ describe('Verify2FAComponent', () => {
 
     it('should redirect to login if no userId provided', () => {
       mockActivatedRoute.snapshot.queryParams = {};
-      
+
       component.ngOnInit();
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/login']);
@@ -89,7 +89,7 @@ describe('Verify2FAComponent', () => {
     it('should initialize theme on init', () => {
       // The component calls getStoredThemeName during ngOnInit, so we need to set up the mock first
       component.ngOnInit();
-      
+
       expect(component.currentThemeName).toBe('indigo-pink'); // Default value set in component
       expect(component.themeLoaded).toBe(true);
     });
@@ -139,7 +139,7 @@ describe('Verify2FAComponent', () => {
 
     it('should not submit if form is invalid', () => {
       component.form.get('code')?.setValue('');
-      
+
       component.onSubmit();
 
       expect(component.submitted).toBe(true);
@@ -158,7 +158,7 @@ describe('Verify2FAComponent', () => {
       expect(mockAccountService.verifyTwoFactor).toHaveBeenCalledWith(
         'test-user-123',
         '123456',
-        true
+        true,
       );
     });
 

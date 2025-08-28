@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { of, throwError } from 'rxjs';
 import { EnrichersComponent } from './enrichers.component';
 import { EnrichersService } from './enrichers.service';
@@ -47,11 +47,11 @@ describe('EnrichersComponent', () => {
         enrichmentType: 'PlateRecognizer' as any,
         isEnabled: true,
 
-        apiKey: 'test-key'
+        apiKey: 'test-key',
       };
 
       mockEnrichersService.getEnricher.and.returnValue(of(mockEnricher));
-      
+
       component.ngOnInit();
 
       expect(mockEnrichersService.getEnricher).toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('EnrichersComponent', () => {
         enrichmentType: 'PlateRecognizer' as any,
         isEnabled: true,
 
-        apiKey: 'test-key'
+        apiKey: 'test-key',
       };
     });
 
@@ -74,9 +74,9 @@ describe('EnrichersComponent', () => {
       mockEnrichersService.testEnricher.and.returnValue(of(true));
 
       component.testEnricher();
-      
+
       tick();
-      
+
       expect(mockEnrichersService.testEnricher).toHaveBeenCalledWith('enricher-1');
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Enricher test succeeded.', SnackBarType.Saved);
     }));
@@ -85,9 +85,9 @@ describe('EnrichersComponent', () => {
       mockEnrichersService.testEnricher.and.returnValue(of(false));
 
       component.testEnricher();
-      
+
       tick();
-      
+
       expect(mockEnrichersService.testEnricher).toHaveBeenCalledWith('enricher-1');
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Enricher test failed, check the logs.', SnackBarType.Error);
     }));
@@ -96,9 +96,9 @@ describe('EnrichersComponent', () => {
       mockEnrichersService.testEnricher.and.returnValue(throwError(() => new Error('Test failed')));
 
       component.testEnricher();
-      
+
       tick();
-      
+
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Enricher test failed, check the logs.', SnackBarType.Error);
     }));
   });
@@ -110,7 +110,7 @@ describe('EnrichersComponent', () => {
         enrichmentType: 'PlateRecognizer' as any,
         isEnabled: true,
 
-        apiKey: 'test-key'
+        apiKey: 'test-key',
       };
     });
 
@@ -120,16 +120,16 @@ describe('EnrichersComponent', () => {
         enrichmentType: 'PlateRecognizer' as any,
         isEnabled: true,
 
-        apiKey: 'test-key'
+        apiKey: 'test-key',
       };
 
       mockEnrichersService.upsertEnricher.and.returnValue(of(null));
       mockEnrichersService.getEnricher.and.returnValue(of(mockEnricher));
 
       component.saveEnricher();
-      
+
       tick();
-      
+
       expect(mockEnrichersService.upsertEnricher).toHaveBeenCalledWith(component.enricher);
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Enricher client saved.', SnackBarType.Successful);
       expect(mockEnrichersService.getEnricher).toHaveBeenCalled();
@@ -139,9 +139,9 @@ describe('EnrichersComponent', () => {
       mockEnrichersService.upsertEnricher.and.returnValue(throwError(() => new Error('Save failed')));
 
       component.saveEnricher();
-      
+
       tick();
-      
+
       expect(mockEnrichersService.upsertEnricher).toHaveBeenCalledWith(component.enricher);
       expect(mockSnackbarService.create).toHaveBeenCalledWith('Enricher client save failed, check the logs.', SnackBarType.Error);
     }));
@@ -154,14 +154,14 @@ describe('EnrichersComponent', () => {
         enrichmentType: 'PlateRecognizer' as any,
         isEnabled: true,
 
-        apiKey: 'test-key'
+        apiKey: 'test-key',
       };
     });
 
     it('should handle toggle off', fakeAsync(() => {
       const mockToggleEvent = {
         checked: false,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       mockEnrichersService.upsertEnricher.and.returnValue(of(null));
@@ -169,16 +169,16 @@ describe('EnrichersComponent', () => {
       component.onEnricherToggle(mockToggleEvent);
 
       expect(component.enricher.isEnabled).toBe(false);
-      
+
       tick();
-      
+
       expect(mockEnrichersService.upsertEnricher).toHaveBeenCalledWith(component.enricher);
     }));
 
     it('should not save when toggle is on', () => {
       const mockToggleEvent = {
         checked: true,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       component.onEnricherToggle(mockToggleEvent);
@@ -189,7 +189,7 @@ describe('EnrichersComponent', () => {
     it('should handle toggle off with error', fakeAsync(() => {
       const mockToggleEvent = {
         checked: false,
-        source: {} as any
+        source: {} as any,
       } as MatSlideToggleChange;
 
       mockEnrichersService.upsertEnricher.and.returnValue(throwError(() => new Error('Toggle failed')));
@@ -197,9 +197,9 @@ describe('EnrichersComponent', () => {
       component.onEnricherToggle(mockToggleEvent);
 
       expect(component.enricher.isEnabled).toBe(false);
-      
+
       tick();
-      
+
       expect(mockEnrichersService.upsertEnricher).toHaveBeenCalledWith(component.enricher);
     }));
   });
@@ -219,7 +219,7 @@ describe('EnrichersComponent', () => {
   describe('ngOnDestroy', () => {
     it('should call parent ngOnDestroy', () => {
       spyOn(component, 'ngOnDestroy').and.callThrough();
-      
+
       component.ngOnDestroy();
 
       expect(component.ngOnDestroy).toHaveBeenCalled();

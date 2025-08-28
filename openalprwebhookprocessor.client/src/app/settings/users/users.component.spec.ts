@@ -56,7 +56,7 @@ describe('UsersComponent', () => {
     it('should handle error when loading users', () => {
       spyOn(console, 'error');
       mockAccountService.getAll.and.returnValue(throwError(() => new Error('Load failed')));
-      
+
       fixture.detectChanges();
 
       expect(console.error).toHaveBeenCalledWith('Error loading users:', jasmine.any(Error));

@@ -52,9 +52,9 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct config for Minimum Model Quality', () => {
       fixture.componentRef.setInput('fieldKey', 'Minimum Model Quality (R²)');
-      
+
       const config = component.fieldConfig;
-      
+
       expect(config.controlName).toBe('minimumModelQuality');
       expect(config.inputType).toBe('number');
       expect(config.step).toBe('0.001');
@@ -64,9 +64,9 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct config for Minimum Training Data', () => {
       fixture.componentRef.setInput('fieldKey', 'Minimum Training Data');
-      
+
       const config = component.fieldConfig;
-      
+
       expect(config.controlName).toBe('minimumTrainingData');
       expect(config.inputType).toBe('number');
       expect(config.min).toBe('10');
@@ -75,9 +75,9 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct config for Training Batch Size', () => {
       fixture.componentRef.setInput('fieldKey', 'Training Batch Size');
-      
+
       const config = component.fieldConfig;
-      
+
       expect(config.controlName).toBe('trainingBatchSize');
       expect(config.inputType).toBe('number');
       expect(config.min).toBe('1000');
@@ -86,9 +86,9 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct config for Training Interval', () => {
       fixture.componentRef.setInput('fieldKey', 'Training Interval');
-      
+
       const config = component.fieldConfig;
-      
+
       expect(config.controlName).toBe('trainingInterval');
       expect(config.inputType).toBe('text');
       expect(config.placeholder).toBe('06:00:00');
@@ -96,9 +96,9 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct config for text fields', () => {
       fixture.componentRef.setInput('fieldKey', 'Model File Name');
-      
+
       const config = component.fieldConfig;
-      
+
       expect(config.controlName).toBe('modelFileName');
       expect(config.inputType).toBe('text');
     });
@@ -111,17 +111,17 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should return correct form control', () => {
       fixture.componentRef.setInput('fieldKey', 'Minimum Model Quality (R²)');
-      
+
       const control = component.formControl;
-      
+
       expect(control).toBe(mockForm.get('minimumModelQuality'));
     });
 
     it('should return null for invalid field key', () => {
       fixture.componentRef.setInput('fieldKey', 'Invalid Field');
-      
+
       const control = component.formControl;
-      
+
       expect(control).toBeNull();
     });
   });
@@ -206,16 +206,16 @@ describe('ConfigurationFieldComponent', () => {
     it('should handle maxlength error', () => {
       // Create a control with maxlength validation
       const testForm = new FormGroup({
-        testField: new FormControl('', [Validators.maxLength(5)])
+        testField: new FormControl('', [Validators.maxLength(5)]),
       });
-      
+
       fixture.componentRef.setInput('fieldKey', 'Test Field');
       fixture.componentRef.setInput('configForm', testForm);
-      
+
       // Mock the field mapping for the test
       (component as any).fieldMapping['Test Field'] = {
         controlName: 'testField',
-        inputType: 'text'
+        inputType: 'text',
       };
 
       const control = testForm.get('testField');
@@ -227,12 +227,12 @@ describe('ConfigurationFieldComponent', () => {
 
     it('should fallback to field key when controlName not available', () => {
       fixture.componentRef.setInput('fieldKey', 'Unknown Field');
-      
+
       // Mock a form with an unknown field that has errors
       const testForm = new FormGroup({
-        unknownField: new FormControl(null, [Validators.required])
+        unknownField: new FormControl(null, [Validators.required]),
       });
-      
+
       // Mock the field mapping and form control
       (component as any).fieldMapping['Unknown Field'] = undefined;
       spyOnProperty(component, 'formControl', 'get').and.returnValue(testForm.get('unknownField'));

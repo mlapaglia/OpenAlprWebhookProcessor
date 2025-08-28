@@ -29,7 +29,7 @@ describe('HomeService', () => {
           { date: new Date('2023-01-01'), count: 10 },
           { date: new Date('2023-01-02'), count: 15 },
         ],
-        weeklyUniqueCounts: []
+        weeklyUniqueCounts: [],
       };
 
       service.getPlatesCount().subscribe(result => {
@@ -64,27 +64,27 @@ describe('HomeService', () => {
   describe('getUpcomingPredictions', () => {
     it('should fetch upcoming predictions with default parameters', () => {
       const mockPredictions: PredictionResult[] = [
-        { 
-          licensePlate: 'ABC123', 
-          confidenceScore: 0.95, 
+        {
+          licensePlate: 'ABC123',
+          confidenceScore: 0.95,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 10,
           averageTimeBetweenVisits: 2.5,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
-        { 
-          licensePlate: 'XYZ789', 
-          confidenceScore: 0.87, 
+        {
+          licensePlate: 'XYZ789',
+          confidenceScore: 0.87,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 8,
           averageTimeBetweenVisits: 3.0,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
       ];
 
@@ -99,16 +99,16 @@ describe('HomeService', () => {
 
     it('should fetch upcoming predictions with custom parameters', () => {
       const mockPredictions: PredictionResult[] = [
-        { 
-          licensePlate: 'ABC123', 
-          confidenceScore: 0.95, 
+        {
+          licensePlate: 'ABC123',
+          confidenceScore: 0.95,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 10,
           averageTimeBetweenVisits: 2.5,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
       ];
 
@@ -125,27 +125,27 @@ describe('HomeService', () => {
   describe('getMostPredictablePlates', () => {
     it('should fetch most predictable plates', () => {
       const mockPredictions: PredictionResult[] = [
-        { 
-          licensePlate: 'ABC123', 
-          confidenceScore: 0.95, 
+        {
+          licensePlate: 'ABC123',
+          confidenceScore: 0.95,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 10,
           averageTimeBetweenVisits: 2.5,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
-        { 
-          licensePlate: 'XYZ789', 
-          confidenceScore: 0.87, 
+        {
+          licensePlate: 'XYZ789',
+          confidenceScore: 0.87,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 8,
           averageTimeBetweenVisits: 3.0,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
       ];
 
@@ -162,27 +162,27 @@ describe('HomeService', () => {
   describe('getNextExpectedPlate', () => {
     it('should return first prediction when results available', () => {
       const mockPredictions: PredictionResult[] = [
-        { 
-          licensePlate: 'ABC123', 
-          confidenceScore: 0.95, 
+        {
+          licensePlate: 'ABC123',
+          confidenceScore: 0.95,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 10,
           averageTimeBetweenVisits: 2.5,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
-        { 
-          licensePlate: 'XYZ789', 
-          confidenceScore: 0.87, 
+        {
+          licensePlate: 'XYZ789',
+          confidenceScore: 0.87,
           predictedNextSeen: new Date(),
           predictedHours: 24,
           totalHistoricalVisits: 8,
           averageTimeBetweenVisits: 3.0,
           lastSeen: new Date(),
           modelVersion: '1.0',
-          predictionMadeAt: new Date()
+          predictionMadeAt: new Date(),
         },
       ];
 
