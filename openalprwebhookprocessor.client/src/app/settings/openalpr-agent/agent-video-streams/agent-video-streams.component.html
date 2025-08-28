@@ -79,7 +79,7 @@
                 <button 
                   mat-icon-button 
                   (click)="openSnapshotModal(stream)"
-                  [disabled]="!agent()?.id || !stream.isStreaming"
+                  [disabled]="!agent()?.uid || !stream.isStreaming"
                   matTooltip="View camera snapshot" 
                   i18n-matTooltip
                   color="primary">

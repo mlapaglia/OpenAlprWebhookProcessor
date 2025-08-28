@@ -73,7 +73,7 @@ export class ConfigurationFieldComponent {
   }
 
   public get formControl() {
-    return this.configForm().get(this.fieldConfig.controlName);
+    return this.fieldConfig ? this.configForm().get(this.fieldConfig.controlName) : null;
   }
 
   public get hasError(): boolean {
