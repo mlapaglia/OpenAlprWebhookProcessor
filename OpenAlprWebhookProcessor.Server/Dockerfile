@@ -49,14 +49,14 @@ RUN dotnet build "./OpenAlprWebhookProcessor.Server.csproj" -c $BUILD_CONFIGURAT
         --project "./OpenAlprWebhookProcessor.Server.csproj" \
         --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context ProcessorContext \
-        --idempotent
+        --idempotent \
         --output /app/build/processor-migrations.sql \
         --configuration $BUILD_CONFIGURATION && \
     /root/.dotnet/tools/dotnet-ef migrations script \
         --project "./OpenAlprWebhookProcessor.Server.csproj" \
         --startup-project "./OpenAlprWebhookProcessor.Server.csproj" \
         --context UsersContext \
-        --idempotent
+        --idempotent \
         --output /app/build/users-migrations.sql \
         --configuration $BUILD_CONFIGURATION
 
