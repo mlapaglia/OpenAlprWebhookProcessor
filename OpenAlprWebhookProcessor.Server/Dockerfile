@@ -8,8 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS dependencies
 ARG BUILD_CONFIGURATION
 WORKDIR /src
 
-RUN apk add --no-cache curl nodejs npm && \
-    dotnet tool install --global dotnet-ef
+RUN apk add --no-cache curl nodejs npm
 
 COPY ["OpenAlprWebhookProcessor.Server/OpenAlprWebhookProcessor.Server.csproj", "OpenAlprWebhookProcessor.Server/"]
 COPY ["openalprwebhookprocessor.client/openalprwebhookprocessor.client.esproj", "openalprwebhookprocessor.client/"]
@@ -63,8 +62,5 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /app/publish .
-COPY --from=build /app/build/processor-migrations.sql ./processor-migrations.sql
-COPY --from=build /app/build/users-migrations.sql ./users-migrations.sql
-COPY --from=build /src/OpenAlprWebhookProcessor.Server/scripts/entrypoint.sh ./
 
 ENTRYPOINT ["dotnet", "OpenAlprWebhookProcessor.Server.dll"]
