@@ -1,3 +1,4 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, inject, type OnInit, type OnChanges, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
@@ -6,10 +7,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
-import { animate, style, transition, trigger } from '@angular/animations';
 import type { Camera } from '../../camera';
 import type { ZoomFocus } from '../zoomfocus';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
+import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-camera-daynight',
@@ -37,6 +38,7 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
+    RefreshButtonComponent,
   ],
 })
 export class CameraDayNightComponent extends OnPushBaseComponent implements OnInit, OnChanges {

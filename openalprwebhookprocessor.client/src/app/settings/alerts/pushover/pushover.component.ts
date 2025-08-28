@@ -54,6 +54,9 @@ export class PushoverComponent extends OnPushBaseComponent implements OnInit, On
       (result) => {
         this.client = result;
       },
+      () => {
+        // Error loading pushover configuration - component will handle undefined state
+      },
     );
   }
 
@@ -103,6 +106,9 @@ export class PushoverComponent extends OnPushBaseComponent implements OnInit, On
 
       this.subscribeAndMarkForCheck(
         this.pushoverService.upsertPushover(this.client),
+        () => {
+          this.isSaving = false;
+        },
         () => {
           this.isSaving = false;
         },

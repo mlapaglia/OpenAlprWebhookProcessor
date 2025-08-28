@@ -59,6 +59,9 @@ export class EnrichersComponent extends OnPushBaseComponent implements OnInit, O
       this.enricherService.getEnricher(),
       (result) => {
         this.enricher = result;
+      },
+      () => {
+        // Error loading enricher configuration - component will handle undefined state
       });
   }
 
@@ -77,7 +80,7 @@ export class EnrichersComponent extends OnPushBaseComponent implements OnInit, O
           this.snackbarService.create('Enricher test failed, check the logs.', SnackBarType.Error);
         }
       }, () => {
-        this.isSaving = false;
+        this.isTesting = false;
         this.snackbarService.create('Enricher test failed, check the logs.', SnackBarType.Error);
       });
   }
@@ -95,7 +98,7 @@ export class EnrichersComponent extends OnPushBaseComponent implements OnInit, O
       },
       () => {
         this.isSaving = false;
-        this.snackbarService.create('Enricher client test failed, check the logs.', SnackBarType.Error);
+        this.snackbarService.create('Enricher client save failed, check the logs.', SnackBarType.Error);
       });
   }
 
@@ -107,6 +110,9 @@ export class EnrichersComponent extends OnPushBaseComponent implements OnInit, O
 
       this.subscribeAndMarkForCheck(
         this.enricherService.upsertEnricher(this.enricher),
+        () => {
+          this.isSaving = false;
+        },
         () => {
           this.isSaving = false;
         });

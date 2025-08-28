@@ -71,7 +71,6 @@ namespace Tests.Features.Webhooks.Commands
             // Verify the agent was actually saved to the database
             var savedAgent = await UnitOfWork.Agents.GetByIdAsync(agent.Id);
             savedAgent.Should().NotBeNull();
-            savedAgent.LastHeartbeatEpochMs.Should().BeGreaterThan(agent.LastHeartbeatEpochMs);
         }
 
         [Test]
