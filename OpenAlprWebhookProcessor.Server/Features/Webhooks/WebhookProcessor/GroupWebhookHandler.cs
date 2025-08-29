@@ -77,6 +77,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor
             }
 
             var camera = await _unitOfWork.Cameras
+                .GetQueryable()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(
                     x => x.OpenAlprCameraId == webhook.Group.CameraId,
