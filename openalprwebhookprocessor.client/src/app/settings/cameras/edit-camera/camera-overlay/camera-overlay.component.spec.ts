@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CameraOverlayComponent } from './camera-overlay.component';
 import { Camera, Manufacturer } from '../../camera';
@@ -44,7 +43,6 @@ describe('CameraOverlayComponent', () => {
       imports: [
         CameraOverlayComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();

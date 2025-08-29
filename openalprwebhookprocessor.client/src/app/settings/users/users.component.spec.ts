@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
 import { UsersComponent } from './users.component';
@@ -17,7 +16,7 @@ describe('UsersComponent', () => {
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
-      imports: [UsersComponent, NoopAnimationsModule],
+      imports: [UsersComponent],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
         { provide: MatDialog, useValue: mockDialog },

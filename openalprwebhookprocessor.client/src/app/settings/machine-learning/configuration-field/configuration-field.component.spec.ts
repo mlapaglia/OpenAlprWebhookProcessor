@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigurationFieldComponent } from './configuration-field.component';
 
 describe('ConfigurationFieldComponent', () => {
@@ -20,7 +19,7 @@ describe('ConfigurationFieldComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ConfigurationFieldComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [ConfigurationFieldComponent, ReactiveFormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ConfigurationFieldComponent);

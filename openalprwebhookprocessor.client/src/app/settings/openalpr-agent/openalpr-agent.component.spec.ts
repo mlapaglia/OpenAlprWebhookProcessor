@@ -8,7 +8,6 @@ import { of, Subject, throwError } from 'rxjs';
 import { Agent } from './agent';
 import { AgentStatus } from './agentStatus';
 import { AgentVideoStreams } from './videoStream';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
@@ -33,7 +32,7 @@ describe(OpenalprAgentComponent.name, () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [OpenalprAgentComponent, BrowserAnimationsModule],
+      imports: [OpenalprAgentComponent],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SignalrService, useValue: mockSignalrService },

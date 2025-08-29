@@ -7,7 +7,6 @@ import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { Camera } from '../camera';
 import { ZoomFocus } from './zoomfocus';
 import { of } from 'rxjs';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
@@ -20,7 +19,7 @@ describe(EditCameraComponent.name, () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EditCameraComponent, BrowserAnimationsModule],
+      imports: [EditCameraComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),

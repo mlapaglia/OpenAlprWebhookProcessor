@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -51,7 +50,6 @@ describe('LoginComponent', () => {
       imports: [
         LoginComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
         MatCardModule,
         MatFormFieldModule,
         MatInputModule,

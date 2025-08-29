@@ -1,5 +1,4 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -44,7 +43,6 @@ describe('TrainingStatusCardComponent', () => {
       imports: [
         TrainingStatusCardComponent,
         RefreshButtonComponent,
-        NoopAnimationsModule,
         CommonModule,
         MatCardModule,
         MatButtonModule,

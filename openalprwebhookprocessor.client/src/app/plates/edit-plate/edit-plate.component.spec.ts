@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { EditPlateComponent } from './edit-plate.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlateService } from '../plate.service';
 
 describe('EditPlateComponent', () => {
@@ -15,10 +14,7 @@ describe('EditPlateComponent', () => {
     mockPlateService = jasmine.createSpyObj('PlateService', ['upsertPlate']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        EditPlateComponent,
-        BrowserAnimationsModule,
-      ],
+      imports: [EditPlateComponent],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: { plateId: '1', currentPlateNumber: 'ABC123' } },
         { provide: MatDialogRef, useValue: mockDialogRef },

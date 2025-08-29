@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChangeDetectorRef } from '@angular/core';
 
 import { CameraBasicInfoComponent } from './camera-basic-info.component';
@@ -46,7 +45,6 @@ describe('CameraBasicInfoComponent', () => {
       imports: [
         CameraBasicInfoComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();

@@ -5,7 +5,6 @@ import { LayoutService } from './layout.service';
 import { HomeDataService } from './home-data.service';
 import { AccountService } from 'app/_services';
 import { of, throwError } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -29,7 +28,7 @@ describe('HomeComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [HomeComponent, NoopAnimationsModule],
+      imports: [HomeComponent],
       providers: [
         { provide: LayoutService, useValue: layoutServiceSpy },
         { provide: HomeDataService, useValue: homeDataServiceSpy },

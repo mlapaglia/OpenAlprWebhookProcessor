@@ -1,6 +1,6 @@
 import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { first } from 'rxjs/operators';
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +16,8 @@ import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmationDialogComponent, type ConfirmationDialogData } from '../../../shared/confirmation-dialog/confirmation-dialog.component';
 import { RefreshButtonComponent } from '../../../shared/refresh-button/refresh-button.component';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 interface DialogData {
   userId: string;
@@ -52,7 +54,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
   data = inject<DialogData>(MAT_DIALOG_DATA);
 
   private readonly accountService = inject(AccountService);
-  private readonly alertService = inject(AlertService);
+  private readonly snackbarService = inject(SnackbarService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<UserPasskeysComponent>);
   private readonly formBuilder = inject(FormBuilder);
@@ -87,7 +89,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
         this.loading = false;
       },
       (error) => {
-        this.alertService.error(`Failed to load passkeys: ${error}`);
+        this.snackbarService.create('Failed to load passkeys', SnackBarType.Error, error as string);
         this.loading = false;
       },
     );
@@ -161,7 +163,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
 
   private handleSuccessfulRegistration(result: { success: boolean; message?: string } | undefined) {
     if (result?.success) {
-      this.alertService.success('Passkey registered successfully!');
+      this.snackbarService.create('Passkey registered successfully', SnackBarType.Saved);
       this.registrationForm.reset();
       this.loadPasskeys();
     } else {
@@ -171,7 +173,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
 
   private handleRegistrationError(error: unknown) {
     console.error('Passkey registration error:', error);
-    this.alertService.error(`Failed to register passkey: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    this.snackbarService.create('Failed to register passkey', SnackBarType.Error, error instanceof Error ? error.message : 'Unknown error');
   }
 
   private convertRegistrationOptions(options: PublicKeyCredentialCreationOptions): PublicKeyCredentialCreationOptions {
@@ -246,14 +248,14 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
             this.accountService.deletePasskey(passkey.id).pipe(first()),
             (result) => {
               if (result.success) {
-                this.alertService.success('Passkey deleted successfully');
+                this.snackbarService.create('Passkey deleted successfully', SnackBarType.Saved);
                 this.loadPasskeys(); // Refresh the list
               } else {
-                this.alertService.error(result.message || 'Failed to delete passkey');
+                this.snackbarService.create('Failed to delete passkey', SnackBarType.Error, result.message || 'Failed to delete passkey');
               }
             },
             (error) => {
-              this.alertService.error(`Failed to delete passkey: ${error}`);
+              this.snackbarService.create('Failed to delete passkey', SnackBarType.Error, error as string);
             },
           );
         }

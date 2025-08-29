@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CameraOpenAlprComponent } from './camera-openalpr.component';
 import { Camera, Manufacturer } from '../../camera';
@@ -45,7 +44,6 @@ describe('CameraOpenAlprComponent', () => {
       imports: [
         CameraOpenAlprComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     })

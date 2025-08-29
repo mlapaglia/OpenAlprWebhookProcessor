@@ -1,6 +1,5 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { of, throwError, Subject } from 'rxjs';
@@ -96,7 +95,7 @@ describe('PlatesComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [PlatesComponent, NoopAnimationsModule],
+      imports: [PlatesComponent],
       providers: [
         { provide: PlateService, useValue: plateServiceSpy },
         { provide: SignalrService, useValue: signalrServiceSpy },

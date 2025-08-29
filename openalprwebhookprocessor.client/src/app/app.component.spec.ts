@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
@@ -65,7 +64,7 @@ describe('AppComponent', () => {
     mockSnackBar.open.and.returnValue(mockSnackBarRef as any);
 
     await TestBed.configureTestingModule({
-      imports: [AppComponent, NoopAnimationsModule],
+      imports: [AppComponent],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
         { provide: SignalrService, useValue: mockSignalrService },

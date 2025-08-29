@@ -7,7 +7,6 @@ import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { Subject, of, delay } from 'rxjs';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe(SystemLogsComponent.name, () => {
   let component: SystemLogsComponent;
@@ -29,7 +28,7 @@ describe(SystemLogsComponent.name, () => {
     snackbarServiceSpy = jasmine.createSpyObj(SnackbarService.name, ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [SystemLogsComponent, NoopAnimationsModule],
+      imports: [SystemLogsComponent],
       providers: [
         { provide: SystemLogsService, useValue: systemLogsServiceSpy },
         { provide: SignalrService, useValue: signalrServiceSpy },

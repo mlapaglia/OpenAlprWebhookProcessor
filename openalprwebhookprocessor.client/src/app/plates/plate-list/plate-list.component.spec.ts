@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { Component, NO_ERRORS_SCHEMA, input, output } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import type { PageEvent } from '@angular/material/paginator';
 import { PlateListComponent } from './plate-list.component';
 import type { PlateData } from '../plate-item/plate-item.component';
@@ -65,7 +64,6 @@ describe('PlateListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         PlateListComponent,
-        BrowserAnimationsModule,
         MockPlateItemComponent,
       ],
       schemas: [NO_ERRORS_SCHEMA],

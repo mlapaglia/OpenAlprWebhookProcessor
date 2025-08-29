@@ -44,6 +44,7 @@
 .registration-card,
 .info-card {
   margin-bottom: 16px;
+  background-color: var(--mat-sys-primary-container);
 }
 
 .registration-card mat-card-header {

@@ -1,6 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ScheduledJobsComponent } from './scheduled-jobs.component';
 import { SettingsService } from '../../settings.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -37,7 +36,7 @@ describe('ScheduledJobsComponent', () => {
     const snackbarServiceSpy = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [ScheduledJobsComponent, NoopAnimationsModule],
+      imports: [ScheduledJobsComponent],
       providers: [
         { provide: SettingsService, useValue: settingsServiceSpy },
         { provide: SnackbarService, useValue: snackbarServiceSpy },

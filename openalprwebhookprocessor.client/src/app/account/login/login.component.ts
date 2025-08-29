@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatIconModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
+    RefreshButtonComponent,
   ],
   templateUrl: 'login.component.html',
   styleUrl: 'login.component.css',

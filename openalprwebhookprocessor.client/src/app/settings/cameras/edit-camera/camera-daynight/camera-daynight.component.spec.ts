@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CameraDayNightComponent } from './camera-daynight.component';
 import { Camera, Manufacturer } from '../../camera';
@@ -51,7 +50,6 @@ describe('CameraDayNightComponent', () => {
       imports: [
         CameraDayNightComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();

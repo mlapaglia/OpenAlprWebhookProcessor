@@ -5,7 +5,6 @@ import { SettingsService } from '../../settings.service';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { of, Subject, throwError } from 'rxjs';
 import { AgentVideoStreams, VideoStream } from '../videoStream';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { Agent } from '../agent';
@@ -28,7 +27,7 @@ describe('AgentVideoStreamsComponent', () => {
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
-      imports: [AgentVideoStreamsComponent, BrowserAnimationsModule],
+      imports: [AgentVideoStreamsComponent],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SignalrService, useValue: mockSignalrService },

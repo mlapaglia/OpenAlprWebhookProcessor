@@ -2,26 +2,26 @@ import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { AddEditComponent } from './edit.component';
-import { AccountService, AlertService } from 'app/_services';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { AccountService } from 'app/_services';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
 
 describe('AddEditComponent', () => {
   let component: AddEditComponent;
   let mockAccountService: jasmine.SpyObj<AccountService>;
-  let mockAlertService: jasmine.SpyObj<AlertService>;
+  let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddEditComponent>>;
 
   beforeEach(async () => {
     mockAccountService = jasmine.createSpyObj('AccountService', ['getById', 'add', 'update']);
-    mockAlertService = jasmine.createSpyObj('AlertService', ['clear', 'success', 'error']);
+    mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [AddEditComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [AddEditComponent, ReactiveFormsModule],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
-        { provide: AlertService, useValue: mockAlertService },
+        { provide: SnackbarService, useValue: mockSnackbarService },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { userId: null } },
       ],

@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormBuilder, Validators } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigurationActionsComponent } from './configuration-actions.component';
 
 describe('ConfigurationActionsComponent', () => {
@@ -10,10 +9,7 @@ describe('ConfigurationActionsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        ConfigurationActionsComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [ConfigurationActionsComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ConfigurationActionsComponent);

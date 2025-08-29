@@ -2,7 +2,6 @@ import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, type ParamMap } from '@angular/router';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { BehaviorSubject } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ThemePickerComponent } from './theme-picker.component';
 import { ThemeStorage } from './theme-storage/theme-storage';
@@ -28,7 +27,7 @@ describe('ThemePickerComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [ThemePickerComponent, NoopAnimationsModule],
+      imports: [ThemePickerComponent],
       providers: [
         { provide: ThemeStorage, useValue: themeStorageSpy },
         { provide: StyleManager, useValue: styleManagerSpy },

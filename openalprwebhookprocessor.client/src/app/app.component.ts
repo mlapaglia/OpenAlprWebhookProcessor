@@ -6,7 +6,6 @@ import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router
 import { SwUpdate } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
 import { PushSubscriberService } from './_services/push-subscriber.service';
-import { AlertComponent } from './_components/alert.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CommonModule } from '@angular/common';
@@ -27,7 +26,7 @@ import { OnPushBaseComponent } from './_helpers/onpush-base.component';
   styleUrls: ['app.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatTabsModule, RouterLink, MatIconModule, AlertComponent, RouterOutlet,
+    MatTabsModule, RouterLink, MatIconModule, RouterOutlet,
     MatSidenavModule, MatListModule, MatDividerModule, CommonModule, ThemePickerComponent,
     MatButtonModule, MatMenuModule, MatToolbarModule,
   ],

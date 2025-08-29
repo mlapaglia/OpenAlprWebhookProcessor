@@ -23,7 +23,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { LightboxModule } from 'ngx-lightbox';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -88,7 +87,6 @@ bootstrapApplication(AppComponent, {
       },
     },
     provideHttpClient(withInterceptorsFromDi()),
-    provideAnimations(),
     provideNativeDateAdapter(),
     // Configure Material Symbols
     {

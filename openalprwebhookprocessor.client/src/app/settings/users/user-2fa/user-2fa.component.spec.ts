@@ -1,10 +1,11 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { User2FAComponent } from './user-2fa.component';
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 interface TwoFactorStatus {
   isTwoFactorEnabled: boolean;
@@ -29,7 +30,7 @@ describe('User2FAComponent', () => {
   let component: User2FAComponent;
   let fixture: ComponentFixture<User2FAComponent>;
   let mockAccountService: jasmine.SpyObj<AccountService>;
-  let mockAlertService: jasmine.SpyObj<AlertService>;
+  let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<User2FAComponent>>;
 
@@ -41,15 +42,15 @@ describe('User2FAComponent', () => {
       'disableTwoFactorForUser',
       'getRecoveryCodesForUser',
     ]);
-    mockAlertService = jasmine.createSpyObj('AlertService', ['success', 'error']);
+    mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [User2FAComponent, NoopAnimationsModule],
+      imports: [User2FAComponent],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
-        { provide: AlertService, useValue: mockAlertService },
+        { provide: SnackbarService, useValue: mockSnackbarService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { userId: '123', userName: 'testuser' } },
@@ -139,7 +140,7 @@ describe('User2FAComponent', () => {
 
       component.onCodeSubmitted('123456');
 
-      expect(mockAlertService.error).toHaveBeenCalledWith('Error: Invalid code');
+      expect(mockSnackbarService.create).toHaveBeenCalledWith('Failed to enable two-factor', SnackBarType.Error, 'Error: Invalid code');
       expect(component.loading).toBe(false);
     });
   });
@@ -170,7 +171,7 @@ describe('User2FAComponent', () => {
 
       expect(mockAccountService.getRecoveryCodesForUser).toHaveBeenCalledWith('123');
       expect(component.recoveryCodes).toEqual(['new1', 'new2', 'new3']);
-      expect(mockAlertService.success).toHaveBeenCalledWith('New recovery codes have been generated for this user.');
+      expect(mockSnackbarService.create).toHaveBeenCalledWith('New recovery codes have been generated for this user.', SnackBarType.Successful);
     });
   });
 

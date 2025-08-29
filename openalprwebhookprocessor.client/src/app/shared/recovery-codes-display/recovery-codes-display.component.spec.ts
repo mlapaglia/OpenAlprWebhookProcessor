@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RecoveryCodesDisplayComponent } from './recovery-codes-display.component';
 
@@ -9,10 +8,7 @@ describe('RecoveryCodesDisplayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RecoveryCodesDisplayComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [RecoveryCodesDisplayComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RecoveryCodesDisplayComponent);

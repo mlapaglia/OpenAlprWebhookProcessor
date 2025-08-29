@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { of, throwError } from 'rxjs';
 import { PushoverComponent } from './pushover.component';
@@ -19,7 +18,7 @@ describe('PushoverComponent', () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [PushoverComponent, NoopAnimationsModule],
+      imports: [PushoverComponent],
       providers: [
         { provide: PushoverService, useValue: mockPushoverService },
         { provide: SnackbarService, useValue: mockSnackbarService },

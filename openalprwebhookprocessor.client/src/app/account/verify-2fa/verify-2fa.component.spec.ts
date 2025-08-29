@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { Verify2FAComponent } from './verify-2fa.component';
 import { AccountService } from '../account.service';
@@ -36,7 +35,7 @@ describe('Verify2FAComponent', () => {
     } as any;
 
     await TestBed.configureTestingModule({
-      imports: [Verify2FAComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [Verify2FAComponent, ReactiveFormsModule],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
         { provide: SnackbarService, useValue: mockSnackbarService },

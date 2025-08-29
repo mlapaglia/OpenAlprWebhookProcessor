@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TwoFactorCodeInputComponent } from './two-factor-code-input.component';
 
@@ -13,7 +12,6 @@ describe('TwoFactorCodeInputComponent', () => {
       imports: [
         TwoFactorCodeInputComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();

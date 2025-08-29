@@ -139,6 +139,10 @@
 }
 
 .login-button {
+  margin-bottom: 24px;
+}
+
+.login-button button {
   height: 56px;
   border-radius: 12px;
   font-size: 16px;
@@ -146,24 +150,21 @@
   text-transform: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-  margin-bottom: 24px;
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
-.login-button:hover:not([disabled]) {
+.login-button button:hover:not([disabled]) {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
-.login-button:active:not([disabled]) {
+.login-button button:active:not([disabled]) {
   transform: translateY(0);
 }
 
-.button-spinner {
-  margin-right: 12px;
-  display: inline-block;
-}
+
 
 .divider {
   position: relative;
@@ -190,6 +191,10 @@
 }
 
 .passkey-button {
+  margin-bottom: 16px;
+}
+
+.passkey-button button {
   height: 56px;
   border-radius: 12px;
   font-size: 16px;
@@ -197,18 +202,18 @@
   text-transform: none;
   border: 2px solid var(--mat-sys-outline);
   transition: all 0.3s ease;
-  margin-bottom: 16px;
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 
-.passkey-button:hover:not([disabled]) {
+.passkey-button button:hover:not([disabled]) {
   transform: translateY(-1px);
   border-color: var(--mat-sys-primary);
   background: var(--mat-sys-primary-container);
 }
 
-.passkey-button:active:not([disabled]) {
+.passkey-button button:active:not([disabled]) {
   transform: translateY(0);
 }
 
@@ -233,6 +238,11 @@
 @media (max-width: 480px) {
   .login-container {
     padding: 16px;
+    box-sizing: border-box;
+  }
+  
+  .login-card {
+    margin: 0;
   }
 }
 
