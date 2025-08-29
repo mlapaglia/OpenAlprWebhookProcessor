@@ -5,6 +5,25 @@ import { BehaviorSubject, type Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { User } from 'app/_models';
 
+interface PasskeyRegistrationOptions {
+  options: PublicKeyCredentialCreationOptions;
+}
+
+interface PasskeyAuthenticationOptions {
+  options: PublicKeyCredentialRequestOptions;
+}
+
+interface PasskeyInfo {
+  id: number;
+  name: string;
+  regDate: string;
+  aaGuid: string;
+}
+
+interface PasskeyListResponse {
+  passkeys: PasskeyInfo[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AccountService {
   private readonly router = inject(Router);
@@ -158,25 +177,25 @@ export class AccountService {
 
   // Passkey methods
   registerPasskey(name?: string) {
-    return this.http.post<{ options: any }>('/api/auth/passkey/register', { name });
+    return this.http.post<PasskeyRegistrationOptions>('/api/auth/passkey/register', { name });
   }
 
   completePasskeyRegistration(attestationResponse: string, name?: string) {
-    return this.http.post<{ message: string, success: boolean }>('/api/auth/passkey/complete-registration', { 
-      attestationResponse, 
-      name 
+    return this.http.post<{ message: string, success: boolean }>('/api/auth/passkey/complete-registration', {
+      attestationResponse,
+      name,
     });
   }
 
   authenticatePasskey(username: string) {
-    return this.http.post<{ options: any }>('/api/auth/passkey/authenticate', { username });
+    return this.http.post<PasskeyAuthenticationOptions>('/api/auth/passkey/authenticate', { username });
   }
 
   completePasskeyAuthentication(username: string, assertionResponse: string, rememberMe: boolean = false) {
-    return this.http.post<User>('/api/auth/passkey/complete-authentication', { 
-      username, 
-      assertionResponse, 
-      rememberMe 
+    return this.http.post<User>('/api/auth/passkey/complete-authentication', {
+      username,
+      assertionResponse,
+      rememberMe,
     }).pipe(map((user) => {
       this.userSubject.next(user);
       return user;
@@ -184,7 +203,7 @@ export class AccountService {
   }
 
   getPasskeys() {
-    return this.http.get<{ passkeys: any[] }>('/api/auth/passkey/list');
+    return this.http.get<PasskeyListResponse>('/api/auth/passkey/list');
   }
 
   deletePasskey(passkeyId: number) {

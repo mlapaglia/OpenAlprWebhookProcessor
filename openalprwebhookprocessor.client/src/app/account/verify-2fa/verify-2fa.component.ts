@@ -142,14 +142,14 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
 
       // Step 1: Get authentication options from server
       const optionsResponse = await this.accountService.authenticatePasskey(this.username).pipe(first()).toPromise();
-      
+
       if (!optionsResponse?.options) {
         throw new Error('Failed to get authentication options');
       }
 
       // Step 2: Get credential using WebAuthn API
       const credential = await navigator.credentials.get({
-        publicKey: this.convertAuthenticationOptions(optionsResponse.options)
+        publicKey: this.convertAuthenticationOptions(optionsResponse.options),
       }) as PublicKeyCredential;
 
       if (!credential) {
@@ -158,11 +158,11 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
 
       // Step 3: Send credential to server for verification
       const assertionResponse = this.encodeAssertionResponse(credential);
-      
+
       const user = await this.accountService.completePasskeyAuthentication(
         this.username,
         assertionResponse,
-        this.rememberMe
+        this.rememberMe,
       ).pipe(first()).toPromise();
 
       if (user) {
@@ -172,8 +172,8 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
     } catch (error) {
       console.error('Passkey authentication error:', error);
       this.snackbarService.create(
-        `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 
-        SnackBarType.Error
+        `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        SnackBarType.Error,
       );
     } finally {
       this.passkeyLoading = false;
@@ -181,20 +181,20 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
     }
   }
 
-  private convertAuthenticationOptions(options: any): PublicKeyCredentialRequestOptions {
+  private convertAuthenticationOptions(options: PublicKeyCredentialRequestOptions): PublicKeyCredentialRequestOptions {
     return {
       ...options,
-      challenge: this.base64urlToBuffer(options.challenge),
-      allowCredentials: options.allowCredentials?.map((cred: any) => ({
+      challenge: this.base64urlToBuffer(options.challenge as unknown as string),
+      allowCredentials: options.allowCredentials?.map((cred) => ({
         ...cred,
-        id: this.base64urlToBuffer(cred.id)
-      }))
+        id: this.base64urlToBuffer(cred.id as unknown as string),
+      })),
     };
   }
 
   private encodeAssertionResponse(credential: PublicKeyCredential): string {
     const response = credential.response as AuthenticatorAssertionResponse;
-    
+
     return JSON.stringify({
       id: credential.id,
       rawId: this.bufferToBase64url(credential.rawId),
@@ -203,8 +203,8 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
         authenticatorData: this.bufferToBase64url(response.authenticatorData),
         clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
         signature: this.bufferToBase64url(response.signature),
-        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null
-      }
+        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null,
+      },
     });
   }
 

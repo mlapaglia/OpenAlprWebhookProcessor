@@ -168,67 +168,92 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
     this.markForCheck();
 
     try {
-      // Check if WebAuthn is supported
-      if (!window.navigator.credentials || !window.PublicKeyCredential) {
-        throw new Error('Passkeys are not supported in this browser');
-      }
-
-      // Step 1: Get authentication options from server
-      const optionsResponse = await this.accountService.authenticatePasskey(username).pipe(first()).toPromise();
-      
-      if (!optionsResponse?.options) {
-        throw new Error('Failed to get authentication options');
-      }
-
-      // Step 2: Get credential using WebAuthn API
-      const credential = await navigator.credentials.get({
-        publicKey: this.convertAuthenticationOptions(optionsResponse.options)
-      }) as PublicKeyCredential;
-
-      if (!credential) {
-        throw new Error('Failed to authenticate with passkey');
-      }
-
-      // Step 3: Send credential to server for verification
-      const assertionResponse = this.encodeAssertionResponse(credential);
-      
-      const user = await this.accountService.completePasskeyAuthentication(
-        username,
-        assertionResponse,
-        this.f.rememberMe.value
-      ).pipe(first()).toPromise();
-
-      if (user) {
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
-        void this.router.navigateByUrl(returnUrl);
-      }
-
+      await this.performPasskeyAuthentication(username);
     } catch (error) {
-      console.error('Passkey authentication error:', error);
-      this.snackbarService.create(
-        `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 
-        SnackBarType.Error
-      );
+      this.handlePasskeyError(error);
     } finally {
       this.passkeyLoading = false;
       this.markForCheck();
     }
   }
 
-  private convertAuthenticationOptions(options: any): PublicKeyCredentialRequestOptions {
+  private async performPasskeyAuthentication(username: string) {
+    this.validateWebAuthnSupport();
+
+    const optionsResponse = await this.getAuthenticationOptions(username);
+    const credential = await this.getCredentialFromUser(optionsResponse.options);
+    const user = await this.verifyCredentialWithServer(username, credential);
+
+    if (user) {
+      this.navigateAfterSuccess();
+    }
+  }
+
+  private validateWebAuthnSupport() {
+    if (!window.navigator.credentials || !window.PublicKeyCredential) {
+      throw new Error('Passkeys are not supported in this browser');
+    }
+  }
+
+  private async getAuthenticationOptions(username: string) {
+    const optionsResponse = await this.accountService.authenticatePasskey(username).pipe(first()).toPromise();
+
+    if (!optionsResponse?.options) {
+      throw new Error('Failed to get authentication options');
+    }
+
+    return optionsResponse;
+  }
+
+  private async getCredentialFromUser(options: PublicKeyCredentialRequestOptions) {
+    const credential = await navigator.credentials.get({
+      publicKey: this.convertAuthenticationOptions(options),
+    }) as PublicKeyCredential;
+
+    if (!credential) {
+      throw new Error('Failed to authenticate with passkey');
+    }
+
+    return credential;
+  }
+
+  private async verifyCredentialWithServer(username: string, credential: PublicKeyCredential) {
+    const assertionResponse = this.encodeAssertionResponse(credential);
+
+    return await this.accountService.completePasskeyAuthentication(
+      username,
+      assertionResponse,
+      this.f.rememberMe.value,
+    ).pipe(first()).toPromise();
+  }
+
+  private navigateAfterSuccess() {
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
+    void this.router.navigateByUrl(returnUrl);
+  }
+
+  private handlePasskeyError(error: unknown) {
+    console.error('Passkey authentication error:', error);
+    this.snackbarService.create(
+      `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      SnackBarType.Error,
+    );
+  }
+
+  private convertAuthenticationOptions(options: PublicKeyCredentialRequestOptions): PublicKeyCredentialRequestOptions {
     return {
       ...options,
-      challenge: this.base64urlToBuffer(options.challenge),
-      allowCredentials: options.allowCredentials?.map((cred: any) => ({
+      challenge: this.base64urlToBuffer(options.challenge as unknown as string),
+      allowCredentials: options.allowCredentials?.map((cred) => ({
         ...cred,
-        id: this.base64urlToBuffer(cred.id)
-      }))
+        id: this.base64urlToBuffer(cred.id as unknown as string),
+      })),
     };
   }
 
   private encodeAssertionResponse(credential: PublicKeyCredential): string {
     const response = credential.response as AuthenticatorAssertionResponse;
-    
+
     return JSON.stringify({
       id: credential.id,
       rawId: this.bufferToBase64url(credential.rawId),
@@ -237,8 +262,8 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
         authenticatorData: this.bufferToBase64url(response.authenticatorData),
         clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
         signature: this.bufferToBase64url(response.signature),
-        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null
-      }
+        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null,
+      },
     });
   }
 

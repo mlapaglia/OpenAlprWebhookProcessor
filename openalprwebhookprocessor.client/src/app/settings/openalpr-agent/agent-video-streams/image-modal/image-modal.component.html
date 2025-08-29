@@ -30,7 +30,7 @@
 
     @if (imageUrl && !isLoading && !errorMessage) {
       <div class="image-container">
-        <img [src]="imageUrl" [alt]="'Snapshot from ' + data.cameraName" class="snapshot-image">
+        <img [ngSrc]="imageUrl" [alt]="'Snapshot from ' + data.cameraName" class="snapshot-image">
       </div>
     }
   </div>

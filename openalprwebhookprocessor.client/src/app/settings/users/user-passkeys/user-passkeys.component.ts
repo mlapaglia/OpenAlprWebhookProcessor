@@ -12,7 +12,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import type { FormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmationDialogComponent, type ConfirmationDialogData } from '../../../shared/confirmation-dialog/confirmation-dialog.component';
 import { RefreshButtonComponent } from '../../../shared/refresh-button/refresh-button.component';
 
@@ -60,7 +61,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
   userName = '';
   loading = false;
   registering = false;
-  
+
   passkeys: PasskeyInfo[] = [];
   registrationForm: FormGroup;
 
@@ -69,7 +70,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
     this.userName = this.data.userName;
 
     this.registrationForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.maxLength(50)]]
+      name: ['', [Validators.required, Validators.maxLength(50)]],
     });
 
     this.loadPasskeys();
@@ -88,7 +89,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
       (error) => {
         this.alertService.error(`Failed to load passkeys: ${error}`);
         this.loading = false;
-      }
+      },
     );
   }
 
@@ -101,80 +102,104 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
     this.markForCheck();
 
     try {
-      // Check if WebAuthn is supported
-      if (!window.navigator.credentials || !window.PublicKeyCredential) {
-        throw new Error('WebAuthn is not supported in this browser');
-      }
-
-      const passkeyName = this.registrationForm.get('name')?.value;
-
-      // Step 1: Get registration options from server
-      const optionsResponse = await this.accountService.registerPasskey(passkeyName).pipe(first()).toPromise();
-      
-      if (!optionsResponse?.options) {
-        throw new Error('Failed to get registration options');
-      }
-
-      // Step 2: Create credential using WebAuthn API
-      const credential = await navigator.credentials.create({
-        publicKey: this.convertRegistrationOptions(optionsResponse.options)
-      }) as PublicKeyCredential;
-
-      if (!credential) {
-        throw new Error('Failed to create credential');
-      }
-
-      // Step 3: Send credential to server for verification
-      const attestationResponse = this.encodeAttestationResponse(credential);
-      
-      const result = await this.accountService.completePasskeyRegistration(
-        attestationResponse, 
-        passkeyName
-      ).pipe(first()).toPromise();
-
-      if (result?.success) {
-        this.alertService.success('Passkey registered successfully!');
-        this.registrationForm.reset();
-        this.loadPasskeys(); // Refresh the list
-      } else {
-        throw new Error(result?.message || 'Failed to register passkey');
-      }
-
+      await this.performPasskeyRegistration();
     } catch (error) {
-      console.error('Passkey registration error:', error);
-      this.alertService.error(`Failed to register passkey: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      this.handleRegistrationError(error);
     } finally {
       this.registering = false;
       this.markForCheck();
     }
   }
 
-  private convertRegistrationOptions(options: any): PublicKeyCredentialCreationOptions {
+  private async performPasskeyRegistration() {
+    this.validateWebAuthnSupport();
+
+    const passkeyName = this.registrationForm.get('name')?.value;
+    const optionsResponse = await this.getRegistrationOptions(passkeyName);
+    const credential = await this.createCredential(optionsResponse.options);
+    const result = await this.completeRegistration(credential, passkeyName);
+
+    this.handleSuccessfulRegistration(result);
+  }
+
+  private validateWebAuthnSupport() {
+    if (!window.navigator.credentials || !window.PublicKeyCredential) {
+      throw new Error('WebAuthn is not supported in this browser');
+    }
+  }
+
+  private async getRegistrationOptions(passkeyName: string) {
+    const optionsResponse = await this.accountService.registerPasskey(passkeyName).pipe(first()).toPromise();
+
+    if (!optionsResponse?.options) {
+      throw new Error('Failed to get registration options');
+    }
+
+    return optionsResponse;
+  }
+
+  private async createCredential(options: PublicKeyCredentialCreationOptions) {
+    const credential = await navigator.credentials.create({
+      publicKey: this.convertRegistrationOptions(options),
+    }) as PublicKeyCredential;
+
+    if (!credential) {
+      throw new Error('Failed to create credential');
+    }
+
+    return credential;
+  }
+
+  private async completeRegistration(credential: PublicKeyCredential, passkeyName: string) {
+    const attestationResponse = this.encodeAttestationResponse(credential);
+
+    return await this.accountService.completePasskeyRegistration(
+      attestationResponse,
+      passkeyName,
+    ).pipe(first()).toPromise();
+  }
+
+  private handleSuccessfulRegistration(result: { success: boolean; message?: string } | undefined) {
+    if (result?.success) {
+      this.alertService.success('Passkey registered successfully!');
+      this.registrationForm.reset();
+      this.loadPasskeys();
+    } else {
+      throw new Error(result?.message ?? 'Failed to register passkey');
+    }
+  }
+
+  private handleRegistrationError(error: unknown) {
+    console.error('Passkey registration error:', error);
+    this.alertService.error(`Failed to register passkey: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  private convertRegistrationOptions(options: PublicKeyCredentialCreationOptions): PublicKeyCredentialCreationOptions {
     return {
       ...options,
-      challenge: this.base64urlToBuffer(options.challenge),
+      challenge: this.base64urlToBuffer(options.challenge as unknown as string),
       user: {
         ...options.user,
-        id: this.base64urlToBuffer(options.user.id)
+        id: this.base64urlToBuffer(options.user.id as unknown as string),
       },
-      excludeCredentials: options.excludeCredentials?.map((cred: any) => ({
+      excludeCredentials: options.excludeCredentials?.map((cred) => ({
         ...cred,
-        id: this.base64urlToBuffer(cred.id)
-      }))
+        id: this.base64urlToBuffer(cred.id as unknown as string),
+      })),
     };
   }
 
   private encodeAttestationResponse(credential: PublicKeyCredential): string {
     const response = credential.response as AuthenticatorAttestationResponse;
-    
+
     return JSON.stringify({
       id: credential.id,
       rawId: this.bufferToBase64url(credential.rawId),
       type: credential.type,
       response: {
         attestationObject: this.bufferToBase64url(response.attestationObject),
-        clientDataJSON: this.bufferToBase64url(response.clientDataJSON)
-      }
+        clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
+      },
     });
   }
 
@@ -229,10 +254,10 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
             },
             (error) => {
               this.alertService.error(`Failed to delete passkey: ${error}`);
-            }
+            },
           );
         }
-      }
+      },
     );
   }
 
