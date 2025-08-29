@@ -76,9 +76,11 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor
                  await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
 
-            var camera = await _unitOfWork.Cameras.FirstOrDefaultAsync(
-                x => x.OpenAlprCameraId == webhook.Group.CameraId,
-                cancellationToken);
+            var camera = await _unitOfWork.Cameras
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.OpenAlprCameraId == webhook.Group.CameraId,
+                    cancellationToken);
 
             if (camera == null)
             {
@@ -99,6 +101,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor
             }
 
             var previousPreviewGroups = await _unitOfWork.PlateGroups.GetQueryable()
+                .AsNoTracking()
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .ToListAsync(cancellationToken);
 
