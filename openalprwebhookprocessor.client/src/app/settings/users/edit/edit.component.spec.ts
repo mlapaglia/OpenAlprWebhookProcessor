@@ -52,6 +52,7 @@ describe('AddEditComponent', () => {
         password: '',
         twoFactorEnabled: false,
         isDeleting: false,
+        hasPasskeys: false,
       };
       component.data = { userId: '1' };
       mockAccountService.getById.and.returnValue(of(mockUser));
@@ -131,6 +132,7 @@ describe('AddEditComponent', () => {
         password: '',
         twoFactorEnabled: false,
         isDeleting: false,
+        hasPasskeys: false,
       };
       component.data = { userId: '1' };
       mockAccountService.getById.and.returnValue(of(mockUser));

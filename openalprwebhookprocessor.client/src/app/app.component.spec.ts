@@ -120,6 +120,7 @@ describe('AppComponent', () => {
         password: '',
         twoFactorEnabled: false,
         isDeleting: false,
+        hasPasskeys: false,
       };
 
       userSubject.next(user);
@@ -137,6 +138,7 @@ describe('AppComponent', () => {
         password: '',
         isDeleting: false,
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
 
       userSubject.next(user);

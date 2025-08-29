@@ -173,6 +173,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
 
       component.ngOnInit();
@@ -211,6 +212,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
 
@@ -228,6 +230,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockActivatedRoute.snapshot.queryParams = { returnUrl: '/dashboard' };
@@ -246,6 +249,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: true,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockRouter.navigate.and.returnValue(Promise.resolve(true));
@@ -255,6 +259,8 @@ describe('LoginComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/verify-2fa'], {
         queryParams: {
           userId: 123,
+          username: 'testuser',
+          hasPasskeys: false,
           rememberMe: false,
           returnUrl: '/',
         },
@@ -270,6 +276,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: true,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockActivatedRoute.snapshot.queryParams = { returnUrl: '/dashboard' };
@@ -282,6 +289,8 @@ describe('LoginComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/verify-2fa'], {
         queryParams: {
           userId: 456,
+          username: 'testuser',
+          hasPasskeys: false,
           rememberMe: true,
           returnUrl: '/dashboard',
         },

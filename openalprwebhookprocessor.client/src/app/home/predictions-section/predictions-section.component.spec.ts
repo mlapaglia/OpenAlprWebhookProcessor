@@ -309,11 +309,13 @@ describe('PredictionsSectionComponent', () => {
       expect(result).toEqual([
         {
           ...mockPredictions[0],
+          formattedTime: jasmine.any(String),
           confidenceColor: '#4CAF50',
           confidencePercentage: '95',
         },
         {
           ...mockPredictions[1],
+          formattedTime: jasmine.any(String),
           confidenceColor: '#FF9800',
           confidencePercentage: '50',
         },
