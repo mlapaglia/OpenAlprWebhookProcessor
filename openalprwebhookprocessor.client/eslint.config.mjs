@@ -63,6 +63,7 @@ export default tseslint.config(
           format: ['camelCase', 'UPPER_CASE'],
         },
       ],
+      '@typescript-eslint/no-deprecated': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-inferrable-types': [

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, startWith, debounceTime, type Observable } from 'rxjs';
+import { map, startWith, type Observable } from 'rxjs';
 
 export interface LayoutState {
   isMobile: boolean;
@@ -15,7 +15,6 @@ export class LayoutService {
   private readonly breakpointObserver = inject(BreakpointObserver);
 
   getLayoutState(): Observable<LayoutState> {
-    // Provide default state to prevent layout shift
     const defaultState: LayoutState = {
       isMobile: false,
       isTablet: false,
@@ -27,8 +26,6 @@ export class LayoutService {
       Breakpoints.Small,
       Breakpoints.Medium,
     ]).pipe(
-      // Add small debounce to avoid rapid layout calculations during page load
-      debounceTime(50), // Slightly longer debounce to let Angular settle
       map(_result => {
         const isMobile = this.breakpointObserver.isMatched(Breakpoints.XSmall);
         const isTablet = this.breakpointObserver.isMatched(Breakpoints.Small);

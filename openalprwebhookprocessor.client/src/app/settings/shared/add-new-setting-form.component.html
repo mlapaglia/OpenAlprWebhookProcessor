@@ -1,8 +1,8 @@
 <!-- Add New Setting Form -->
 <mat-card class="add-setting-card">
   <mat-card-header>
-    <mat-card-title i18n class="mat-headline-6">Add New {{config.entityName | titlecase}}</mat-card-title>
-    <mat-card-subtitle i18n>Create a new rule to {{config.entityName === 'ignore rule' ? 'ignore' : 'monitor'}} specific license plates</mat-card-subtitle>
+    <mat-card-title i18n class="mat-headline-6">Add New {{config().entityName | titlecase}}</mat-card-title>
+    <mat-card-subtitle i18n>Create a new rule to {{config().entityName === 'ignore rule' ? 'ignore' : 'monitor'}} specific license plates</mat-card-subtitle>
   </mat-card-header>
   
   <mat-card-content>
@@ -53,7 +53,7 @@
         <textarea 
           matInput 
           formControlName="description"
-          [placeholder]="'Add a note about this ' + config.entityName + '...'"
+          [placeholder]="'Add a note about this ' + config().entityName + '...'"
           rows="2"
           maxlength="200">
         </textarea>
@@ -79,10 +79,10 @@
           @if(!isAddingSetting) {
             <mat-icon i18n>add</mat-icon>
           }
-          @if(isAddingSetting) {
+          @if(isAddingSetting()) {
             <mat-spinner diameter="20" />
           }
-          {{ isAddingSetting ? 'Adding...' : config.addButtonText }}
+          {{ isAddingSetting() ? 'Adding...' : config().addButtonText }}
         </button>
         
         <button i18n 

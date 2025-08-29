@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { SettingsService } from './settings.service';
 import { type ScheduledJobsResponse, ScheduledJobType } from './debug/scheduled-jobs/scheduled-job';
 
@@ -9,8 +10,11 @@ describe('SettingsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [SettingsService],
+      providers: [
+        SettingsService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(SettingsService);
     httpMock = TestBed.inject(HttpTestingController);

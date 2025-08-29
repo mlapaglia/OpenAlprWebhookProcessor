@@ -2,6 +2,7 @@ import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 import { OnPushBaseComponent } from '../../_helpers/onpush-base.component';
 
 import { AccountService } from 'app/_services';
@@ -103,7 +104,6 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
       this.currentThemeName = currentTheme.name;
 
       try {
-        // Always load the theme CSS file
         const themeUrl = `assets/themes/${currentTheme.name}.css`;
         await this.styleManager.setStyle('theme', themeUrl);
       } catch (error) {
@@ -184,25 +184,19 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
 
     const optionsResponse = await this.getAuthenticationOptions(username);
     const credential = await this.getCredentialFromUser(optionsResponse.options);
-    const user = await this.verifyCredentialWithServer(username, credential);
+    await this.verifyCredentialWithServer(username, credential);
 
-    if (user) {
-      this.navigateAfterSuccess();
-    }
+    this.navigateAfterSuccess();
   }
 
   private validateWebAuthnSupport() {
-    if (!window.navigator.credentials || !window.PublicKeyCredential) {
+    if (!('credentials' in navigator) || !('PublicKeyCredential' in window)) {
       throw new Error('Passkeys are not supported in this browser');
     }
   }
 
   private async getAuthenticationOptions(username: string) {
-    const optionsResponse = await this.accountService.authenticatePasskey(username).pipe(first()).toPromise();
-
-    if (!optionsResponse?.options) {
-      throw new Error('Failed to get authentication options');
-    }
+    const optionsResponse = await firstValueFrom(this.accountService.authenticatePasskey(username));
 
     return optionsResponse;
   }
@@ -212,21 +206,17 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
       publicKey: this.convertAuthenticationOptions(options),
     }) as PublicKeyCredential;
 
-    if (!credential) {
-      throw new Error('Failed to authenticate with passkey');
-    }
-
     return credential;
   }
 
   private async verifyCredentialWithServer(username: string, credential: PublicKeyCredential) {
     const assertionResponse = this.encodeAssertionResponse(credential);
 
-    return await this.accountService.completePasskeyAuthentication(
+    await firstValueFrom(this.accountService.completePasskeyAuthentication(
       username,
       assertionResponse,
       this.f.rememberMe.value,
-    ).pipe(first()).toPromise();
+    ));
   }
 
   private navigateAfterSuccess() {

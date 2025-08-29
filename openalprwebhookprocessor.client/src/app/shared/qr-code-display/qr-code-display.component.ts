@@ -51,29 +51,6 @@ export class QrCodeDisplayComponent extends OnPushBaseComponent implements OnIni
   async copyToClipboard() {
     if (!this.sharedKey()) return;
 
-    try {
-      await navigator.clipboard.writeText(this.sharedKey());
-    } catch {
-      this.fallbackCopyToClipboard();
-    }
-  }
-
-  private fallbackCopyToClipboard() {
-    const textArea = document.createElement('textarea');
-    textArea.value = this.sharedKey();
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand('copy');
-    } catch (error) {
-      console.error('Fallback copy failed:', error);
-    }
-
-    document.body.removeChild(textArea);
+    await navigator.clipboard.writeText(this.sharedKey());
   }
 }

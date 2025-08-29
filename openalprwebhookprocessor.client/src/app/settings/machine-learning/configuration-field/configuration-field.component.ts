@@ -73,7 +73,9 @@ export class ConfigurationFieldComponent {
   }
 
   public get formControl() {
-    return this.fieldConfig ? this.configForm().get(this.fieldConfig.controlName) : null;
+    const config = this.fieldConfig;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return config ? this.configForm().get(config.controlName) : null;
   }
 
   public get hasError(): boolean {

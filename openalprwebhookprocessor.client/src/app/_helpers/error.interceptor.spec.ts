@@ -40,7 +40,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Unauthorized',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -62,7 +62,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Forbidden',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -84,7 +84,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Unauthorized',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -106,7 +106,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Forbidden',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -128,7 +128,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Internal Server Error',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -168,7 +168,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Unauthorized',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -189,7 +189,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Unauthorized',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({
@@ -216,7 +216,7 @@ describe('ErrorInterceptor', () => {
       });
 
       requests.forEach(request => {
-        httpHandler.handle.and.returnValue(throwError(errorResponse));
+        httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
         // Act
         interceptor.intercept(request, httpHandler).subscribe({
@@ -242,7 +242,7 @@ describe('ErrorInterceptor', () => {
         statusText: 'Unauthorized',
       });
 
-      httpHandler.handle.and.returnValue(throwError(errorResponse));
+      httpHandler.handle.and.returnValue(throwError(() => errorResponse));
 
       // Act
       interceptor.intercept(request, httpHandler).subscribe({

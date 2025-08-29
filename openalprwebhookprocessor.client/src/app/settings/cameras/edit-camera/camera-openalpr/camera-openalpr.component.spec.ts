@@ -65,7 +65,6 @@ describe('CameraOpenAlprComponent', () => {
     });
 
     it('should initialize form with default values', () => {
-      // Create a fresh component without calling ngOnInit
       const freshFixture = TestBed.createComponent(CameraOpenAlprComponent);
       const freshComponent = freshFixture.componentInstance;
 
@@ -183,7 +182,6 @@ describe('CameraOpenAlprComponent', () => {
       const nameControl = component.openAlprForm.get('openAlprName');
       const idControl = component.openAlprForm.get('openAlprCameraId');
 
-      // Clear the fields first
       nameControl?.setValue('');
       idControl?.setValue('');
 
@@ -200,10 +198,8 @@ describe('CameraOpenAlprComponent', () => {
     });
 
     it('should remove validators when openAlprEnabled is false', () => {
-      // First enable to set validators
       component.openAlprForm.patchValue({ openAlprEnabled: true });
 
-      // Then disable to remove validators
       component.openAlprForm.patchValue({ openAlprEnabled: false });
 
       const nameControl = component.openAlprForm.get('openAlprName');
@@ -339,7 +335,6 @@ describe('CameraOpenAlprComponent', () => {
       let error = compiled.querySelector('mat-error');
       expect(error?.textContent?.trim()).toContain('Camera ID is required');
 
-      // Test min error
       idControl?.setValue(0);
       fixture.detectChanges();
 
@@ -406,18 +401,16 @@ describe('CameraOpenAlprComponent', () => {
       component.openAlprForm.patchValue({ openAlprEnabled: true });
       const idControl = component.openAlprForm.get('openAlprCameraId');
 
-      // Test invalid values
       const invalidValues = [0, -1, -10];
       invalidValues.forEach(value => {
         idControl?.setValue(value);
-        expect(idControl?.hasError('min')).toBe(true, `${value} should be invalid`);
+        expect(idControl?.hasError('min')).withContext(`${value} should be invalid`).toBe(true);
       });
 
-      // Test valid values
       const validValues = [1, 5, 100, 999];
       validValues.forEach(value => {
         idControl?.setValue(value);
-        expect(idControl?.hasError('min')).toBe(false, `${value} should be valid`);
+        expect(idControl?.hasError('min')).withContext(`${value} should be valid`).toBe(false);
       });
     });
   });
@@ -468,7 +461,6 @@ describe('CameraOpenAlprComponent', () => {
 
   describe('form integration', () => {
     it('should emit camera changes multiple times for multiple field updates', () => {
-      // Reset and create fresh spy since ngOnInit was already called in beforeEach
       const emitSpy = jasmine.createSpy('emit');
       component.cameraChange.emit = emitSpy;
 

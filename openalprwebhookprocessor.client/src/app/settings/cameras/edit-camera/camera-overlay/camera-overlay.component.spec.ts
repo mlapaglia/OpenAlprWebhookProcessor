@@ -59,7 +59,6 @@ describe('CameraOverlayComponent', () => {
     });
 
     it('should initialize form with default values', () => {
-      // Create a fresh component without calling ngOnInit
       const freshFixture = TestBed.createComponent(CameraOverlayComponent);
       const freshComponent = freshFixture.componentInstance;
 
@@ -166,7 +165,6 @@ describe('CameraOverlayComponent', () => {
     it('should add validators when updateOverlayEnabled is true', () => {
       const urlControl = component.overlayForm.get('updateOverlayTextUrl');
 
-      // Clear the field first
       urlControl?.setValue('');
 
       component.overlayForm.patchValue({ updateOverlayEnabled: true });
@@ -181,10 +179,8 @@ describe('CameraOverlayComponent', () => {
     });
 
     it('should remove validators when updateOverlayEnabled is false', () => {
-      // First enable to set validators
       component.overlayForm.patchValue({ updateOverlayEnabled: true });
 
-      // Then disable to remove validators
       component.overlayForm.patchValue({ updateOverlayEnabled: false });
 
       const urlControl = component.overlayForm.get('updateOverlayTextUrl');
@@ -199,14 +195,14 @@ describe('CameraOverlayComponent', () => {
       const invalidUrls = ['invalid', 'ftp://test.com', 'not-a-url', 'mailto:test@test.com'];
       invalidUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(true, `${url} should be invalid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be invalid`).toBe(true);
       });
 
       // Valid URLs
       const validUrls = ['http://test.com', 'https://example.org/api', 'http://192.168.1.1/endpoint'];
       validUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(false, `${url} should be valid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be valid`).toBe(false);
       });
     });
   });
@@ -394,7 +390,6 @@ describe('CameraOverlayComponent', () => {
       component.overlayForm.patchValue({ updateOverlayEnabled: true });
       const urlControl = component.overlayForm.get('updateOverlayTextUrl');
 
-      // Test valid URLs
       const validUrls = [
         'http://example.com',
         'https://example.com',
@@ -405,10 +400,9 @@ describe('CameraOverlayComponent', () => {
 
       validUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.valid).toBe(true, `${url} should be valid`);
+        expect(urlControl?.valid).withContext(`${url} should be valid`).toBe(true);
       });
 
-      // Test invalid URLs
       const invalidUrls = [
         'ftp://example.com',
         'example.com',
@@ -418,7 +412,7 @@ describe('CameraOverlayComponent', () => {
 
       invalidUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(true, `${url} should be invalid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be invalid`).toBe(true);
       });
     });
   });

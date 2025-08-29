@@ -33,6 +33,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.status-indicator mat-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .app-title {
@@ -118,8 +132,8 @@
   position: absolute;
   border-radius: 50%;
   border: 2px solid #FF0000;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   animation: pulse 1.5s 1 forwards;
 }
 
@@ -140,8 +154,8 @@
   position: absolute;
   border-radius: 50%;
   border: 2px solid #4CAF50;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   animation: pulse-offline 3s 1 forwards;
 }
 

@@ -83,7 +83,6 @@
             <input matInput 
               [formControl]="vehicleModelControl" 
               [matAutocomplete]="modelAuto" 
-              [disabled]="isModelDisabled"
               placeholder="Select a make first">
             <mat-autocomplete #modelAuto="matAutocomplete">
               @for (model of filteredModels$ | async; track model) {

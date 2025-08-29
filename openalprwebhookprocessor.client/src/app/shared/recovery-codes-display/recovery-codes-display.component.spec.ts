@@ -59,23 +59,25 @@ describe('RecoveryCodesDisplayComponent', () => {
     });
 
     it('should create download link', () => {
-      spyOn(document, 'createElement').and.callThrough();
-      spyOn(document.body, 'appendChild').and.stub();
-      spyOn(document.body, 'removeChild').and.stub();
-
       const mockLink = {
         href: '',
         download: '',
         click: jasmine.createSpy('click'),
       } as any;
 
-      (document.createElement as jasmine.Spy).and.returnValue(mockLink);
+      const createElementSpy = spyOn(document, 'createElement').and.returnValue(mockLink);
+      spyOn(document.body, 'appendChild').and.stub();
+      spyOn(document.body, 'removeChild').and.stub();
+      spyOn(window.URL, 'createObjectURL').and.returnValue('mock-url');
+      spyOn(window.URL, 'revokeObjectURL').and.stub();
 
       component.downloadCodes();
 
-      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(createElementSpy).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe('recovery-codes.txt');
       expect(mockLink.click).toHaveBeenCalled();
+      expect(document.body.appendChild).toHaveBeenCalledWith(mockLink);
+      expect(document.body.removeChild).toHaveBeenCalledWith(mockLink);
     });
   });
 
@@ -85,10 +87,33 @@ describe('RecoveryCodesDisplayComponent', () => {
     });
 
     it('should open print window', () => {
+      const mockElements = {
+        html: { appendChild: jasmine.createSpy('appendChild') },
+        head: { appendChild: jasmine.createSpy('appendChild') },
+        title: { textContent: '' },
+        body: { appendChild: jasmine.createSpy('appendChild') },
+        h2: { textContent: '' },
+        p: { textContent: '' },
+        ul: { appendChild: jasmine.createSpy('appendChild') },
+        li: { textContent: '' },
+      };
+
       const mockWindow = {
         document: {
-          write: jasmine.createSpy('write'),
-          close: jasmine.createSpy('close'),
+          createElement: jasmine.createSpy('createElement').and.callFake((tag: string) => {
+            switch (tag) {
+              case 'html': return mockElements.html;
+              case 'head': return mockElements.head;
+              case 'title': return mockElements.title;
+              case 'body': return mockElements.body;
+              case 'h2': return mockElements.h2;
+              case 'p': return mockElements.p;
+              case 'ul': return mockElements.ul;
+              case 'li': return { ...mockElements.li };
+              default: return {};
+            }
+          }),
+          appendChild: jasmine.createSpy('appendChild'),
         },
         print: jasmine.createSpy('print'),
       };
@@ -98,8 +123,10 @@ describe('RecoveryCodesDisplayComponent', () => {
       component.printCodes();
 
       expect(window.open).toHaveBeenCalledWith('', '_blank');
-      expect(mockWindow.document.write).toHaveBeenCalled();
-      expect(mockWindow.document.close).toHaveBeenCalled();
+      expect(mockWindow.document.createElement).toHaveBeenCalledWith('html');
+      expect(mockWindow.document.createElement).toHaveBeenCalledWith('head');
+      expect(mockWindow.document.createElement).toHaveBeenCalledWith('title');
+      expect(mockWindow.document.createElement).toHaveBeenCalledWith('body');
       expect(mockWindow.print).toHaveBeenCalled();
     });
 

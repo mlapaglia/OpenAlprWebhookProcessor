@@ -97,7 +97,7 @@ describe('AuthGuard', () => {
       // Arrange
       const unauthenticatedUser = new User(); // No ID
       Object.defineProperty(accountService, 'userValue', { value: unauthenticatedUser });
-      accountService.checkAuthenticationStatus.and.returnValue(throwError('Authentication failed'));
+      accountService.checkAuthenticationStatus.and.returnValue(throwError(() => new Error('Authentication failed')));
 
       // Act
       guard.canActivate(route, state).subscribe(result => {

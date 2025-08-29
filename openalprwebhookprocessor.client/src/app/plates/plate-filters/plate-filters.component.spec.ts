@@ -153,7 +153,6 @@ describe('PlateFiltersComponent', () => {
       expect(component.showSearchError).toBeDefined();
       expect(component.showDateRangeError).toBeDefined();
       expect(component.isSearchDisabled).toBeDefined();
-      expect(component.isModelDisabled).toBeDefined();
     });
   });
 

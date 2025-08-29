@@ -151,7 +151,6 @@ describe('PlateSettingsTableComponent', () => {
       mockService.getAll.and.returnValue(of([]));
 
       component.loadSettings();
-      // Initially loading should be true (before observable completes)
       expect(component.hasError).toBe(false);
     });
   });
@@ -230,7 +229,7 @@ describe('PlateSettingsTableComponent', () => {
 
     it('should reject edit with empty plate number', () => {
       const setting = component.settings.data[0];
-      component.editingId = setting.id; // Set editing state
+      component.editingId = setting.id;
       component.editingSetting = new TestPlateSetting({ ...setting, plateNumber: '' });
 
       component.saveEdit(setting);
@@ -397,6 +396,7 @@ describe('PlateSettingsTableComponent', () => {
 
       component.scrollToForm();
 
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       expect(document.querySelector).toHaveBeenCalledWith('.add-setting-card');
       expect(mockElement.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
     });

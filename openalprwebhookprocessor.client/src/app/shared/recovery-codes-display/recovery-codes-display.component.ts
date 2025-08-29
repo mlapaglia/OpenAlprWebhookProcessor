@@ -42,23 +42,36 @@ export class RecoveryCodesDisplayComponent {
   }
 
   printCodes() {
-    const printContent = `
-      <h2>Two-Factor Authentication Recovery Codes</h2>
-      <p>Keep these codes safe. Each code can only be used once.</p>
-      <ul>
-        ${this.recoveryCodes().map(code => `<li>${code}</li>`).join('')}
-      </ul>
-    `;
-
     const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head><title>Recovery Codes</title></head>
-          <body>${printContent}</body>
-        </html>
-      `);
-      printWindow.document.close();
+    if (printWindow?.document) {
+      const doc = printWindow.document;
+
+      const html = doc.createElement('html');
+      const head = doc.createElement('head');
+      const title = doc.createElement('title');
+      title.textContent = 'Recovery Codes';
+      head.appendChild(title);
+
+      const body = doc.createElement('body');
+      const h2 = doc.createElement('h2');
+      h2.textContent = 'Two-Factor Authentication Recovery Codes';
+      const p = doc.createElement('p');
+      p.textContent = 'Keep these codes safe. Each code can only be used once.';
+      const ul = doc.createElement('ul');
+
+      this.recoveryCodes().forEach(code => {
+        const li = doc.createElement('li');
+        li.textContent = code;
+        ul.appendChild(li);
+      });
+
+      body.appendChild(h2);
+      body.appendChild(p);
+      body.appendChild(ul);
+      html.appendChild(head);
+      html.appendChild(body);
+
+      doc.appendChild(html);
       printWindow.print();
     }
   }

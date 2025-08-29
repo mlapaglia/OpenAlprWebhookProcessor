@@ -3,12 +3,22 @@ button.full-width {
   width: 100% !important;
 }
 
+// Ensure icons are properly centered and don't wobble during animation
+button mat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .spinning {
   animation: spin 1s linear infinite;
+  transform-origin: center center;
 }
 
 .stopping {
   animation: spin-decelerate 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform-origin: center center;
 }
 
 @keyframes spin {

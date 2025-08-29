@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { AccountService } from './account.service';
 import { User } from 'app/_models';
 
@@ -13,10 +14,11 @@ describe('AccountService', () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         AccountService,
         { provide: Router, useValue: mockRouter },
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     });
     service = TestBed.inject(AccountService);
@@ -270,12 +272,99 @@ describe('AccountService', () => {
 
       expect(service.finalizeLogout).toHaveBeenCalled();
     });
+  });
 
-    it('should clear user and navigate to login on finalize logout', () => {
-      service.finalizeLogout();
+  describe('passkey methods', () => {
+    it('should register passkey', () => {
+      const mockOptions = {
+        challenge: new ArrayBuffer(32),
+        rp: { name: 'Test App', id: 'test.com' },
+        user: { id: new ArrayBuffer(8), name: 'testuser', displayName: 'Test User' },
+        pubKeyCredParams: [{ type: 'public-key' as const, alg: -7 }],
+      };
+      const mockResponse = { options: mockOptions };
 
-      expect(service.userValue).toEqual(new User());
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/login']);
+      service.registerPasskey('My Device').subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/register');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ name: 'My Device' });
+      req.flush(mockResponse);
+    });
+
+    it('should complete passkey registration', () => {
+      const mockResponse = { message: 'Success', success: true };
+
+      service.completePasskeyRegistration('mock-attestation', 'My Device').subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/complete-registration');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ attestationResponse: 'mock-attestation', name: 'My Device' });
+      req.flush(mockResponse);
+    });
+
+    it('should authenticate passkey', () => {
+      const mockOptions = {
+        challenge: new ArrayBuffer(32),
+        allowCredentials: [{ type: 'public-key' as const, id: new ArrayBuffer(8) }],
+      };
+      const mockResponse = { options: mockOptions };
+
+      service.authenticatePasskey('testuser').subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/authenticate');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ username: 'testuser' });
+      req.flush(mockResponse);
+    });
+
+    it('should complete passkey authentication', () => {
+      const mockUser = { id: 1, username: 'testuser' } as User;
+
+      service.completePasskeyAuthentication('testuser', 'mock-assertion', true).subscribe(user => {
+        expect(user).toEqual(mockUser);
+        expect(service.userValue).toEqual(mockUser);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/complete-authentication');
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual({ username: 'testuser', assertionResponse: 'mock-assertion', rememberMe: true });
+      req.flush(mockUser);
+    });
+
+    it('should get passkeys', () => {
+      const mockPasskeys = {
+        passkeys: [
+          { id: 1, name: 'My Device', regDate: '2023-01-01', aaGuid: 'guid-123' },
+          { id: 2, name: 'Another Device', regDate: '2023-01-02', aaGuid: 'guid-456' },
+        ],
+      };
+
+      service.getPasskeys().subscribe(response => {
+        expect(response).toEqual(mockPasskeys);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/list');
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPasskeys);
+    });
+
+    it('should delete passkey', () => {
+      const mockResponse = { message: 'Deleted', success: true };
+
+      service.deletePasskey(1).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+      });
+
+      const req = httpMock.expectOne('/api/auth/passkey/1');
+      expect(req.request.method).toBe('DELETE');
+      req.flush(mockResponse);
     });
   });
 

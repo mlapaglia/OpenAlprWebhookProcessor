@@ -1,6 +1,6 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode, isDevMode, importProvidersFrom, ENVIRONMENT_INITIALIZER, inject } from '@angular/core';
+import { enableProdMode, isDevMode, importProvidersFrom, inject, provideEnvironmentInitializer } from '@angular/core';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -89,11 +89,7 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptorsFromDi()),
     provideNativeDateAdapter(),
     // Configure Material Symbols
-    {
-      provide: ENVIRONMENT_INITIALIZER,
-      useFactory: configureIcons,
-      multi: true,
-    },
+    provideEnvironmentInitializer(configureIcons),
   ],
 })
   .catch(err => console.error(err));

@@ -1,5 +1,6 @@
 import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 import { AccountService } from 'app/_services';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { CommonModule } from '@angular/common';
@@ -85,7 +86,7 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
     this.subscribeAndMarkForCheck(
       this.accountService.getPasskeys().pipe(first()),
       (response) => {
-        this.passkeys = response.passkeys || [];
+        this.passkeys = response.passkeys;
         this.loading = false;
       },
       (error) => {
@@ -125,25 +126,19 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
   }
 
   private validateWebAuthnSupport() {
-    if (!window.navigator.credentials || !window.PublicKeyCredential) {
+    if (!('credentials' in navigator) || !('PublicKeyCredential' in window)) {
       throw new Error('WebAuthn is not supported in this browser');
     }
   }
 
   private async getRegistrationOptions(passkeyName: string) {
-    const optionsResponse = await this.accountService.registerPasskey(passkeyName).pipe(first()).toPromise();
-
-    if (!optionsResponse?.options) {
-      throw new Error('Failed to get registration options');
-    }
-
-    return optionsResponse;
+    return await firstValueFrom(this.accountService.registerPasskey(passkeyName));
   }
 
   private async createCredential(options: PublicKeyCredentialCreationOptions) {
     const credential = await navigator.credentials.create({
       publicKey: this.convertRegistrationOptions(options),
-    }) as PublicKeyCredential;
+    }) as PublicKeyCredential | null;
 
     if (!credential) {
       throw new Error('Failed to create credential');
@@ -155,10 +150,10 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
   private async completeRegistration(credential: PublicKeyCredential, passkeyName: string) {
     const attestationResponse = this.encodeAttestationResponse(credential);
 
-    return await this.accountService.completePasskeyRegistration(
+    return await firstValueFrom(this.accountService.completePasskeyRegistration(
       attestationResponse,
       passkeyName,
-    ).pipe(first()).toPromise();
+    ));
   }
 
   private handleSuccessfulRegistration(result: { success: boolean; message?: string } | undefined) {

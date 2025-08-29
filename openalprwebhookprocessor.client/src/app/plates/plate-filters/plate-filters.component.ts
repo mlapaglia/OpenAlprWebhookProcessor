@@ -151,11 +151,6 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
   protected validateDateRange() {
     const filters = this.plateFilters();
-    if (!filters.startDate || !filters.endDate) {
-      this.filterDateRangeIsValid = true;
-      this.markForCheck();
-      return;
-    }
 
     this.filterDateRangeIsValid = filters.startDate <= filters.endDate;
     this.markForCheck();
@@ -315,9 +310,7 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
     return !this.filterPlateNumberIsValid || !this.filterDateRangeIsValid;
   }
 
-  get isModelDisabled(): boolean {
-    return !this.plateFilters().vehicleMake;
-  }
+
 
   private filterOptions(value: string, options: string[]): string[] {
     const filterValue = value.toLowerCase();
@@ -326,23 +319,29 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
   private syncFormControlsWithModel(): void {
     const filters = this.plateFilters();
-    this.cameraControl.setValue(filters.cameraId ?? '');
-    this.vehicleMakeControl.setValue(filters.vehicleMake ?? '');
-    this.vehicleModelControl.setValue(filters.vehicleModel ?? '');
-    this.vehicleTypeControl.setValue(filters.vehicleType ?? '');
-    this.vehicleColorControl.setValue(filters.vehicleColor ?? '');
-    this.vehicleRegionControl.setValue(filters.vehicleRegion ?? '');
+    this.cameraControl.setValue(filters.cameraId || '');
+    this.vehicleMakeControl.setValue(filters.vehicleMake || '');
+    this.vehicleModelControl.setValue(filters.vehicleModel || '');
+    this.vehicleTypeControl.setValue(filters.vehicleType || '');
+    this.vehicleColorControl.setValue(filters.vehicleColor || '');
+    this.vehicleRegionControl.setValue(filters.vehicleRegion || '');
+
+    if (filters.vehicleMake) {
+      this.vehicleModelControl.enable();
+    } else {
+      this.vehicleModelControl.disable();
+    }
   }
 
   private setupFilteredOptions(): void {
     this.filteredCameras$ = this.cameraControl.valueChanges.pipe(
       startWith(''),
-      map(value => this.filterOptions(value ?? '', this.vehicleFilters().cameras ?? [])),
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().cameras)),
     );
 
     this.filteredMakes$ = this.vehicleMakeControl.valueChanges.pipe(
       startWith(''),
-      map(value => this.filterOptions(value ?? '', this.vehicleFilters().makes ?? [])),
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().makes)),
     );
 
     this.filteredModels$ = combineLatest([
@@ -369,17 +368,17 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
 
     this.filteredTypes$ = this.vehicleTypeControl.valueChanges.pipe(
       startWith(''),
-      map(value => this.filterOptions(value ?? '', this.vehicleFilters().types ?? [])),
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().types)),
     );
 
     this.filteredColors$ = this.vehicleColorControl.valueChanges.pipe(
       startWith(''),
-      map(value => this.filterOptions(value ?? '', this.vehicleFilters().colors ?? [])),
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().colors)),
     );
 
     this.filteredRegions$ = this.vehicleRegionControl.valueChanges.pipe(
       startWith(''),
-      map(value => this.filterOptions(value ?? '', this.vehicleFilters().regions ?? [])),
+      map(value => this.filterOptions(value ?? '', this.vehicleFilters().regions)),
     );
   }
 
@@ -395,6 +394,12 @@ export class PlateFiltersComponent extends OnPushBaseComponent implements OnInit
       if (this.plateFilters().vehicleModel) {
         this.plateFilters().vehicleModel = '';
         this.vehicleModelControl.setValue('');
+      }
+      // Enable/disable model control based on make selection
+      if (value) {
+        this.vehicleModelControl.enable();
+      } else {
+        this.vehicleModelControl.disable();
       }
       this.onFilterChange();
     });

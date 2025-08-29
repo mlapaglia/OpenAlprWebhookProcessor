@@ -247,14 +247,14 @@ describe('CameraDayNightComponent', () => {
       const invalidUrls = ['invalid', 'ftp://test.com', 'not-a-url'];
       invalidUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(true, `${url} should be invalid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be invalid`).toBe(true);
       });
 
       // Valid URLs
       const validUrls = ['http://test.com', 'https://example.org/api'];
       validUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(false, `${url} should be valid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be valid`).toBe(false);
       });
     });
   });

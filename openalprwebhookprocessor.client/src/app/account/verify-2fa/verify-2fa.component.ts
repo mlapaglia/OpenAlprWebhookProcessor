@@ -1,6 +1,7 @@
 import { Component, type OnInit, type OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { first } from 'rxjs/operators';
 
 import { AccountService } from '../account.service';
@@ -61,7 +62,6 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
       code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
     });
 
-    // Get parameters from query string
     this.userId = this.route.snapshot.queryParams['userId'];
     this.username = this.route.snapshot.queryParams['username'];
     this.hasPasskeys = this.route.snapshot.queryParams['hasPasskeys'] === 'true';
@@ -72,7 +72,6 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
       void this.router.navigate(['/account/login']);
     }
 
-    // Initialize theme
     this.initializeTheme();
   }
 
@@ -81,13 +80,11 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
   }
 
   private initializeTheme() {
-    // Set initial theme
     const storedTheme = this.themeStorage.getStoredThemeName();
     this.currentThemeName = storedTheme ?? 'indigo-pink';
     this.themeLoaded = true;
     this.markForCheck();
 
-    // Subscribe to theme changes
     this.subscribeAndMarkForCheck(
       this.themeStorage.onThemeUpdate,
       (theme: DocsSiteTheme) => {
@@ -135,39 +132,31 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
     this.markForCheck();
 
     try {
-      // Check if WebAuthn is supported
-      if (!window.navigator.credentials || !window.PublicKeyCredential) {
+      if (!('credentials' in navigator) || !('PublicKeyCredential' in window)) {
         throw new Error('Passkeys are not supported in this browser');
       }
 
-      // Step 1: Get authentication options from server
-      const optionsResponse = await this.accountService.authenticatePasskey(this.username).pipe(first()).toPromise();
+      const optionsResponse = await firstValueFrom(this.accountService.authenticatePasskey(this.username));
 
-      if (!optionsResponse?.options) {
-        throw new Error('Failed to get authentication options');
-      }
 
-      // Step 2: Get credential using WebAuthn API
+
       const credential = await navigator.credentials.get({
         publicKey: this.convertAuthenticationOptions(optionsResponse.options),
-      }) as PublicKeyCredential;
+      }) as PublicKeyCredential | null;
 
       if (!credential) {
         throw new Error('Failed to authenticate with passkey');
       }
 
-      // Step 3: Send credential to server for verification
       const assertionResponse = this.encodeAssertionResponse(credential);
 
-      const user = await this.accountService.completePasskeyAuthentication(
+      await firstValueFrom(this.accountService.completePasskeyAuthentication(
         this.username,
         assertionResponse,
         this.rememberMe,
-      ).pipe(first()).toPromise();
+      ));
 
-      if (user) {
-        void this.router.navigateByUrl(this.returnUrl);
-      }
+      void this.router.navigateByUrl(this.returnUrl);
 
     } catch (error) {
       console.error('Passkey authentication error:', error);

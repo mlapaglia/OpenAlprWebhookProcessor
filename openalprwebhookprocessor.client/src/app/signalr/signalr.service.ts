@@ -34,7 +34,7 @@ export class SignalrService {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const userId = user?.id as number | null | undefined;
     if (!userId) {
-      return; // User not authenticated
+      return;
     }
 
     // Build connection - rely on cookies for authentication

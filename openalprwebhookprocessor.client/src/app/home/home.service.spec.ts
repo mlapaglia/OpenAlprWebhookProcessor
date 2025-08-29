@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { HomeService, type HourlyStats, type QuickStats } from './home.service';
 import type { DayCounts } from './plateCountResponse';
 import type { MostSeenCounts } from './most-seen/mostSeenResponse';
@@ -11,8 +12,11 @@ describe('HomeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [HomeService],
+      providers: [
+        HomeService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(HomeService);
     httpMock = TestBed.inject(HttpTestingController);
