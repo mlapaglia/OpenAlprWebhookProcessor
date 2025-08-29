@@ -97,11 +97,14 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor
 
             if (webhook.Group.IsParked)
             {
-                _logger.LogInformation("parked car: {PlateNumber}, ignoring.", webhook.Group.BestPlateNumber);
+                _logger.LogDebug("parked car: {PlateNumber}, ignoring.", webhook.Group.BestPlateNumber);
                 return;
             }
 
-            var previousPreviewGroups = await _unitOfWork.PlateGroups.GetQueryable()
+            _logger.LogTrace("Searching for {Count} Uuids", webhook.Group.Uuids.Count);
+
+            var previousPreviewGroups = await _unitOfWork.PlateGroups
+                .GetQueryable()
                 .AsNoTracking()
                 .Where(x => webhook.Group.Uuids.Contains(x.OpenAlprUuid))
                 .ToListAsync(cancellationToken);
@@ -112,7 +115,7 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor
                 plateGroup = previousPreviewGroups[0];
                 _unitOfWork.PlateGroups.DeleteRange(previousPreviewGroups.Skip(1));
 
-                _logger.LogInformation("Previous preview plate exists: {PlateNumber}, overwriting", plateGroup.BestNumber);
+                _logger.LogDebug("Previous preview plate exists: {PlateNumber}, overwriting", plateGroup.BestNumber);
             }
             else
             {
