@@ -30,7 +30,6 @@
     "@microsoft/signalr": "^9.0.6",
     "chart.js": "^4.5.0",
     "lean-qr": "^2.5.0",
-    "material-icons": "^1.13.14",
     "ngx-highlightjs": "^14.0.1",
     "ngx-lightbox": "^3.0.0",
     "run-script-os": "^1.1.6",
