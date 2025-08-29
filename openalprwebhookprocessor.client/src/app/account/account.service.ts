@@ -155,4 +155,39 @@ export class AccountService {
         return x;
       }));
   }
+
+  // Passkey methods
+  registerPasskey(name?: string) {
+    return this.http.post<{ options: any }>('/api/auth/passkey/register', { name });
+  }
+
+  completePasskeyRegistration(attestationResponse: string, name?: string) {
+    return this.http.post<{ message: string, success: boolean }>('/api/auth/passkey/complete-registration', { 
+      attestationResponse, 
+      name 
+    });
+  }
+
+  authenticatePasskey(username: string) {
+    return this.http.post<{ options: any }>('/api/auth/passkey/authenticate', { username });
+  }
+
+  completePasskeyAuthentication(username: string, assertionResponse: string, rememberMe: boolean = false) {
+    return this.http.post<User>('/api/auth/passkey/complete-authentication', { 
+      username, 
+      assertionResponse, 
+      rememberMe 
+    }).pipe(map((user) => {
+      this.userSubject.next(user);
+      return user;
+    }));
+  }
+
+  getPasskeys() {
+    return this.http.get<{ passkeys: any[] }>('/api/auth/passkey/list');
+  }
+
+  deletePasskey(passkeyId: number) {
+    return this.http.delete<{ message: string, success: boolean }>(`/api/auth/passkey/${passkeyId}`);
+  }
 }

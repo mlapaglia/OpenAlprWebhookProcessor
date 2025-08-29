@@ -46,6 +46,7 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
 
   form: FormGroup;
   loading = false;
+  passkeyLoading = false;
   submitted = false;
   public canRegister = false;
   public currentThemeName = '';
@@ -137,6 +138,8 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
           void this.router.navigate(['/account/verify-2fa'], {
             queryParams: {
               userId: response.id,
+              username: response.username,
+              hasPasskeys: response.hasPasskeys,
               rememberMe: this.f.rememberMe.value,
               returnUrl: this.route.snapshot.queryParams['returnUrl'] ?? '/',
             },
@@ -152,5 +155,111 @@ export class LoginComponent extends OnPushBaseComponent implements OnInit {
         this.markForCheck();
       },
     );
+  }
+
+  async authenticateWithPasskey() {
+    const username = this.f.username.value;
+    if (!username) {
+      this.snackbarService.create('Please enter your username first', SnackBarType.Error);
+      return;
+    }
+
+    this.passkeyLoading = true;
+    this.markForCheck();
+
+    try {
+      // Check if WebAuthn is supported
+      if (!window.navigator.credentials || !window.PublicKeyCredential) {
+        throw new Error('Passkeys are not supported in this browser');
+      }
+
+      // Step 1: Get authentication options from server
+      const optionsResponse = await this.accountService.authenticatePasskey(username).pipe(first()).toPromise();
+      
+      if (!optionsResponse?.options) {
+        throw new Error('Failed to get authentication options');
+      }
+
+      // Step 2: Get credential using WebAuthn API
+      const credential = await navigator.credentials.get({
+        publicKey: this.convertAuthenticationOptions(optionsResponse.options)
+      }) as PublicKeyCredential;
+
+      if (!credential) {
+        throw new Error('Failed to authenticate with passkey');
+      }
+
+      // Step 3: Send credential to server for verification
+      const assertionResponse = this.encodeAssertionResponse(credential);
+      
+      const user = await this.accountService.completePasskeyAuthentication(
+        username,
+        assertionResponse,
+        this.f.rememberMe.value
+      ).pipe(first()).toPromise();
+
+      if (user) {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
+        void this.router.navigateByUrl(returnUrl);
+      }
+
+    } catch (error) {
+      console.error('Passkey authentication error:', error);
+      this.snackbarService.create(
+        `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 
+        SnackBarType.Error
+      );
+    } finally {
+      this.passkeyLoading = false;
+      this.markForCheck();
+    }
+  }
+
+  private convertAuthenticationOptions(options: any): PublicKeyCredentialRequestOptions {
+    return {
+      ...options,
+      challenge: this.base64urlToBuffer(options.challenge),
+      allowCredentials: options.allowCredentials?.map((cred: any) => ({
+        ...cred,
+        id: this.base64urlToBuffer(cred.id)
+      }))
+    };
+  }
+
+  private encodeAssertionResponse(credential: PublicKeyCredential): string {
+    const response = credential.response as AuthenticatorAssertionResponse;
+    
+    return JSON.stringify({
+      id: credential.id,
+      rawId: this.bufferToBase64url(credential.rawId),
+      type: credential.type,
+      response: {
+        authenticatorData: this.bufferToBase64url(response.authenticatorData),
+        clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
+        signature: this.bufferToBase64url(response.signature),
+        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null
+      }
+    });
+  }
+
+  private base64urlToBuffer(base64url: string): ArrayBuffer {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    const binary = atob(padded);
+    const buffer = new ArrayBuffer(binary.length);
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+  }
+
+  private bufferToBase64url(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   }
 }

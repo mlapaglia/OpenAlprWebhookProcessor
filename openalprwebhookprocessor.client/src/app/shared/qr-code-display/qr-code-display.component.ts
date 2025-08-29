@@ -39,7 +39,7 @@ export class QrCodeDisplayComponent extends OnPushBaseComponent implements OnIni
 
     try {
       const qrCode = generate(this.qrCodeData());
-      this.qrCodeImageUrl = qrCode.toDataURL();
+      this.qrCodeImageUrl = qrCode.toDataURL({ scale: 8 });
     } catch {
       this.error = 'Failed to generate QR code';
     } finally {

@@ -8,6 +8,8 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data
 {
     public class UsersContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
+        public DbSet<PasskeyCredential> PasskeyCredentials { get; set; }
+
         public UsersContext(DbContextOptions<UsersContext> options)
             : base(options)
         {
@@ -16,6 +18,18 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<PasskeyCredential>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.PasskeyCredentials)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasIndex(e => e.CredentialId).IsUnique();
+                entity.HasIndex(e => new { e.UserId, e.CredentialId });
+            });
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

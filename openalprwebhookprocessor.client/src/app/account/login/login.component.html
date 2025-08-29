@@ -61,7 +61,7 @@
             color="primary" 
             type="submit"
             class="login-button full-width"
-            [disabled]="loading"
+            [disabled]="loading || passkeyLoading"
             i18n>
             @if (loading) {
               <mat-spinner diameter="20" class="button-spinner" />
@@ -70,6 +70,33 @@
               Sign In
             }
           </button>
+
+          <div class="divider">
+            <span class="divider-text" i18n>or</span>
+          </div>
+
+          <button 
+            mat-stroked-button 
+            color="accent" 
+            type="button"
+            class="passkey-button full-width"
+            [disabled]="loading || passkeyLoading || !f.username.value"
+            (click)="authenticateWithPasskey()"
+            i18n>
+            @if (passkeyLoading) {
+              <mat-spinner diameter="20" class="button-spinner" />
+              Authenticating...
+            } @else {
+              <ng-container>
+                <mat-icon>fingerprint</mat-icon>
+                Sign in with Passkey
+              </ng-container>
+            }
+          </button>
+          
+          @if (!f.username.value) {
+            <p class="passkey-hint" i18n>Enter your username to use passkey authentication</p>
+          }
 
           @if (canRegister) {
             <div class="register-section">

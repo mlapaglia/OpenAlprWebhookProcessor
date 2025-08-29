@@ -70,6 +70,8 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     <PackageReference Include="System.IO.Abstractions" Version="22.0.15" />
+    <PackageReference Include="Fido2.AspNet" Version="3.0.1" />
+    <PackageReference Include="Fido2" Version="3.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -9,6 +9,12 @@ using OpenAlprWebhookProcessor.Features.Users.Commands.RegisterUser;
 using OpenAlprWebhookProcessor.Features.Users.Commands.Logout;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetCurrentUser;
 using OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister;
+using OpenAlprWebhookProcessor.Features.Users.Commands.RegisterPasskey;
+using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegistration;
+using OpenAlprWebhookProcessor.Features.Users.Commands.AuthenticatePasskey;
+using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthentication;
+using OpenAlprWebhookProcessor.Features.Users.Commands.DeletePasskey;
+using OpenAlprWebhookProcessor.Features.Users.Queries.GetUserPasskeys;
 
 namespace OpenAlprWebhookProcessor.Features.Users
 {
@@ -101,5 +107,102 @@ namespace OpenAlprWebhookProcessor.Features.Users
 
             return Ok(user);
         }
+
+        [HttpPost("passkey/register")]
+        public async Task<IActionResult> RegisterPasskey([FromBody] RegisterPasskeyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new RegisterPasskeyCommand(User, request.Name);
+                var response = await _mediator.Send(command, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("passkey/complete-registration")]
+        public async Task<IActionResult> CompletePasskeyRegistration([FromBody] CompletePasskeyRegistrationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new CompletePasskeyRegistrationCommand(User, request.AttestationResponse, request.Name);
+                var response = await _mediator.Send(command, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("passkey/authenticate")]
+        public async Task<IActionResult> AuthenticatePasskey([FromBody] AuthenticatePasskeyRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new AuthenticatePasskeyCommand(request.Username);
+                var response = await _mediator.Send(command, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("passkey/complete-authentication")]
+        public async Task<IActionResult> CompletePasskeyAuthentication([FromBody] CompletePasskeyAuthenticationRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new CompletePasskeyAuthenticationCommand(request.Username, request.AssertionResponse, request.RememberMe);
+                var response = await _mediator.Send(command, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("passkey/list")]
+        public async Task<IActionResult> GetPasskeys(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = new GetUserPasskeysQuery(User);
+                var response = await _mediator.Send(query, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("passkey/{passkeyId}")]
+        public async Task<IActionResult> DeletePasskey(int passkeyId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new DeletePasskeyCommand(User, passkeyId);
+                var response = await _mediator.Send(command, cancellationToken);
+                return Ok(response);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
+
+    public record RegisterPasskeyRequest(string? Name = null);
+    public record CompletePasskeyRegistrationRequest(string AttestationResponse, string? Name = null);
+    public record AuthenticatePasskeyRequest(string Username);
+    public record CompletePasskeyAuthenticationRequest(string Username, string AssertionResponse, bool RememberMe = false);
 }

@@ -165,6 +165,64 @@
   display: inline-block;
 }
 
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--mat-sys-outline-variant);
+}
+
+.divider-text {
+  background: var(--mat-sys-surface);
+  padding: 0 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 14px;
+  position: relative;
+}
+
+.passkey-button {
+  height: 56px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: none;
+  border: 2px solid var(--mat-sys-outline);
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.passkey-button:hover:not([disabled]) {
+  transform: translateY(-1px);
+  border-color: var(--mat-sys-primary);
+  background: var(--mat-sys-primary-container);
+}
+
+.passkey-button:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+.passkey-button mat-icon {
+  margin-right: 8px;
+}
+
+.passkey-hint {
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+  margin: 8px 0 16px 0;
+}
+
 .register-section {
   text-align: center;
   padding-top: 16px;

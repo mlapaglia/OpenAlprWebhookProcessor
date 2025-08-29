@@ -54,7 +54,7 @@ namespace Tests.Features.Users.Commands
             _userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             _signInManager = serviceProvider.GetRequiredService<SignInManager<ApplicationUser>>();
             
-            _handler = new AuthenticateCommandHandler(_userManager, _signInManager);
+            _handler = new AuthenticateCommandHandler(_userManager, _signInManager, UsersContext);
         }
 
         [TearDown]

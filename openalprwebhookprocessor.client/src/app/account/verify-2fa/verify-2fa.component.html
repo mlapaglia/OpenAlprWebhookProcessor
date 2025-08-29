@@ -46,20 +46,43 @@
           </div>
 
           <div class="login-actions">
+            <app-refresh-button
+              [isLoading]="loading"
+              [disabled]="form.invalid || loading || passkeyLoading"
+              buttonType="raised"
+              color="primary"
+              buttonText="Verify Code"
+              buttonRefreshingText="Verifying..."
+              [fullWidth]="true"
+              (refreshStarted)="onSubmit()"
+              class="login-button"
+              i18n-buttonText
+              i18n-buttonRefreshingText />
+
+          @if (hasPasskeys) {
+            <div class="divider">
+              <span class="divider-text" i18n>or</span>
+            </div>
+
             <button 
-              mat-raised-button 
-              color="primary" 
-              type="submit"
-              class="login-button full-width"
-              [disabled]="loading"
+              mat-stroked-button 
+              color="accent" 
+              type="button"
+              class="passkey-button full-width"
+              [disabled]="loading || passkeyLoading"
+              (click)="authenticateWithPasskey()"
               i18n>
-              @if (loading) {
+              @if (passkeyLoading) {
                 <mat-spinner diameter="20" class="button-spinner" />
-                Verifying...
+                Authenticating...
               } @else {
-                Verify Code
+                <ng-container>
+                  <mat-icon>fingerprint</mat-icon>
+                  Use Passkey Instead
+                </ng-container>
               }
             </button>
+          }
           </div>
         </form>
       </mat-card-content>

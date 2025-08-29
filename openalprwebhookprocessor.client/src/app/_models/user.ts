@@ -6,4 +6,5 @@
   firstName: string;
   lastName: string;
   twoFactorEnabled: boolean;
+  hasPasskeys: boolean;
 }

@@ -12,7 +12,10 @@ using OpenAlprWebhookProcessor.Infrastructure.Extensions;
 using OpenAlprWebhookProcessor.Infrastructure.Middleware;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Fido2NetLib;
+using Fido2NetLib.Development;
 
 namespace OpenAlprWebhookProcessor
 {
@@ -95,6 +98,16 @@ namespace OpenAlprWebhookProcessor
             });
 
             services.AddScoped<IPasswordService, PasswordService>();
+
+            // Configure FIDO2/WebAuthn
+            services.AddFido2(options =>
+            {
+                options.ServerDomain = Configuration["Fido2:ServerDomain"] ?? "localhost";
+                options.ServerName = "OpenALPR Webhook Processor";
+                options.Origins = new HashSet<string>(Configuration.GetSection("Fido2:Origins").Get<string[]>() ?? new[] { "https://localhost:4200", "https://localhost:5001" });
+                options.TimestampDriftTolerance = 300000;
+                options.MDSCacheDirPath = "./config/mds-cache";
+            });
 
             services.AddExternalServices();
 

@@ -1,0 +1,150 @@
+.user-form-card {
+  width: 100%;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.passkey-management-container {
+  padding: 20px;
+  max-width: 600px;
+}
+
+.card-header {
+  padding: 24px 24px 16px;
+  background: linear-gradient(135deg, var(--mdc-theme-primary, #1976d2) 0%, var(--mdc-theme-primary-variant, #1565c0) 100%);
+  color: var(--mdc-theme-on-primary, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.9;
+}
+
+.card-title h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.card-content {
+  padding: 24px;
+  background: var(--mdc-theme-surface);
+}
+
+.loading-card,
+.passkeys-list-card,
+.registration-card,
+.info-card {
+  margin-bottom: 16px;
+}
+
+.registration-card mat-card-header {
+  margin-bottom: 16px;
+}
+
+.registration-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button-spinner {
+  margin-right: 8px;
+}
+
+.info-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-card li {
+  margin-bottom: 8px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.info-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 16px;
+}
+
+.loading-container p {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.passkey-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.passkey-item:last-child {
+  border-bottom: none;
+}
+
+.passkey-info {
+  flex: 1;
+}
+
+.passkey-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.passkey-name mat-icon {
+  color: var(--mat-sys-primary);
+}
+
+.passkey-details {
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.passkey-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.info-card mat-card-content ul {
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-card mat-card-content ul li {
+  color: var(--mat-sys-on-surface);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
