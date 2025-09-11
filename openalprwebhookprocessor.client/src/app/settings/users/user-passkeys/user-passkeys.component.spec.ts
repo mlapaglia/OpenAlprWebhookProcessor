@@ -337,24 +337,6 @@ describe('UserPasskeysComponent', () => {
       component.ngOnInit();
       fixture.detectChanges();
     });
-
-    // Note: Dialog interaction tests are skipped due to complex Material Dialog testing requirements
-    xit('should open confirmation dialog and delete passkey on confirmation', () => {
-      // This test requires complex Angular Material Dialog mocking
-      // Core deletion logic is tested at the service level
-    });
-
-    xit('should handle delete failure', () => {
-      // This test requires complex Angular Material Dialog mocking
-    });
-
-    xit('should handle delete service error', () => {
-      // This test requires complex Angular Material Dialog mocking
-    });
-
-    xit('should not delete passkey if confirmation is cancelled', () => {
-      // This test requires complex Angular Material Dialog mocking
-    });
   });
 
   describe('onClose', () => {
