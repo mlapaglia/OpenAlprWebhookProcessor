@@ -38,7 +38,6 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RegisterPasskey
             if (user == null)
                 throw new AppException("User not found");
 
-            // Get existing credentials for this user
             var existingCredentials = await _context.PasskeyCredentials
                 .Where(c => c.UserId == user.Id)
                 .Select(c => new PublicKeyCredentialDescriptor(Convert.FromBase64String(c.CredentialId)))
@@ -52,14 +51,12 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RegisterPasskey
                 Id = Encoding.UTF8.GetBytes(user.Id.ToString())
             };
 
-            // Create registration options
             var options = _fido2.RequestNewCredential(
                 fido2User,
                 existingCredentials,
                 AuthenticatorSelection.Default,
                 AttestationConveyancePreference.None);
 
-            // Store options in cache for later verification (expires in 5 minutes)
             var cacheKey = $"passkey_registration_{user.Id}";
             _cache.Set(cacheKey, options, TimeSpan.FromMinutes(5));
 

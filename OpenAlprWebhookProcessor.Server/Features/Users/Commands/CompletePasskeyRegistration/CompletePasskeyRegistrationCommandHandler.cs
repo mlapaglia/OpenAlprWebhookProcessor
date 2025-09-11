@@ -38,28 +38,23 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegist
 
             try
             {
-                // Parse the attestation response
                 var attestationResponse = JsonSerializer.Deserialize<AuthenticatorAttestationRawResponse>(request.AttestationResponse);
                 if (attestationResponse == null)
                     throw new AppException("Invalid attestation response");
 
-                // Retrieve the original options from cache
                 var optionsCacheKey = $"passkey_registration_{user.Id}";
                 var originalOptions = _cache.Get<CredentialCreateOptions>(optionsCacheKey);
 
                 if (originalOptions == null)
                     throw new AppException("Registration session expired or invalid. Please try again.");
 
-                // Remove the options from cache after use to prevent replay attacks
                 _cache.Remove(optionsCacheKey);
 
-                // Verify the attestation
                 var result = await _fido2.MakeNewCredentialAsync(
                     attestationResponse,
                     originalOptions,
                     async (args, cancellationToken) =>
                     {
-                        // Check if credential ID already exists
                         var existingCredential = await _context.PasskeyCredentials
                             .FirstOrDefaultAsync(c => c.CredentialId == Convert.ToBase64String(args.CredentialId), cancellationToken);
                         return existingCredential == null;
@@ -68,7 +63,6 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegist
                 if (result.Status != "ok")
                     throw new AppException($"Failed to register passkey: {result.ErrorMessage}");
 
-                // Store the credential in the database
                 var credential = new PasskeyCredential
                 {
                     UserId = user.Id,

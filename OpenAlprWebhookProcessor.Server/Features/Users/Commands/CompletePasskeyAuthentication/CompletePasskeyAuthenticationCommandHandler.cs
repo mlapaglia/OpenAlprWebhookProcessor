@@ -39,16 +39,16 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
         {
             var user = await _userManager.FindByNameAsync(request.Username);
             if (user == null)
+            {
                 throw new AppException("User not found");
+            }
 
             try
             {
-                // Parse the assertion response
                 var assertionResponse = JsonSerializer.Deserialize<AuthenticatorAssertionRawResponse>(request.AssertionResponse);
                 if (assertionResponse == null)
                     throw new AppException("Invalid assertion response");
 
-                // Get the credential from database
                 var credentialId = Convert.ToBase64String(assertionResponse.Id);
                 var credential = await _context.PasskeyCredentials
                     .FirstOrDefaultAsync(c => c.CredentialId == credentialId && c.UserId == user.Id, cancellationToken);
@@ -56,17 +56,14 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
                 if (credential == null)
                     throw new AppException("Credential not found");
 
-                // Retrieve the original options from cache
                 var optionsCacheKey = $"passkey_authentication_{user.Id}";
                 var originalOptions = _cache.Get<AssertionOptions>(optionsCacheKey);
 
                 if (originalOptions == null)
                     throw new AppException("Authentication session expired or invalid. Please try again.");
 
-                // Remove the options from cache after use to prevent replay attacks
                 _cache.Remove(optionsCacheKey);
 
-                // Verify the assertion
                 var result = await _fido2.MakeAssertionAsync(
                     assertionResponse,
                     originalOptions,
@@ -74,26 +71,24 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
                     credential.SignatureCounter,
                     async (args, cancellationToken) =>
                     {
-                        // Verify user handle matches
                         return credential.UserHandle.SequenceEqual(args.UserHandle);
-                    });
+                    },
+                    cancellationToken: cancellationToken);
 
                 if (result.Status != "ok")
                     throw new AppException($"Failed to authenticate with passkey: {result.ErrorMessage}");
 
-                // Update signature counter
                 credential.SignatureCounter = result.Counter;
                 await _context.SaveChangesAsync(cancellationToken);
 
-                // Sign in the user
                 await _signInManager.SignInAsync(user, request.RememberMe);
 
                 return new UserDto
                 {
                     FirstName = user.FirstName,
                     Id = user.Id,
-                    TwoFactorEnabled = false, // Passkey bypasses 2FA
-                    HasPasskeys = true, // User just authenticated with a passkey
+                    TwoFactorEnabled = false,
+                    HasPasskeys = true,
                     LastName = user.LastName,
                     Username = user.UserName,
                 };
