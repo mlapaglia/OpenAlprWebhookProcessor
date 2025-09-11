@@ -40,7 +40,7 @@ const mockNavigator = {
         },
         getClientExtensionResults: () => ({}),
         toJSON: () => ({}),
-      } as unknown as PublicKeyCredential)
+      } as unknown as PublicKeyCredential),
     ),
   },
 };
@@ -60,10 +60,10 @@ describe('LoginComponent', () => {
     themeUpdateSubject = new Subject<DocsSiteTheme>();
 
     mockAccountService = jasmine.createSpyObj('AccountService', [
-      'canRegister', 
-      'login', 
-      'authenticatePasskey', 
-      'completePasskeyAuthentication'
+      'canRegister',
+      'login',
+      'authenticatePasskey',
+      'completePasskeyAuthentication',
     ]);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
     mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -86,7 +86,9 @@ describe('LoginComponent', () => {
 
     // Mock window.PublicKeyCredential
     Object.defineProperty(globalThis, 'PublicKeyCredential', {
-      value: function () {},
+      value: function PublicKeyCredential() {
+        // Mock constructor
+      },
       writable: true,
     });
 
@@ -94,14 +96,22 @@ describe('LoginComponent', () => {
     Object.defineProperty(globalThis, 'atob', {
       value: (str: string) => {
         // Simple base64 decode mock for testing
-        return decodeURIComponent(escape(str));
+        try {
+          return Buffer.from(str, 'base64').toString('binary');
+        } catch {
+          return str; // Fallback for invalid base64
+        }
       },
       writable: true,
     });
     Object.defineProperty(globalThis, 'btoa', {
       value: (str: string) => {
         // Simple base64 encode mock for testing
-        return unescape(encodeURIComponent(str));
+        try {
+          return Buffer.from(str, 'binary').toString('base64');
+        } catch {
+          return str; // Fallback for invalid input
+        }
       },
       writable: true,
     });
@@ -429,7 +439,7 @@ describe('LoginComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Please enter your username first',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(mockAccountService.authenticatePasskey).not.toHaveBeenCalled();
     });
@@ -438,11 +448,13 @@ describe('LoginComponent', () => {
       const mockAuthOptions: PasskeyAuthenticationOptions = {
         options: {
           challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
-          allowCredentials: [{
-            id: 'dGVzdC1jcmVkLWlk' as unknown as ArrayBuffer,
-            type: 'public-key' as const,
-            transports: ['usb', 'nfc'],
-          }],
+          allowCredentials: [
+            {
+              id: 'dGVzdC1jcmVkLWlk' as unknown as ArrayBuffer,
+              type: 'public-key' as const,
+              transports: ['usb', 'nfc'],
+            },
+          ],
           userVerification: 'preferred',
           timeout: 60000,
         } as PublicKeyCredentialRequestOptions,
@@ -483,7 +495,7 @@ describe('LoginComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Passkeys are not supported in this browser',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
 
@@ -501,7 +513,7 @@ describe('LoginComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Options failed',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -523,7 +535,7 @@ describe('LoginComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         jasmine.stringContaining('Passkey authentication failed:'),
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -540,7 +552,7 @@ describe('LoginComponent', () => {
 
       mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
       mockAccountService.completePasskeyAuthentication.and.returnValue(throwError(() => new Error('Verification failed')));
-      
+
       // Ensure credentials.get returns a valid credential for this test
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -556,14 +568,14 @@ describe('LoginComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Verification failed',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -591,7 +603,7 @@ describe('LoginComponent', () => {
       };
       mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
       mockActivatedRoute.snapshot.queryParams = {}; // No returnUrl
-      
+
       // Reset navigator mock to ensure it works properly
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -607,7 +619,7 @@ describe('LoginComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();
@@ -653,17 +665,17 @@ describe('LoginComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       const promise = component.authenticateWithPasskey();
-      
+
       // Check loading state is set
       expect(component.passkeyLoading).toBe(true);
-      
+
       // Wait for completion
       await promise;
-      
+
       // Check final state
       expect(component.passkeyLoading).toBe(false);
     });

@@ -31,7 +31,7 @@ const mockNavigator = {
         },
         getClientExtensionResults: () => ({}),
         toJSON: () => ({}),
-      } as unknown as PublicKeyCredential)
+      } as unknown as PublicKeyCredential),
     ),
   },
 };
@@ -47,9 +47,9 @@ describe('Verify2FAComponent', () => {
 
   beforeEach(async () => {
     mockAccountService = jasmine.createSpyObj('AccountService', [
-      'verifyTwoFactor', 
-      'authenticatePasskey', 
-      'completePasskeyAuthentication'
+      'verifyTwoFactor',
+      'authenticatePasskey',
+      'completePasskeyAuthentication',
     ]);
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
@@ -77,7 +77,9 @@ describe('Verify2FAComponent', () => {
 
     // Mock window.PublicKeyCredential
     Object.defineProperty(globalThis, 'PublicKeyCredential', {
-      value: function () {},
+      value: function PublicKeyCredential() {
+        // Mock constructor
+      },
       writable: true,
     });
 
@@ -85,14 +87,22 @@ describe('Verify2FAComponent', () => {
     Object.defineProperty(globalThis, 'atob', {
       value: (str: string) => {
         // Simple base64 decode mock for testing
-        return decodeURIComponent(escape(str));
+        try {
+          return Buffer.from(str, 'base64').toString('binary');
+        } catch {
+          return str; // Fallback for invalid base64
+        }
       },
       writable: true,
     });
     Object.defineProperty(globalThis, 'btoa', {
       value: (str: string) => {
         // Simple base64 encode mock for testing
-        return unescape(encodeURIComponent(str));
+        try {
+          return Buffer.from(str, 'binary').toString('base64');
+        } catch {
+          return str; // Fallback for invalid input
+        }
       },
       writable: true,
     });
@@ -293,7 +303,7 @@ describe('Verify2FAComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Username not available for passkey authentication',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(mockAccountService.authenticatePasskey).not.toHaveBeenCalled();
     });
@@ -302,11 +312,13 @@ describe('Verify2FAComponent', () => {
       const mockAuthOptions: PasskeyAuthenticationOptions = {
         options: {
           challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
-          allowCredentials: [{
-            id: 'dGVzdC1jcmVkLWlk' as unknown as ArrayBuffer,
-            type: 'public-key' as const,
-            transports: ['usb', 'nfc'],
-          }],
+          allowCredentials: [
+            {
+              id: 'dGVzdC1jcmVkLWlk' as unknown as ArrayBuffer,
+              type: 'public-key' as const,
+              transports: ['usb', 'nfc'],
+            },
+          ],
           userVerification: 'preferred',
           timeout: 60000,
         } as PublicKeyCredentialRequestOptions,
@@ -324,7 +336,7 @@ describe('Verify2FAComponent', () => {
         hasPasskeys: true,
       };
       mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
-      
+
       // Reset navigator mock to ensure it works properly
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -340,7 +352,7 @@ describe('Verify2FAComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();
@@ -349,7 +361,7 @@ describe('Verify2FAComponent', () => {
       expect(mockAccountService.completePasskeyAuthentication).toHaveBeenCalledWith(
         'testuser',
         jasmine.any(String),
-        true
+        true,
       );
       expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/dashboard');
       expect(component.passkeyLoading).toBe(false);
@@ -368,7 +380,7 @@ describe('Verify2FAComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Passkeys are not supported in this browser',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
 
@@ -386,7 +398,7 @@ describe('Verify2FAComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Options failed',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -408,7 +420,7 @@ describe('Verify2FAComponent', () => {
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Failed to authenticate with passkey',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -425,7 +437,7 @@ describe('Verify2FAComponent', () => {
 
       mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
       mockAccountService.completePasskeyAuthentication.and.returnValue(throwError(() => new Error('Verification failed')));
-      
+
       // Ensure credentials.get returns a valid credential for this test
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -441,14 +453,14 @@ describe('Verify2FAComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();
 
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Passkey authentication failed: Verification failed',
-        SnackBarType.Error
+        SnackBarType.Error,
       );
       expect(component.passkeyLoading).toBe(false);
     });
@@ -476,7 +488,7 @@ describe('Verify2FAComponent', () => {
         hasPasskeys: true,
       };
       mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
-      
+
       // Reset navigator mock to ensure it works properly
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -492,7 +504,7 @@ describe('Verify2FAComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();
@@ -522,7 +534,7 @@ describe('Verify2FAComponent', () => {
         hasPasskeys: true,
       };
       mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
-      
+
       // Reset navigator mock to ensure it works properly
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -538,7 +550,7 @@ describe('Verify2FAComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       // Don't await - we want to check intermediate state
@@ -570,7 +582,7 @@ describe('Verify2FAComponent', () => {
         hasPasskeys: true,
       };
       mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
-      
+
       // Reset navigator mock to ensure it works properly
       mockNavigator.credentials.get.and.returnValue(
         Promise.resolve({
@@ -586,7 +598,7 @@ describe('Verify2FAComponent', () => {
           },
           getClientExtensionResults: () => ({}),
           toJSON: () => ({}),
-        } as unknown as PublicKeyCredential)
+        } as unknown as PublicKeyCredential),
       );
 
       await component.authenticateWithPasskey();

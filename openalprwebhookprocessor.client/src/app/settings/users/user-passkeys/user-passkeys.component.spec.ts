@@ -1,7 +1,7 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
 import { UserPasskeysComponent } from './user-passkeys.component';
 import { AccountService } from 'app/_services';
@@ -50,7 +50,7 @@ const mockNavigator = {
         },
         getClientExtensionResults: () => ({}),
         toJSON: () => ({}),
-      } as unknown as PublicKeyCredential)
+      } as unknown as PublicKeyCredential),
     ),
   },
 };
@@ -84,7 +84,9 @@ describe('UserPasskeysComponent', () => {
 
     // Mock window.PublicKeyCredential
     Object.defineProperty(globalThis, 'PublicKeyCredential', {
-      value: function () {},
+      value: function PublicKeyCredential() {
+        // Mock constructor
+      },
       writable: true,
     });
 
@@ -92,14 +94,22 @@ describe('UserPasskeysComponent', () => {
     Object.defineProperty(globalThis, 'atob', {
       value: (str: string) => {
         // Simple base64 decode mock for testing
-        return decodeURIComponent(escape(str));
+        try {
+          return Buffer.from(str, 'base64').toString('binary');
+        } catch {
+          return str; // Fallback for invalid base64
+        }
       },
       writable: true,
     });
     Object.defineProperty(globalThis, 'btoa', {
       value: (str: string) => {
         // Simple base64 encode mock for testing
-        return unescape(encodeURIComponent(str));
+        try {
+          return Buffer.from(str, 'binary').toString('base64');
+        } catch {
+          return str; // Fallback for invalid input
+        }
       },
       writable: true,
     });
@@ -126,9 +136,7 @@ describe('UserPasskeysComponent', () => {
   describe('ngOnInit', () => {
     it('should initialize with dialog data and load passkeys', () => {
       const mockPasskeys: PasskeyListResponse = {
-        passkeys: [
-          { id: 1, name: 'Test Passkey', regDate: '2024-01-01', aaGuid: 'test-guid' },
-        ],
+        passkeys: [{ id: 1, name: 'Test Passkey', regDate: '2024-01-01', aaGuid: 'test-guid' }],
       };
 
       mockAccountService.getPasskeys.and.returnValue(of(mockPasskeys));
@@ -153,7 +161,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to load passkeys',
         SnackBarType.Error,
-        jasmine.any(Error)
+        jasmine.any(Error),
       );
       expect(component.loading).toBe(false);
     });
@@ -247,7 +255,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to register passkey',
         SnackBarType.Error,
-        'WebAuthn is not supported in this browser'
+        'WebAuthn is not supported in this browser',
       );
       expect(component.registering).toBe(false);
 
@@ -268,7 +276,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to register passkey',
         SnackBarType.Error,
-        'Options failed'
+        'Options failed',
       );
       expect(component.registering).toBe(false);
     });
@@ -293,7 +301,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to register passkey',
         SnackBarType.Error,
-        jasmine.any(String)
+        jasmine.any(String),
       );
       expect(component.registering).toBe(false);
     });
@@ -323,7 +331,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to register passkey',
         SnackBarType.Error,
-        jasmine.any(String)
+        jasmine.any(String),
       );
       expect(component.registering).toBe(false);
     });
@@ -373,7 +381,7 @@ describe('UserPasskeysComponent', () => {
             cancelText: 'Cancel',
             color: 'warn',
           }),
-        })
+        }),
       );
 
       expect(mockAccountService.deletePasskey).toHaveBeenCalledWith(1);
@@ -402,7 +410,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to delete passkey',
         SnackBarType.Error,
-        'Delete failed'
+        'Delete failed',
       );
     });
 
@@ -423,7 +431,7 @@ describe('UserPasskeysComponent', () => {
       expect(mockSnackbarService.create).toHaveBeenCalledWith(
         'Failed to delete passkey',
         SnackBarType.Error,
-        jasmine.any(Error)
+        jasmine.any(Error),
       );
     });
 
