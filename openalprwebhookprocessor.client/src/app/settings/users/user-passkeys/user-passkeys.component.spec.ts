@@ -337,6 +337,15 @@ describe('UserPasskeysComponent', () => {
       component.ngOnInit();
       fixture.detectChanges();
     });
+
+    it('should call deletePasskey on accountService', () => {
+      const passkey: PasskeyInfo = { id: 1, name: 'Test Passkey', dateCreated: '2023-01-01' };
+      mockAccountService.deletePasskey.and.returnValue(of({ message: 'Deleted successfully', success: true }));
+      
+      component.deletePasskey(passkey);
+      
+      expect(mockAccountService.deletePasskey).toHaveBeenCalledWith(passkey.id);
+    });
   });
 
   describe('onClose', () => {

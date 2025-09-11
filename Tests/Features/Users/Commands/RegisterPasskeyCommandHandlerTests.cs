@@ -89,14 +89,12 @@ namespace Tests.Features.Users.Commands
                     Name = "testuser",
                     Id = Encoding.UTF8.GetBytes(user.Id.ToString())
                 },
-                Challenge = new byte[] { 1, 2, 3, 4, 5 }
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
             };
 
             _mockFido2.RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>())
+                Arg.Any<RequestNewCredentialParams>())
                 .Returns(expectedOptions);
 
             var command = new RegisterPasskeyCommand(userClaims, "MyPasskey");
@@ -111,13 +109,11 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with correct parameters
             _mockFido2.Received(1).RequestNewCredential(
-                Arg.Is<Fido2User>(u => 
-                    u.DisplayName == "Test User" && 
-                    u.Name == "testuser" && 
-                    Encoding.UTF8.GetString(u.Id) == user.Id.ToString()),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Is<AttestationConveyancePreference>(p => p == AttestationConveyancePreference.None));
+                Arg.Is<RequestNewCredentialParams>(p => 
+                    p.User.DisplayName == "Test User" && 
+                    p.User.Name == "testuser" && 
+                    Encoding.UTF8.GetString(p.User.Id) == user.Id.ToString() &&
+                    p.AttestationPreference == AttestationConveyancePreference.None));
 
             // Verify options were cached
             var cacheKey = $"passkey_registration_{user.Id}";
@@ -179,12 +175,15 @@ namespace Tests.Features.Users.Commands
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }));
 
-            var expectedOptions = new CredentialCreateOptions();
+            var expectedOptions = new CredentialCreateOptions
+            {
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
+            };
             _mockFido2.RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>())
+                Arg.Any<RequestNewCredentialParams>())
                 .Returns(expectedOptions);
 
             var command = new RegisterPasskeyCommand(userClaims, "NewPasskey");
@@ -198,13 +197,10 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with existing credentials excluded
             _mockFido2.Received(1).RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Is<List<PublicKeyCredentialDescriptor>>(list => 
-                    list.Count == 2 &&
-                    list.Any(d => d.Id.SequenceEqual(new byte[] { 1, 2, 3 })) &&
-                    list.Any(d => d.Id.SequenceEqual(new byte[] { 4, 5, 6 }))),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>());
+                Arg.Is<RequestNewCredentialParams>(p => 
+                    p.ExcludeCredentials.Count == 2 &&
+                    p.ExcludeCredentials.Any(d => d.Id.SequenceEqual(new byte[] { 1, 2, 3 })) &&
+                    p.ExcludeCredentials.Any(d => d.Id.SequenceEqual(new byte[] { 4, 5, 6 }))));
         }
 
         [Test]
@@ -245,12 +241,15 @@ namespace Tests.Features.Users.Commands
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }));
 
-            var expectedOptions = new CredentialCreateOptions();
+            var expectedOptions = new CredentialCreateOptions
+            {
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
+            };
             _mockFido2.RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>())
+                Arg.Any<RequestNewCredentialParams>())
                 .Returns(expectedOptions);
 
             var command = new RegisterPasskeyCommand(userClaims, "MyPasskey");
@@ -264,12 +263,9 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with empty display name (trimmed)
             _mockFido2.Received(1).RequestNewCredential(
-                Arg.Is<Fido2User>(u => 
-                    u.DisplayName == "" && 
-                    u.Name == "testuser"),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>());
+                Arg.Is<RequestNewCredentialParams>(p => 
+                    p.User.DisplayName == "" && 
+                    p.User.Name == "testuser"));
         }
 
         [Test]
@@ -296,12 +292,15 @@ namespace Tests.Features.Users.Commands
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }));
 
-            var expectedOptions = new CredentialCreateOptions();
+            var expectedOptions = new CredentialCreateOptions
+            {
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
+            };
             _mockFido2.RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>())
+                Arg.Any<RequestNewCredentialParams>())
                 .Returns(expectedOptions);
 
             var command = new RegisterPasskeyCommand(userClaims, "MyPasskey");
@@ -315,12 +314,9 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with email as Name
             _mockFido2.Received(1).RequestNewCredential(
-                Arg.Is<Fido2User>(u => 
-                    u.DisplayName == "Test User" && 
-                    u.Name == "test@example.com"),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>());
+                Arg.Is<RequestNewCredentialParams>(p => 
+                    p.User.DisplayName == "Test User" && 
+                    p.User.Name == "test@example.com"));
         }
 
         [Test]
@@ -343,12 +339,15 @@ namespace Tests.Features.Users.Commands
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }));
 
-            var expectedOptions = new CredentialCreateOptions();
+            var expectedOptions = new CredentialCreateOptions
+            {
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
+            };
             _mockFido2.RequestNewCredential(
-                Arg.Any<Fido2User>(),
-                Arg.Any<List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<AuthenticatorSelection>(),
-                Arg.Any<AttestationConveyancePreference>())
+                Arg.Any<RequestNewCredentialParams>())
                 .Returns(expectedOptions);
 
             var command = new RegisterPasskeyCommand(userClaims, "MyPasskey");

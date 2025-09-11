@@ -171,7 +171,10 @@ namespace Tests.Features.Users.Commands
             // Set up cached options
             var originalOptions = new CredentialCreateOptions
             {
-                Challenge = new byte[] { 1, 2, 3 }
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
             };
             var optionsCacheKey = $"passkey_registration_{user.Id}";
             _memoryCache.Set(optionsCacheKey, originalOptions);

@@ -104,6 +104,11 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
       return;
     }
 
+    if (!this.isWebAuthnSupported()) {
+      this.snackbarService.create('Your browser does not support WebAuthn/passkeys', SnackBarType.Error);
+      return;
+    }
+
     this.registering = true;
     this.markForCheck();
 
@@ -115,6 +120,16 @@ export class UserPasskeysComponent extends OnPushBaseComponent implements OnInit
       this.registering = false;
       this.markForCheck();
     }
+  }
+
+  private isWebAuthnSupported(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      'navigator' in window &&
+      'credentials' in navigator &&
+      'create' in navigator.credentials &&
+      'get' in navigator.credentials
+    );
   }
 
   private async performPasskeyRegistration() {

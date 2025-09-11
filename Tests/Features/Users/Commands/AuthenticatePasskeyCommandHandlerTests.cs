@@ -113,8 +113,7 @@ namespace Tests.Features.Users.Commands
             };
 
             _mockFido2.GetAssertionOptions(
-                Arg.Any<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<UserVerificationRequirement>())
+                Arg.Any<GetAssertionOptionsParams>())
                 .Returns(expectedOptions);
 
             var command = new AuthenticatePasskeyCommand("testuser");
@@ -129,11 +128,11 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with correct parameters
             _mockFido2.Received(1).GetAssertionOptions(
-                Arg.Is<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(list => 
-                    list.Count == 2 &&
-                    list.Any(d => d.Id.SequenceEqual(new byte[] { 1, 2, 3 })) &&
-                    list.Any(d => d.Id.SequenceEqual(new byte[] { 4, 5, 6 }))),
-                Arg.Is<UserVerificationRequirement>(req => req == UserVerificationRequirement.Preferred));
+                Arg.Is<GetAssertionOptionsParams>(p => 
+                    p.AllowedCredentials.Count == 2 &&
+                    p.AllowedCredentials.Any(d => d.Id.SequenceEqual(new byte[] { 1, 2, 3 })) &&
+                    p.AllowedCredentials.Any(d => d.Id.SequenceEqual(new byte[] { 4, 5, 6 })) &&
+                    p.UserVerification == UserVerificationRequirement.Preferred));
 
             // Verify options were cached
             var cacheKey = $"passkey_authentication_{user.Id}";
@@ -208,8 +207,7 @@ namespace Tests.Features.Users.Commands
 
             var expectedOptions = new AssertionOptions();
             _mockFido2.GetAssertionOptions(
-                Arg.Any<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<UserVerificationRequirement>())
+                Arg.Any<GetAssertionOptionsParams>())
                 .Returns(expectedOptions);
 
             var command = new AuthenticatePasskeyCommand("testuser");
@@ -223,10 +221,9 @@ namespace Tests.Features.Users.Commands
             
             // Verify FIDO2 was called with single credential
             _mockFido2.Received(1).GetAssertionOptions(
-                Arg.Is<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(list => 
-                    list.Count == 1 &&
-                    list.First().Id.SequenceEqual(new byte[] { 1, 2, 3, 4, 5 })),
-                Arg.Any<UserVerificationRequirement>());
+                Arg.Is<GetAssertionOptionsParams>(p => 
+                    p.AllowedCredentials.Count == 1 &&
+                    p.AllowedCredentials.First().Id.SequenceEqual(new byte[] { 1, 2, 3, 4, 5 })));
         }
 
         [Test]
@@ -258,8 +255,7 @@ namespace Tests.Features.Users.Commands
 
             var expectedOptions = new AssertionOptions();
             _mockFido2.GetAssertionOptions(
-                Arg.Any<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<UserVerificationRequirement>())
+                Arg.Any<GetAssertionOptionsParams>())
                 .Returns(expectedOptions);
 
             var command = new AuthenticatePasskeyCommand("testuser");
@@ -307,8 +303,7 @@ namespace Tests.Features.Users.Commands
 
             var expectedOptions = new AssertionOptions();
             _mockFido2.GetAssertionOptions(
-                Arg.Any<System.Collections.Generic.List<PublicKeyCredentialDescriptor>>(),
-                Arg.Any<UserVerificationRequirement>())
+                Arg.Any<GetAssertionOptionsParams>())
                 .Returns(expectedOptions);
 
             var command = new AuthenticatePasskeyCommand("testuser"); // lowercase

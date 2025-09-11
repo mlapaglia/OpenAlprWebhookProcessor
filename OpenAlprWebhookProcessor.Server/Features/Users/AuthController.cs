@@ -201,8 +201,4 @@ namespace OpenAlprWebhookProcessor.Features.Users
         }
     }
 
-    public record RegisterPasskeyRequest(string? Name = null);
-    public record CompletePasskeyRegistrationRequest(string AttestationResponse, string? Name = null);
-    public record AuthenticatePasskeyRequest(string Username);
-    public record CompletePasskeyAuthenticationRequest(string Username, string AssertionResponse, bool RememberMe = false);
 }

@@ -71,9 +71,9 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
                         OriginalOptions = originalOptions,
                         StoredPublicKey = credential.PublicKey,
                         StoredSignatureCounter = credential.SignatureCounter,
-                        IsUserHandleOwnerOfCredentialIdCallback = async (args, cancellationToken) =>
+                        IsUserHandleOwnerOfCredentialIdCallback = (args, cancellationToken) =>
                         {
-                            return credential.UserHandle.SequenceEqual(args.UserHandle);
+                            return Task.FromResult(credential.UserHandle.SequenceEqual(args.UserHandle));
                         }
                     },
                     cancellationToken);

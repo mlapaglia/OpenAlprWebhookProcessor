@@ -371,7 +371,13 @@ namespace Tests.Features.Users
         {
             // Arrange
             var request = new RegisterPasskeyRequest("MyPasskey");
-            var expectedResponse = new RegisterPasskeyResponse(new CredentialCreateOptions());
+            var expectedResponse = new RegisterPasskeyResponse(new CredentialCreateOptions
+            {
+                Rp = new PublicKeyCredentialRpEntity("test.com", "Test", null),
+                User = new Fido2User { DisplayName = "Test User", Name = "testuser", Id = new byte[] { 1 } },
+                Challenge = new byte[] { 1, 2, 3, 4, 5 },
+                PubKeyCredParams = new List<PubKeyCredParam>()
+            });
             
             _mediator.Send(Arg.Any<RegisterPasskeyCommand>(), Arg.Any<CancellationToken>())
                 .Returns(expectedResponse);

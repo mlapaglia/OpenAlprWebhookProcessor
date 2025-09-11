@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthentication;
 using OpenAlprWebhookProcessor.Features.Users.Data;
@@ -115,7 +116,7 @@ namespace Tests.Features.Users.Commands
             // Mock assertion response
             var assertionResponse = new AuthenticatorAssertionRawResponse
             {
-                Id = new byte[] { 1, 2, 3, 4, 5 },
+                Id = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 }),
                 RawId = new byte[] { 1, 2, 3, 4, 5 },
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
@@ -143,19 +144,14 @@ namespace Tests.Features.Users.Commands
             _memoryCache.Set(optionsCacheKey, originalOptions);
 
             // Mock successful FIDO2 verification
-            var makeAssertionResult = new AssertionVerificationResult
+            var makeAssertionResult = new VerifyAssertionResult
             {
-                Status = "ok",
-                Counter = 2,
-                ErrorMessage = null
+                SignCount = 2
             };
 
             _mockFido2.MakeAssertionAsync(
-                Arg.Any<AuthenticatorAssertionRawResponse>(),
-                Arg.Any<AssertionOptions>(),
-                Arg.Any<byte[]>(),
-                Arg.Any<uint>(),
-                Arg.Any<IsUserHandleOwnerOfCredentialIdAsync>())
+                Arg.Any<MakeAssertionParams>(),
+                Arg.Any<CancellationToken>())
                 .Returns(makeAssertionResult);
 
             var command = new CompletePasskeyAuthenticationCommand("testuser", assertionResponseJson, false);
@@ -229,7 +225,7 @@ namespace Tests.Features.Users.Commands
 
             var assertionResponse = new AuthenticatorAssertionRawResponse
             {
-                Id = new byte[] { 1, 2, 3, 4, 5 },
+                Id = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 }),
                 RawId = new byte[] { 1, 2, 3, 4, 5 },
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
@@ -281,7 +277,7 @@ namespace Tests.Features.Users.Commands
 
             var assertionResponse = new AuthenticatorAssertionRawResponse
             {
-                Id = new byte[] { 1, 2, 3, 4, 5 },
+                Id = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 }),
                 RawId = new byte[] { 1, 2, 3, 4, 5 },
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
@@ -338,7 +334,7 @@ namespace Tests.Features.Users.Commands
 
             var assertionResponse = new AuthenticatorAssertionRawResponse
             {
-                Id = new byte[] { 1, 2, 3, 4, 5 },
+                Id = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 }),
                 RawId = new byte[] { 1, 2, 3, 4, 5 },
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
@@ -360,20 +356,11 @@ namespace Tests.Features.Users.Commands
             var optionsCacheKey = $"passkey_authentication_{user.Id}";
             _memoryCache.Set(optionsCacheKey, originalOptions);
 
-            // Mock failed FIDO2 verification
-            var makeAssertionResult = new AssertionVerificationResult
-            {
-                Status = "error",
-                ErrorMessage = "Invalid signature"
-            };
-
+            // Mock failed FIDO2 verification - throw exception in v4.0.0
             _mockFido2.MakeAssertionAsync(
-                Arg.Any<AuthenticatorAssertionRawResponse>(),
-                Arg.Any<AssertionOptions>(),
-                Arg.Any<byte[]>(),
-                Arg.Any<uint>(),
-                Arg.Any<IsUserHandleOwnerOfCredentialIdAsync>())
-                .Returns(makeAssertionResult);
+                Arg.Any<MakeAssertionParams>(),
+                Arg.Any<CancellationToken>())
+                .ThrowsAsync(new Exception("Invalid signature"));
 
             var command = new CompletePasskeyAuthenticationCommand("testuser", assertionResponseJson, false);
             var cancellationToken = GetCancellationToken();
@@ -381,7 +368,7 @@ namespace Tests.Features.Users.Commands
             // Act & Assert
             await FluentActions.Invoking(async () => await _handler.Handle(command, cancellationToken))
                 .Should().ThrowExactlyAsync<AppException>()
-                .WithMessage("*Failed to authenticate with passkey: Invalid signature*");
+                .WithMessage("*Passkey authentication failed: Invalid signature*");
         }
 
         [Test]
@@ -417,7 +404,7 @@ namespace Tests.Features.Users.Commands
 
             var assertionResponse = new AuthenticatorAssertionRawResponse
             {
-                Id = new byte[] { 1, 2, 3, 4, 5 },
+                Id = Convert.ToBase64String(new byte[] { 1, 2, 3, 4, 5 }),
                 RawId = new byte[] { 1, 2, 3, 4, 5 },
                 Type = PublicKeyCredentialType.PublicKey,
                 Response = new AuthenticatorAssertionRawResponse.AssertionResponse
@@ -439,18 +426,14 @@ namespace Tests.Features.Users.Commands
             var optionsCacheKey = $"passkey_authentication_{user.Id}";
             _memoryCache.Set(optionsCacheKey, originalOptions);
 
-            var makeAssertionResult = new AssertionVerificationResult
+            var makeAssertionResult = new VerifyAssertionResult
             {
-                Status = "ok",
-                Counter = 2
+                SignCount = 2
             };
 
             _mockFido2.MakeAssertionAsync(
-                Arg.Any<AuthenticatorAssertionRawResponse>(),
-                Arg.Any<AssertionOptions>(),
-                Arg.Any<byte[]>(),
-                Arg.Any<uint>(),
-                Arg.Any<IsUserHandleOwnerOfCredentialIdAsync>())
+                Arg.Any<MakeAssertionParams>(),
+                Arg.Any<CancellationToken>())
                 .Returns(makeAssertionResult);
 
             var command = new CompletePasskeyAuthenticationCommand("testuser", assertionResponseJson, true);
