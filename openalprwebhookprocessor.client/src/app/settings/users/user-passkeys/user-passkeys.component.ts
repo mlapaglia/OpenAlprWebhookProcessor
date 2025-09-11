@@ -13,6 +13,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule } from '@angular/material/dialog';
 import type { FormGroup } from '@angular/forms';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfirmationDialogComponent, type ConfirmationDialogData } from '../../../shared/confirmation-dialog/confirmation-dialog.component';
@@ -48,6 +50,8 @@ interface PasskeyInfo {
     MatFormFieldModule,
     MatInputModule,
     MatTooltipModule,
+    MatDividerModule,
+    MatDialogModule,
     RefreshButtonComponent,
   ],
 })
