@@ -100,11 +100,35 @@ namespace OpenAlprWebhookProcessor
             // Configure FIDO2/WebAuthn
             services.AddFido2(options =>
             {
-                options.ServerDomain = Configuration["Fido2:ServerDomain"] ?? "localhost";
+                var serverDomain = Environment.GetEnvironmentVariable("FIDO2_SERVER_DOMAIN");
+                var originsEnv = Environment.GetEnvironmentVariable("FIDO2_ORIGINS");
+                
+                // Default to localhost for development if not configured
+                if (string.IsNullOrEmpty(serverDomain))
+                {
+                    serverDomain = "localhost";
+                    Log.Warning("FIDO2_SERVER_DOMAIN environment variable not set, defaulting to 'localhost'. This should be set for production deployments.");
+                }
+                
+                string[] origins;
+                if (string.IsNullOrEmpty(originsEnv))
+                {
+                    origins = new[] { "https://localhost:4200", "https://localhost:5001" };
+                    Log.Warning("FIDO2_ORIGINS environment variable not set, defaulting to localhost URLs. This should be set for production deployments.");
+                }
+                else
+                {
+                    origins = originsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                }
+                
+                options.ServerDomain = serverDomain;
                 options.ServerName = "OpenALPR Webhook Processor";
-                options.Origins = new HashSet<string>(Configuration.GetSection("Fido2:Origins").Get<string[]>() ?? new[] { "https://localhost:4200", "https://localhost:5001" });
+                options.Origins = new HashSet<string>(origins);
                 options.TimestampDriftTolerance = 300000;
                 options.MDSCacheDirPath = "./config/mds-cache";
+                
+                Log.Information("FIDO2 configured with ServerDomain: {ServerDomain}, Origins: {Origins}", 
+                    serverDomain, string.Join(", ", origins));
             });
 
             services.AddExternalServices();
