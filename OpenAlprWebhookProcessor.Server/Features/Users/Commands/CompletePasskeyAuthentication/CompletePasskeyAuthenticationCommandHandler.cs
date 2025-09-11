@@ -49,7 +49,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
                 if (assertionResponse == null)
                     throw new AppException("Invalid assertion response");
 
-                var credentialId = Convert.ToBase64String(assertionResponse.Id);
+                var credentialId = Convert.ToBase64String(assertionResponse.RawId);
                 var credential = await _context.PasskeyCredentials
                     .FirstOrDefaultAsync(c => c.CredentialId == credentialId && c.UserId == user.Id, cancellationToken);
 
@@ -65,20 +65,20 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthen
                 _cache.Remove(optionsCacheKey);
 
                 var result = await _fido2.MakeAssertionAsync(
-                    assertionResponse,
-                    originalOptions,
-                    credential.PublicKey,
-                    credential.SignatureCounter,
-                    async (args, cancellationToken) =>
+                    new MakeAssertionParams
                     {
-                        return credential.UserHandle.SequenceEqual(args.UserHandle);
+                        AssertionResponse = assertionResponse,
+                        OriginalOptions = originalOptions,
+                        StoredPublicKey = credential.PublicKey,
+                        StoredSignatureCounter = credential.SignatureCounter,
+                        IsUserHandleOwnerOfCredentialIdCallback = async (args, cancellationToken) =>
+                        {
+                            return credential.UserHandle.SequenceEqual(args.UserHandle);
+                        }
                     },
-                    cancellationToken: cancellationToken);
+                    cancellationToken);
 
-                if (result.Status != "ok")
-                    throw new AppException($"Failed to authenticate with passkey: {result.ErrorMessage}");
-
-                credential.SignatureCounter = result.Counter;
+                credential.SignatureCounter = result.SignCount;
                 await _context.SaveChangesAsync(cancellationToken);
 
                 await _signInManager.SignInAsync(user, request.RememberMe);

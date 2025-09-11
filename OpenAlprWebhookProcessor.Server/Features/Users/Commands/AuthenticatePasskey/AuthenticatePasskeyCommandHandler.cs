@@ -45,9 +45,11 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.AuthenticatePasskey
             if (!existingCredentials.Any())
                 throw new AppException("No passkeys registered for this user");
 
-            var options = _fido2.GetAssertionOptions(
-                existingCredentials,
-                UserVerificationRequirement.Preferred);
+            var options = _fido2.GetAssertionOptions(new GetAssertionOptionsParams
+            {
+                AllowedCredentials = existingCredentials,
+                UserVerification = UserVerificationRequirement.Preferred
+            });
 
             var cacheKey = $"passkey_authentication_{user.Id}";
             _cache.Set(cacheKey, options, TimeSpan.FromMinutes(5));

@@ -51,28 +51,28 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegist
                 _cache.Remove(optionsCacheKey);
 
                 var result = await _fido2.MakeNewCredentialAsync(
-                    attestationResponse,
-                    originalOptions,
-                    async (args, cancellationToken) =>
+                    new MakeNewCredentialParams
                     {
-                        var existingCredential = await _context.PasskeyCredentials
-                            .FirstOrDefaultAsync(c => c.CredentialId == Convert.ToBase64String(args.CredentialId), cancellationToken);
-                        return existingCredential == null;
+                        AttestationResponse = attestationResponse,
+                        OriginalOptions = originalOptions,
+                        IsCredentialIdUniqueToUserCallback = async (args, cancellationToken) =>
+                        {
+                            var existingCredential = await _context.PasskeyCredentials
+                                .FirstOrDefaultAsync(c => c.CredentialId == Convert.ToBase64String(args.CredentialId), cancellationToken);
+                            return existingCredential == null;
+                        }
                     });
-
-                if (result.Status != "ok")
-                    throw new AppException($"Failed to register passkey: {result.ErrorMessage}");
 
                 var credential = new PasskeyCredential
                 {
                     UserId = user.Id,
-                    CredentialId = Convert.ToBase64String(result.Result.CredentialId),
-                    PublicKey = result.Result.PublicKey,
-                    UserHandle = result.Result.User.Id,
-                    SignatureCounter = result.Result.Counter,
-                    CredType = result.Result.CredType,
+                    CredentialId = Convert.ToBase64String(result.Id),
+                    PublicKey = result.PublicKey,
+                    UserHandle = result.User.Id,
+                    SignatureCounter = result.SignCount,
+                    CredType = result.Type.ToString(),
                     RegDate = DateTime.UtcNow,
-                    AaGuid = result.Result.Aaguid.ToString(),
+                    AaGuid = result.AaGuid.ToString(),
                     Name = request.Name ?? $"Passkey {DateTime.UtcNow:yyyy-MM-dd HH:mm}"
                 };
 

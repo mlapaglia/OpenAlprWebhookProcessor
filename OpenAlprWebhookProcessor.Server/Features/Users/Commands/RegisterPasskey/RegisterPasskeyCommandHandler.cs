@@ -51,11 +51,13 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.RegisterPasskey
                 Id = Encoding.UTF8.GetBytes(user.Id.ToString())
             };
 
-            var options = _fido2.RequestNewCredential(
-                fido2User,
-                existingCredentials,
-                AuthenticatorSelection.Default,
-                AttestationConveyancePreference.None);
+            var options = _fido2.RequestNewCredential(new RequestNewCredentialParams
+            {
+                User = fido2User,
+                ExcludeCredentials = existingCredentials,
+                AuthenticatorSelection = AuthenticatorSelection.Default,
+                AttestationPreference = AttestationConveyancePreference.None
+            });
 
             var cacheKey = $"passkey_registration_{user.Id}";
             _cache.Set(cacheKey, options, TimeSpan.FromMinutes(5));
