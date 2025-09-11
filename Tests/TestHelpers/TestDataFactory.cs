@@ -1,4 +1,3 @@
-using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Ignores.Queries.GetIgnores;
 using OpenAlprWebhookProcessor.Features.Users.Data;

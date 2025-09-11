@@ -1,6 +1,5 @@
 using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -3,8 +3,6 @@ using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.UpsertPushover;
-using System.Linq;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Commands

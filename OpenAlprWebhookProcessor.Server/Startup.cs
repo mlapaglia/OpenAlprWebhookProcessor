@@ -14,8 +14,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Fido2NetLib;
-using Fido2NetLib.Development;
 
 namespace OpenAlprWebhookProcessor
 {

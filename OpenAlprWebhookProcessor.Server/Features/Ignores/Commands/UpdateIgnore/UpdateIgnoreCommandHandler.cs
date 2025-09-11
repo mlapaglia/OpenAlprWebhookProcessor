@@ -1,6 +1,5 @@
 using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
-using OpenAlprWebhookProcessor.Features.Ignores.Commands.UpdateIgnore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

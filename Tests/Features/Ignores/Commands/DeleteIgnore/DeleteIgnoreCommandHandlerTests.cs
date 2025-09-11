@@ -2,8 +2,6 @@ using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Ignores.Commands.DeleteIgnore;
-using System;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Ignores.Commands.DeleteIgnore

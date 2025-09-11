@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

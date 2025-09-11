@@ -1,7 +1,6 @@
 using Mediator;
 using OpenAlprWebhookProcessor.Data.Repositories;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor.OpenAlprWebsocket;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 

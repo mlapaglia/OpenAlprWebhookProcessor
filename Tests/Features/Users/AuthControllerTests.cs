@@ -12,8 +12,15 @@ using OpenAlprWebhookProcessor.Features.Users.Commands.Logout;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetCurrentUser;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers;
 using OpenAlprWebhookProcessor.Features.Users.Queries.CanRegister;
+using OpenAlprWebhookProcessor.Features.Users.Commands.RegisterPasskey;
+using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegistration;
+using OpenAlprWebhookProcessor.Features.Users.Commands.AuthenticatePasskey;
+using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthentication;
+using OpenAlprWebhookProcessor.Features.Users.Commands.DeletePasskey;
+using OpenAlprWebhookProcessor.Features.Users.Queries.GetUserPasskeys;
 using System.Security.Claims;
 using Tests.TestHelpers;
+using Fido2NetLib;
 
 namespace Tests.Features.Users
 {
@@ -357,6 +364,277 @@ namespace Tests.Features.Users
             await _mediator.Received(1).Send(
                 Arg.Any<AuthenticateCommand>(), 
                 Arg.Is<CancellationToken>(ct => ct == cancellationToken));
+        }
+
+        [Test]
+        public async Task RegisterPasskey_WithValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            var request = new RegisterPasskeyRequest("MyPasskey");
+            var expectedResponse = new RegisterPasskeyResponse(new CredentialCreateOptions());
+            
+            _mediator.Send(Arg.Any<RegisterPasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.RegisterPasskey(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<RegisterPasskeyCommand>(cmd => 
+                    cmd.User == _controller.User && 
+                    cmd.Name == request.Name), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task RegisterPasskey_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            var request = new RegisterPasskeyRequest("MyPasskey");
+            
+            _mediator.Send(Arg.Any<RegisterPasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<RegisterPasskeyResponse>>(x => throw new AppException("Passkey registration failed"));
+
+            // Act
+            var result = await _controller.RegisterPasskey(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Passkey registration failed" });
+        }
+
+        [Test]
+        public async Task CompletePasskeyRegistration_WithValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            var request = new CompletePasskeyRegistrationRequest("attestationResponse", "MyPasskey");
+            var expectedResponse = new CompletePasskeyRegistrationResponse("Passkey registered successfully", true);
+            
+            _mediator.Send(Arg.Any<CompletePasskeyRegistrationCommand>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.CompletePasskeyRegistration(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<CompletePasskeyRegistrationCommand>(cmd => 
+                    cmd.User == _controller.User && 
+                    cmd.AttestationResponse == request.AttestationResponse &&
+                    cmd.Name == request.Name), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task CompletePasskeyRegistration_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            var request = new CompletePasskeyRegistrationRequest("attestationResponse", "MyPasskey");
+            
+            _mediator.Send(Arg.Any<CompletePasskeyRegistrationCommand>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<CompletePasskeyRegistrationResponse>>(x => throw new AppException("Registration failed"));
+
+            // Act
+            var result = await _controller.CompletePasskeyRegistration(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Registration failed" });
+        }
+
+        [Test]
+        public async Task AuthenticatePasskey_WithValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            var request = new AuthenticatePasskeyRequest("testuser");
+            var expectedResponse = new AuthenticatePasskeyResponse(new AssertionOptions());
+            
+            _mediator.Send(Arg.Any<AuthenticatePasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.AuthenticatePasskey(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<AuthenticatePasskeyCommand>(cmd => 
+                    cmd.Username == request.Username), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task AuthenticatePasskey_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            var request = new AuthenticatePasskeyRequest("testuser");
+            
+            _mediator.Send(Arg.Any<AuthenticatePasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<AuthenticatePasskeyResponse>>(x => throw new AppException("Authentication failed"));
+
+            // Act
+            var result = await _controller.AuthenticatePasskey(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Authentication failed" });
+        }
+
+        [Test]
+        public async Task CompletePasskeyAuthentication_WithValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            var request = new CompletePasskeyAuthenticationRequest("testuser", "assertionResponse", true);
+            var expectedResponse = new UserDto
+            {
+                Id = 123,
+                Username = "testuser",
+                FirstName = "Test",
+                LastName = "User"
+            };
+            
+            _mediator.Send(Arg.Any<CompletePasskeyAuthenticationCommand>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.CompletePasskeyAuthentication(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<CompletePasskeyAuthenticationCommand>(cmd => 
+                    cmd.Username == request.Username && 
+                    cmd.AssertionResponse == request.AssertionResponse &&
+                    cmd.RememberMe == request.RememberMe), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task CompletePasskeyAuthentication_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            var request = new CompletePasskeyAuthenticationRequest("testuser", "assertionResponse", false);
+            
+            _mediator.Send(Arg.Any<CompletePasskeyAuthenticationCommand>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<UserDto>>(x => throw new AppException("Authentication failed"));
+
+            // Act
+            var result = await _controller.CompletePasskeyAuthentication(request, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Authentication failed" });
+        }
+
+        [Test]
+        public async Task GetPasskeys_WithValidRequest_ReturnsOkResult()
+        {
+            // Arrange
+            var expectedResponse = new GetUserPasskeysResponse(new List<PasskeyDto>
+            {
+                new PasskeyDto(1, "MyPasskey1", DateTime.Now, "guid1"),
+                new PasskeyDto(2, "MyPasskey2", DateTime.Now.AddDays(-1), "guid2")
+            });
+            
+            _mediator.Send(Arg.Any<GetUserPasskeysQuery>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.GetPasskeys(CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<GetUserPasskeysQuery>(query => 
+                    query.User == _controller.User), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task GetPasskeys_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            _mediator.Send(Arg.Any<GetUserPasskeysQuery>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<GetUserPasskeysResponse>>(x => throw new AppException("Failed to retrieve passkeys"));
+
+            // Act
+            var result = await _controller.GetPasskeys(CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Failed to retrieve passkeys" });
+        }
+
+        [Test]
+        public async Task DeletePasskey_WithValidId_ReturnsOkResult()
+        {
+            // Arrange
+            const int passkeyId = 123;
+            var expectedResponse = new DeletePasskeyResponse("Passkey deleted successfully", true);
+            
+            _mediator.Send(Arg.Any<DeletePasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.DeletePasskey(passkeyId, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = (OkObjectResult)result;
+            okResult.Value.Should().Be(expectedResponse);
+            
+            await _mediator.Received(1).Send(
+                Arg.Is<DeletePasskeyCommand>(cmd => 
+                    cmd.User == _controller.User && 
+                    cmd.PasskeyId == passkeyId), 
+                Arg.Any<CancellationToken>());
+        }
+
+        [Test]
+        public async Task DeletePasskey_WithException_ReturnsBadRequest()
+        {
+            // Arrange
+            const int passkeyId = 123;
+            
+            _mediator.Send(Arg.Any<DeletePasskeyCommand>(), Arg.Any<CancellationToken>())
+                .Returns<ValueTask<DeletePasskeyResponse>>(x => throw new AppException("Passkey not found"));
+
+            // Act
+            var result = await _controller.DeletePasskey(passkeyId, CancellationToken.None);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = (BadRequestObjectResult)result;
+            var response = badRequestResult.Value;
+            response.Should().BeEquivalentTo(new { message = "Passkey not found" });
         }
     }
 }

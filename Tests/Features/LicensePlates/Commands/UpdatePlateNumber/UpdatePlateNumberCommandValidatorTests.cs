@@ -1,7 +1,6 @@
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.LicensePlates.Commands.UpdatePlateNumber;
-using System;
 using Tests.TestHelpers;
 
 namespace Tests.Features.LicensePlates.Commands.UpdatePlateNumber

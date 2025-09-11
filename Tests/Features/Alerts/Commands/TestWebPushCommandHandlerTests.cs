@@ -1,15 +1,9 @@
 using AwesomeAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using OpenAlprWebhookProcessor.Data;
 using OpenAlprWebhookProcessor.Features.Alerts;
 using OpenAlprWebhookProcessor.Features.Alerts.Commands.TestWebPush;
 using OpenAlprWebhookProcessor.Features.WebPushSubscriptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Alerts.Commands

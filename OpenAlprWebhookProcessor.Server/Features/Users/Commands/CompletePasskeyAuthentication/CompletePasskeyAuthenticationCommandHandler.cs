@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Fido2NetLib;
-using Fido2NetLib.Objects;
 using System.Text.Json;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthentication

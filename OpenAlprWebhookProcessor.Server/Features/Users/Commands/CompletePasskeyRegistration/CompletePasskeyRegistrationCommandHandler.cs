@@ -4,11 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Fido2NetLib;
-using Fido2NetLib.Objects;
 using System.Text.Json;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyRegistration

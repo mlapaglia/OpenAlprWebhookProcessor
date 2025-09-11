@@ -1,15 +1,8 @@
-using AwesomeAssertions;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Webhooks.WebhookProcessor;
-using System;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Webhooks.WebhookProcessor

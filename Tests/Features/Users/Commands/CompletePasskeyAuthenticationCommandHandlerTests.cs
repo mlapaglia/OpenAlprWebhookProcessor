@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
@@ -11,12 +10,9 @@ using OpenAlprWebhookProcessor.Features.Users.Commands.CompletePasskeyAuthentica
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users;
 using Tests.TestHelpers;
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
-using System.Linq;
 
 namespace Tests.Features.Users.Commands
 {
