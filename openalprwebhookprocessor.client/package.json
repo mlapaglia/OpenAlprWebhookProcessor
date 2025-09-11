@@ -43,7 +43,7 @@
     "@angular/cli": "^20.2.1",
     "@angular/compiler-cli": "^20.2.3",
     "@angular/localize": "^20.2.3",
-    "@stylistic/eslint-plugin": "^5.2.3",
+    "@stylistic/eslint-plugin": "^5.3.1",
     "@types/jasmine": "~5.1.9",
     "@types/node": "^24.3.1",
     "@types/qrcode": "^1.5.5",
