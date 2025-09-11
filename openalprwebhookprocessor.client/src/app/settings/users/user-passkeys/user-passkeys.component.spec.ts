@@ -181,7 +181,7 @@ describe('UserPasskeysComponent', () => {
       mockAccountService.getPasskeys.and.returnValue(of(mockPasskeys));
       component.ngOnInit();
       fixture.detectChanges();
-      
+
       // Ensure WebAuthn support is available for each test
       Object.defineProperty(globalThis, 'navigator', {
         value: mockNavigator,
