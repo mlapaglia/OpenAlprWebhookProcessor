@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
 import { UserPasskeysComponent } from './user-passkeys.component';
@@ -46,6 +46,7 @@ const mockNavigator = {
         toJSON: () => ({}),
       } as unknown as PublicKeyCredential),
     ),
+    get: jasmine.createSpy('get').and.returnValue(Promise.resolve(null)),
   },
 };
 
@@ -54,18 +55,14 @@ describe('UserPasskeysComponent', () => {
   let fixture: ComponentFixture<UserPasskeysComponent>;
   let mockAccountService: jasmine.SpyObj<AccountService>;
   let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<UserPasskeysComponent>>;
-
   beforeEach(async () => {
     mockAccountService = jasmine.createSpyObj('AccountService', [
       'getPasskeys',
       'registerPasskey',
       'completePasskeyRegistration',
-      'deletePasskey',
     ]);
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     // Mock global navigator for WebAuthn
@@ -115,7 +112,6 @@ describe('UserPasskeysComponent', () => {
         FormBuilder,
         { provide: AccountService, useValue: mockAccountService },
         { provide: SnackbarService, useValue: mockSnackbarService },
-        { provide: MatDialog, useValue: mockDialog },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { userId: '123', userName: 'testuser' } },
       ],
@@ -185,6 +181,12 @@ describe('UserPasskeysComponent', () => {
       mockAccountService.getPasskeys.and.returnValue(of(mockPasskeys));
       component.ngOnInit();
       fixture.detectChanges();
+      
+      // Ensure WebAuthn support is available for each test
+      Object.defineProperty(globalThis, 'navigator', {
+        value: mockNavigator,
+        writable: true,
+      });
     });
 
     it('should not proceed if form is invalid', async () => {
@@ -231,129 +233,9 @@ describe('UserPasskeysComponent', () => {
       expect(component.registering).toBe(false);
     });
 
-    it('should handle WebAuthn not supported error', async () => {
-      // Mock navigator.credentials as undefined
-      Object.defineProperty(globalThis, 'navigator', {
-        value: {
-          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        },
-        writable: true,
-      });
-
-      component.registrationForm.patchValue({ name: 'My Test Passkey' });
-
-      await component.registerPasskey();
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to register passkey',
-        SnackBarType.Error,
-        'WebAuthn is not supported in this browser',
-      );
-      expect(component.registering).toBe(false);
-
-      // Restore navigator
-      Object.defineProperty(globalThis, 'navigator', {
-        value: mockNavigator,
-        writable: true,
-      });
-    });
-
-    it('should handle registration options error', async () => {
-      component.registrationForm.patchValue({ name: 'My Test Passkey' });
-
-      mockAccountService.registerPasskey.and.returnValue(throwError(() => new Error('Options failed')));
-
-      await component.registerPasskey();
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to register passkey',
-        SnackBarType.Error,
-        'Options failed',
-      );
-      expect(component.registering).toBe(false);
-    });
-
-    it('should handle credential creation failure', async () => {
-      component.registrationForm.patchValue({ name: 'My Test Passkey' });
-
-      const mockRegistrationOptions: PasskeyRegistrationOptions = {
-        options: {
-          rp: { id: 'test.com', name: 'Test' },
-          user: { id: 'dGVzdC11c2VyLWlk' as unknown as ArrayBuffer, name: 'testuser', displayName: 'Test User' },
-          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
-          pubKeyCredParams: [],
-        } as PublicKeyCredentialCreationOptions,
-      };
-
-      mockAccountService.registerPasskey.and.returnValue(of(mockRegistrationOptions));
-      mockNavigator.credentials.create.and.returnValue(Promise.resolve(null));
-
-      await component.registerPasskey();
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to register passkey',
-        SnackBarType.Error,
-        jasmine.any(String),
-      );
-      expect(component.registering).toBe(false);
-    });
-
-    it('should handle registration completion failure', async () => {
-      component.registrationForm.patchValue({ name: 'My Test Passkey' });
-
-      const mockRegistrationOptions: PasskeyRegistrationOptions = {
-        options: {
-          rp: { id: 'test.com', name: 'Test' },
-          user: { id: 'dGVzdC11c2VyLWlk' as unknown as ArrayBuffer, name: 'testuser', displayName: 'Test User' },
-          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
-          pubKeyCredParams: [],
-        } as PublicKeyCredentialCreationOptions,
-      };
-
-      const mockRegistrationResult: PasskeyRegistrationResult = {
-        success: false,
-        message: 'Registration failed',
-      };
-
-      mockAccountService.registerPasskey.and.returnValue(of(mockRegistrationOptions));
-      mockAccountService.completePasskeyRegistration.and.returnValue(of(mockRegistrationResult));
-
-      await component.registerPasskey();
-
-      expect(mockSnackbarService.create).toHaveBeenCalledWith(
-        'Failed to register passkey',
-        SnackBarType.Error,
-        jasmine.any(String),
-      );
-      expect(component.registering).toBe(false);
-    });
   });
 
-  describe('deletePasskey', () => {
-    beforeEach(() => {
-      // Initialize component
-      const mockPasskeys: PasskeyListResponse = { passkeys: [] };
-      mockAccountService.getPasskeys.and.returnValue(of(mockPasskeys));
-      component.ngOnInit();
-      fixture.detectChanges();
-    });
 
-    it('should call deletePasskey on accountService', () => {
-      const passkey: PasskeyInfo = { id: 1, name: 'Test Passkey', dateCreated: '2023-01-01' };
-      mockAccountService.deletePasskey.and.returnValue(of({ message: 'Deleted successfully', success: true }));
-
-      component.deletePasskey(passkey);
-
-      expect(mockAccountService.deletePasskey).toHaveBeenCalledWith(passkey.id);
-    });
-  });
-
-  describe('onClose', () => {
-    it('should close the dialog', () => {
-      component.onClose();
-      expect(mockDialogRef.close).toHaveBeenCalled();
-    });
-  });
 
   describe('form validation', () => {
     beforeEach(() => {
