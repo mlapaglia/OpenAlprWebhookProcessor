@@ -442,7 +442,7 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should handle save mask error', () => {
-      mockCameraMaskService.upsertImageMask.and.returnValue(throwError('Save failed'));
+      mockCameraMaskService.upsertImageMask.and.returnValue(throwError(() => new Error('Save failed')));
 
       component.saveMask();
 
@@ -515,7 +515,7 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should draw canvas with coordinates', () => {
-      component.currentPos = { x: 0, y: 0 }; // Initialize currentPos
+      component.currentPos = { x: 0, y: 0 };
 
       (component as any).draw();
 
@@ -527,7 +527,7 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should handle drawing error gracefully', () => {
-      component.currentPos = { x: 0, y: 0 }; // Initialize currentPos
+      component.currentPos = { x: 0, y: 0 };
       mockContext.drawImage.and.throwError('Canvas error');
 
       expect(() => (component as any).draw()).not.toThrow();
@@ -536,7 +536,7 @@ describe(CameraMaskComponent.name, () => {
 
     it('should draw filled polygon when closed', () => {
       component.isClosed = true;
-      component.currentPos = { x: 0, y: 0 }; // Initialize currentPos
+      component.currentPos = { x: 0, y: 0 };
 
       (component as any).draw();
 
@@ -674,13 +674,10 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should get correct mouse position', () => {
-      // Remove the spy to test the actual implementation
       ((component as any).getMousePosition as jasmine.Spy).and.callThrough();
 
-      // Reset the spy to ensure it's clean
       (mockCanvas.getBoundingClientRect as jasmine.Spy).calls.reset();
 
-      // Test the getMousePosition method directly
       const result = (component as any).getMousePosition(mockMouseEvent);
 
       expect(result).toEqual({ x: 150, y: 150 });
@@ -695,7 +692,6 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should call service when loading sample plates', () => {
-      // Test that the service method is called, not error handling since component doesn't handle errors
       spyOn(component, 'loadImageIntoCanvas' as any);
 
       (component as any).getSamplePlates();
@@ -704,8 +700,7 @@ describe(CameraMaskComponent.name, () => {
     });
 
     it('should call service when loading mask coordinates', () => {
-      // Test that the service method is called when coordinates are empty
-      component.coordinates = []; // Ensure the condition to load coordinates is met
+      component.coordinates = [];
 
       (component as any).loadMaskCoordinates();
 

@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CameraDayNightComponent } from './camera-daynight.component';
 import { Camera, Manufacturer } from '../../camera';
@@ -51,7 +50,6 @@ describe('CameraDayNightComponent', () => {
       imports: [
         CameraDayNightComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();
@@ -249,14 +247,14 @@ describe('CameraDayNightComponent', () => {
       const invalidUrls = ['invalid', 'ftp://test.com', 'not-a-url'];
       invalidUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(true, `${url} should be invalid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be invalid`).toBe(true);
       });
 
       // Valid URLs
       const validUrls = ['http://test.com', 'https://example.org/api'];
       validUrls.forEach(url => {
         urlControl?.setValue(url);
-        expect(urlControl?.hasError('pattern')).toBe(false, `${url} should be valid`);
+        expect(urlControl?.hasError('pattern')).withContext(`${url} should be valid`).toBe(false);
       });
     });
   });

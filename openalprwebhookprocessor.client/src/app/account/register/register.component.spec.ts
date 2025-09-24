@@ -1,12 +1,12 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 
 import { RegisterComponent } from './register.component';
 import { AccountService } from '../account.service';
-import { AlertService } from 'app/_services';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -14,13 +14,13 @@ describe('RegisterComponent', () => {
   let mockAccountService: jasmine.SpyObj<AccountService>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockActivatedRoute: jasmine.SpyObj<ActivatedRoute>;
-  let mockAlertService: jasmine.SpyObj<AlertService>;
+  let mockSnackbarService: jasmine.SpyObj<SnackbarService>;
 
   beforeEach(async () => {
     mockAccountService = jasmine.createSpyObj('AccountService', ['register', 'canRegister']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
     mockActivatedRoute = {} as jasmine.SpyObj<ActivatedRoute>;
-    mockAlertService = jasmine.createSpyObj('AlertService', ['clear', 'success', 'error']);
+    mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     // Setup default mock behavior - registration is allowed
     mockAccountService.canRegister.and.returnValue(of(true));
@@ -29,14 +29,13 @@ describe('RegisterComponent', () => {
       imports: [
         RegisterComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [
         FormBuilder,
         { provide: AccountService, useValue: mockAccountService },
         { provide: Router, useValue: mockRouter },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: AlertService, useValue: mockAlertService },
+        { provide: SnackbarService, useValue: mockSnackbarService },
       ],
     }).compileComponents();
 
@@ -97,7 +96,7 @@ describe('RegisterComponent', () => {
       component.onSubmit();
 
       expect(component.submitted).toBe(true);
-      expect(mockAlertService.clear).toHaveBeenCalled();
+      expect(mockSnackbarService.create).toHaveBeenCalled();
       expect(mockAccountService.register).not.toHaveBeenCalled();
     });
 
@@ -115,7 +114,7 @@ describe('RegisterComponent', () => {
 
       expect(component.submitted).toBe(true);
       expect(component.loading).toBe(true);
-      expect(mockAlertService.clear).toHaveBeenCalled();
+      expect(mockSnackbarService.create).toHaveBeenCalled();
       expect(mockAccountService.register).toHaveBeenCalledWith(jasmine.objectContaining({
         firstName: 'John',
         lastName: 'Doe',
@@ -141,7 +140,7 @@ describe('RegisterComponent', () => {
 
       component.onSubmit();
 
-      expect(mockAlertService.success).toHaveBeenCalledWith('Registration successful', true);
+      expect(mockSnackbarService.create).toHaveBeenCalledWith('Registration successful', SnackBarType.Successful);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['../login'], { relativeTo: mockActivatedRoute });
     });
 
@@ -151,18 +150,18 @@ describe('RegisterComponent', () => {
 
       component.onSubmit();
 
-      expect(mockAlertService.error).toHaveBeenCalledWith('Username already exists', true);
+      expect(mockSnackbarService.create).toHaveBeenCalledWith('Registration failed', SnackBarType.Error, errorMessage);
       expect(component.loading).toBe(false);
       expect(mockRouter.navigate).not.toHaveBeenCalled();
     });
 
     it('should show specific server error message on failed registration', () => {
-      const errorMessage = 'Registration failed: Email \'asdf\' is invalid.';
+      const errorMessage = 'Email \'asdf\' is invalid.';
       mockAccountService.register.and.returnValue(throwError(() => errorMessage));
 
       component.onSubmit();
 
-      expect(mockAlertService.error).toHaveBeenCalledWith('Registration failed: Email \'asdf\' is invalid.', true);
+      expect(mockSnackbarService.create).toHaveBeenCalledWith('Registration failed', SnackBarType.Error, errorMessage);
       expect(component.loading).toBe(false);
       expect(mockRouter.navigate).not.toHaveBeenCalled();
     });

@@ -3,11 +3,10 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
 import { ThemeStorage, type DocsSiteTheme } from 'app/theme-picker/theme-storage/theme-storage';
 import { StyleManager } from 'app/theme-picker/style-manager/style-manager.component';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
-import { AlertComponent } from 'app/_components/alert.component';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +14,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 @Component({
   templateUrl: 'register.component.html',
@@ -29,7 +30,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    AlertComponent,
   ],
 })
 export class RegisterComponent extends OnPushBaseComponent implements OnInit {
@@ -37,7 +37,7 @@ export class RegisterComponent extends OnPushBaseComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly accountService = inject(AccountService);
-  private readonly alertService = inject(AlertService);
+  private readonly snackbarService = inject(SnackbarService);
   private readonly themeStorage = inject(ThemeStorage);
   private readonly styleManager = inject(StyleManager);
 
@@ -126,9 +126,8 @@ export class RegisterComponent extends OnPushBaseComponent implements OnInit {
     this.submitted = true;
     this.markForCheck();
 
-    this.alertService.clear();
-
     if (this.form.invalid) {
+      this.snackbarService.create('Registration failed', SnackBarType.Error, 'Form is invalid');
       return;
     }
 
@@ -138,11 +137,11 @@ export class RegisterComponent extends OnPushBaseComponent implements OnInit {
     this.subscribeAndMarkForCheck(
       this.accountService.register(this.form.value).pipe(first()),
       () => {
-        this.alertService.success('Registration successful', true);
+        this.snackbarService.create('Registration successful', SnackBarType.Successful);
         void this.router.navigate(['../login'], { relativeTo: this.route });
       },
       error => {
-        this.alertService.error(String(error), true);
+        this.snackbarService.create('Registration failed', SnackBarType.Error, String(error));
         this.loading = false;
         this.markForCheck();
       },

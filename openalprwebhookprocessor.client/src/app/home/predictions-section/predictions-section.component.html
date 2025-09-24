@@ -65,6 +65,7 @@
               <mat-list-item>
                 <div matListItemTitle>{{ prediction.licensePlate }}</div>
                 <div matListItemLine>
+                  <span class="time-badge">{{ prediction.formattedTime }}</span>
                   <span i18n class="pattern">{{ prediction.totalHistoricalVisits }} visits</span>
                 </div>
                 <mat-chip matListItemMeta

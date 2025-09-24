@@ -1,5 +1,4 @@
 import { type ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { MachineLearningComponent } from './machine-learning.component';
 import { MachineLearningService, type ModelInfo, type TrainingStatus, type MachineLearningConfigDto } from '../machine-learning.service';
@@ -68,10 +67,7 @@ describe('MachineLearningComponent', () => {
     const snackbarServiceSpy = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        MachineLearningComponent,
-        BrowserAnimationsModule,
-      ],
+      imports: [MachineLearningComponent],
       providers: [
         { provide: MachineLearningService, useValue: mlServiceSpy },
         { provide: SnackbarService, useValue: snackbarServiceSpy },

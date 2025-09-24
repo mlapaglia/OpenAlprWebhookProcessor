@@ -1,6 +1,6 @@
 /// <reference types="@angular/localize" />
 
-import { enableProdMode, isDevMode, importProvidersFrom, ENVIRONMENT_INITIALIZER, inject } from '@angular/core';
+import { enableProdMode, isDevMode, importProvidersFrom, inject, provideEnvironmentInitializer } from '@angular/core';
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -23,7 +23,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { LightboxModule } from 'ngx-lightbox';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
@@ -88,14 +87,9 @@ bootstrapApplication(AppComponent, {
       },
     },
     provideHttpClient(withInterceptorsFromDi()),
-    provideAnimations(),
     provideNativeDateAdapter(),
     // Configure Material Symbols
-    {
-      provide: ENVIRONMENT_INITIALIZER,
-      useFactory: configureIcons,
-      multi: true,
-    },
+    provideEnvironmentInitializer(configureIcons),
   ],
 })
   .catch(err => console.error(err));

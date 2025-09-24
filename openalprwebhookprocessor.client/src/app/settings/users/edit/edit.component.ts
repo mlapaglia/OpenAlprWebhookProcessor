@@ -1,7 +1,7 @@
 ﻿import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule, FormsModule, type FormGroup } from '@angular/forms';
 import { first } from 'rxjs/operators';
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
+import { SnackBarType } from 'app/snackbar/snackbartype';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
 
 interface DialogData {
   userId?: string;
@@ -39,7 +41,7 @@ export class AddEditComponent extends OnPushBaseComponent implements OnInit {
 
   private readonly formBuilder = inject(FormBuilder);
   private readonly accountService = inject(AccountService);
-  private readonly alertService = inject(AlertService);
+  private readonly snackbarService = inject(SnackbarService);
   private readonly dialogRef = inject(MatDialogRef<AddEditComponent>);
 
   form: FormGroup;
@@ -72,7 +74,7 @@ export class AddEditComponent extends OnPushBaseComponent implements OnInit {
           this.form.patchValue(user);
         },
         (error) => {
-          this.alertService.error(String(error));
+          this.snackbarService.create('Failed to load user', SnackBarType.Error, String(error));
         },
       );
     }
@@ -108,9 +110,6 @@ export class AddEditComponent extends OnPushBaseComponent implements OnInit {
     this.submitted = true;
     this.markForCheck();
 
-    // reset alerts on submit
-    this.alertService.clear();
-
     // stop here if form is invalid
     if (this.form.invalid) {
       return;
@@ -134,12 +133,12 @@ export class AddEditComponent extends OnPushBaseComponent implements OnInit {
     this.subscribeAndMarkForCheck(
       this.accountService.add(this.form.value).pipe(first()),
       () => {
-        this.alertService.success('User added successfully', true);
+        this.snackbarService.create('User added successfully', SnackBarType.Successful);
         this.loading = false;
         this.dialogRef.close(true);
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to add user', SnackBarType.Error, String(error));
         this.loading = false;
       },
     );
@@ -149,12 +148,12 @@ export class AddEditComponent extends OnPushBaseComponent implements OnInit {
     this.subscribeAndMarkForCheck(
       this.accountService.update(this.id, this.form.value).pipe(first()),
       () => {
-        this.alertService.success('Update successful', true);
+        this.snackbarService.create('Update successful', SnackBarType.Successful);
         this.loading = false;
         this.dialogRef.close(true);
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to update user', SnackBarType.Error, String(error));
         this.loading = false;
       },
     );

@@ -234,7 +234,7 @@ export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDe
       pageNumber: this.pageNumber,
       ...this.buildDateFilters(filters),
       ...this.buildVehicleFilters(filters),
-      plateNumber: plateNumber ?? filters?.plateNumber ?? '',
+      plateNumber: plateNumber ?? filters.plateNumber,
       strictMatch: false,
       ...this.buildBooleanFilters(filters),
     };

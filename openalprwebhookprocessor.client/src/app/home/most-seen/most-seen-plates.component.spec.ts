@@ -1,5 +1,4 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MostSeenPlatesComponent } from './most-seen-plates.component';
 
@@ -9,10 +8,7 @@ describe('MostSeenPlatesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        MostSeenPlatesComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [MostSeenPlatesComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MostSeenPlatesComponent);

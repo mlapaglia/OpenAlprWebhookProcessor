@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import type { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { of, throwError } from 'rxjs';
 import { EnrichersComponent } from './enrichers.component';
@@ -19,7 +18,7 @@ describe('EnrichersComponent', () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [EnrichersComponent, NoopAnimationsModule],
+      imports: [EnrichersComponent],
       providers: [
         { provide: EnrichersService, useValue: mockEnrichersService },
         { provide: SnackbarService, useValue: mockSnackbarService },

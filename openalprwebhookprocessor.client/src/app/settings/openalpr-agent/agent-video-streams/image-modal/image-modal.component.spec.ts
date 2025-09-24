@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 import { ImageModalComponent } from './image-modal.component';
 import { SettingsService } from '../../../settings.service';
@@ -22,7 +21,7 @@ describe('ImageModalComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [ImageModalComponent, NoopAnimationsModule],
+      imports: [ImageModalComponent],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: MatDialogRef, useValue: mockDialogRef },

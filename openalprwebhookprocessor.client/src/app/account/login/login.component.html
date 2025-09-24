@@ -56,20 +56,40 @@
         </div>
 
         <div class="login-actions">
-          <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit"
-            class="login-button full-width"
-            [disabled]="loading"
-            i18n>
-            @if (loading) {
-              <mat-spinner diameter="20" class="button-spinner" />
-              Signing In...
-            } @else {
-              Sign In
-            }
-          </button>
+          <app-refresh-button
+            [isLoading]="loading"
+            [disabled]="loading || passkeyLoading"
+            buttonType="raised"
+            color="primary"
+            buttonText="Sign In"
+            buttonRefreshingText="Signing In..."
+            [fullWidth]="true"
+            (refreshStarted)="onSubmit()"
+            class="login-button"
+            i18n-buttonText
+            i18n-buttonRefreshingText />
+
+          <div class="divider">
+            <span class="divider-text" i18n>or</span>
+          </div>
+
+          <app-refresh-button
+            [isLoading]="passkeyLoading"
+            [disabled]="loading || passkeyLoading || !f.username.value"
+            buttonType="raised"
+            color="accent"
+            buttonText="Sign in with Passkey"
+            buttonRefreshingText="Authenticating..."
+            icon="fingerprint"
+            [fullWidth]="true"
+            (refreshStarted)="authenticateWithPasskey()"
+            class="passkey-button"
+            i18n-buttonText
+            i18n-buttonRefreshingText />
+          
+          @if (!f.username.value) {
+            <p class="passkey-hint" i18n>Enter your username to use passkey authentication</p>
+          }
 
           @if (canRegister) {
             <div class="register-section">

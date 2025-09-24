@@ -1,5 +1,6 @@
 using Mediator;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OpenAlprWebhookProcessor.Features.Users.Data;
 using OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers;
 using System.Threading;
@@ -11,13 +12,16 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UsersContext _context;
 
         public AuthenticateCommandHandler(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            UsersContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         public async ValueTask<UserDto> Handle(AuthenticateCommand request, CancellationToken cancellationToken)
@@ -37,11 +41,16 @@ namespace OpenAlprWebhookProcessor.Features.Users.Commands.Authenticate
             if (!result.Succeeded)
                 throw new AppException("Username or password is incorrect");
 
+            // Check if user has passkeys
+            var hasPasskeys = await _context.PasskeyCredentials
+                .AnyAsync(p => p.UserId == user.Id, cancellationToken);
+
             var authUser = new UserDto
             {
                 FirstName = user.FirstName,
                 Id = user.Id,
                 TwoFactorEnabled = false,
+                HasPasskeys = hasPasskeys,
                 LastName = user.LastName,
                 Username = user.UserName,
             };

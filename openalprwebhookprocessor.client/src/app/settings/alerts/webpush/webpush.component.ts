@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, Component, inject, type OnDestroy, type OnInit } from '@angular/core';
 import { MatSlideToggleModule, type MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -22,18 +21,6 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './webpush.component.html',
   styleUrls: ['./webpush.component.css'],
-  animations: [
-    trigger('inOutAnimation', [
-      transition(':enter', [
-        style({ height: 0, opacity: 0 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 })),
-      ]),
-      transition(':leave', [
-        style({ height: '*', opacity: 1 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: 0, opacity: 0 })),
-      ]),
-    ]),
-  ],
   imports: [
     MatCardModule, MatSlideToggleModule, ReactiveFormsModule, FormsModule,
     MatFormFieldModule, MatInputModule, MatIconModule, MatTooltipModule,

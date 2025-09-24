@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CameraMaskComponent } from '../camera-mask/camera-mask.component';
 import type { Camera } from '../../camera';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
@@ -16,18 +15,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './camera-openalpr.component.html',
   styleUrls: ['./camera-openalpr.component.less'],
-  animations: [
-    trigger('inOutAnimation', [
-      transition(':enter', [
-        style({ height: 0, opacity: 0 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 })),
-      ]),
-      transition(':leave', [
-        style({ height: '*', opacity: 1 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: 0, opacity: 0 })),
-      ]),
-    ]),
-  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,

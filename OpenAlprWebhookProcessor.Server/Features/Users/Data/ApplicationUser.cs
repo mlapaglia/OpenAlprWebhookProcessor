@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace OpenAlprWebhookProcessor.Features.Users.Data
 {
@@ -7,5 +8,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Data
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+        public virtual ICollection<PasskeyCredential> PasskeyCredentials { get; set; } = new List<PasskeyCredential>();
     }
 }

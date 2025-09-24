@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlateNotesComponent } from './plate-notes.component';
 import { Plate } from '../plate';
 
@@ -22,7 +21,6 @@ describe('PlateNotesComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        BrowserAnimationsModule,
         FormsModule,
         MatButtonModule,
         MatCardModule,

@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { PlateNumberCellComponent } from './plate-number-cell.component';
 import type { IPlateSetting } from '../shared/plate-setting.interface';
 
@@ -27,7 +26,6 @@ describe('PlateNumberCellComponent', () => {
       imports: [
         PlateNumberCellComponent,
         FormsModule,
-        NoopAnimationsModule,
       ],
     }).compileComponents();
 

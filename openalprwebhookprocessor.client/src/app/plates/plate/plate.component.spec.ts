@@ -5,7 +5,6 @@ import { Lightbox, LightboxConfig, LightboxEvent } from 'ngx-lightbox';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DatePipe } from '@angular/common';
 import { PlateService } from '../plate.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('PlateComponent', () => {
@@ -14,10 +13,7 @@ describe('PlateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        PlateComponent,
-      ],
+      imports: [PlateComponent],
       providers: [
         DatePipe,
         Lightbox,

@@ -49,6 +49,7 @@ export class PredictionsSectionComponent {
   get predictablePlatesWithFormatting() {
     return this.predictablePlates().map(prediction => ({
       ...prediction,
+      formattedTime: this.formatTimeUntil(prediction.predictedNextSeen),
       confidenceColor: this.getConfidenceColor(prediction.confidenceScore),
       confidencePercentage: (prediction.confidenceScore * 100).toFixed(0),
     }));

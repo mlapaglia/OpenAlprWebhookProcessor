@@ -53,7 +53,7 @@ namespace OpenAlprWebhookProcessor.Features.MachineLearning.Services
                     var nextTime = DateTimeOffset.FromUnixTimeMilliseconds(next.ReceivedOnEpoch).DateTime;
                     var hoursUntilNext = (float)(nextTime - currentTime).TotalHours;
 
-                    if (hoursUntilNext > 0 && hoursUntilNext < 96) // Less than 4 days - filter out irregular visitors
+                    if (hoursUntilNext > 0 && hoursUntilNext < 96) // Include intervals less than 4 days (96 hours)
                     {
                         var features = ExtractFeatures(current, sightings.Take(i + 1).ToList());
                         features.HoursUntilNextSeen = hoursUntilNext;

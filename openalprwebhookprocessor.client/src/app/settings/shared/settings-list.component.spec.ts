@@ -1,6 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatTableDataSource } from '@angular/material/table';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SettingsListComponent } from './settings-list.component';
 import type { PlateSettingsConfig } from './plate-settings-table.component';
@@ -47,10 +46,7 @@ describe('SettingsListComponent', () => {
     mockConfig = createMockConfig();
 
     await TestBed.configureTestingModule({
-      imports: [
-        SettingsListComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [SettingsListComponent],
       providers: [{ provide: MatSnackBar, useValue: mockSnackBar }],
     }).compileComponents();
 

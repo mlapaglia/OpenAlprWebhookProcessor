@@ -2,8 +2,6 @@ using AwesomeAssertions;
 using NUnit.Framework;
 using OpenAlprWebhookProcessor.Features.Settings.Queries.GetVersion;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Tests.TestHelpers;
 
 namespace Tests.Features.Settings.Queries.GetVersion

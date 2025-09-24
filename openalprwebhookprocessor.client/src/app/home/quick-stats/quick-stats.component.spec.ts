@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { QuickStatsComponent } from './quick-stats.component';
 import type { QuickStats } from './../home.service';
@@ -20,10 +19,7 @@ describe('QuickStatsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        QuickStatsComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [QuickStatsComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(QuickStatsComponent);

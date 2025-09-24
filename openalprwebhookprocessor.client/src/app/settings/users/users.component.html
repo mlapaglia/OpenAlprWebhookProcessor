@@ -52,6 +52,10 @@
                 <mat-icon>security</mat-icon>
                 Manage 2FA
               </button>
+              <button i18n mat-raised-button color="accent" (click)="managePasskeys(row)" class="action-button">
+                <mat-icon>fingerprint</mat-icon>
+                Manage Passkeys
+              </button>
               <button i18n mat-raised-button color="warn" (click)="deleteUser(row.id)" [disabled]="row.isDeleting" class="action-button">
                 @if (row.isDeleting) {
                   <mat-spinner diameter="16" style="margin-right: 8px;" />
@@ -105,6 +109,10 @@
                 <button i18n mat-raised-button color="accent" (click)="manage2FA(user)" class="card-action-button">
                   <mat-icon>security</mat-icon>
                   Manage 2FA
+                </button>
+                <button i18n mat-raised-button color="accent" (click)="managePasskeys(user)" class="card-action-button">
+                  <mat-icon>fingerprint</mat-icon>
+                  Manage Passkeys
                 </button>
                 <button i18n mat-raised-button color="warn" (click)="deleteUser(user.id)" [disabled]="user.isDeleting" class="card-action-button">
                   @if (user.isDeleting) {

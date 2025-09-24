@@ -1,18 +1,32 @@
-mat-card {
+.user-form-card {
   width: 100%;
   margin: 0;
   box-shadow: none;
   border-radius: 0;
+  overflow: visible;
 }
 
-mat-card-header {
-  padding: 16px 20px 8px;
+.card-header {
+  padding: 24px 24px 16px;
+  background: linear-gradient(135deg, var(--mdc-theme-primary, #1976d2) 0%, var(--mdc-theme-primary-variant, #1565c0) 100%);
+  color: var(--mdc-theme-on-primary, #ffffff);
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-mat-card-header h1 {
-  font-size: 1.25rem;
+.header-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  opacity: 0.9;
+}
+
+.card-title h1 {
   margin: 0;
+  font-size: 28px;
   font-weight: 500;
+  letter-spacing: -0.5px;
 }
 
 mat-card-content {

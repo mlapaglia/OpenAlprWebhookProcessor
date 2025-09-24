@@ -1,6 +1,6 @@
 import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { first } from 'rxjs/operators';
-import { AccountService, AlertService } from 'app/_services';
+import { AccountService } from 'app/_services';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,8 @@ import { QrCodeDisplayComponent } from '../../../shared/qr-code-display/qr-code-
 import { ConfirmationDialogComponent, type ConfirmationDialogData } from '../../../shared/confirmation-dialog/confirmation-dialog.component';
 import { TwoFactorCodeInputComponent } from '../../../shared/two-factor-code-input/two-factor-code-input.component';
 import { RecoveryCodesDisplayComponent } from '../../../shared/recovery-codes-display/recovery-codes-display.component';
+import { SnackbarService } from 'app/snackbar/snackbar.service';
+import { SnackBarType } from 'app/snackbar/snackbartype';
 
 @Component({
   selector: 'app-user-2fa',
@@ -41,7 +43,7 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
   data = inject<DialogData>(MAT_DIALOG_DATA);
 
   private readonly accountService = inject(AccountService);
-  private readonly alertService = inject(AlertService);
+  private readonly snackbarService = inject(SnackbarService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<User2FAComponent>);
 
@@ -74,7 +76,7 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
         }
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to load two-factor status', SnackBarType.Error, error as string);
       },
     );
   }
@@ -90,7 +92,7 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
         this.setupLoading = false;
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to setup two-factor', SnackBarType.Error, String(error));
         this.setupLoading = false;
       },
     );
@@ -105,10 +107,10 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
         this.recoveryCodes = result.recoveryCodes;
         this.twoFactorEnabled = true;
         this.loading = false;
-        this.alertService.success('Two-factor authentication has been enabled successfully for this user!');
+        this.snackbarService.create('Two-factor authentication has been enabled successfully for this user!', SnackBarType.Successful);
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to enable two-factor', SnackBarType.Error, String(error));
         this.loading = false;
       },
     );
@@ -140,11 +142,11 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
               this.recoveryCodes = [];
               this.qrCodeUri = '';
               this.sharedKey = '';
-              this.alertService.success('Two-factor authentication has been disabled for this user.');
+              this.snackbarService.create('Two-factor authentication has been disabled for this user.', SnackBarType.Successful);
               this.setupTwoFactor();
             },
             (error) => {
-              this.alertService.error(String(error));
+              this.snackbarService.create('Failed to disable two-factor', SnackBarType.Error, String(error));
             },
           );
         }
@@ -157,10 +159,10 @@ export class User2FAComponent extends OnPushBaseComponent implements OnInit {
       this.accountService.getRecoveryCodesForUser(this.userId).pipe(first()),
       (result) => {
         this.recoveryCodes = result.recoveryCodes;
-        this.alertService.success('New recovery codes have been generated for this user.');
+        this.snackbarService.create('New recovery codes have been generated for this user.', SnackBarType.Successful);
       },
       (error) => {
-        this.alertService.error(String(error));
+        this.snackbarService.create('Failed to generate new recovery codes', SnackBarType.Error, String(error));
       },
     );
   }

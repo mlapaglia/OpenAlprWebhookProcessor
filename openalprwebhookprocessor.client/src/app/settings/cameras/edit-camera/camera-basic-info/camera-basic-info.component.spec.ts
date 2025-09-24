@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChangeDetectorRef } from '@angular/core';
 
 import { CameraBasicInfoComponent } from './camera-basic-info.component';
@@ -46,7 +45,6 @@ describe('CameraBasicInfoComponent', () => {
       imports: [
         CameraBasicInfoComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();
@@ -231,19 +229,19 @@ describe('CameraBasicInfoComponent', () => {
       const validFormatIPs = ['0.0.0.0', '192.168.1.1', '255.255.255.255', '10.0.0.1', '999.999.999.999'];
       validFormatIPs.forEach(ip => {
         ipControl?.setValue(ip);
-        expect(ipControl?.hasError('pattern')).toBe(false, `${ip} should match pattern`);
+        expect(ipControl?.hasError('pattern')).withContext(`${ip} should match pattern`).toBe(false);
       });
 
       // Invalid format IPs
       const invalidFormatIPs = ['192.168.1', 'invalid', '192.168.1.1.1'];
       invalidFormatIPs.forEach(ip => {
         ipControl?.setValue(ip);
-        expect(ipControl?.hasError('pattern')).toBe(true, `${ip} should not match pattern`);
+        expect(ipControl?.hasError('pattern')).withContext(`${ip} should not match pattern`).toBe(true);
       });
 
       // Empty should have required error
       ipControl?.setValue('');
-      expect(ipControl?.hasError('required')).toBe(true, 'Empty should be required error');
+      expect(ipControl?.hasError('required')).withContext('Empty should be required error').toBe(true);
     });
   });
 

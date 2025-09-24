@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
 
 import { Setup2FAComponent } from './setup-2fa.component';
@@ -54,10 +53,7 @@ describe('Setup2FAComponent', () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        Setup2FAComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [Setup2FAComponent],
       providers: [
         { provide: AccountService, useValue: mockAccountService },
         { provide: Router, useValue: mockRouter },

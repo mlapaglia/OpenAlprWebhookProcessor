@@ -1,7 +1,6 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -19,6 +18,33 @@ import { ThemeStorage, type DocsSiteTheme } from 'app/theme-picker/theme-storage
 import { StyleManager } from 'app/theme-picker/style-manager/style-manager.component';
 import type { User } from 'app/_models';
 
+interface PasskeyAuthenticationOptions {
+  options: PublicKeyCredentialRequestOptions;
+}
+
+// Mock global navigator.credentials for WebAuthn
+const mockNavigator = {
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+  credentials: {
+    get: jasmine.createSpy('get').and.returnValue(
+      Promise.resolve({
+        id: 'test-credential-id',
+        rawId: new ArrayBuffer(8),
+        type: 'public-key',
+        authenticatorAttachment: null,
+        response: {
+          authenticatorData: new ArrayBuffer(8),
+          clientDataJSON: new ArrayBuffer(8),
+          signature: new ArrayBuffer(8),
+          userHandle: new ArrayBuffer(8),
+        },
+        getClientExtensionResults: () => ({}),
+        toJSON: () => ({}),
+      } as unknown as PublicKeyCredential),
+    ),
+  },
+};
+
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
@@ -33,7 +59,12 @@ describe('LoginComponent', () => {
   beforeEach(async () => {
     themeUpdateSubject = new Subject<DocsSiteTheme>();
 
-    mockAccountService = jasmine.createSpyObj('AccountService', ['canRegister', 'login']);
+    mockAccountService = jasmine.createSpyObj('AccountService', [
+      'canRegister',
+      'login',
+      'authenticatePasskey',
+      'completePasskeyAuthentication',
+    ]);
     mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl', 'navigate']);
     mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: { queryParams: {} },
@@ -47,11 +78,48 @@ describe('LoginComponent', () => {
     mockAccountService.canRegister.and.returnValue(of(true));
     mockStyleManager.setStyle.and.returnValue(Promise.resolve());
 
+    // Mock global navigator for WebAuthn
+    Object.defineProperty(globalThis, 'navigator', {
+      value: mockNavigator,
+      writable: true,
+    });
+
+    // Mock window.PublicKeyCredential
+    Object.defineProperty(globalThis, 'PublicKeyCredential', {
+      value: function PublicKeyCredential() {
+        // Mock constructor
+      },
+      writable: true,
+    });
+
+    // Mock base64 encoding functions
+    Object.defineProperty(globalThis, 'atob', {
+      value: (str: string) => {
+        // Simple base64 decode mock for testing
+        try {
+          return Buffer.from(str, 'base64').toString('binary');
+        } catch {
+          return str; // Fallback for invalid base64
+        }
+      },
+      writable: true,
+    });
+    Object.defineProperty(globalThis, 'btoa', {
+      value: (str: string) => {
+        // Simple base64 encode mock for testing
+        try {
+          return Buffer.from(str, 'binary').toString('base64');
+        } catch {
+          return str; // Fallback for invalid input
+        }
+      },
+      writable: true,
+    });
+
     await TestBed.configureTestingModule({
       imports: [
         LoginComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
         MatCardModule,
         MatFormFieldModule,
         MatInputModule,
@@ -173,6 +241,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
 
       component.ngOnInit();
@@ -211,6 +280,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
 
@@ -228,6 +298,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: false,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockActivatedRoute.snapshot.queryParams = { returnUrl: '/dashboard' };
@@ -246,6 +317,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: true,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockRouter.navigate.and.returnValue(Promise.resolve(true));
@@ -255,6 +327,8 @@ describe('LoginComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/verify-2fa'], {
         queryParams: {
           userId: 123,
+          username: 'testuser',
+          hasPasskeys: false,
           rememberMe: false,
           returnUrl: '/',
         },
@@ -270,6 +344,7 @@ describe('LoginComponent', () => {
         firstName: 'Test',
         lastName: 'User',
         twoFactorEnabled: true,
+        hasPasskeys: false,
       };
       mockAccountService.login.and.returnValue(of(loginResponse));
       mockActivatedRoute.snapshot.queryParams = { returnUrl: '/dashboard' };
@@ -282,6 +357,8 @@ describe('LoginComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/account/verify-2fa'], {
         queryParams: {
           userId: 456,
+          username: 'testuser',
+          hasPasskeys: false,
           rememberMe: true,
           returnUrl: '/dashboard',
         },
@@ -342,6 +419,265 @@ describe('LoginComponent', () => {
       component.ngOnInit();
 
       expect(component.canRegister).toBe(false);
+    });
+  });
+
+  describe('passkey authentication', () => {
+    beforeEach(() => {
+      component.ngOnInit();
+      component.form.patchValue({
+        username: 'testuser',
+        password: 'testpass',
+        rememberMe: false,
+      });
+    });
+
+    it('should require username for passkey authentication', async () => {
+      component.form.patchValue({ username: '' });
+
+      await component.authenticateWithPasskey();
+
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Please enter your username first',
+        SnackBarType.Error,
+      );
+      expect(mockAccountService.authenticatePasskey).not.toHaveBeenCalled();
+    });
+
+    it('should successfully authenticate with passkey', async () => {
+      const mockAuthOptions: PasskeyAuthenticationOptions = {
+        options: {
+          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
+          allowCredentials: [
+            {
+              id: 'dGVzdC1jcmVkLWlk' as unknown as ArrayBuffer,
+              type: 'public-key' as const,
+              transports: ['usb', 'nfc'],
+            },
+          ],
+          userVerification: 'preferred',
+          timeout: 60000,
+        } as PublicKeyCredentialRequestOptions,
+      };
+
+      mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
+      const mockUser: User = {
+        id: 123,
+        isDeleting: false,
+        password: '',
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        twoFactorEnabled: false,
+        hasPasskeys: true,
+      };
+      mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
+      mockActivatedRoute.snapshot.queryParams = { returnUrl: '/dashboard' };
+
+      await component.authenticateWithPasskey();
+
+      expect(mockAccountService.authenticatePasskey).toHaveBeenCalledWith('testuser');
+      expect(mockAccountService.completePasskeyAuthentication).toHaveBeenCalled();
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+      expect(component.passkeyLoading).toBe(false);
+    });
+
+    it('should handle WebAuthn not supported error', async () => {
+      // Mock navigator.credentials as undefined
+      Object.defineProperty(globalThis, 'navigator', {
+        value: {
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        },
+        writable: true,
+      });
+
+      await component.authenticateWithPasskey();
+
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Passkey authentication failed: Passkeys are not supported in this browser',
+        SnackBarType.Error,
+      );
+      expect(component.passkeyLoading).toBe(false);
+
+      // Restore navigator
+      Object.defineProperty(globalThis, 'navigator', {
+        value: mockNavigator,
+        writable: true,
+      });
+    });
+
+    it('should handle authentication options error', async () => {
+      mockAccountService.authenticatePasskey.and.returnValue(throwError(() => new Error('Options failed')));
+
+      await component.authenticateWithPasskey();
+
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Passkey authentication failed: Options failed',
+        SnackBarType.Error,
+      );
+      expect(component.passkeyLoading).toBe(false);
+    });
+
+    it('should handle credential get failure', async () => {
+      const mockAuthOptions: PasskeyAuthenticationOptions = {
+        options: {
+          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
+          allowCredentials: [],
+          userVerification: 'preferred',
+          timeout: 60000,
+        } as PublicKeyCredentialRequestOptions,
+      };
+
+      mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
+      mockNavigator.credentials.get.and.returnValue(Promise.resolve(null));
+
+      await component.authenticateWithPasskey();
+
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        jasmine.stringContaining('Passkey authentication failed:'),
+        SnackBarType.Error,
+      );
+      expect(component.passkeyLoading).toBe(false);
+    });
+
+    it('should handle authentication completion failure', async () => {
+      const mockAuthOptions: PasskeyAuthenticationOptions = {
+        options: {
+          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
+          allowCredentials: [],
+          userVerification: 'preferred',
+          timeout: 60000,
+        } as PublicKeyCredentialRequestOptions,
+      };
+
+      mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
+      mockAccountService.completePasskeyAuthentication.and.returnValue(throwError(() => new Error('Verification failed')));
+
+      // Ensure credentials.get returns a valid credential for this test
+      mockNavigator.credentials.get.and.returnValue(
+        Promise.resolve({
+          id: 'test-credential-id',
+          rawId: new ArrayBuffer(8),
+          type: 'public-key',
+          authenticatorAttachment: null,
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+          getClientExtensionResults: () => ({}),
+          toJSON: () => ({}),
+        } as unknown as PublicKeyCredential),
+      );
+
+      await component.authenticateWithPasskey();
+
+      expect(mockSnackbarService.create).toHaveBeenCalledWith(
+        'Passkey authentication failed: Verification failed',
+        SnackBarType.Error,
+      );
+      expect(component.passkeyLoading).toBe(false);
+    });
+
+    it('should navigate to default route after successful passkey auth', async () => {
+      const mockAuthOptions: PasskeyAuthenticationOptions = {
+        options: {
+          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
+          allowCredentials: [],
+          userVerification: 'preferred',
+          timeout: 60000,
+        } as PublicKeyCredentialRequestOptions,
+      };
+
+      mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
+      const mockUser: User = {
+        id: 123,
+        isDeleting: false,
+        password: '',
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        twoFactorEnabled: false,
+        hasPasskeys: true,
+      };
+      mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
+      mockActivatedRoute.snapshot.queryParams = {}; // No returnUrl
+
+      // Reset navigator mock to ensure it works properly
+      mockNavigator.credentials.get.and.returnValue(
+        Promise.resolve({
+          id: 'test-credential-id',
+          rawId: new ArrayBuffer(8),
+          type: 'public-key',
+          authenticatorAttachment: null,
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+          getClientExtensionResults: () => ({}),
+          toJSON: () => ({}),
+        } as unknown as PublicKeyCredential),
+      );
+
+      await component.authenticateWithPasskey();
+
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/');
+    });
+
+    it('should set loading state during passkey authentication', async () => {
+      const mockAuthOptions: PasskeyAuthenticationOptions = {
+        options: {
+          challenge: 'dGVzdC1jaGFsbGVuZ2U' as unknown as ArrayBuffer,
+          allowCredentials: [],
+          userVerification: 'preferred',
+          timeout: 60000,
+        } as PublicKeyCredentialRequestOptions,
+      };
+
+      mockAccountService.authenticatePasskey.and.returnValue(of(mockAuthOptions));
+      const mockUser: User = {
+        id: 123,
+        isDeleting: false,
+        password: '',
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        twoFactorEnabled: false,
+        hasPasskeys: true,
+      };
+      mockAccountService.completePasskeyAuthentication.and.returnValue(of(mockUser));
+
+      // Reset navigator mock to ensure it works properly
+      mockNavigator.credentials.get.and.returnValue(
+        Promise.resolve({
+          id: 'test-credential-id',
+          rawId: new ArrayBuffer(8),
+          type: 'public-key',
+          authenticatorAttachment: null,
+          response: {
+            authenticatorData: new ArrayBuffer(8),
+            clientDataJSON: new ArrayBuffer(8),
+            signature: new ArrayBuffer(8),
+            userHandle: new ArrayBuffer(8),
+          },
+          getClientExtensionResults: () => ({}),
+          toJSON: () => ({}),
+        } as unknown as PublicKeyCredential),
+      );
+
+      const promise = component.authenticateWithPasskey();
+
+      // Check loading state is set
+      expect(component.passkeyLoading).toBe(true);
+
+      // Wait for completion
+      await promise;
+
+      // Check final state
+      expect(component.passkeyLoading).toBe(false);
     });
   });
 });

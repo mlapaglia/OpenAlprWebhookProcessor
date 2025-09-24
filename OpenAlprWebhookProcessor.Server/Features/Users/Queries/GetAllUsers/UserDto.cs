@@ -11,5 +11,7 @@ namespace OpenAlprWebhookProcessor.Features.Users.Queries.GetAllUsers
         public string LastName { get; set; }
 
         public bool TwoFactorEnabled { get; set; }
+
+        public bool HasPasskeys { get; set; }
     }
 }

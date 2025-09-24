@@ -1,6 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
@@ -28,7 +27,6 @@ describe('PlateSettingsFormComponent', () => {
       imports: [
         PlateSettingsFormComponent,
         ReactiveFormsModule,
-        BrowserAnimationsModule,
       ],
       providers: [provideNativeDateAdapter()],
     }).compileComponents();

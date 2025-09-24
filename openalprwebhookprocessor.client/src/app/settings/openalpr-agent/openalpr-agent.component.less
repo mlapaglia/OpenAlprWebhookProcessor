@@ -1,0 +1,42 @@
+/* Default spacing for agent action buttons */
+mat-card-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Default spacing for bottom action buttons (Save and Start Scrape) */
+.bottom-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Mobile responsive styling for agent action buttons */
+@media (max-width: 768px) {
+  mat-card-actions {
+    flex-direction: column;
+    gap: 8px;
+    
+    app-refresh-button {
+      width: 100%;
+      
+      ::ng-deep button {
+        width: 100%;
+      }
+    }
+  }
+  
+  /* Mobile responsive styling for bottom action buttons */
+  .bottom-actions {
+    flex-direction: column;
+    gap: 8px;
+    
+    app-refresh-button {
+      width: 100%;
+      
+      ::ng-deep button {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+
+  <div class="dialog-header">
+    <mat-icon class="header-icon">fingerprint</mat-icon>
+    <div>
+      <h1 mat-dialog-title>Manage Passkeys for {{ userName }}</h1>
+    </div>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="loading-state">
+        <mat-spinner diameter="40" />
+        <p>Loading passkeys...</p>
+      </div>
+    }
+
+    <!-- Existing Passkeys -->
+    @if (!loading && passkeys.length > 0) {
+      <div class="section">
+        <h3 class="section-title">
+          <mat-icon>security</mat-icon>
+          Your Passkeys ({{ passkeys.length }})
+        </h3>
+        
+        <div class="passkeys-grid">
+          @for (passkey of passkeys; track passkey.id) {
+            <div class="passkey-card">
+              <div class="passkey-header">
+                <mat-icon>fingerprint</mat-icon>
+                <div>
+                  <div class="passkey-name">{{ passkey.name }}</div>
+                  <div class="passkey-date">{{ passkey.regDate | date:'short' }}</div>
+                </div>
+              </div>
+              <button 
+                mat-icon-button 
+                color="warn" 
+                class="delete-btn"
+                (click)="deletePasskey(passkey)"
+                matTooltip="Delete passkey">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+      
+      <mat-divider />
+    }
+
+    <!-- Registration Form -->
+    <div class="section">
+      <h3 class="section-title">
+        <mat-icon>add</mat-icon>
+        Add New Passkey
+      </h3>
+      <div class="passkey-card">
+        <form [formGroup]="registrationForm" (ngSubmit)="registerPasskey()" class="registration-form">
+          <mat-form-field appearance="outline" class="name-field">
+            <mat-label>Passkey Name</mat-label>
+            <input 
+            matInput 
+            formControlName="name" 
+            placeholder="e.g., My iPhone, Work Laptop"
+            maxlength="50">
+          <mat-icon matSuffix>label</mat-icon>
+          @if (registrationForm.get('name')?.errors?.['required']) {
+            <mat-error>Passkey name is required</mat-error>
+          }
+          @if (registrationForm.get('name')?.errors?.['maxlength']) {
+            <mat-error>Name must be 50 characters or less</mat-error>
+          }
+        </mat-form-field>
+        
+        <app-refresh-button
+          [isLoading]="registering"
+          [disabled]="registrationForm.invalid"
+          buttonType="raised"
+          buttonText="Register Passkey"
+          buttonRefreshingText="Registering..."
+          color="primary"
+          icon="add"
+          class="register-btn"
+          (refreshStarted)="registerPasskey()" />
+        </form>
+      </div>
+    </div>
+
+    <mat-divider />
+
+    <!-- Info Section -->
+    <div class="section info-section">
+      <h3 class="section-title">
+        <mat-icon>info</mat-icon>
+        About Passkeys
+      </h3>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <mat-icon>security</mat-icon>
+          <span>Uses device security (Face ID, Touch ID, Windows Hello)</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>shield</mat-icon>
+          <span>More secure than passwords, can't be phished</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>verified_user</mat-icon>
+          <span>Can bypass 2FA requirements</span>
+        </div>
+        <div class="info-item">
+          <mat-icon>lock</mat-icon>
+          <span>Private keys never leave your device</span>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()">Close</button>
+  </mat-dialog-actions>
+  

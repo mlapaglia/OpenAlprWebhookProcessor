@@ -1,6 +1,7 @@
 import { Component, type OnInit, type OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { first } from 'rxjs/operators';
 
 import { AccountService } from '../account.service';
@@ -15,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { SnackBarType } from 'app/snackbar/snackbartype';
+import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-verify-2fa',
@@ -30,6 +32,7 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    RefreshButtonComponent,
   ],
 })
 export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
@@ -42,8 +45,11 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
 
   form!: FormGroup;
   loading = false;
+  passkeyLoading = false;
   submitted = false;
   userId!: string;
+  username!: string;
+  hasPasskeys = false;
   rememberMe = false;
   returnUrl = '/';
 
@@ -56,8 +62,9 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
       code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
     });
 
-    // Get parameters from query string
     this.userId = this.route.snapshot.queryParams['userId'];
+    this.username = this.route.snapshot.queryParams['username'];
+    this.hasPasskeys = this.route.snapshot.queryParams['hasPasskeys'] === 'true';
     this.rememberMe = this.route.snapshot.queryParams['rememberMe'] === 'true';
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] ?? '/';
 
@@ -65,7 +72,6 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
       void this.router.navigate(['/account/login']);
     }
 
-    // Initialize theme
     this.initializeTheme();
   }
 
@@ -74,13 +80,11 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
   }
 
   private initializeTheme() {
-    // Set initial theme
     const storedTheme = this.themeStorage.getStoredThemeName();
     this.currentThemeName = storedTheme ?? 'indigo-pink';
     this.themeLoaded = true;
     this.markForCheck();
 
-    // Subscribe to theme changes
     this.subscribeAndMarkForCheck(
       this.themeStorage.onThemeUpdate,
       (theme: DocsSiteTheme) => {
@@ -116,5 +120,101 @@ export class Verify2FAComponent extends OnPushBaseComponent implements OnInit, O
           this.markForCheck();
         },
       });
+  }
+
+  async authenticateWithPasskey() {
+    if (!this.username) {
+      this.snackbarService.create('Username not available for passkey authentication', SnackBarType.Error);
+      return;
+    }
+
+    this.passkeyLoading = true;
+    this.markForCheck();
+
+    try {
+      if (!('credentials' in navigator) || !('PublicKeyCredential' in window)) {
+        throw new Error('Passkeys are not supported in this browser');
+      }
+
+      const optionsResponse = await firstValueFrom(this.accountService.authenticatePasskey(this.username));
+
+
+
+      const credential = await navigator.credentials.get({
+        publicKey: this.convertAuthenticationOptions(optionsResponse.options),
+      }) as PublicKeyCredential | null;
+
+      if (!credential) {
+        throw new Error('Failed to authenticate with passkey');
+      }
+
+      const assertionResponse = this.encodeAssertionResponse(credential);
+
+      await firstValueFrom(this.accountService.completePasskeyAuthentication(
+        this.username,
+        assertionResponse,
+        this.rememberMe,
+      ));
+
+      void this.router.navigateByUrl(this.returnUrl);
+
+    } catch (error) {
+      console.error('Passkey authentication error:', error);
+      this.snackbarService.create(
+        `Passkey authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        SnackBarType.Error,
+      );
+    } finally {
+      this.passkeyLoading = false;
+      this.markForCheck();
+    }
+  }
+
+  private convertAuthenticationOptions(options: PublicKeyCredentialRequestOptions): PublicKeyCredentialRequestOptions {
+    return {
+      ...options,
+      challenge: this.base64urlToBuffer(options.challenge as unknown as string),
+      allowCredentials: options.allowCredentials?.map((cred) => ({
+        ...cred,
+        id: this.base64urlToBuffer(cred.id as unknown as string),
+      })),
+    };
+  }
+
+  private encodeAssertionResponse(credential: PublicKeyCredential): string {
+    const response = credential.response as AuthenticatorAssertionResponse;
+
+    return JSON.stringify({
+      id: credential.id,
+      rawId: this.bufferToBase64url(credential.rawId),
+      type: credential.type,
+      response: {
+        authenticatorData: this.bufferToBase64url(response.authenticatorData),
+        clientDataJSON: this.bufferToBase64url(response.clientDataJSON),
+        signature: this.bufferToBase64url(response.signature),
+        userHandle: response.userHandle ? this.bufferToBase64url(response.userHandle) : null,
+      },
+    });
+  }
+
+  private base64urlToBuffer(base64url: string): ArrayBuffer {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    const binary = atob(padded);
+    const buffer = new ArrayBuffer(binary.length);
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+  }
+
+  private bufferToBase64url(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   }
 }

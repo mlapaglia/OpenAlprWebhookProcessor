@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 
 import { QrCodeDisplayComponent } from './qr-code-display.component';
@@ -10,10 +9,7 @@ describe('QrCodeDisplayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        QrCodeDisplayComponent,
-        NoopAnimationsModule,
-      ],
+      imports: [QrCodeDisplayComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(QrCodeDisplayComponent);

@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -30,7 +29,6 @@ describe('PredictionsSectionComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         PredictionsSectionComponent,
-        NoopAnimationsModule,
         MatCardModule,
         MatListModule,
         MatIconModule,
@@ -309,11 +307,13 @@ describe('PredictionsSectionComponent', () => {
       expect(result).toEqual([
         {
           ...mockPredictions[0],
+          formattedTime: jasmine.any(String),
           confidenceColor: '#4CAF50',
           confidencePercentage: '95',
         },
         {
           ...mockPredictions[1],
+          formattedTime: jasmine.any(String),
           confidenceColor: '#FF9800',
           confidencePercentage: '50',
         },

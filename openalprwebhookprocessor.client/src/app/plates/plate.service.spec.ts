@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { PlateService, PlateRequest } from './plate.service';
 import { type Plate } from './plate/plate';
 import { type PlateResponse } from './plate/plateResponse';
@@ -13,8 +14,11 @@ describe('PlateService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [PlateService],
+      providers: [
+        PlateService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(PlateService);
     httpMock = TestBed.inject(HttpTestingController);

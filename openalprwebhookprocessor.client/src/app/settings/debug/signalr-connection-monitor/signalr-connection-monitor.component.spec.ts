@@ -1,6 +1,6 @@
 import { TestBed, type ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { SignalrConnectionMonitorComponent } from './signalr-connection-monitor.component';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -41,10 +41,12 @@ describe('SignalrConnectionMonitorComponent', () => {
     mockSnackbarService = jasmine.createSpyObj('SnackbarService', ['create']);
 
     await TestBed.configureTestingModule({
-      imports: [SignalrConnectionMonitorComponent, HttpClientTestingModule, NoopAnimationsModule],
+      imports: [SignalrConnectionMonitorComponent],
       providers: [
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: SnackbarService, useValue: mockSnackbarService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     }).compileComponents();
 

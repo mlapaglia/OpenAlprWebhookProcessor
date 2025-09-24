@@ -1,5 +1,4 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ChartsComponent } from './charts.component';
 import { ChartService } from './charts.service';
 
@@ -27,7 +26,7 @@ describe('ChartsComponent', () => {
     mockChartService.createHourlyChart.and.returnValue(mockChart);
 
     await TestBed.configureTestingModule({
-      imports: [ChartsComponent, NoopAnimationsModule],
+      imports: [ChartsComponent],
       providers: [{ provide: ChartService, useValue: mockChartService }],
     }).compileComponents();
 

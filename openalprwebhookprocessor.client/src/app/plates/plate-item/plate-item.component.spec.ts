@@ -1,6 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, input, NO_ERRORS_SCHEMA } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DatePipe } from '@angular/common';
 import { PlateItemComponent, type PlateData } from './plate-item.component';
 import { VehicleLogoService } from '../vehicle-logo.service';
@@ -45,7 +44,6 @@ describe('PlateItemComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         PlateItemComponent,
-        BrowserAnimationsModule,
         MockPlateComponent,
         RefreshButtonComponent,
       ],

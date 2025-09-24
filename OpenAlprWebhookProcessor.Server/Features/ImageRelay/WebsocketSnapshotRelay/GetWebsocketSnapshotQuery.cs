@@ -1,5 +1,4 @@
 using Mediator;
-using System;
 using System.IO;
 
 namespace OpenAlprWebhookProcessor.Features.ImageRelay.WebsocketSnapshotRelay

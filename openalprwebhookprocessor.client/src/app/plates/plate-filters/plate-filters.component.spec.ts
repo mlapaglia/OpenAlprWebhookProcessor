@@ -1,7 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -63,7 +62,6 @@ describe('PlateFiltersComponent', () => {
       imports: [
         PlateFiltersComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
         MatCardModule,
         MatFormFieldModule,
         MatInputModule,
@@ -155,7 +153,6 @@ describe('PlateFiltersComponent', () => {
       expect(component.showSearchError).toBeDefined();
       expect(component.showDateRangeError).toBeDefined();
       expect(component.isSearchDisabled).toBeDefined();
-      expect(component.isModelDisabled).toBeDefined();
     });
   });
 

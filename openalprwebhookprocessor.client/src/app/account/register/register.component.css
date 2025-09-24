@@ -131,11 +131,6 @@
   align-items: center;
 }
 
-.login-card-wrapper app-alert {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
 .login-card {
   border-radius: 24px;
   overflow: hidden;

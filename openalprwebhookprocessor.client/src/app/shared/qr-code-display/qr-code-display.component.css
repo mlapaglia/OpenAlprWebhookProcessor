@@ -15,8 +15,8 @@
 }
 
 .qr-code {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 300px;
+  max-height: 300px;
   border: 1px solid #ddd;
   padding: 10px;
   background: white;

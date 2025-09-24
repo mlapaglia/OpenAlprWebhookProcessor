@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { SettingsService } from '../../../settings.service';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 
@@ -23,6 +23,7 @@ interface DialogData {
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    NgOptimizedImage,
   ],
 })
 export class ImageModalComponent extends OnPushBaseComponent implements OnInit {

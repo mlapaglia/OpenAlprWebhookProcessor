@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, inject, type OnInit, type OnChanges, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
@@ -10,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import type { Camera } from '../../camera';
 import type { ZoomFocus } from '../zoomfocus';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
-import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
 @Component({
   selector: 'app-camera-daynight',
@@ -18,18 +16,6 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
   templateUrl: './camera-daynight.component.html',
   styleUrls: ['./camera-daynight.component.less'],
   standalone: true,
-  animations: [
-    trigger('inOutAnimation', [
-      transition(':enter', [
-        style({ height: 0, opacity: 0 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: '*', opacity: 1 })),
-      ]),
-      transition(':leave', [
-        style({ height: '*', opacity: 1 }),
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)', style({ height: 0, opacity: 0 })),
-      ]),
-    ]),
-  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -38,7 +24,6 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
-    RefreshButtonComponent,
   ],
 })
 export class CameraDayNightComponent extends OnPushBaseComponent implements OnInit, OnChanges {

@@ -34,6 +34,14 @@
   flex-shrink: 0;
 }
 
+.stat-icon mat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 28px;
+}
+
 .stat-content {
   flex: 1;
   min-width: 0;

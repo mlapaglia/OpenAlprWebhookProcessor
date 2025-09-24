@@ -1,0 +1,196 @@
+.passkey-dialog {
+  min-width: 500px;
+  max-width: 600px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.header-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--mat-sys-primary);
+  margin-top: 4px;
+}
+
+.dialog-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.dialog-description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dialog-content {
+  padding: 0 !important;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 16px;
+}
+
+.loading-state p {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.section {
+  padding: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.section-title mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--mat-sys-primary);
+}
+
+/* Passkey Cards Grid */
+.passkeys-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.passkey-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.passkey-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.passkey-header mat-icon {
+  color: var(--mat-sys-primary);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.passkey-name {
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  margin-bottom: 2px;
+}
+
+.passkey-date {
+  font-size: 12px;
+}
+
+.delete-btn {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.passkey-card:hover .delete-btn {
+  opacity: 1;
+}
+
+/* Registration Form */
+.registration-form {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.name-field {
+  flex: 1;
+}
+
+.register-btn {
+  margin-top: 8px;
+}
+
+/* Info Section */
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 6px;
+}
+
+.info-item mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--mat-sys-primary);
+  flex-shrink: 0;
+}
+
+.info-item span {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface);
+}
+
+/* Dialog Actions */
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  margin: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .passkey-dialog {
+    min-width: auto;
+    max-width: 90vw;
+  }
+  
+  .registration-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .register-btn {
+    margin-top: 0;
+    align-self: flex-start;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,9 +3,6 @@ using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using OpenAlprWebhookProcessor.CameraUpdateService;
 using OpenAlprWebhookProcessor.Cameras;
-using System;
-using System.Net.Http;
-using System.Threading;
 
 namespace Tests.CameraUpdateService.Dahua
 {

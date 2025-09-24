@@ -1,6 +1,5 @@
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddNewSettingFormComponent } from './add-new-setting-form.component';
 import type { PlateSettingsConfig } from './plate-settings-table.component';
 import type { IPlateSetting } from './plate-setting.interface';
@@ -44,7 +43,6 @@ describe('AddNewSettingFormComponent', () => {
       imports: [
         AddNewSettingFormComponent,
         ReactiveFormsModule,
-        NoopAnimationsModule,
       ],
       providers: [FormBuilder],
     }).compileComponents();

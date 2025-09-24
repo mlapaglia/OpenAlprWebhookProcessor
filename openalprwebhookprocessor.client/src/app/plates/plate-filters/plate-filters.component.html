@@ -5,9 +5,11 @@
       <!-- Primary Filter Row -->
       <div class="primary-filter-row">
         <div class="primary-inputs">
-          <mat-form-field class="date-range-field">
+          <mat-form-field
+            class="date-range-field"
+            subscriptSizing="dynamic">
             <mat-label i18n>Date Range</mat-label>
-            <mat-date-range-input [rangePicker]="picker" [max]="todaysDate()">
+            <mat-date-range-input [rangePicker]="picker" [max]="todaysDate()" >
               <input matStartDate [(ngModel)]="plateFilters().startDate" (ngModelChange)="onStartDateChange()" (keyup.enter)="onSearch()" placeholder="Start" i18n-placeholder>
               <input matEndDate [(ngModel)]="plateFilters().endDate" (ngModelChange)="onEndDateChange()" (keyup.enter)="onSearch()" placeholder="End" i18n-placeholder>
             </mat-date-range-input>
@@ -15,7 +17,9 @@
             <mat-date-range-picker #picker />
           </mat-form-field>
           
-          <mat-form-field class="plate-field">
+          <mat-form-field
+            class="plate-field"
+            subscriptSizing="dynamic">
             <mat-label i18n>Plate Number</mat-label>
             <input matInput
               [(ngModel)]="plateFilters().plateNumber"
@@ -79,7 +83,6 @@
             <input matInput 
               [formControl]="vehicleModelControl" 
               [matAutocomplete]="modelAuto" 
-              [disabled]="isModelDisabled"
               placeholder="Select a make first">
             <mat-autocomplete #modelAuto="matAutocomplete">
               @for (model of filteredModels$ | async; track model) {

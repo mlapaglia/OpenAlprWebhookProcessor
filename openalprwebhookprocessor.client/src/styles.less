@@ -26,7 +26,7 @@ body {
 
 /* Material Symbols Configuration */
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols Outlined', sans-serif;
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -40,6 +40,41 @@ body {
   font-feature-settings: 'liga';
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+}
+
+/* Override Angular Material's default icon font with Material Symbols */
+mat-icon {
+  font-family: 'Material Symbols Outlined', sans-serif !important;
+  font-feature-settings: 'liga' !important;
+  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Ensure proper sizing for form field icons */
+.mat-mdc-form-field mat-icon[matPrefix],
+.mat-mdc-form-field mat-icon[matSuffix] {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure proper sizing for button icons */
+.mat-mdc-button mat-icon,
+.mat-mdc-raised-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* Ensure proper sizing for list item icons */
+.mat-mdc-list-item mat-icon[matListItemIcon] {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
 }
 
 /* Material Design Form Field Fixes - Use default theme colors */

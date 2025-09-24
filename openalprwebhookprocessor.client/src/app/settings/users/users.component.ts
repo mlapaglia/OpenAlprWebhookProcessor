@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { AddEditComponent } from './edit/edit.component';
 import { User2FAComponent } from './user-2fa/user-2fa.component';
+import { UserPasskeysComponent } from './user-passkeys/user-passkeys.component';
 
 @Component({
   templateUrl: 'users.component.html',
@@ -71,6 +72,24 @@ export class UsersComponent extends OnPushBaseComponent implements OnInit {
       dialogRef.afterClosed(),
       () => {
         // No need to refresh users list for 2FA changes
+        // as it doesn't affect the main user data
+      },
+    );
+  }
+
+  managePasskeys(user: User) {
+    const dialogRef = this.dialog.open(UserPasskeysComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data: { userId: user.id, userName: user.username },
+      disableClose: true,
+    });
+
+    this.subscribeAndMarkForCheck(
+      dialogRef.afterClosed(),
+      () => {
+        // No need to refresh users list for passkey changes
         // as it doesn't affect the main user data
       },
     );
