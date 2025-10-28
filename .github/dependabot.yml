@@ -41,6 +41,10 @@ updates:
       - "@me"
     assignees:
       - "@me"
+    groups:
+      nuget-dependencies:
+        patterns:
+          - "*"
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
@@ -52,3 +56,7 @@ updates:
       - "@me"
     assignees:
       - "@me"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
