@@ -11,10 +11,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    reviewers:
-      - "@me"
-    assignees:
-      - "@me"
     groups:
       angular:
         patterns:
@@ -37,10 +33,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
-    reviewers:
-      - "@me"
-    assignees:
-      - "@me"
     groups:
       nuget-dependencies:
         patterns:
@@ -52,10 +44,6 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
-    reviewers:
-      - "@me"
-    assignees:
-      - "@me"
     groups:
       docker-dependencies:
         patterns:
