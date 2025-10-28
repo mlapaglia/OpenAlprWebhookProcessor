@@ -29,7 +29,7 @@
     "@angular/router": "^20.3.7",
     "@angular/service-worker": "^20.3.7",
     "@microsoft/signalr": "^9.0.6",
-    "chart.js": "^4.5.0",
+    "chart.js": "^4.5.1",
     "lean-qr": "^2.5.0",
     "ngx-highlightjs": "^14.0.1",
     "ngx-lightbox": "^3.0.0",
