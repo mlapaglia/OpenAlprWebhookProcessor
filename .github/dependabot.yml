@@ -30,6 +30,9 @@ updates:
           - "protractor*"
           - "@types/jasmine*"
           - "@types/node*"
+      other-dependencies:
+        patterns:
+          - "*"
 
   # Enable version updates for NuGet (.NET server projects)
   - package-ecosystem: "nuget"
