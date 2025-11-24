@@ -28,7 +28,7 @@
     "@angular/platform-browser-dynamic": "^20.3.9",
     "@angular/router": "^20.3.9",
     "@angular/service-worker": "^20.3.9",
-    "@microsoft/signalr": "^9.0.6",
+    "@microsoft/signalr": "^10.0.0",
     "chart.js": "^4.5.1",
     "lean-qr": "^2.6.0",
     "ngx-highlightjs": "^14.0.1",
@@ -43,11 +43,11 @@
     "@angular/cli": "^20.3.8",
     "@angular/compiler-cli": "^20.3.9",
     "@angular/localize": "^20.3.9",
-    "@stylistic/eslint-plugin": "^5.5.0",
+    "@stylistic/eslint-plugin": "^5.6.1",
     "@types/jasmine": "~5.1.12",
     "@types/node": "^24.9.1",
     "@types/qrcode": "^1.5.6",
-    "angular-eslint": "^20.6.0",
+    "angular-eslint": "^21.0.1",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "jasmine-core": "~5.12.0",
@@ -57,8 +57,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "less": "^4.4.2",
-    "puppeteer": "^24.29.1",
+    "puppeteer": "^24.31.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.3"
+    "typescript-eslint": "^8.47.0"
   }
 }
