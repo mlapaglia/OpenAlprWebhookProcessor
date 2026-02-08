@@ -1,5 +1,5 @@
 import { Component, type OnChanges, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { type FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { type MachineLearningConfigDto } from '../machine-learning.service';
@@ -34,7 +34,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     }
   `,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatTableModule,
     ConfigurationFieldComponent,

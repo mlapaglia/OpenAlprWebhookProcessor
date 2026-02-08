@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, type OnDestroy, type OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +19,6 @@ import { type ScheduledJob, type ScheduledJobsResponse, ScheduledJobType, Sunris
   templateUrl: './scheduled-jobs.component.html',
   styleUrls: ['./scheduled-jobs.component.less'],
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

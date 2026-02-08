@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+
 import { interval } from 'rxjs';
 import { MachineLearningService, type ModelInfo, type TrainingStatus, type MachineLearningConfigDto } from '../machine-learning.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -20,7 +20,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   styleUrls: ['./machine-learning.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

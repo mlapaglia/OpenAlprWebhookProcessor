@@ -47,7 +47,7 @@ describe('Setup2FAComponent', () => {
       'disableTwoFactor',
       'getRecoveryCodes',
     ]);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate'], { events: of() });
     mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: { queryParams: {} },
     });

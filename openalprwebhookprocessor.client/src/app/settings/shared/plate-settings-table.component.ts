@@ -1,5 +1,5 @@
 import { Component, inject, type OnInit, type OnDestroy, type TemplateRef, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
@@ -40,7 +40,6 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
   templateUrl: './plate-settings-table.component.html',
   styleUrls: ['./plate-settings-table.component.less'],
   imports: [
-    CommonModule,
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,

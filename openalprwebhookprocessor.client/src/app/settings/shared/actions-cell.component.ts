@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, type OnDestroy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -58,7 +58,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     }
   `,
   imports: [
-    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,

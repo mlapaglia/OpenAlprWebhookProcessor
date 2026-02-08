@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, type AfterViewInit, type OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
@@ -20,8 +20,14 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   templateUrl: './system-logs.component.html',
   styleUrls: ['./system-logs.component.less'],
   imports: [
-    CommonModule, MatButtonModule, MatCheckboxModule, ReactiveFormsModule,
-    FormsModule, Highlight, MatSelectModule, MatFormFieldModule, MatInputModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    ReactiveFormsModule,
+    FormsModule,
+    Highlight,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
 })
 export class SystemLogsComponent extends OnPushBaseComponent implements AfterViewInit, OnDestroy {

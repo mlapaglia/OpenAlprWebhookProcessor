@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import type { PageEvent } from '@angular/material/paginator';
@@ -11,7 +11,6 @@ import { PlateItemComponent, type PlateData } from '../plate-item/plate-item.com
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatExpansionModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,

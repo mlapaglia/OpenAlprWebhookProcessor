@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
@@ -45,7 +45,6 @@ export interface LoadingConfig {
   `,
   styleUrls: ['./plate-settings-table.component.less'],
   imports: [
-    CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatButtonModule,

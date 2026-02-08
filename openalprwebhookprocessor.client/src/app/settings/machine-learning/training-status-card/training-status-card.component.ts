@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+
 import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 import { type TrainingStatus } from '../machine-learning.service';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
@@ -15,7 +15,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   styleUrls: ['./training-status-card.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,

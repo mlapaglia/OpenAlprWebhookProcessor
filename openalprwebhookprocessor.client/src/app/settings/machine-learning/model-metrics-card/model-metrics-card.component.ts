@@ -1,7 +1,7 @@
 import { Component, type OnChanges, ChangeDetectionStrategy, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+
 import { type TrainingStatus } from '../machine-learning.service';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 
@@ -11,7 +11,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   styleUrls: ['./model-metrics-card.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatTableModule,
   ],

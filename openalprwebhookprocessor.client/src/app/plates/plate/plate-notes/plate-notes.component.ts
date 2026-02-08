@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import type { Plate } from '../plate';
 import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button.component';
 
@@ -16,7 +16,6 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
   templateUrl: './plate-notes.component.html',
   styleUrls: ['./plate-notes.component.css'],
   imports: [
-    CommonModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
