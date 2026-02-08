@@ -15,8 +15,8 @@ import type { Plate } from '../plate';
     MatCardModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatTooltipModule
-],
+    MatTooltipModule,
+  ],
   templateUrl: './plate-images.component.html',
   styleUrls: ['./plate-images.component.css'],
 })

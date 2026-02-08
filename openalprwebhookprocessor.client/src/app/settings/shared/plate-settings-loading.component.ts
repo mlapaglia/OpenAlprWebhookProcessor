@@ -48,8 +48,8 @@ export interface LoadingConfig {
     MatCardModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    MatIconModule
-],
+    MatIconModule,
+  ],
 })
 export class PlateSettingsLoadingComponent {
   readonly isLoading = input(false);

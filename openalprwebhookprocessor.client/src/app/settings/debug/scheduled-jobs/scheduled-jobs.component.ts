@@ -25,8 +25,8 @@ import { type ScheduledJob, type ScheduledJobsResponse, ScheduledJobType, Sunris
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatTableModule,
-    MatChipsModule
-],
+    MatChipsModule,
+  ],
 })
 export class ScheduledJobsComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly settingsService = inject(SettingsService);

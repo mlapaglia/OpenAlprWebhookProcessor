@@ -27,8 +27,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     Highlight,
     MatSelectModule,
     MatFormFieldModule,
-    MatInputModule
-],
+    MatInputModule,
+  ],
 })
 export class SystemLogsComponent extends OnPushBaseComponent implements AfterViewInit, OnDestroy {
   private readonly signalRHub = inject(SignalrService);

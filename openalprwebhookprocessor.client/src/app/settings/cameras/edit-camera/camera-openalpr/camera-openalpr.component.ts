@@ -35,8 +35,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
-    CameraMaskComponent
-],
+    CameraMaskComponent,
+  ],
   standalone: true,
 })
 export class CameraOpenAlprComponent extends OnPushBaseComponent implements OnInit, OnDestroy {

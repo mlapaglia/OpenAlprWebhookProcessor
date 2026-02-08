@@ -20,8 +20,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class TrainingStatusCardComponent extends OnPushBaseComponent implements OnChanges {
   readonly trainingStatus = input<TrainingStatus | null>(null);

@@ -17,8 +17,8 @@ import type { PredictionResult } from './../prediction-response';
     MatListModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatChipsModule
-],
+    MatChipsModule,
+  ],
 })
 export class PredictionsSectionComponent {
   readonly nextExpected = input<PredictionResult | null>(null);

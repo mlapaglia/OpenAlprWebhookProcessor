@@ -12,8 +12,8 @@ import { MatChipsModule } from '@angular/material/chips';
   imports: [
     MatCardModule,
     MatListModule,
-    MatChipsModule
-],
+    MatChipsModule,
+  ],
 })
 export class MostSeenPlatesComponent {
   readonly mostSeenCounts = input<{ name: string, value: number }[]>([]);

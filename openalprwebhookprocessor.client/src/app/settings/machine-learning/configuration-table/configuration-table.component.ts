@@ -36,8 +36,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   imports: [
     ReactiveFormsModule,
     MatTableModule,
-    ConfigurationFieldComponent
-],
+    ConfigurationFieldComponent,
+  ],
 })
 export class ConfigurationTableComponent extends OnPushBaseComponent implements OnChanges {
   readonly configuration = input.required<MachineLearningConfigDto | null>();

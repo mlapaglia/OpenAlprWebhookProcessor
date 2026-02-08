@@ -54,8 +54,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    MatChipsModule
-],
+    MatChipsModule,
+  ],
 })
 export class PlateNumberCellComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly setting = input.required<T>();

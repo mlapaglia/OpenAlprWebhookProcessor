@@ -23,8 +23,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatSelectModule,
     MatOptionModule,
     MatIconModule,
-    MatCardModule
-],
+    MatCardModule,
+  ],
 })
 export class CameraBasicInfoComponent extends OnPushBaseComponent implements OnInit {
   readonly camera = input.required<Camera>();

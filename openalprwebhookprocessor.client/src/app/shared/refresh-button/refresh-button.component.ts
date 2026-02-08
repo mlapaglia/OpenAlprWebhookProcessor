@@ -15,8 +15,8 @@ export type ButtonColor = 'primary' | 'accent' | 'warn' | undefined;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatButtonModule,
-    MatIconModule
-],
+    MatIconModule,
+  ],
 })
 export class RefreshButtonComponent extends OnPushBaseComponent implements OnChanges {
   /** Whether the button is loading. */

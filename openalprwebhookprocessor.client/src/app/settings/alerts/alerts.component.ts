@@ -40,8 +40,8 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
     MatTooltipModule,
     PushoverComponent,
     WebpushComponent,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class AlertsComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly alertsService = inject(AlertsService);

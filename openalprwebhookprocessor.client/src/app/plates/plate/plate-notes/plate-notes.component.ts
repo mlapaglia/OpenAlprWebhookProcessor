@@ -23,8 +23,8 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
     MatIconModule,
     TextFieldModule,
     FormsModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class PlateNotesComponent {
   readonly plate = model.required<Plate>();

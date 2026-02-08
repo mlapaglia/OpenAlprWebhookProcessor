@@ -33,8 +33,8 @@ import { RecoveryCodesDisplayComponent } from '../../../shared/recovery-codes-di
     MatIconModule,
     QrCodeDisplayComponent,
     TwoFactorCodeInputComponent,
-    RecoveryCodesDisplayComponent
-],
+    RecoveryCodesDisplayComponent,
+  ],
 })
 export class User2FAComponent extends OnPushBaseComponent implements OnInit {
   data = inject<DialogData>(MAT_DIALOG_DATA);

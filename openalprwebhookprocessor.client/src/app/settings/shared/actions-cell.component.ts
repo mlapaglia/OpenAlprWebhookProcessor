@@ -60,8 +60,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   imports: [
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
-],
+    MatTooltipModule,
+  ],
 })
 export class ActionsCellComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly setting = input<T>();

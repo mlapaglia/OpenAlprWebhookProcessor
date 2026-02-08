@@ -32,8 +32,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   imports: [
     FormsModule,
     MatFormFieldModule,
-    MatInputModule
-],
+    MatInputModule,
+  ],
 })
 export class DescriptionCellComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly setting = input<T>();

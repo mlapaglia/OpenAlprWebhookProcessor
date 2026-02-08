@@ -11,8 +11,8 @@ import { MatInputModule } from '@angular/material/input';
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule
-],
+    MatInputModule,
+  ],
 })
 export class ConfigurationFieldComponent {
   readonly fieldKey = input.required<string>();

@@ -21,8 +21,8 @@ interface DialogData {
   imports: [
     MatProgressSpinnerModule,
     MatButtonModule,
-    MatIconModule
-],
+    MatIconModule,
+  ],
 })
 export class ImageModalComponent extends OnPushBaseComponent implements OnInit {
   data = inject<DialogData>(MAT_DIALOG_DATA);

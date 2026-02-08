@@ -15,8 +15,8 @@ import type { QuickStats } from './../home.service';
     MatCardModule,
     MatIconModule,
     MatGridListModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+  ],
 })
 export class QuickStatsComponent {
   readonly quickStats = input<QuickStats | null>(null);

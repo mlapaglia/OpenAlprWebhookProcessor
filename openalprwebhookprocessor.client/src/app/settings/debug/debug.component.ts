@@ -29,8 +29,8 @@ import { ConfirmationDialogComponent, type ConfirmationDialogData } from 'app/sh
     MatTooltipModule,
     MatDividerModule,
     SignalrConnectionMonitorComponent,
-    ScheduledJobsComponent
-],
+    ScheduledJobsComponent,
+  ],
 })
 export class DebugComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly settingsService = inject(SettingsService);

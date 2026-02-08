@@ -47,8 +47,8 @@ interface ClientConnectionInfo {
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDividerModule
-],
+    MatDividerModule,
+  ],
 })
 export class SignalrConnectionMonitorComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly signalrService = inject(SignalrService);

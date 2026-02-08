@@ -30,8 +30,8 @@ interface DialogData {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class AddEditComponent extends OnPushBaseComponent implements OnInit {
   data = inject<DialogData>(MAT_DIALOG_DATA);

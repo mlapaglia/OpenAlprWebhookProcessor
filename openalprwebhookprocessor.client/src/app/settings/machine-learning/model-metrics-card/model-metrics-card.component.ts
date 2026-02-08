@@ -12,8 +12,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatCardModule,
-    MatTableModule
-],
+    MatTableModule,
+  ],
 })
 export class ModelMetricsCardComponent extends OnPushBaseComponent implements OnChanges {
   readonly trainingStatus = input<TrainingStatus | null>();

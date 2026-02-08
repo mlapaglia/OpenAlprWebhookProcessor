@@ -37,8 +37,8 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class CameraDayNightComponent extends OnPushBaseComponent implements OnInit, OnChanges {
   readonly camera = input<Camera>();

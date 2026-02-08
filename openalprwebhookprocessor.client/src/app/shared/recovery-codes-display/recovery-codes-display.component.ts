@@ -15,8 +15,8 @@ import { MatListModule } from '@angular/material/list';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatListModule
-],
+    MatListModule,
+  ],
 })
 export class RecoveryCodesDisplayComponent {
   readonly recoveryCodes = input<string[]>([]);

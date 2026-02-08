@@ -46,7 +46,7 @@ function configureIcons() {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZoneChangeDetection(),importProvidersFrom(
+    provideZoneChangeDetection(), importProvidersFrom(
       BrowserModule,
       AppRoutingModule,
       FormsModule,

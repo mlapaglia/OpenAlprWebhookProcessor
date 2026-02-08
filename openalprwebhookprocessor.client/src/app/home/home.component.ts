@@ -20,8 +20,8 @@ import { OnPushBaseComponent } from '../_helpers/onpush-base.component';
     PredictionsSectionComponent,
     QuickStatsComponent,
     ChartsComponent,
-    MostSeenPlatesComponent
-],
+    MostSeenPlatesComponent,
+  ],
 })
 export class HomeComponent extends OnPushBaseComponent implements AfterViewInit {
   readonly chartsComponent = viewChild<ChartsComponent>(ChartsComponent);

@@ -27,8 +27,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatTableModule,
     ModelMetricsCardComponent,
     ConfigurationCardComponent,
-    TrainingStatusCardComponent
-],
+    TrainingStatusCardComponent,
+  ],
 })
 export class MachineLearningComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly mlService = inject(MachineLearningService);

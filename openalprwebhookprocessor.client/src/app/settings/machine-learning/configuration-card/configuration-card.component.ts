@@ -16,8 +16,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatCardModule,
     ConfigurationHeaderComponent,
     ConfigurationTableComponent,
-    ConfigurationActionsComponent
-],
+    ConfigurationActionsComponent,
+  ],
 })
 export class ConfigurationCardComponent extends OnPushBaseComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);

@@ -14,8 +14,8 @@ import type { Chart } from 'chart.js';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatCardModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+  ],
 })
 export class ChartsComponent extends OnPushBaseComponent implements AfterViewInit, OnDestroy {
   readonly dailyChartRef = viewChild<ElementRef<HTMLCanvasElement>>('dailyChart');

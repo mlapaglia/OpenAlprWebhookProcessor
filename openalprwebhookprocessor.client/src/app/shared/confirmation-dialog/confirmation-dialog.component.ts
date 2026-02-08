@@ -21,8 +21,8 @@ export interface ConfirmationDialogData {
   imports: [
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
-],
+    MatIconModule,
+  ],
   template: `
     <div class="confirmation-dialog">
       <h2 mat-dialog-title>

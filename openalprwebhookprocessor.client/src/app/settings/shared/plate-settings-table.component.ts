@@ -55,8 +55,8 @@ export interface PlateSettingsConfig<T extends IPlateSetting> {
     MatChipsModule,
     MatDialogModule,
     AddNewSettingFormComponent,
-    SettingsListComponent
-],
+    SettingsListComponent,
+  ],
 })
 export class PlateSettingsTableComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnInit, OnDestroy {
   readonly config = input.required<PlateSettingsConfig<T>>();

@@ -14,8 +14,8 @@ import { PlateItemComponent, type PlateData } from '../plate-item/plate-item.com
     MatExpansionModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    PlateItemComponent
-],
+    PlateItemComponent,
+  ],
   templateUrl: './plate-list.component.html',
   styleUrl: './plate-list.component.less',
 })

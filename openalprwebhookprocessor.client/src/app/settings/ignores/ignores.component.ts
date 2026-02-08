@@ -34,8 +34,8 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class IgnoresComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly ignoresService = inject(IgnoresService);

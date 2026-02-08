@@ -38,8 +38,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+  ],
 })
 export class SettingsHeaderComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly config = input<PlateSettingsConfig<T>>();

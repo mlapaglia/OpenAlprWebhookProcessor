@@ -39,8 +39,8 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
     MatIconModule,
     MatProgressSpinnerModule,
     MatCardModule,
-    RefreshButtonComponent
-],
+    RefreshButtonComponent,
+  ],
 })
 export class ConfigurationActionsComponent {
   readonly isEditingConfiguration = input(false);

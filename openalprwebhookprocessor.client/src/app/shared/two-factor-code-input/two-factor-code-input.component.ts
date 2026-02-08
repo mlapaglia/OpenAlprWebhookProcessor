@@ -18,8 +18,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+  ],
 })
 export class TwoFactorCodeInputComponent extends OnPushBaseComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);

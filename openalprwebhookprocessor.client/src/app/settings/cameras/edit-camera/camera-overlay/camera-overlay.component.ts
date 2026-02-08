@@ -33,8 +33,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     MatInputModule,
     MatCardModule,
     MatSlideToggleModule,
-    MatButtonModule
-],
+    MatButtonModule,
+  ],
   standalone: true,
 })
 export class CameraOverlayComponent extends OnPushBaseComponent implements OnInit, OnDestroy {

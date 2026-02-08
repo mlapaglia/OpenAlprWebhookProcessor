@@ -24,8 +24,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     SettingsEmptyStateComponent,
     PlateNumberCellComponent,
     DescriptionCellComponent,
-    ActionsCellComponent
-],
+    ActionsCellComponent,
+  ],
 })
 export class SettingsListComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly config = input<PlateSettingsConfig<T>>();

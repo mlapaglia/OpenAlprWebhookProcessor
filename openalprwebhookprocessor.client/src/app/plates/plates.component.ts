@@ -27,8 +27,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   standalone: true,
   imports: [
     PlateFiltersComponent,
-    PlateListComponent
-],
+    PlateListComponent,
+  ],
 })
 export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly plateService = inject(PlateService);
