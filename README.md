@@ -107,7 +107,7 @@ Mount a volume to `/app/config/` to persist data between container restarts.
 ## 🛠️ Development
 
 ### Prerequisites
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Node.js 24+](https://nodejs.org/) and npm
 - [Angular CLI](https://angular.io/cli): `npm install -g @angular/cli`
 

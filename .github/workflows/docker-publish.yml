@@ -30,10 +30,10 @@ jobs:
           java-version: 17
           distribution: 'zulu'
 
-      - name: Setup .NETf
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 9.x
+          dotnet-version: 10.x
 
       - name: Install SonarQube Cloud scanner
         run: |
@@ -91,7 +91,7 @@ jobs:
       - name: Setup Buildx
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '9.x'
+          dotnet-version: '10.x'
           include-prerelease: true
 
       - name: Build Artifact
