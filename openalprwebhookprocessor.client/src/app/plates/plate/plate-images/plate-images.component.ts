@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
+
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import type { Plate } from '../plate';
 
@@ -12,12 +12,11 @@ import type { Plate } from '../plate';
   selector: 'app-plate-images',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatTooltipModule,
-  ],
+    MatTooltipModule
+],
   templateUrl: './plate-images.component.html',
   styleUrls: ['./plate-images.component.css'],
 })

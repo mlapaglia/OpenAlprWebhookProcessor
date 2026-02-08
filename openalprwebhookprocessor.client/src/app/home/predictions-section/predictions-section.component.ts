@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,13 +13,12 @@ import type { PredictionResult } from './../prediction-response';
   styleUrls: ['./predictions-section.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatListModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatChipsModule,
-  ],
+    MatChipsModule
+],
 })
 export class PredictionsSectionComponent {
   readonly nextExpected = input<PredictionResult | null>(null);

@@ -1,6 +1,6 @@
 import type { OnDestroy, ElementRef } from '@angular/core';
 import { Component, inject, type AfterViewInit, ChangeDetectionStrategy, viewChild, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ChartService, type ChartData } from './charts.service';
@@ -13,10 +13,9 @@ import type { Chart } from 'chart.js';
   styleUrls: ['./charts.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
-    MatProgressSpinnerModule,
-  ],
+    MatProgressSpinnerModule
+],
 })
 export class ChartsComponent extends OnPushBaseComponent implements AfterViewInit, OnDestroy {
   readonly dailyChartRef = viewChild<ElementRef<HTMLCanvasElement>>('dailyChart');

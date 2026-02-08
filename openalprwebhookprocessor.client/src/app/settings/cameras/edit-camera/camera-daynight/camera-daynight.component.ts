@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, inject, type OnInit, type OnChanges, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,15 +31,14 @@ import { RefreshButtonComponent } from 'app/shared/refresh-button/refresh-button
     ]),
   ],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
-    RefreshButtonComponent,
-  ],
+    RefreshButtonComponent
+],
 })
 export class CameraDayNightComponent extends OnPushBaseComponent implements OnInit, OnChanges {
   readonly camera = input<Camera>();

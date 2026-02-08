@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, type OnInit, input, output } from '@angular/core';
 import { FormBuilder, type FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,13 +14,12 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatProgressSpinnerModule,
-  ],
+    MatProgressSpinnerModule
+],
 })
 export class TwoFactorCodeInputComponent extends OnPushBaseComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);

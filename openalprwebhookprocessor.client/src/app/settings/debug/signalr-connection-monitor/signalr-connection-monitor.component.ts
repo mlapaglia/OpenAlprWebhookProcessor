@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 
@@ -47,9 +47,8 @@ interface ClientConnectionInfo {
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDividerModule,
-    CommonModule,
-  ],
+    MatDividerModule
+],
 })
 export class SignalrConnectionMonitorComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly signalrService = inject(SignalrService);

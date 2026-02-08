@@ -1,5 +1,5 @@
 import { Component, inject, type OnInit, type OnDestroy, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, Validators, ReactiveFormsModule, type FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -29,15 +29,14 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     ]),
   ],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
     MatSlideToggleModule,
     MatButtonModule,
-    CameraMaskComponent,
-  ],
+    CameraMaskComponent
+],
   standalone: true,
 })
 export class CameraOpenAlprComponent extends OnPushBaseComponent implements OnInit, OnDestroy {

@@ -1,6 +1,6 @@
 import { Component, type OnChanges, type SimpleChanges, inject, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, Validators, type FormGroup } from '@angular/forms';
 import { type MachineLearningConfigDto } from '../machine-learning.service';
 import { ConfigurationHeaderComponent } from '../configuration-header/configuration-header.component';
@@ -13,12 +13,11 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   templateUrl: './configuration-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     ConfigurationHeaderComponent,
     ConfigurationTableComponent,
-    ConfigurationActionsComponent,
-  ],
+    ConfigurationActionsComponent
+],
 })
 export class ConfigurationCardComponent extends OnPushBaseComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);

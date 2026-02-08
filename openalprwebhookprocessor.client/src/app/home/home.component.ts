@@ -1,7 +1,7 @@
 import { Component, inject, type AfterViewInit, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import type { User } from 'app/_models';
 import { AccountService } from 'app/_services';
-import { CommonModule } from '@angular/common';
+
 import { PredictionsSectionComponent } from './predictions-section/predictions-section.component';
 import { QuickStatsComponent } from './quick-stats/quick-stats.component';
 import { ChartsComponent } from './charts/charts.component';
@@ -17,12 +17,11 @@ import { OnPushBaseComponent } from '../_helpers/onpush-base.component';
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     PredictionsSectionComponent,
     QuickStatsComponent,
     ChartsComponent,
-    MostSeenPlatesComponent,
-  ],
+    MostSeenPlatesComponent
+],
 })
 export class HomeComponent extends OnPushBaseComponent implements AfterViewInit {
   readonly chartsComponent = viewChild<ChartsComponent>(ChartsComponent);

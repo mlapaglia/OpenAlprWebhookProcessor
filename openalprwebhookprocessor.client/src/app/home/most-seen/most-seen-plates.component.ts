@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
@@ -10,11 +10,10 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrls: ['./most-seen-plates.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatListModule,
-    MatChipsModule,
-  ],
+    MatChipsModule
+],
 })
 export class MostSeenPlatesComponent {
   readonly mostSeenCounts = input<{ name: string, value: number }[]>([]);

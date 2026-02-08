@@ -2,7 +2,7 @@ import { Component, inject, type OnInit, ChangeDetectionStrategy } from '@angula
 import { first } from 'rxjs/operators';
 import { AccountService, AlertService } from 'app/_services';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -26,7 +26,6 @@ import { RecoveryCodesDisplayComponent } from '../../../shared/recovery-codes-di
   styleUrl: 'user-2fa.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,
@@ -34,8 +33,8 @@ import { RecoveryCodesDisplayComponent } from '../../../shared/recovery-codes-di
     MatIconModule,
     QrCodeDisplayComponent,
     TwoFactorCodeInputComponent,
-    RecoveryCodesDisplayComponent,
-  ],
+    RecoveryCodesDisplayComponent
+],
 })
 export class User2FAComponent extends OnPushBaseComponent implements OnInit {
   data = inject<DialogData>(MAT_DIALOG_DATA);

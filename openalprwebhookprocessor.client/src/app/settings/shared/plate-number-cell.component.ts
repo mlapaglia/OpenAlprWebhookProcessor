@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, type OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -49,14 +49,13 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     }
   `,
   imports: [
-    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatOptionModule,
-    MatChipsModule,
-  ],
+    MatChipsModule
+],
 })
 export class PlateNumberCellComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly setting = input.required<T>();

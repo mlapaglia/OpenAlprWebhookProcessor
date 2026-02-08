@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, type OnInit, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -14,7 +14,7 @@ import { generate } from 'lean-qr';
   styleUrl: 'qr-code-display.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [CommonModule, MatProgressSpinnerModule, MatIconModule, MatCardModule, MatButtonModule, MatTooltipModule],
+  imports: [MatProgressSpinnerModule, MatIconModule, MatCardModule, MatButtonModule, MatTooltipModule],
 })
 export class QrCodeDisplayComponent extends OnPushBaseComponent implements OnInit {
   readonly qrCodeData = input<string>('');

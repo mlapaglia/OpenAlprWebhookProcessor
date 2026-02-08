@@ -11,7 +11,7 @@ import { AlertsService } from 'app/settings/alerts/alerts.service';
 import { MatDialog } from '@angular/material/dialog';
 import { EditPlateComponent } from './edit-plate/edit-plate.component';
 import { LocalStorageService } from 'app/_services/local-storage.service';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute } from '@angular/router';
 import { type PageEvent } from '@angular/material/paginator';
 import { PlateFiltersComponent, type PlateFilters, type VehicleFilters as FilterVehicleFilters } from './plate-filters/plate-filters.component';
@@ -26,10 +26,9 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    CommonModule,
     PlateFiltersComponent,
-    PlateListComponent,
-  ],
+    PlateListComponent
+],
 })
 export class PlatesComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly plateService = inject(PlateService);

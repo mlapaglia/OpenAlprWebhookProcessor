@@ -9,7 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
+
 
 import { Ignore } from './ignore';
 import { IgnoresService } from './ignores.service';
@@ -24,7 +24,6 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
   templateUrl: './ignores.component.html',
   styleUrls: ['./ignores.component.less'],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -35,8 +34,8 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
-    RefreshButtonComponent,
-  ],
+    RefreshButtonComponent
+],
 })
 export class IgnoresComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly ignoresService = inject(IgnoresService);

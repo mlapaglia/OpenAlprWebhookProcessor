@@ -1,5 +1,5 @@
 import { Component, type TrackByFunction, ChangeDetectionStrategy, type OnDestroy, output, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -17,7 +17,6 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './settings-list.component.html',
   imports: [
-    CommonModule,
     MatTableModule,
     MatIconModule,
     MatCardModule,
@@ -25,8 +24,8 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
     SettingsEmptyStateComponent,
     PlateNumberCellComponent,
     DescriptionCellComponent,
-    ActionsCellComponent,
-  ],
+    ActionsCellComponent
+],
 })
 export class SettingsListComponent<T extends IPlateSetting> extends OnPushBaseComponent implements OnDestroy {
   readonly config = input<PlateSettingsConfig<T>>();

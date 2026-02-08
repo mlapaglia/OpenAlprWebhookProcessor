@@ -1,7 +1,7 @@
 import { Component, input, output, ChangeDetectionStrategy, type OnChanges, HostBinding } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
+
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import { timer, type Subscription } from 'rxjs';
 
@@ -14,10 +14,9 @@ export type ButtonColor = 'primary' | 'accent' | 'warn' | undefined;
   styleUrls: ['./refresh-button.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     MatButtonModule,
-    MatIconModule,
-  ],
+    MatIconModule
+],
 })
 export class RefreshButtonComponent extends OnPushBaseComponent implements OnChanges {
   /** Whether the button is loading. */

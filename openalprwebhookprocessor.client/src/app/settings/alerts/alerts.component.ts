@@ -10,7 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
+
 
 import { Alert } from './alert';
 import { AlertsService } from './alerts.service';
@@ -27,7 +27,6 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
   templateUrl: './alerts.component.html',
   styleUrls: ['./alerts.component.less'],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatTabsModule,
     MatCardModule,
@@ -41,8 +40,8 @@ import { SnackBarType } from 'app/snackbar/snackbartype';
     MatTooltipModule,
     PushoverComponent,
     WebpushComponent,
-    RefreshButtonComponent,
-  ],
+    RefreshButtonComponent
+],
 })
 export class AlertsComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly alertsService = inject(AlertsService);

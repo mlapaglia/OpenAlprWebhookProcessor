@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
-import { CommonModule } from '@angular/common';
+
 import { SignalrConnectionMonitorComponent } from './signalr-connection-monitor/signalr-connection-monitor.component';
 import { ScheduledJobsComponent } from './scheduled-jobs/scheduled-jobs.component';
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
@@ -28,10 +28,9 @@ import { ConfirmationDialogComponent, type ConfirmationDialogData } from 'app/sh
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDividerModule,
-    CommonModule,
     SignalrConnectionMonitorComponent,
-    ScheduledJobsComponent,
-  ],
+    ScheduledJobsComponent
+],
 })
 export class DebugComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
   private readonly settingsService = inject(SettingsService);
