@@ -33,7 +33,7 @@ jobs:
       - name: Setup .NETf
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 9.x
+          dotnet-version: 10.x
 
       - name: Install SonarQube Cloud scanner
         run: |
@@ -91,7 +91,7 @@ jobs:
       - name: Setup Buildx
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '9.x'
+          dotnet-version: '10.x'
           include-prerelease: true
 
       - name: Build Artifact
