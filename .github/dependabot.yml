@@ -12,9 +12,12 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     reviewers:
-      - "@me"
+      - "@mlapaglia"
     assignees:
-      - "@me"
+      - "@mlapaglia"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     groups:
       angular:
         patterns:
@@ -41,9 +44,12 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     reviewers:
-      - "@me"
+      - "@mlapaglia"
     assignees:
-      - "@me"
+      - "@mlapaglia"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     groups:
       nuget-dependencies:
         patterns:
@@ -56,9 +62,12 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     reviewers:
-      - "@me"
+      - "@mlapaglia"
     assignees:
-      - "@me"
+      - "@mlapaglia"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
     groups:
       docker-dependencies:
         patterns:
