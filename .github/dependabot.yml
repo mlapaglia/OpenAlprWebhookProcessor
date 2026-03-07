@@ -12,9 +12,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     reviewers:
-      - "@mlapaglia"
+      - "mlapaglia"
     assignees:
-      - "@mlapaglia"
+      - "mlapaglia"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
@@ -44,9 +44,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     reviewers:
-      - "@mlapaglia"
+      - "mlapaglia"
     assignees:
-      - "@mlapaglia"
+      - "mlapaglia"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
@@ -62,9 +62,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     reviewers:
-      - "@mlapaglia"
+      - "mlapaglia"
     assignees:
-      - "@mlapaglia"
+      - "mlapaglia"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
