@@ -39,7 +39,7 @@
     <PackageReference Include="Flurl.Http" Version="4.0.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Lib.AspNetCore.WebPush" Version="2.2.2" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.3" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.4" />
     <PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
     <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*-*">
       <PrivateAssets>all</PrivateAssets>
