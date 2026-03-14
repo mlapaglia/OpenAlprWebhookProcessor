@@ -32,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
     <PackageReference Include="CoordinateSharp" Version="3.4.1.1" />
     <PackageReference Include="Flurl" Version="4.0.0" />
