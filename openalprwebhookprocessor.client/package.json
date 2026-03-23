@@ -45,7 +45,7 @@
     "@angular/localize": "^21.2.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/jasmine": "~6.0.0",
-    "@types/node": "^25.3.0",
+    "@types/node": "^25.5.0",
     "@types/qrcode": "^1.5.6",
     "@angular-eslint/builder": "^21.3.0",
     "angular-eslint": "^21.3.0",
