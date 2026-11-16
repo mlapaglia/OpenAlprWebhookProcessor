@@ -9,7 +9,7 @@ import { Agent } from './agent';
 import { AgentStatus } from './agentStatus';
 import { AgentVideoStreams } from './videoStream';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe(OpenalprAgentComponent.name, () => {
@@ -38,7 +38,7 @@ describe(OpenalprAgentComponent.name, () => {
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: SnackbarService, useValue: mockSnackbarService },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
       schemas: [NO_ERRORS_SCHEMA],

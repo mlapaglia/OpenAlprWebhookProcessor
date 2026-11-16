@@ -1,12 +1,13 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlateImagesComponent } from './plate-images.component';
-import { Lightbox, LightboxConfig, LightboxEvent } from 'ngx-lightbox';
+import { MatDialog } from '@angular/material/dialog';
+import { ImageViewerDialogComponent } from './image-viewer-dialog.component';
 import { Plate } from '../plate';
 
 describe('PlateImagesComponent', () => {
   let component: PlateImagesComponent;
   let fixture: ComponentFixture<PlateImagesComponent>;
-  let lightbox: jasmine.SpyObj<Lightbox>;
+  let dialog: jasmine.SpyObj<MatDialog>;
 
   const mockPlate = new Plate({
     id: '1',
@@ -16,21 +17,17 @@ describe('PlateImagesComponent', () => {
   });
 
   beforeEach(async () => {
-    const lightboxSpy = jasmine.createSpyObj('Lightbox', ['open']);
+    const dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [PlateImagesComponent],
-      providers: [
-        { provide: Lightbox, useValue: lightboxSpy },
-        LightboxConfig,
-        LightboxEvent,
-      ],
+      providers: [{ provide: MatDialog, useValue: dialogSpy }],
     })
       .compileComponents();
 
     fixture = TestBed.createComponent(PlateImagesComponent);
     component = fixture.componentInstance;
-    lightbox = TestBed.inject(Lightbox) as jasmine.SpyObj<Lightbox>;
+    dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
     fixture.componentRef.setInput('plate', mockPlate);
     fixture.detectChanges();
@@ -44,17 +41,14 @@ describe('PlateImagesComponent', () => {
     expect(component.plate()).toEqual(mockPlate);
   });
 
-  it('should open lightbox with image URL and plate number', () => {
+  it('should open image viewer dialog with image URL and plate number', () => {
     component.openLightbox('http://test.com/test.jpg', 'TEST123');
 
-    expect(lightbox.open).toHaveBeenCalledWith(
-      [
-        {
-          src: 'http://test.com/test.jpg',
-          caption: 'TEST123',
-          thumb: 'http://test.com/test.jpg',
-        },
-      ], 0);
+    expect(dialog.open).toHaveBeenCalledWith(
+      ImageViewerDialogComponent,
+      jasmine.objectContaining({
+        data: { src: 'http://test.com/test.jpg', caption: 'TEST123' },
+      }));
   });
 
   it('should handle vehicle image loading', () => {

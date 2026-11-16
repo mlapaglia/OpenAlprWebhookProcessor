@@ -1,5 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { DebugComponent } from './debug.component';
@@ -21,7 +21,7 @@ describe('DebugComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DebugComponent],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
         { provide: SettingsService, useValue: settingsServiceSpy },
         { provide: SnackbarService, useValue: snackbarServiceSpy },

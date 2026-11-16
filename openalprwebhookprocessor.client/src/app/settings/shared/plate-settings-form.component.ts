@@ -22,7 +22,7 @@ export interface FormConfig {
   template: `
     <mat-card class="add-setting-card">
       <mat-card-header>
-        <mat-card-title i18n class="mat-headline-6">Add New {{config()?.entityName | titlecase}}</mat-card-title>
+        <mat-card-title i18n class="mat-headline-6">Add New {{$safeNavigationMigration(config()?.entityName) | titlecase}}</mat-card-title>
         <mat-card-subtitle i18n>Create a new rule to {{config()?.entityName === 'ignore rule' ? 'ignore' : 'monitor'}} specific license plates</mat-card-subtitle>
       </mat-card-header>
 

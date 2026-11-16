@@ -1,6 +1,6 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
-import { Component, NO_ERRORS_SCHEMA, input, output } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import type { PageEvent } from '@angular/material/paginator';
 import { PlateListComponent } from './plate-list.component';
@@ -10,6 +10,7 @@ import type { PlateData } from '../plate-item/plate-item.component';
 @Component({
   selector: 'app-plate-item',
   template: '<div data-testid="plate-item">{{ plate.plateNumber }}</div>',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 class MockPlateItemComponent {

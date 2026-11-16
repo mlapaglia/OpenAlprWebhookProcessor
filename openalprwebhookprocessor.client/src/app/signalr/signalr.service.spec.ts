@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { SignalrService } from './signalr.service';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { AccountService } from 'app/_services';
 import * as signalR from '@microsoft/signalr';
@@ -27,7 +27,7 @@ describe('SignalrService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
         SignalrService,
         { provide: SnackbarService, useValue: snackbarSpy },

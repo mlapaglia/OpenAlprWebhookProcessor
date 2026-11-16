@@ -8,7 +8,7 @@ import { Camera } from '../camera';
 import { ZoomFocus } from './zoomfocus';
 import { of } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe(EditCameraComponent.name, () => {
@@ -22,7 +22,7 @@ describe(EditCameraComponent.name, () => {
     await TestBed.configureTestingModule({
       imports: [EditCameraComponent, BrowserAnimationsModule],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: new Camera() },

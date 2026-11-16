@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { SystemLogsService, ApiLogLevel } from './system-logs.service';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe(SystemLogsService.name, () => {
   let service: SystemLogsService;
@@ -10,7 +10,7 @@ describe(SystemLogsService.name, () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: [SystemLogsService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
+      providers: [SystemLogsService, provideHttpClient(withXhr(), withInterceptorsFromDi()), provideHttpClientTesting()],
     });
     service = TestBed.inject(SystemLogsService);
     httpMock = TestBed.inject(HttpTestingController);

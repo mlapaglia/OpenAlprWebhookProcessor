@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamerasComponent } from './cameras.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe('CamerasComponent', () => {
   let component: CamerasComponent;
@@ -12,7 +12,7 @@ describe('CamerasComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CamerasComponent],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
+      providers: [provideHttpClient(withXhr(), withInterceptorsFromDi()), provideHttpClientTesting()],
     }).compileComponents();
   });
 

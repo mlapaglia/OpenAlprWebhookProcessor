@@ -1,5 +1,5 @@
 import { Component, input, inject, type OnInit, type OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { Lightbox } from 'ngx-lightbox';
+import { MatDialog } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
 import type { Plate } from '../plate';
+import { ImageViewerDialogComponent, type ImageViewerDialogData } from './image-viewer-dialog.component';
 
 @Component({
   selector: 'app-plate-images',
@@ -21,7 +22,7 @@ import type { Plate } from '../plate';
   styleUrls: ['./plate-images.component.css'],
 })
 export class PlateImagesComponent extends OnPushBaseComponent implements OnInit, OnDestroy {
-  private readonly lightbox = inject(Lightbox);
+  private readonly dialog = inject(MatDialog);
 
   readonly plate = input.required<Plate>();
 
@@ -60,15 +61,11 @@ export class PlateImagesComponent extends OnPushBaseComponent implements OnInit,
   }
 
   public openLightbox(url: string, plateNumber: string) {
-    const albums = [
-      {
-        src: url,
-        caption: plateNumber,
-        thumb: url,
-      },
-    ];
-
-    this.lightbox.open(albums, 0);
+    this.dialog.open<ImageViewerDialogComponent, ImageViewerDialogData>(ImageViewerDialogComponent, {
+      data: { src: url, caption: plateNumber },
+      maxWidth: '95vw',
+      autoFocus: false,
+    });
   }
 
   public vehicleImageLoaded() {

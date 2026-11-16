@@ -1,12 +1,11 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { PlateComponent } from './plate.component';
-import { Lightbox, LightboxConfig, LightboxEvent } from 'ngx-lightbox';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DatePipe } from '@angular/common';
 import { PlateService } from '../plate.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe('PlateComponent', () => {
   let component: PlateComponent;
@@ -20,11 +19,8 @@ describe('PlateComponent', () => {
       ],
       providers: [
         DatePipe,
-        Lightbox,
-        LightboxConfig,
-        LightboxEvent,
         PlateService,
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
     })
