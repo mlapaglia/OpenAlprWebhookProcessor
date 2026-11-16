@@ -110,14 +110,14 @@ namespace Tests.Features.Settings.Queries.GetDebugPlates
         }
 
         [Test]
-        public void Handle_PassesCancellationToken()
+        public async Task Handle_PassesCancellationToken()
         {
             // Arrange
             var query = new GetDebugPlatesQuery(false);
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(
+            await Assert.DoesNotThrowAsync(
                 async () => await _handler.Handle(query, cancellationToken));
         }
 
@@ -159,13 +159,13 @@ namespace Tests.Features.Settings.Queries.GetDebugPlates
         }
 
         [Test]
-        public void Handle_ValidQuery_DoesNotThrowException()
+        public async Task Handle_ValidQuery_DoesNotThrowException()
         {
             // Arrange
             var query = new GetDebugPlatesQuery(true);
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(
+            await Assert.DoesNotThrowAsync(
                 async () => await _handler.Handle(query, GetCancellationToken()));
         }
     }

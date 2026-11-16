@@ -203,7 +203,7 @@ namespace Tests.Features.Settings.Queries.GetAgentStatus
             var query = new GetAgentStatusQuery();
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(query, GetCancellationToken()));
         }
 

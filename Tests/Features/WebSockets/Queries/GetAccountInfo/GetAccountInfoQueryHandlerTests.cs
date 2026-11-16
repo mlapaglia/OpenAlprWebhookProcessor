@@ -120,7 +120,7 @@ namespace Tests.Features.WebSockets.Queries.GetAccountInfo
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<NullReferenceException>(() => 
+            var exception = await Assert.ThrowsAsync<NullReferenceException>(() => 
                 _handler.Handle(query, cancellationToken).AsTask());
             
             exception.Should().NotBeNull();

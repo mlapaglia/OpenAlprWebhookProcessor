@@ -291,17 +291,17 @@ namespace Tests.Features.Alerts
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _webPushProducer.VerifyCredentialsAsync(cancellationToken));
+            await Assert.DoesNotThrowAsync(() => _webPushProducer.VerifyCredentialsAsync(cancellationToken));
         }
 
         [Test]
-        public void VerifyCredentialsAsync_WithNoSettings_DoesNotThrow()
+        public async Task VerifyCredentialsAsync_WithNoSettings_DoesNotThrow()
         {
             // Arrange
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _webPushProducer.VerifyCredentialsAsync(cancellationToken));
+            await Assert.DoesNotThrowAsync(() => _webPushProducer.VerifyCredentialsAsync(cancellationToken));
         }
 
         [Test]

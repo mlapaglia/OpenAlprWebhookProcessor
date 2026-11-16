@@ -96,7 +96,7 @@ namespace Tests.Features.Webhooks.Commands
         }
 
         [Test]
-        public void Handle_WhenGroupWebhookHandlerThrows_PropagatesException()
+        public async Task Handle_WhenGroupWebhookHandlerThrows_PropagatesException()
         {
             // Arrange
             var webhook = CreateTestWebhook();
@@ -109,7 +109,7 @@ namespace Tests.Features.Webhooks.Commands
                 .Do(x => throw expectedException);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, cancellationToken));
         }
 

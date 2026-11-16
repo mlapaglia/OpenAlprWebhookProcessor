@@ -334,7 +334,7 @@ namespace Tests.Features.Settings.Commands.CleanupDatabase
         }
 
         [Test]
-        public void Handle_WhenExceptionOccurs_RethrowsException()
+        public async Task Handle_WhenExceptionOccurs_RethrowsException()
         {
             // Arrange
             var command = new CleanupDatabaseCommand();
@@ -343,7 +343,7 @@ namespace Tests.Features.Settings.Commands.CleanupDatabase
             Context.Dispose();
 
             // Act & Assert
-            Assert.ThrowsAsync<ObjectDisposedException>(async () => await _handler.Handle(command, GetCancellationToken()));
+            await Assert.ThrowsAsync<ObjectDisposedException>(async () => await _handler.Handle(command, GetCancellationToken()));
         }
 
         [TearDown]

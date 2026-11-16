@@ -85,21 +85,21 @@ namespace Tests.Features.Alerts.Commands
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, cancellationToken));
             
             exception.Message.Should().Be("No test plate group with image found in the database");
         }
 
         [Test]
-        public void Handle_WithEmptyDatabase_ThrowsInvalidOperationException()
+        public async Task Handle_WithEmptyDatabase_ThrowsInvalidOperationException()
         {
             // Arrange
             var command = new TestWebPushCommand();
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("No test plate group with image found in the database");
@@ -120,7 +120,7 @@ namespace Tests.Features.Alerts.Commands
             _mockWebPushClient.SetVerifyCredentialsException(credentialsException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, cancellationToken));
             
             exception.Should().Be(credentialsException);
@@ -141,7 +141,7 @@ namespace Tests.Features.Alerts.Commands
             _mockWebPushClient.SetSendAlertException(sendAlertException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, cancellationToken));
             
             exception.Should().Be(sendAlertException);

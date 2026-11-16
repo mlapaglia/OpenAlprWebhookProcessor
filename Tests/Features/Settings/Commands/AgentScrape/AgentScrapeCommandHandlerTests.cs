@@ -51,7 +51,7 @@ namespace Tests.Features.Settings.Commands.AgentScrape
         }
 
         [Test]
-        public void Handle_HydrationServiceThrowsException_ExceptionBubbles()
+        public async Task Handle_HydrationServiceThrowsException_ExceptionBubbles()
         {
             // Arrange
             var command = new AgentScrapeCommand();
@@ -59,7 +59,7 @@ namespace Tests.Features.Settings.Commands.AgentScrape
                 .Do(x => throw new InvalidOperationException("Test exception"));
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
         }
 

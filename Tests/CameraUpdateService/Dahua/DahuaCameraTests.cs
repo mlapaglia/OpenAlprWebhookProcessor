@@ -184,7 +184,7 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public void SetCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task SetCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Server Error", 500);
@@ -197,73 +197,73 @@ namespace Tests.CameraUpdateService.Dahua
             };
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.SetCameraTextAsync(updateRequest, CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting video overlay for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void GetSnapshotAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task GetSnapshotAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Not Found", 404);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.GetSnapshotAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error getting snapshot from camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void SendDayNightCommandAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task SendDayNightCommandAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Server Error", 500);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting sunrise/sunset for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void SetZoomAndFocusAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task SetZoomAndFocusAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Server Error", 500);
             var zoomFocus = new ZoomFocus { Zoom = 2.5m, Focus = 0.8m };
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.SetZoomAndFocusAsync(zoomFocus, CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting zoom and focus for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void GetZoomAndFocusAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task GetZoomAndFocusAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Server Error", 500);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.GetZoomAndFocusAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error getting zoom and focus from camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void TriggerAutoFocusAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task TriggerAutoFocusAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             // Arrange
             _httpTest.RespondWith("Server Error", 500);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.TriggerAutoFocusAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error triggering auto focus for camera {_testCamera.Id}"));
@@ -299,28 +299,28 @@ namespace Tests.CameraUpdateService.Dahua
         }
 
         [Test]
-        public void GetZoomAndFocusAsync_ThrowsException_WhenRegexDoesNotMatch()
+        public async Task GetZoomAndFocusAsync_ThrowsException_WhenRegexDoesNotMatch()
         {
             // Arrange
             var responseText = "invalid response format";
             _httpTest.RespondWith(responseText);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.GetZoomAndFocusAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error getting zoom and focus from camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void TriggerAutoFocusAsync_ThrowsException_WhenRegexDoesNotMatch()
+        public async Task TriggerAutoFocusAsync_ThrowsException_WhenRegexDoesNotMatch()
         {
             // Arrange
             var responseText = "invalid response format";
             _httpTest.RespondWith(responseText);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _dahuaCamera.TriggerAutoFocusAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error triggering auto focus for camera {_testCamera.Id}"));

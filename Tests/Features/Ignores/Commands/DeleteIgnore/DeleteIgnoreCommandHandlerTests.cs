@@ -40,14 +40,14 @@ namespace Tests.Features.Ignores.Commands.DeleteIgnore
         }
 
         [Test]
-        public void Handle_NonExistentIgnoreId_ThrowsInvalidOperationException()
+        public async Task Handle_NonExistentIgnoreId_ThrowsInvalidOperationException()
         {
             // Arrange
             var nonExistentId = Guid.NewGuid();
             var command = new DeleteIgnoreCommand(nonExistentId);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be($"Ignore with ID {nonExistentId} not found");

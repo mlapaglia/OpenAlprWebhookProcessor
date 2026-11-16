@@ -83,7 +83,7 @@ namespace Tests.CameraUpdateService
                 .Throws(expectedException);
 
             // Act & Assert - should throw the exception since StopAsync doesn't catch it
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => 
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => 
                 _hostedService.StopAsync(cancellationToken));
             
             ex.Message.Should().Be("Scheduler stop failed");
@@ -129,7 +129,7 @@ namespace Tests.CameraUpdateService
                 .Throws(cancellationException);
 
             // Act & Assert - should propagate the exception
-            var ex = Assert.ThrowsAsync<OperationCanceledException>(() => 
+            var ex = await Assert.ThrowsAsync<OperationCanceledException>(() => 
                 _hostedService.StopAsync(cancellationToken));
             
             ex.Message.Should().Be("Operation was cancelled");
