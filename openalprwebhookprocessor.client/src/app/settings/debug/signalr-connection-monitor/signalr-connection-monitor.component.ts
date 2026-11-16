@@ -59,7 +59,7 @@ export class SignalrConnectionMonitorComponent extends OnPushBaseComponent imple
   public isLoadingConnections = false;
   public isManualRefresh = false;
   public clientConnectionInfo: ClientConnectionInfo | null = null;
-  private refreshInterval: NodeJS.Timeout | null = null;
+  private refreshInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     this.loadSignalRConnections(false);
