@@ -62,7 +62,7 @@ namespace Tests.Utilities
         }
 
         [Test]
-        public void EnsureSuccessWithDetailsAsync_With400StatusCode_ThrowsHttpRequestExceptionWithDetails()
+        public async Task EnsureSuccessWithDetailsAsync_With400StatusCode_ThrowsHttpRequestExceptionWithDetails()
         {
             // Arrange
             var errorContent = "Bad request details";
@@ -74,7 +74,7 @@ namespace Tests.Utilities
             var errorMessagePrefix = "API call failed";
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 async () => await response.EnsureSuccessWithDetailsAsync(errorMessagePrefix));
 
             exception.Message.Should().Contain(errorMessagePrefix);
@@ -84,7 +84,7 @@ namespace Tests.Utilities
         }
 
         [Test]
-        public void EnsureSuccessWithDetailsAsync_With404StatusCode_ThrowsHttpRequestExceptionWithDetails()
+        public async Task EnsureSuccessWithDetailsAsync_With404StatusCode_ThrowsHttpRequestExceptionWithDetails()
         {
             // Arrange
             var errorContent = "Resource not found";
@@ -96,7 +96,7 @@ namespace Tests.Utilities
             var errorMessagePrefix = "Resource retrieval failed";
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 async () => await response.EnsureSuccessWithDetailsAsync(errorMessagePrefix));
 
             exception.Message.Should().Contain(errorMessagePrefix);
@@ -106,7 +106,7 @@ namespace Tests.Utilities
         }
 
         [Test]
-        public void EnsureSuccessWithDetailsAsync_With500StatusCode_ThrowsHttpRequestExceptionWithDetails()
+        public async Task EnsureSuccessWithDetailsAsync_With500StatusCode_ThrowsHttpRequestExceptionWithDetails()
         {
             // Arrange
             var errorContent = "Internal server error occurred";
@@ -118,7 +118,7 @@ namespace Tests.Utilities
             var errorMessagePrefix = "Server operation failed";
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 async () => await response.EnsureSuccessWithDetailsAsync(errorMessagePrefix));
 
             exception.Message.Should().Contain(errorMessagePrefix);
@@ -128,7 +128,7 @@ namespace Tests.Utilities
         }
 
         [Test]
-        public void EnsureSuccessWithDetailsAsync_WithEmptyErrorContent_IncludesEmptyContentInMessage()
+        public async Task EnsureSuccessWithDetailsAsync_WithEmptyErrorContent_IncludesEmptyContentInMessage()
         {
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.BadRequest)
@@ -139,7 +139,7 @@ namespace Tests.Utilities
             var errorMessagePrefix = "Test failed";
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 async () => await response.EnsureSuccessWithDetailsAsync(errorMessagePrefix));
 
             exception.Message.Should().Contain(errorMessagePrefix);

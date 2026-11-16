@@ -61,7 +61,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         }
 
         [Test]
-        public void Handle_PlateNotFound_ThrowsArgumentException()
+        public async Task Handle_PlateNotFound_ThrowsArgumentException()
         {
             // Arrange
             var nonExistentPlateId = Guid.NewGuid();
@@ -69,7 +69,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Plate Id not found.");
@@ -91,7 +91,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Plate has already been enriched.");
@@ -113,7 +113,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Plate must be United States region.");
@@ -141,7 +141,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 .Returns((EnrichedLicensePlate)null);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be("Failed to enrich plate data.");
@@ -169,7 +169,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 .ThrowsAsync(new Exception("Enricher service error"));
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<Exception>(async () => await 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => await 
                 _handler.Handle(command, cancellationToken));
             
             exception.Message.Should().Be("Enricher service error");

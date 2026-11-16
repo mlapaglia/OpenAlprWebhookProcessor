@@ -119,30 +119,30 @@ namespace Tests.CameraUpdateService.Hikvision
         }
 
         [Test]
-        public void SetZoomAndFocusAsync_ThrowsNotImplementedException()
+        public async Task SetZoomAndFocusAsync_ThrowsNotImplementedException()
         {
             var zoomFocus = new ZoomFocus { Zoom = 2.5m, Focus = 0.8m };
 
-            var exception = Assert.ThrowsAsync<NotImplementedException>(
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(
                 () => _hikvisionCamera.SetZoomAndFocusAsync(zoomFocus, CancellationToken.None));
         }
 
         [Test]
-        public void GetZoomAndFocusAsync_ThrowsNotImplementedException()
+        public async Task GetZoomAndFocusAsync_ThrowsNotImplementedException()
         {
-            var exception = Assert.ThrowsAsync<NotImplementedException>(
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(
                 () => _hikvisionCamera.GetZoomAndFocusAsync(CancellationToken.None));
         }
 
         [Test]
-        public void TriggerAutoFocusAsync_ThrowsNotImplementedException()
+        public async Task TriggerAutoFocusAsync_ThrowsNotImplementedException()
         {
-            var exception = Assert.ThrowsAsync<NotImplementedException>(
+            var exception = await Assert.ThrowsAsync<NotImplementedException>(
                 () => _hikvisionCamera.TriggerAutoFocusAsync(CancellationToken.None));
         }
 
         [Test]
-        public void SetCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task SetCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             _httpTest.RespondWith("Server Error", 500);
             var updateRequest = new CameraUpdateRequest
@@ -153,40 +153,40 @@ namespace Tests.CameraUpdateService.Hikvision
                 ProcessedPlateConfidence = 95.5
             };
 
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _hikvisionCamera.SetCameraTextAsync(updateRequest, CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting video overlay for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void ClearCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task ClearCameraTextAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             _httpTest.RespondWith("Server Error", 500);
 
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _hikvisionCamera.ClearCameraTextAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting video overlay for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void TriggerDayNightModeAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task TriggerDayNightModeAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             _httpTest.RespondWith("Server Error", 500);
 
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _hikvisionCamera.TriggerDayNightModeAsync(SunriseSunset.Sunrise, CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error setting sunrise/sunset for camera {_testCamera.Id}"));
         }
 
         [Test]
-        public void GetSnapshotAsync_ThrowsHttpRequestException_OnFlurlError()
+        public async Task GetSnapshotAsync_ThrowsHttpRequestException_OnFlurlError()
         {
             _httpTest.RespondWith("Not Found", 404);
 
-            var exception = Assert.ThrowsAsync<HttpRequestException>(
+            var exception = await Assert.ThrowsAsync<HttpRequestException>(
                 () => _hikvisionCamera.GetSnapshotAsync(CancellationToken.None));
 
             Assert.That(exception.Message, Does.Contain($"Error getting snapshot from camera {_testCamera.Id}"));

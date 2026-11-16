@@ -70,7 +70,7 @@ namespace Tests.Features.Settings.Commands.TestEnrichers
         }
 
         [Test]
-        public void Handle_EnricherClientThrowsException_ExceptionBubbles()
+        public async Task Handle_EnricherClientThrowsException_ExceptionBubbles()
         {
             // Arrange
             var command = new TestEnrichersCommand();
@@ -78,7 +78,7 @@ namespace Tests.Features.Settings.Commands.TestEnrichers
                 .ThrowsAsync(new InvalidOperationException("Test exception"));
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
         }
 

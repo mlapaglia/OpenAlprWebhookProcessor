@@ -132,7 +132,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
         }
 
         [Test]
-        public void Handle_RepositoryThrowsException_PropagatesException()
+        public async Task Handle_RepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -144,14 +144,14 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(repositoryException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await 
                 _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(repositoryException);
         }
 
         [Test]
-        public void Handle_IgnoreRepositoryThrowsException_PropagatesException()
+        public async Task Handle_IgnoreRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -169,14 +169,14 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(ignoreException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => await 
                 _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(ignoreException);
         }
 
         [Test]
-        public void Handle_AlertRepositoryThrowsException_PropagatesException()
+        public async Task Handle_AlertRepositoryThrowsException_PropagatesException()
         {
             // Arrange
             var plateId = Guid.NewGuid();
@@ -202,7 +202,7 @@ namespace Tests.Features.LicensePlates.Queries.GetPlate
                 .ThrowsAsync(alertException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => 
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => 
                 await _handler.Handle(query, cancellationToken));
 
             exception.Should().Be(alertException);

@@ -275,7 +275,7 @@ namespace Tests.WebhookProcessor
         }
 
         [Test]
-        public void GetConsumingImageRequestsAsync_WithCancellation_StopsEnumeration()
+        public async Task GetConsumingImageRequestsAsync_WithCancellation_StopsEnumeration()
         {
             // Arrange
             using var cts = new CancellationTokenSource();
@@ -284,7 +284,7 @@ namespace Tests.WebhookProcessor
 
             // Act & Assert
             var results = new List<string>();
-            Assert.ThrowsAsync<TaskCanceledException>(async () =>
+            await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
                 await foreach (var request in _service.GetConsumingImageRequestsAsync(cts.Token))
                 {
@@ -337,7 +337,7 @@ namespace Tests.WebhookProcessor
         }
 
         [Test]
-        public void GetConsumingCompressionRequestsAsync_WithCancellation_StopsEnumeration()
+        public async Task GetConsumingCompressionRequestsAsync_WithCancellation_StopsEnumeration()
         {
             // Arrange
             using var cts = new CancellationTokenSource();
@@ -346,7 +346,7 @@ namespace Tests.WebhookProcessor
 
             // Act & Assert
             var results = new List<string>();
-            Assert.ThrowsAsync<TaskCanceledException>(async () =>
+            await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
                 await foreach (var request in _service.GetConsumingCompressionRequestsAsync(cts.Token))
                 {

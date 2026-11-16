@@ -82,7 +82,7 @@ namespace Tests.Features.Alerts.Commands
             var command = new AddAlertCommand(newAlert);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
             
             exception.Message.Should().Be("alert already exists");
@@ -100,7 +100,7 @@ namespace Tests.Features.Alerts.Commands
             var command = new AddAlertCommand(newAlert);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be("alert already exists");

@@ -47,7 +47,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
         }
 
         [Test]
-        public void Handle_PlateNotFound_ThrowsArgumentException()
+        public async Task Handle_PlateNotFound_ThrowsArgumentException()
         {
             // Arrange
             var nonExistentPlateId = Guid.NewGuid();
@@ -61,7 +61,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be($"Plate with ID {nonExistentPlateId} not found");
@@ -124,7 +124,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
         }
 
         [Test]
-        public void Handle_EmptyGuid_ThrowsArgumentException()
+        public async Task Handle_EmptyGuid_ThrowsArgumentException()
         {
             // Arrange
             var command = new EditPlateCommand
@@ -137,7 +137,7 @@ namespace Tests.Features.LicensePlates.Commands.EditPlate
             var cancellationToken = GetCancellationToken();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(async () => await 
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () => await 
                 _handler.Handle(command, cancellationToken));
 
             exception.Message.Should().Be($"Plate with ID {Guid.Empty} not found");
