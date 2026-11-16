@@ -5,6 +5,9 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
+permissions:
+  contents: read
+
 env:
   IMAGE_NAME: OpenAlprWebhookProcessor
 
@@ -12,7 +15,12 @@ jobs:
   cleanup-alpha-releases:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
-    
+    permissions:
+      # Deletes alpha releases and their git tags
+      contents: write
+      # Lists container package versions to find alpha Docker tags
+      packages: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
