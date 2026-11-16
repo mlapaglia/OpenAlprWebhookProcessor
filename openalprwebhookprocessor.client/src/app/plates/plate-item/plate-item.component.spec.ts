@@ -1,5 +1,5 @@
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, input, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, input, NO_ERRORS_SCHEMA, ChangeDetectionStrategy } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DatePipe } from '@angular/common';
 import { PlateItemComponent, type PlateData } from './plate-item.component';
@@ -10,6 +10,7 @@ import { RefreshButtonComponent } from '../../shared/refresh-button/refresh-butt
 @Component({
   selector: 'app-plate',
   template: '<div>Mock Plate Component</div>',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 class MockPlateComponent {

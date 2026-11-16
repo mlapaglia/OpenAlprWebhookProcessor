@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EnrichersService } from './enrichers.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 describe('EnrichersService', () => {
   let service: EnrichersService;
@@ -10,7 +10,7 @@ describe('EnrichersService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()],
+      providers: [provideHttpClient(withXhr(), withInterceptorsFromDi()), provideHttpClientTesting()],
     });
     service = TestBed.inject(EnrichersService);
   });

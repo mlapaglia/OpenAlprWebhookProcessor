@@ -5,7 +5,7 @@ import { IgnoresService } from './ignores.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import type { Ignore } from './ignore';
 import { of } from 'rxjs';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe(IgnoresComponent.name, () => {
@@ -18,7 +18,7 @@ describe(IgnoresComponent.name, () => {
     await TestBed.configureTestingModule({
       imports: [IgnoresComponent],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         { provide: IgnoresService, useValue: ignoresServiceSpy },
         { provide: SnackbarService, useValue: snackbarServiceSpy },

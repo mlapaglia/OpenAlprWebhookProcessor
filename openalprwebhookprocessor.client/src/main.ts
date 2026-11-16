@@ -21,7 +21,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
-import { LightboxModule } from 'ngx-lightbox';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -29,7 +28,7 @@ import { AppRoutingModule } from './app/app-routing.module';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { HIGHLIGHT_OPTIONS, HighlightModule } from 'ngx-highlightjs';
 import { CookieInterceptor, ErrorInterceptor } from './app/_helpers';
-import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient, withXhr } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 
 if (environment.production) {
@@ -52,7 +51,6 @@ bootstrapApplication(AppComponent, {
       FormsModule,
       ReactiveFormsModule,
       MatAutocompleteModule,
-      LightboxModule,
       MatButtonModule,
       MatTabsModule,
       MatIconModule,
@@ -87,7 +85,7 @@ bootstrapApplication(AppComponent, {
         },
       },
     },
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
     provideAnimations(),
     provideNativeDateAdapter(),
     // Configure Material Symbols

@@ -6,7 +6,7 @@ import { SignalrService } from 'app/signalr/signalr.service';
 import { of, Subject, throwError } from 'rxjs';
 import { AgentVideoStreams, VideoStream } from '../videoStream';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { Agent } from '../agent';
 
@@ -33,7 +33,7 @@ describe('AgentVideoStreamsComponent', () => {
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SignalrService, useValue: mockSignalrService },
         { provide: MatDialog, useValue: mockDialog },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
     }).compileComponents();

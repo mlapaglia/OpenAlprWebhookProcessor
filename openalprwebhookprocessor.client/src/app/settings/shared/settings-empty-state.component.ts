@@ -17,7 +17,7 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
         <p class="mat-body-1">{{config()?.emptyStateDescription}}</p>
         <button mat-stroked-button color="primary" (click)="onScrollToForm()">
           <mat-icon i18n>add</mat-icon>
-          Add First {{config()?.entityName | titlecase}}
+          Add First {{$safeNavigationMigration(config()?.entityName) | titlecase}}
         </button>
       </div>
     </div>

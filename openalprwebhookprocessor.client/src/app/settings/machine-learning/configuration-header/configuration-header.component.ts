@@ -23,7 +23,7 @@ import { type MachineLearningConfigDto } from '../machine-learning.service';
         }
         @if (configuration()?.lastUpdated) {
           <div style="margin-top: 8px; font-size: 12px; color: #666;">
-            Last updated: {{ configuration()?.lastUpdated | date:'medium' }}
+            Last updated: {{ $safeNavigationMigration(configuration()?.lastUpdated) | date:'medium' }}
             @if (configuration()?.updatedBy) {
               by {{ configuration()?.updatedBy }}
             }

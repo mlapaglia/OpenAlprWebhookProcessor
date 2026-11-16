@@ -18,7 +18,7 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
           mat-icon-button
           color="primary"
           (click)="onStartEdit()"
-          [matTooltip]="'Edit this ' + config()?.entityName"
+          [matTooltip]="'Edit this ' + $safeNavigationMigration(config()?.entityName)"
           [attr.aria-label]="'Edit ' + config()?.entityName + ' for ' + setting()?.plateNumber">
           <mat-icon i18n>edit</mat-icon>
         </button>
@@ -27,7 +27,7 @@ import { OnPushBaseComponent } from 'app/_helpers/onpush-base.component';
           mat-icon-button
           color="warn"
           (click)="onConfirmDelete()"
-          [matTooltip]="'Delete this ' + config()?.entityName"
+          [matTooltip]="'Delete this ' + $safeNavigationMigration(config()?.entityName)"
           [attr.aria-label]="'Delete ' + config()?.entityName + ' for ' + setting()?.plateNumber">
           <mat-icon i18n>delete</mat-icon>
         </button>

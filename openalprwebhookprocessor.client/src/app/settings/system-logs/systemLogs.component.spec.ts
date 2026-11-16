@@ -5,7 +5,7 @@ import { SystemLogsService, ApiLogLevel } from './system-logs.service';
 import { SignalrService } from 'app/signalr/signalr.service';
 import { SnackbarService } from 'app/snackbar/snackbar.service';
 import { Subject, of, delay } from 'rxjs';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -66,7 +66,7 @@ describe(SystemLogsComponent.name, () => {
             },
           },
         },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
     }).compileComponents();
