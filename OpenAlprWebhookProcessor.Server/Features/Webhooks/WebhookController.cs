@@ -19,6 +19,8 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
     [Route("api/webhook")]
     public class WebhookController : ControllerBase
     {
+        private const int MaxLoggedPayloadLength = 1000;
+
         private readonly ILogger<WebhookController> _logger;
         private readonly IMediator _mediator;
 
@@ -82,7 +84,15 @@ namespace OpenAlprWebhookProcessor.Features.Webhooks
                 }
                 else
                 {
-                    _logger.LogDebug("Unknown payload received, ignoring: {RawWebhook}", rawWebhook);
+                    // The body is unauthenticated input: strip line breaks so it can't forge
+                    // log entries, and cap its length so it can't flood the log.
+                    var preview = rawWebhook.Length > MaxLoggedPayloadLength
+                        ? rawWebhook[..MaxLoggedPayloadLength]
+                        : rawWebhook;
+                    _logger.LogDebug(
+                        "Unknown payload received ({Length} chars), ignoring: {RawWebhook}",
+                        rawWebhook.Length,
+                        preview.Replace("\r", string.Empty).Replace("\n", string.Empty));
                 }
             }
 
