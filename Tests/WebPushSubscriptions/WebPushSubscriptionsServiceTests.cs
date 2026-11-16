@@ -265,10 +265,10 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void Insert_WhenSubscriptionIsNull_ThrowsArgumentNullException()
+        public async Task Insert_WhenSubscriptionIsNull_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(() => _service.InsertAsync(null));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.InsertAsync(null));
         }
 
         [Test]
@@ -365,17 +365,17 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void Delete_WhenEndpointIsNull_DoesNotThrow()
+        public async Task Delete_WhenEndpointIsNull_DoesNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _service.DeleteAsync(null)); // Should not throw
+            await Assert.DoesNotThrowAsync(() => _service.DeleteAsync(null)); // Should not throw
         }
 
         [Test]
-        public void Delete_WhenEndpointIsEmpty_DoesNotThrow()
+        public async Task Delete_WhenEndpointIsEmpty_DoesNotThrow()
         {
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _service.DeleteAsync(string.Empty)); // Should not throw
+            await Assert.DoesNotThrowAsync(() => _service.DeleteAsync(string.Empty)); // Should not throw
         }
 
         [Test]
@@ -412,7 +412,7 @@ namespace Tests.WebPushSubscriptions
         }
 
         [Test]
-        public void GetAll_WhenServiceProviderThrowsException_PropagatesException()
+        public async Task GetAll_WhenServiceProviderThrowsException_PropagatesException()
         {
             // Arrange
             var badServiceProvider = Substitute.For<IServiceProvider>();
@@ -423,12 +423,12 @@ namespace Tests.WebPushSubscriptions
             var serviceWithBadProvider = new WebPushSubscriptionsService(badServiceProvider);
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.GetAllAsync());
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.GetAllAsync());
             ex.Message.Should().Be("Service provider error");
         }
 
         [Test]
-        public void Insert_WhenServiceProviderThrowsException_PropagatesException()
+        public async Task Insert_WhenServiceProviderThrowsException_PropagatesException()
         {
             // Arrange
             var badServiceProvider = Substitute.For<IServiceProvider>();
@@ -440,12 +440,12 @@ namespace Tests.WebPushSubscriptions
             var pushSubscription = CreateTestPushSubscription();
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.InsertAsync(pushSubscription));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.InsertAsync(pushSubscription));
             ex.Message.Should().Be("Service provider error");
         }
 
         [Test]
-        public void Delete_WhenServiceProviderThrowsException_PropagatesException()
+        public async Task Delete_WhenServiceProviderThrowsException_PropagatesException()
         {
             // Arrange
             var badServiceProvider = Substitute.For<IServiceProvider>();
@@ -456,7 +456,7 @@ namespace Tests.WebPushSubscriptions
             var serviceWithBadProvider = new WebPushSubscriptionsService(badServiceProvider);
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.DeleteAsync("endpoint"));
+            var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => serviceWithBadProvider.DeleteAsync("endpoint"));
             ex.Message.Should().Be("Service provider error");
         }
 

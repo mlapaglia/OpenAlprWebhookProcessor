@@ -208,7 +208,7 @@ namespace Tests.Features.Alerts
             _httpMessageHandler.SetupResponse(HttpStatusCode.BadRequest, "Error response");
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() =>
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _pushoverClient.SendAlertAsync(alert, cancellationToken));
             exception.Message.Should().Be("failed");
         }
@@ -227,7 +227,7 @@ namespace Tests.Features.Alerts
             _httpMessageHandler.SetupException(new HttpRequestException("Network error"));
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(() =>
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _pushoverClient.SendAlertAsync(alert, cancellationToken));
             exception.Message.Should().Be("failed");
         }
@@ -327,7 +327,7 @@ namespace Tests.Features.Alerts
             _httpMessageHandler.SetupResponse(HttpStatusCode.BadRequest, "Invalid credentials");
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _pushoverClient.VerifyCredentialsAsync(cancellationToken));
+            await Assert.DoesNotThrowAsync(() => _pushoverClient.VerifyCredentialsAsync(cancellationToken));
         }
 
         [Test]
@@ -342,7 +342,7 @@ namespace Tests.Features.Alerts
             _httpMessageHandler.SetupException(new HttpRequestException("Network error"));
 
             // Act & Assert
-            Assert.DoesNotThrowAsync(() => _pushoverClient.VerifyCredentialsAsync(cancellationToken));
+            await Assert.DoesNotThrowAsync(() => _pushoverClient.VerifyCredentialsAsync(cancellationToken));
         }
 
         [Test]

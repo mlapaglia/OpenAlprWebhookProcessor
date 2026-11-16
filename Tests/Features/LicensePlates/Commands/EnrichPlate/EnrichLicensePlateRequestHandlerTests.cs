@@ -68,13 +68,13 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
         }
 
         [Test]
-        public void HandleAsync_WithNonExistentPlateId_ThrowsArgumentException()
+        public async Task HandleAsync_WithNonExistentPlateId_ThrowsArgumentException()
         {
             // Arrange
             var nonExistentPlateId = Guid.NewGuid();
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
                 () => _handler.HandleAsync(nonExistentPlateId, CancellationToken.None));
 
             exception.Message.Should().Be("Plate Id not found.");
@@ -89,7 +89,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             await SeedPlateGroupAsync(plateGroup);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
                 () => _handler.HandleAsync(plateId, CancellationToken.None));
 
             exception.Message.Should().Be("Plate must be United States region.");
@@ -104,7 +104,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
             await SeedPlateGroupAsync(plateGroup);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<ArgumentException>(
+            var exception = await Assert.ThrowsAsync<ArgumentException>(
                 () => _handler.HandleAsync(plateId, CancellationToken.None));
 
             exception.Message.Should().Be("Plate has already been enriched.");
@@ -167,7 +167,7 @@ namespace Tests.Features.LicensePlates.Commands.EnrichPlate
                 .Throws(expectedException);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 () => _handler.HandleAsync(plateId, CancellationToken.None));
 
             exception.Should().Be(expectedException);

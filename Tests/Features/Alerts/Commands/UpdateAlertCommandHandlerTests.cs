@@ -87,14 +87,14 @@ namespace Tests.Features.Alerts.Commands
         }
 
         [Test]
-        public void Handle_NonExistentAlert_ThrowsInvalidOperationException()
+        public async Task Handle_NonExistentAlert_ThrowsInvalidOperationException()
         {
             // Arrange
             var nonExistentAlert = TestDataFactory.CreateTestAlert("TEST123", "Description");
             var command = new UpdateAlertCommand(nonExistentAlert);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be($"Alert with ID {nonExistentAlert.Id} not found");

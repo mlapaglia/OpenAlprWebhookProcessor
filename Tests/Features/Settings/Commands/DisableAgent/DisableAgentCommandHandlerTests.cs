@@ -125,7 +125,7 @@ namespace Tests.Features.Settings.Commands.DisableAgent
                 .ThrowsAsync(new InvalidOperationException("Test exception"));
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
         }
 

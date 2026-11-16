@@ -220,7 +220,7 @@ namespace Tests.Features.Alerts
 
         [Test]
         [Ignore("testing")]
-        public void ExecuteAsync_WithUnhandledException_RethrowsException()
+        public async Task ExecuteAsync_WithUnhandledException_RethrowsException()
         {
             // Arrange
             var cancellationToken = new CancellationTokenSource();
@@ -230,7 +230,7 @@ namespace Tests.Features.Alerts
                 .Throws(expectedException);
 
             // Act & Assert
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
                 await _alertHostedService.StartAsync(cancellationToken.Token);
             });

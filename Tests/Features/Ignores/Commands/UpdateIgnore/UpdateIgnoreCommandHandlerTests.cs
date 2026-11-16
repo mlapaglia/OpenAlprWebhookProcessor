@@ -94,14 +94,14 @@ namespace Tests.Features.Ignores.Commands.UpdateIgnore
         }
 
         [Test]
-        public void Handle_NonExistentIgnore_ThrowsInvalidOperationException()
+        public async Task Handle_NonExistentIgnore_ThrowsInvalidOperationException()
         {
             // Arrange
             var nonExistentIgnoreDto = TestDataFactory.CreateTestIgnoreDto("TEST123");
             var command = new UpdateIgnoreCommand(nonExistentIgnoreDto);
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 async () => await _handler.Handle(command, GetCancellationToken()));
 
             exception.Message.Should().Be($"Ignore with ID {nonExistentIgnoreDto.Id} not found");

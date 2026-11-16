@@ -54,7 +54,7 @@ namespace Tests.Features.LicensePlates.Commands.UpdatePlateNumber
         }
 
         [Test]
-        public void Handle_WithNonExistentPlateId_ThrowsInvalidOperationException()
+        public async Task Handle_WithNonExistentPlateId_ThrowsInvalidOperationException()
         {
             // Arrange
             var nonExistentId = Guid.NewGuid();
@@ -65,7 +65,7 @@ namespace Tests.Features.LicensePlates.Commands.UpdatePlateNumber
             };
 
             // Act & Assert
-            var exception = Assert.ThrowsAsync<InvalidOperationException>(
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
                 () => _handler.Handle(command, GetCancellationToken()).AsTask());
             
             exception.Message.Should().Be($"Plate with ID {nonExistentId} not found");
