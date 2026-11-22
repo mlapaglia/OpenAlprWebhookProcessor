@@ -43,11 +43,11 @@
     "@angular/cli": "^22.3.0",
     "@angular/compiler-cli": "^22.3.0",
     "@angular/localize": "^22.3.0",
-    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin": "^6.0.1",
     "@types/jasmine": "~6.0.0",
     "@types/node": "^25.6.0",
     "@types/qrcode": "^1.5.6",
-    "angular-eslint": "^22.7.0",
+    "angular-eslint": "^22.8.0",
     "eslint": "^10.1.0",
     "globals": "^17.14.0",
     "istanbul-lib-instrument": "^6.0.3",
@@ -58,8 +58,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.2.0",
     "less": "^4.9.1",
-    "puppeteer": "^25.17.0",
-    "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.2"
+    "puppeteer": "^25.18.1",
+    "typescript": "~7.0.2",
+    "typescript-eslint": "^8.73.0"
   }
 }
